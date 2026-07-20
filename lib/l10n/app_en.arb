@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+  "appTitle": "RehabTrack",
+  "today": "Today",
+  "health": "Health",
+  "activities": "Activities",
+  "records": "Records",
+  "settings": "Settings",
+  "noDataYet": "No data yet",
+  "addFirstItem": "Add your first item to get started",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "confirm": "Confirm",
+  "back": "Back",
+  "loading": "Loading...",
+  "error": "Error",
+  "retry": "Retry",
+  "ok": "OK",
+  "yes": "Yes",
+  "no": "No"
+}
