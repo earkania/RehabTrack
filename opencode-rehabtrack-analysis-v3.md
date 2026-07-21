@@ -47,14 +47,15 @@ The proposed Clean Architecture with `core/`, `data/`, `domain/`, `presentation/
 
 ## 3. Database Model Review
 
-**v2 schema (17 tables)**:
+**v2 schema (18 tables)**:
 
 | Table | Purpose | Notes |
 |---|---|---|
 | `profile` | Person info | Multi-profile ready; v1 = single row |
 | `medication` | Drug info | Standalone, no course link |
 | `medication_alternative` | Alternative medications | FK → medication; doctor_approved flag; info only |
-| `medication_schedule` | Schedule config (JSON) | Sealed class in Dart |
+| `medication_administration_guidance` | How-to-take instructions | FK → medication; category + free-text; info only |
+| `medication_schedule` | Schedule config (JSON) | Sealed class in Dart; optional `administration_condition` JSON |
 | `medication_log` | Adherence history | Status: pending/taken/missed/skipped |
 | `measurement_type` | Configurable categories | `is_system` flag for built-ins |
 | `measurement_record` | Actual readings | Unit stored per row |
@@ -85,6 +86,10 @@ The proposed Clean Architecture with `core/`, `data/`, `domain/`, `presentation/
 6. **Missing: `medication.dose_amount` and `medication.dose_unit`** — the v2 spec doesn't include dose info on the medication itself. In v1, `prescription_entry` had `dose_amount` and `dose_unit`. In v2, the `medication` table has `name`, `description`, but no dose fields. This seems like an oversight. **Recommendation: add `dose_amount` and `dose_unit` to `medication` table.**
 
 7. **`medication_alternative` — optional but well-scoped** — supports storing doctor-recommended substitutes for when a prescribed medication is unavailable. Purely informational; the app must never recommend replacements or calculate dose equivalences. The `doctor_approved` boolean is sufficient to distinguish pharmacist-suggested vs user-noted alternatives. Should be displayed on the medication detail screen as an expandable section, not a separate tab. Cascade delete: deleting a medication should delete its alternatives (orphaned alternatives have no meaning). No notification or reminder integration needed — alternatives are reference data only.
+
+8. **`medication_administration_guidance` — HOW to take** — a new table storing informational instructions (e.g. "before meal", "after meal", "with meal", "on empty stomach", "before bedtime", "drink plenty of water", "avoid alcohol", free-text). Each row links to a medication via FK. The `category` field uses a predefined enum in Dart (`before_meal`, `after_meal`, `with_meal`, `empty_stomach`, `before_bedtime`, `morning_only`, `drink_water`, `avoid_alcohol`, `other`) but is stored as a string in the DB so new categories don't require migration. Displayed on: medication detail screen, Today Dashboard medication list, and reminder notification text. Purely informational — does not affect whether a medication is taken. Cascade delete from parent medication.
+
+9. **`medication_schedule.administration_condition` — WHETHER to take** — a new optional JSON column on `medication_schedule` storing a generic rule that determines if a dose should be taken or skipped at reminder time. The JSON schema is extensible: v1 supports measurement-based conditions (e.g. `{ "type": "measurement_check", "measurement_type": "pulse", "operator": "gte", "threshold": 55, "unit": "bpm" }`). When a reminder fires, if this field is non-null, the app presents a condition-check flow: (a) use the latest recorded measurement of the specified type, or (b) enter a new measurement, then compare against the threshold using the operator. If the condition is met → mark as taken; if not → mark as skipped with reason "condition not met". If the field is null, the reminder behaves normally (Taken/Snooze/Skip buttons). This is a **domain-level concern** — the `AdministrationCondition` sealed class in `domain/entities/` handles parsing, validation, and evaluation logic. No hardcoded medication names — the system is fully generic.
 
 ---
 
@@ -127,9 +132,10 @@ The proposed Clean Architecture with `core/`, `data/`, `domain/`, `presentation/
 - Set `applicationId` to `com.earkania.rehabtrack`
 
 ### Phase 2 — Database & Core Data Layer
-- Define all Drift tables (17 tables, excluding `health_template` as static asset)
+- Define all Drift tables (18 tables, excluding `health_template` as static asset)
 - Implement migration strategy (schema versioning)
 - Implement `ScheduleConfig` sealed class (`DailySchedule`, `FixedTimesSchedule`, `IntervalDaysSchedule`)
+- Implement `AdministrationCondition` sealed class (`MeasurementCondition` with operator enum)
 - Implement all 7 repositories (`ProfileRepository`, `MedicationRepository`, `MeasurementRepository`, `ExerciseRepository`, `DoctorRepository`, `DocumentRepository`, `SettingsRepository`)
 - Implement `AppSettingRepository` for key-value preferences
 - Seed `measurement_type` table with built-in types on first run
@@ -146,10 +152,13 @@ The proposed Clean Architecture with `core/`, `data/`, `domain/`, `presentation/
 ### Phase 4 — Medication Module
 - Medication CRUD screens
 - Medication alternatives: add/edit/delete alternatives on medication detail screen (expandable section)
+- Medication administration guidance: add/edit/delete guidance items on medication detail screen (separate expandable section)
+- Administration condition editor: optional condition builder on medication schedule (measurement type + operator + threshold)
 - Visual schedule editor (daily, fixed_times, interval_days)
 - Medication list with status indicators
 - Medication history (calendar/timeline + adherence stats)
 - Notification integration test on real device
+- Condition-check flow at reminder time (use latest measurement or enter new one)
 
 ### Phase 5 — Measurements & Charts
 - `measurement_type` management (view built-ins, create custom)
@@ -214,3 +223,11 @@ The proposed Clean Architecture with `core/`, `data/`, `domain/`, `presentation/
 10. **Notification snooze action** — The spec shows "Snooze" button on notifications but `medication_log` has no snooze field. Need either: (a) snooze creates a new pending `medication_log` entry for the snoozed time, or (b) add a `snoozed_until` field. Recommendation: option (a) — cleaner.
 
 11. **Medication alternatives — UI placement** — Alternatives should appear as an expandable/collapsible section on the medication detail screen, not a separate tab or screen. This keeps the information visible when needed without cluttering the primary medication view. The section should show alternative name, dose (if provided), source (doctor-approved badge), and notes. No actions beyond add/edit/delete — no "switch to alternative" or dose comparison logic.
+
+12. **Administration guidance vs condition — clear separation** — Guidance (`medication_administration_guidance`) answers "how to take"; condition (`medication_schedule.administration_condition`) answers "whether to take". These are independent concepts stored in different tables. A medication can have guidance without a condition, a condition without guidance, both, or neither. The medication detail screen should show them in separate clearly labeled sections: "Administration Instructions" and "Conditional Schedule".
+
+13. **Administration condition — generic rule engine** — The condition system must not be hardcoded for specific medications or measurement types. The `AdministrationCondition` sealed class defines the rule grammar. v1 supports: `MeasurementCondition` (measurement type + operator + threshold). Future conditions (e.g. time-of-day checks, combined rules) add new subclasses without DB migration. The condition evaluator is a pure Dart function in `domain/` — no UI dependency.
+
+14. **Condition-check flow at reminder time** — When a medication with an administration condition fires a reminder, the notification should include a "Check Condition" action button (alongside Taken/Snooze/Skip). Tapping it opens a mini-flow: show the condition rule, display the latest matching measurement (if available within a configurable window, e.g. last 30 minutes), offer to record a new measurement, then evaluate. The result (met/not met) is logged in `medication_log` with a `condition_result` field. If the user overrides (e.g. takes the medication anyway despite condition not met), log that as `taken` with a note — the app never blocks the user from taking a medication.
+
+15. **Notification text includes guidance** — When scheduling a medication reminder, the notification title/body should incorporate administration guidance text (e.g. "Aspirin 100mg — Take after meal"). This means guidance text is captured at schedule time and included in the notification payload. If guidance changes, pending notifications should be rescheduled (listen to medication updates via Drift stream).
