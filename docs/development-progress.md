@@ -16,6 +16,7 @@ RehabTrack is a personal health companion Flutter application designed for track
 | Navigation | GoRouter |
 | Database | Drift (SQLite ORM) |
 | Serialization | Freezed, JSON Serializable |
+| Notifications | flutter_local_notifications |
 | Theming | Material 3 |
 | Localization | Flutter l10n (ARB files) |
 
@@ -122,6 +123,70 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - 5 built-in measurement types: Blood Pressure, Heart Rate, Weight, Blood Glucose, Temperature
 - 3 health templates: Cardiac Recovery, Diabetes Management, General Wellness
 
+### Phase 3 — Notification Infrastructure
+
+**Status:** Completed
+
+**What was done:**
+
+**Dependencies Added:**
+- `flutter_local_notifications: ^18.0.1` — Cross-platform local notifications
+- `timezone: ^0.10.1` — Timezone-aware scheduling
+
+**Services Created:**
+
+| Service | Location | Purpose |
+|---|---|---|
+| `NotificationService` | `data/services/notification/` | Low-level notification capabilities |
+| `NotificationScheduler` | `data/services/notification/` | Converts domain schedules to notifications |
+| `ScheduleRecoveryService` | `data/services/notification/` | Restores notifications on app start |
+| `BatteryOptimizationHelper` | `data/services/notification/` | Battery optimization detection |
+
+**Notification Channels (5):**
+
+| Channel ID | Name | Purpose |
+|---|---|---|
+| `rehabtrack_medications` | Medication Reminders | Medication dose reminders |
+| `rehabtrack_measurements` | Measurement Reminders | Health measurement reminders |
+| `rehabtrack_appointments` | Appointment Reminders | Doctor visit reminders |
+| `rehabtrack_exercise` | Exercise Reminders | Exercise activity reminders |
+| `rehabtrack_general` | General Notifications | General app notifications |
+
+**Notification Actions:**
+- `Taken` — Mark dose as taken
+- `Snooze` — Postpone reminder
+- `Skip` — Skip dose
+
+**Domain Schedule Model:**
+- `ScheduleConfig` sealed class already existed from Phase 2
+- Supports: `DailySchedule`, `FixedTimesSchedule`, `IntervalDaysSchedule`
+
+**Providers Added:**
+
+| Provider | Purpose |
+|---|---|
+| `notificationServiceProvider` | Singleton NotificationService |
+| `notificationSchedulerProvider` | NotificationScheduler instance |
+| `scheduleRecoveryServiceProvider` | ScheduleRecoveryService instance |
+| `batteryOptimizationHelperProvider` | BatteryOptimizationHelper instance |
+
+**Android Configuration:**
+- `RECEIVE_BOOT_COMPLETED` — Boot rescheduling
+- `VIBRATE` — Notification vibration
+- `SCHEDULE_EXACT_ALARM` — Precise timing
+- `POST_NOTIFICATIONS` — Android 13+ permission
+- `USE_EXACT_ALARM` — Exact alarm support
+
+**Testing Results:**
+- `flutter analyze` — passes (0 issues)
+- `flutter test` — passes (1/1)
+- App builds successfully with notification dependencies
+
+**Known Limitations:**
+- Battery optimization detection is placeholder (requires platform-specific code)
+- Boot rescheduling requires app to start (no native receiver)
+- Notification actions are infrastructure only — not connected to medication logs yet
+
 ## Current Application State
 
 **App launches successfully on Pixel 7.**
@@ -143,6 +208,8 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - Security toggle placeholder (hardcoded off)
 
 **Database:** Initializes on first provider access. Schema v1 created with all 17 tables and seed data. Ready for UI integration.
+
+**Notification Infrastructure:** Fully initialized. All services ready for UI integration.
 
 ## Current Technical Decisions
 
@@ -208,18 +275,16 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 ## Next Planned Phase
 
-### Phase 3 — Notification Infrastructure
+### Phase 4 — Medication Module
 
 **Planned work:**
 
-- `NotificationScheduler` service for scheduling and managing notifications
-- Android notification channel configuration
-- Notification actions (mark as taken, snooze, skip)
-- Background callbacks for scheduling medications and measurements
-- Boot rescheduling — restore all scheduled notifications on device restart
-- Exact alarm handling for precise timing
-- Battery optimization handling and Doze mode considerations
-- Real device testing on Pixel 7
+- Medication CRUD screens
+- Medication list with status indicators
+- Visual schedule editor (daily, fixed times, interval days)
+- Medication history (calendar/timeline + adherence stats)
+- Notification integration test on real device
+- Condition-check flow at reminder time (future)
 
 ## Development Rules
 
