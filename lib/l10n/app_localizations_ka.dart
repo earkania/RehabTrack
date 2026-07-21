@@ -12,6 +12,9 @@ class AppLocalizationsKa extends AppLocalizations {
   String get appTitle => 'RehabTrack';
 
   @override
+  String get welcomeMessage => 'მოგესალმებით RehabTrack-ში';
+
+  @override
   String get today => 'დღეს';
 
   @override
@@ -25,6 +28,30 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get settings => 'პარამეტრები';
+
+  @override
+  String get language => 'ენა';
+
+  @override
+  String get theme => 'თემა';
+
+  @override
+  String get systemDefault => 'სისტემის ნაგულისხმევი';
+
+  @override
+  String get notifications => 'შეტყობინებები';
+
+  @override
+  String get enableNotifications => 'შეტყობინებების ჩართვა';
+
+  @override
+  String get security => 'უსაფრთხოება';
+
+  @override
+  String get appLock => 'აპლიკაციის დაბლოკვა';
+
+  @override
+  String get disabled => 'გამორთული';
 
   @override
   String get noDataYet => 'მონაცემები ჯერ არ არის';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rehab_track/l10n/app_localizations.dart';
 
 import 'package:rehab_track/presentation/screens/today/today_screen.dart';
 import 'package:rehab_track/presentation/screens/health/health_screen.dart';
@@ -89,36 +90,38 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _calculateSelectedIndex(context),
         onDestinationSelected: (index) => _onItemTapped(context, index),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.today_outlined),
-            selectedIcon: Icon(Icons.today),
-            label: 'Today',
+            icon: const Icon(Icons.today_outlined),
+            selectedIcon: const Icon(Icons.today),
+            label: l10n.today,
           ),
           NavigationDestination(
-            icon: Icon(Icons.favorite_outline),
-            selectedIcon: Icon(Icons.favorite),
-            label: 'Health',
+            icon: const Icon(Icons.favorite_outline),
+            selectedIcon: const Icon(Icons.favorite),
+            label: l10n.health,
           ),
           NavigationDestination(
-            icon: Icon(Icons.directions_walk_outlined),
-            selectedIcon: Icon(Icons.directions_walk),
-            label: 'Activities',
+            icon: const Icon(Icons.directions_walk_outlined),
+            selectedIcon: const Icon(Icons.directions_walk),
+            label: l10n.activities,
           ),
           NavigationDestination(
-            icon: Icon(Icons.folder_outlined),
-            selectedIcon: Icon(Icons.folder),
-            label: 'Records',
+            icon: const Icon(Icons.folder_outlined),
+            selectedIcon: const Icon(Icons.folder),
+            label: l10n.records,
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings),
+            label: l10n.settings,
           ),
         ],
       ),

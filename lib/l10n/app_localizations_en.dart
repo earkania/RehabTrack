@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'RehabTrack';
 
   @override
+  String get welcomeMessage => 'Welcome to RehabTrack';
+
+  @override
   String get today => 'Today';
 
   @override
@@ -25,6 +28,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings => 'Settings';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get systemDefault => 'System default';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get enableNotifications => 'Enable notifications';
+
+  @override
+  String get security => 'Security';
+
+  @override
+  String get appLock => 'App lock';
+
+  @override
+  String get disabled => 'Disabled';
 
   @override
   String get noDataYet => 'No data yet';
