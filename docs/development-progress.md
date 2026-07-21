@@ -177,10 +177,19 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - `POST_NOTIFICATIONS` — Android 13+ permission
 - `USE_EXACT_ALARM` — Exact alarm support
 
-**Testing Results:**
-- `flutter analyze` — passes (0 issues)
-- `flutter test` — passes (1/1)
-- App builds successfully with notification dependencies
+**Android Integration:**
+- Added `flutter_local_notifications: ^18.0.1` to pubspec.yaml
+- Enabled core library desugaring in `android/app/build.gradle.kts`
+- Added `coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")`
+- Enabled `multiDexEnabled = true` in defaultConfig
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (1/1) |
+| `flutter build apk --debug` | Built successfully |
+| Pixel 7 debug build/run | Passed |
 
 **Known Limitations:**
 - Battery optimization detection is placeholder (requires platform-specific code)
