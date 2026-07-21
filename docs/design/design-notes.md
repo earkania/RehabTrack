@@ -22,14 +22,15 @@ When a note becomes an approved requirement, it should be moved into the officia
 - Privacy is a priority.
 - Medical history should never be silently lost.
 - Users should be able to customize the application according to their own health needs.
+- The application should assist users in following their own health plans, but should not make medical decisions.
 
 ---
 
 ## Future Ideas
 
-### Medication Management
+# Medication Management
 
-#### Medication alternatives
+## Medication alternatives
 
 Some prescribed medications may have acceptable replacements.
 
@@ -41,16 +42,18 @@ Original:
 Concor
 
 Alternatives:
-Bisoprolol (generic)
-Another equivalent approved by the doctor
+- Bisoprolol (generic)
+- Another equivalent approved by the doctor
 
 The application should show these alternatives whenever viewing medication details.
 
 This feature is optional per medication.
 
+The application should not recommend replacements automatically. Alternatives are only user-entered information based on advice from a doctor or other trusted source.
+
 ---
 
-#### Administration guidance
+## Administration guidance
 
 Medication may include guidance such as:
 
@@ -63,21 +66,32 @@ Medication may include guidance such as:
 - Drink plenty of water
 - Avoid alcohol
 
-These instructions are informational.
+These instructions should be shown together with medication reminders.
+
+The instructions are informational only.
+
+The application must not provide medical recommendations or change prescriptions. It only reminds the user of instructions they entered or received from a healthcare professional.
 
 ---
 
-#### Conditional administration
+## Conditional administration
 
 Some medications require checking measurements before taking them.
 
 Example:
 
-Take Concor only if pulse is at least 55 bpm.
+Medication:
+Concor
+
+Schedule:
+10:00
+
+Condition:
+Take only if pulse is at least 55 bpm.
 
 Administration conditions should be generic rather than medication-specific.
 
-Future conditions may include:
+Possible future conditions may include:
 
 - Pulse
 - Blood pressure
@@ -86,34 +100,91 @@ Future conditions may include:
 - Weight
 - Custom measurements
 
+The system should allow conditions to be defined per medication but should not contain built-in medical rules.
+
 ---
 
-### Exercise Ideas
+## Medication safety workflow
+
+Some conditional medications may require the user to verify a measurement before confirming that a dose was taken.
+
+Example:
+
+Medication:
+Concor
+
+Schedule:
+10:00
+
+Condition:
+Take only if pulse >= 55 bpm.
+
+Possible future workflow:
+
+1. Notification appears:
+   "Time to take Concor"
+
+2. User opens notification.
+
+3. Application checks whether a recent required measurement exists.
+
+4. If no recent measurement exists:
+   - Ask the user to enter the required value (for example pulse).
+   - Show whether the entered value satisfies the configured condition.
+
+5. If the condition is satisfied:
+   - Allow marking the medication as taken.
+
+6. If the condition is not satisfied:
+   - Allow skipping the dose.
+   - Optionally record the reason.
+
+The application should not decide whether a medication is safe or unsafe. It only helps the user follow their predefined instructions.
+
+---
+
+# Exercise Ideas
 
 Leave space for future exercise planning and rehabilitation features.
 
+Possible future improvements:
+
+- Walking goals
+- Exercise schedules
+- Activity tracking
+- Exercise reminders
+- Progress tracking
+
 ---
 
-### Health Monitoring Ideas
+# Health Monitoring Ideas
 
 Leave space for future health tracking improvements.
 
 Examples:
 
-- wearable integration
-- automatic measurement import
-- trends
-- risk indicators
+- Wearable integration
+- Automatic measurement import
+- Trends
+- Risk indicators
+- Additional health metrics
 
 ---
 
-### User Experience Ideas
+# User Experience Ideas
 
 Record usability improvements whenever discovered during development.
 
+Examples:
+
+- Simplifying daily workflows
+- Reducing the number of steps needed for common actions
+- Improving visibility of important information
+- Making the application easier for elderly users
+
 ---
 
-## Future Features
+# Future Features
 
 Keep an expandable checklist for ideas that may be implemented later.
 
@@ -130,8 +201,15 @@ Keep an expandable checklist for ideas that may be implemented later.
 
 ---
 
-## Notes From Real Usage
+# Notes From Real Usage
 
 Create a section specifically intended for recording observations that arise while actually using the application.
 
 This section should become one of the primary sources of future improvements.
+
+Examples:
+
+- Problems discovered during daily usage
+- Features that reduce routine effort
+- Missing information that would be useful
+- Things that are confusing or inconvenient
