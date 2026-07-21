@@ -7,6 +7,8 @@ class Medications extends Table {
       integer().references(Profiles, #id)();
   TextColumn get name => text()();
   TextColumn get description => text().nullable()();
+  TextColumn get doseAmount => text().nullable()();
+  TextColumn get doseUnit => text().nullable()();
   BoolColumn get active => boolean().withDefault(const Constant(true))();
   DateTimeColumn get startDate => dateTime().nullable()();
   DateTimeColumn get endDate => dateTime().nullable()();
@@ -34,6 +36,19 @@ class MedicationLogs extends Table {
   DateTimeColumn get scheduledTime => dateTime()();
   DateTimeColumn get takenTime => dateTime().nullable()();
   TextColumn get status => text()();
+  TextColumn get notes => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+class MedicationAlternatives extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get medicationId =>
+      integer().references(Medications, #id)();
+  TextColumn get name => text()();
+  TextColumn get doseAmount => text().nullable()();
+  TextColumn get doseUnit => text().nullable()();
+  BoolColumn get doctorApproved =>
+      boolean().withDefault(const Constant(false))();
   TextColumn get notes => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 }

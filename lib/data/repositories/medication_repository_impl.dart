@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:rehab_track/data/database/app_database.dart' as db;
 import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 
@@ -43,6 +44,8 @@ class MedicationRepositoryImpl implements MedicationRepository {
         profileId: medication.profileId,
         name: medication.name,
         description: Value(medication.description),
+        doseAmount: Value(medication.doseAmount),
+        doseUnit: Value(medication.doseUnit),
         active: Value(medication.active),
         startDate: Value(medication.startDate),
         endDate: Value(medication.endDate),
@@ -61,6 +64,8 @@ class MedicationRepositoryImpl implements MedicationRepository {
         profileId: Value(medication.profileId),
         name: Value(medication.name),
         description: Value(medication.description),
+        doseAmount: Value(medication.doseAmount),
+        doseUnit: Value(medication.doseUnit),
         active: Value(medication.active),
         startDate: Value(medication.startDate),
         endDate: Value(medication.endDate),
@@ -183,6 +188,8 @@ class MedicationRepositoryImpl implements MedicationRepository {
       profileId: row.profileId,
       name: row.name,
       description: row.description,
+      doseAmount: row.doseAmount,
+      doseUnit: row.doseUnit,
       active: row.active,
       startDate: row.startDate,
       endDate: row.endDate,
@@ -215,6 +222,86 @@ class MedicationRepositoryImpl implements MedicationRepository {
       scheduledTime: row.scheduledTime,
       takenTime: row.takenTime,
       status: row.status,
+      notes: row.notes,
+      createdAt: row.createdAt,
+    );
+  }
+
+  @override
+  Stream<List<MedicationAlternative>> watchAlternatives(
+    int medicationId,
+  ) {
+    return _database.medicationAlternativesDao
+        .watchAlternatives(medicationId)
+        .map((rows) => rows.map(_alternativeToDomain).toList());
+  }
+
+  @override
+  Future<List<MedicationAlternative>> getAlternatives(
+    int medicationId,
+  ) async {
+    final rows = await _database.medicationAlternativesDao
+        .getAlternatives(medicationId);
+    return rows.map(_alternativeToDomain).toList();
+  }
+
+  @override
+  Future<MedicationAlternative?> getAlternative(int id) async {
+    final row =
+        await _database.medicationAlternativesDao.getAlternative(id);
+    return row != null ? _alternativeToDomain(row) : null;
+  }
+
+  @override
+  Future<int> createAlternative(
+    MedicationAlternative alternative,
+  ) async {
+    return _database.medicationAlternativesDao.insertAlternative(
+      db.MedicationAlternativesCompanion.insert(
+        medicationId: alternative.medicationId,
+        name: alternative.name,
+        doseAmount: Value(alternative.doseAmount),
+        doseUnit: Value(alternative.doseUnit),
+        doctorApproved: Value(alternative.doctorApproved),
+        notes: Value(alternative.notes),
+        createdAt: alternative.createdAt,
+      ),
+    );
+  }
+
+  @override
+  Future<void> updateAlternative(
+    MedicationAlternative alternative,
+  ) async {
+    await _database.medicationAlternativesDao.updateAlternative(
+      db.MedicationAlternativesCompanion(
+        id: Value(alternative.id!),
+        medicationId: Value(alternative.medicationId),
+        name: Value(alternative.name),
+        doseAmount: Value(alternative.doseAmount),
+        doseUnit: Value(alternative.doseUnit),
+        doctorApproved: Value(alternative.doctorApproved),
+        notes: Value(alternative.notes),
+        createdAt: Value(alternative.createdAt),
+      ),
+    );
+  }
+
+  @override
+  Future<void> deleteAlternative(int id) async {
+    await _database.medicationAlternativesDao.deleteAlternative(id);
+  }
+
+  MedicationAlternative _alternativeToDomain(
+    db.MedicationAlternative row,
+  ) {
+    return MedicationAlternative(
+      id: row.id,
+      medicationId: row.medicationId,
+      name: row.name,
+      doseAmount: row.doseAmount,
+      doseUnit: row.doseUnit,
+      doctorApproved: row.doctorApproved,
       notes: row.notes,
       createdAt: row.createdAt,
     );

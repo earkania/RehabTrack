@@ -5,6 +5,8 @@ class Medication {
   final int profileId;
   final String name;
   final String? description;
+  final String? doseAmount;
+  final String? doseUnit;
   final bool active;
   final DateTime? startDate;
   final DateTime? endDate;
@@ -17,6 +19,8 @@ class Medication {
     required this.profileId,
     required this.name,
     this.description,
+    this.doseAmount,
+    this.doseUnit,
     this.active = true,
     this.startDate,
     this.endDate,
@@ -30,6 +34,8 @@ class Medication {
     int? profileId,
     String? name,
     String? description,
+    String? doseAmount,
+    String? doseUnit,
     bool? active,
     DateTime? startDate,
     DateTime? endDate,
@@ -42,6 +48,8 @@ class Medication {
       profileId: profileId ?? this.profileId,
       name: name ?? this.name,
       description: description ?? this.description,
+      doseAmount: doseAmount ?? this.doseAmount,
+      doseUnit: doseUnit ?? this.doseUnit,
       active: active ?? this.active,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,

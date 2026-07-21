@@ -24,6 +24,7 @@ import 'package:rehab_track/data/database/daos/document_dao.dart';
 import 'package:rehab_track/data/database/daos/diet_dao.dart';
 import 'package:rehab_track/data/database/daos/health_template_dao.dart';
 import 'package:rehab_track/data/database/daos/app_setting_dao.dart';
+import 'package:rehab_track/data/database/daos/medication_alternatives_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -33,6 +34,7 @@ part 'app_database.g.dart';
     Medications,
     MedicationSchedules,
     MedicationLogs,
+    MedicationAlternatives,
     MeasurementTypes,
     MeasurementRecords,
     MeasurementSchedules,
@@ -53,6 +55,8 @@ class AppDatabase extends _$AppDatabase {
 
   ProfileDao get profileDao => ProfileDao(this);
   MedicationDao get medicationDao => MedicationDao(this);
+  MedicationAlternativesDao get medicationAlternativesDao =>
+      MedicationAlternativesDao(this);
   MeasurementDao get measurementDao => MeasurementDao(this);
   ExerciseDao get exerciseDao => ExerciseDao(this);
   DoctorDao get doctorDao => DoctorDao(this);
@@ -63,13 +67,20 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {
       await m.createAll();
       await seedDatabase(this);
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(medications, medications.doseAmount);
+        await m.addColumn(medications, medications.doseUnit);
+        await m.createTable(medicationAlternatives);
+      }
     },
   );
 }

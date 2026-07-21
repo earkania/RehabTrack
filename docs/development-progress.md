@@ -282,9 +282,64 @@ Note: Diet module has a DAO but no dedicated repository yet.
   - General wellness
 - Templates pre-populate measurement types, exercise goals, and schedules
 
+### Phase 4A — Medication Data Layer (Gaps)
+
+**Status:** Completed
+
+**What was done:**
+
+**Database Schema Changes:**
+- Schema version bumped from `1` to `2`
+- Added `doseAmount` (TextColumn nullable) to `Medications` table
+- Added `doseUnit` (TextColumn nullable) to `Medications` table
+- Created new `MedicationAlternatives` table with foreign key to Medications
+- Migration strategy handles v1→v2 upgrade (adds columns, creates table)
+
+**MedicationAlternatives Table:**
+
+| Column | Type | Notes |
+|---|---|---|
+| id | INTEGER | Primary key, auto-increment |
+| medicationId | INTEGER | Foreign key → Medications |
+| name | TEXT | Alternative medication name |
+| doseAmount | TEXT | Nullable |
+| doseUnit | TEXT | Nullable |
+| doctorApproved | BOOLEAN | Default false |
+| notes | TEXT | Nullable |
+| createdAt | DATETIME | Record creation time |
+
+**Domain Entities Updated:**
+- `Medication` — added `doseAmount` and `doseUnit` fields with copyWith support
+- New `MedicationAlternative` class created in separate file
+
+**DAOs Created/Updated:**
+- New `MedicationAlternativesDao` with CRUD operations for alternatives
+- `MedicationDao` unchanged (already had all needed methods)
+
+**Repository Layer Updated:**
+- `MedicationRepository` interface — added alternative CRUD method signatures
+- `MedicationRepositoryImpl` — implemented alternative methods with domain mapping
+- Updated `_toDomain` and companion creation for dose fields
+
+**Files Changed:**
+- `lib/data/database/tables/medication_tables.dart` — new columns + table
+- `lib/data/database/app_database.dart` — schema v2, migration, new DAO getter
+- `lib/domain/entities/medication.dart` — dose fields added
+- `lib/domain/entities/medication_alternative.dart` — new file
+- `lib/data/database/daos/medication_alternatives_dao.dart` — new file
+- `lib/domain/repositories/medication_repository.dart` — alternative methods
+- `lib/data/repositories/medication_repository_impl.dart` — alternative implementation
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `build_runner` | Completed successfully |
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (1/1) |
+
 ## Next Planned Phase
 
-### Phase 4 — Medication Module
+### Phase 4B — Medication UI
 
 **Planned work:**
 
