@@ -6,7 +6,7 @@
 
 This file is a living collection of ideas, future improvements, design decisions, usability observations, and real-world scenarios that should be considered during development.
 
-It supplements the official requirements (`opencode-cardiac-rehab-app-prompt-flutter-v2.md`) and the architecture analysis (`opencode-rehabtrack-analysis-v3.md`). It should never replace them.
+It supplements the official requirements (`docs/requirements/opencode-cardiac-rehab-app-prompt-flutter-v2.md`) and the architecture analysis (`docs/analysis/opencode-rehabtrack-analysis-v3.md`). It should never replace them.
 
 When a note becomes an approved requirement, it should be moved into the official specification while optionally remaining here as historical context.
 
