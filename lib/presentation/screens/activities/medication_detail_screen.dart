@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
@@ -15,6 +16,8 @@ class MedicationDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final medicationAsync = ref.watch(medicationProvider(medicationId));
+    final schedulesAsync =
+        ref.watch(medicationSchedulesProvider(medicationId));
 
     return Scaffold(
       appBar: AppBar(
@@ -86,6 +89,39 @@ class MedicationDetailScreen extends ConsumerWidget {
                   value: medication.notes!,
                 ),
               const Divider(height: 32),
+
+              // Schedules Section
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.schedulesSection,
+                      style: textTheme.titleMedium,
+                    ),
+                  ),
+                  if (medication.active)
+                    FilledButton.tonalIcon(
+                      onPressed: () {
+                        context.push(
+                            '/activities/medication/$medicationId/schedule/add');
+                      },
+                      icon: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.addSchedule),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _buildSchedulesSection(
+                context,
+                ref,
+                schedulesAsync,
+                l10n,
+                colorScheme,
+                textTheme,
+              ),
+
+              const Divider(height: 32),
+
               if (medication.active)
                 ListTile(
                   leading: Icon(
@@ -103,6 +139,157 @@ class MedicationDetailScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Widget _buildSchedulesSection(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<MedicationSchedule>> schedulesAsync,
+    AppLocalizations l10n,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    return schedulesAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Center(
+          child: Column(
+            children: [
+              Text(l10n.error),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () =>
+                    ref.invalidate(medicationSchedulesProvider(medicationId)),
+                child: Text(l10n.retry),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (schedules) {
+        if (schedules.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.schedule_outlined,
+                    size: 48,
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.noSchedulesYet,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.addScheduleSubtitle,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return Column(
+          children: schedules.map((schedule) {
+            return Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                leading: Icon(
+                  _scheduleIcon(schedule.scheduleType),
+                  color: schedule.active
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                ),
+                title: Text(
+                  _formatScheduleSummary(schedule, l10n),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (schedule.instructions != null &&
+                        schedule.instructions!.isNotEmpty)
+                      Text(
+                        schedule.instructions!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    Row(
+                      children: [
+                        Icon(
+                          schedule.active
+                              ? Icons.check_circle_outline
+                              : Icons.cancel_outlined,
+                          size: 14,
+                          color: schedule.active ? Colors.green : Colors.grey,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          schedule.active ? l10n.active : l10n.disabled,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: schedule.active ? Colors.green : Colors.grey,
+                          ),
+                        ),
+                        if (schedule.startDate != null) ...[
+                          const SizedBox(width: 12),
+                          Text(
+                            _formatDate(schedule.startDate!),
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+                isThreeLine: schedule.instructions != null &&
+                    schedule.instructions!.isNotEmpty,
+                onTap: () {
+                  context.push(
+                    '/activities/medication/$medicationId/schedule/${schedule.id}/edit',
+                  );
+                },
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  IconData _scheduleIcon(String type) => switch (type) {
+        'daily' => Icons.today,
+        'fixed_times' => Icons.access_time,
+        'interval_days' => Icons.date_range,
+        _ => Icons.schedule,
+      };
+
+  String _formatScheduleSummary(
+      MedicationSchedule schedule, AppLocalizations l10n) {
+    final config = schedule.scheduleConfig;
+    switch (config) {
+      case DailySchedule(:final time):
+        return l10n.dailyAt(time);
+      case FixedTimesSchedule(:final times):
+        return l10n.fixedTimes(times.join(', '));
+      case IntervalDaysSchedule(:final interval, :final time):
+        return l10n.everyNDays(interval, time);
+    }
   }
 
   String _formatDose(Medication medication) {

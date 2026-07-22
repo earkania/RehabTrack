@@ -18,3 +18,17 @@ final medicationProvider =
   final repo = ref.watch(medicationRepositoryProvider);
   return repo.getMedication(id);
 });
+
+final medicationSchedulesProvider =
+    StreamProvider.autoDispose.family<List<MedicationSchedule>, int>(
+        (ref, medicationId) {
+  final repo = ref.watch(medicationRepositoryProvider);
+  return repo.watchSchedules(medicationId);
+});
+
+final medicationScheduleProvider =
+    FutureProvider.autoDispose.family<MedicationSchedule?, int>(
+        (ref, scheduleId) async {
+  final repo = ref.watch(medicationRepositoryProvider);
+  return repo.getSchedule(scheduleId);
+});

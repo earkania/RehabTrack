@@ -551,7 +551,7 @@ abstract class AppLocalizations {
   /// No description provided for @noSchedulesYet.
   ///
   /// In en, this message translates to:
-  /// **'No schedules yet'**
+  /// **'No schedules yet. Add one to get reminders.'**
   String get noSchedulesYet;
 
   /// No description provided for @noAlternativesYet.
@@ -589,6 +589,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid page'**
   String get invalidRoute;
+
+  /// No description provided for @schedules.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedules'**
+  String get schedules;
+
+  /// No description provided for @deleteSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Schedule'**
+  String get deleteSchedule;
+
+  /// No description provided for @deleteScheduleConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this schedule? Notifications will be cancelled.'**
+  String get deleteScheduleConfirmation;
+
+  /// No description provided for @selectTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Time'**
+  String get selectTime;
+
+  /// No description provided for @addTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Time'**
+  String get addTime;
+
+  /// No description provided for @removeTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeTime;
+
+  /// No description provided for @intervalDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval (days)'**
+  String get intervalDays;
+
+  /// No description provided for @atLeastOneTimeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one time is required'**
+  String get atLeastOneTimeRequired;
+
+  /// No description provided for @duplicateTimesNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate times are not allowed'**
+  String get duplicateTimesNotAllowed;
+
+  /// No description provided for @invalidInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval must be between 1 and 30'**
+  String get invalidInterval;
+
+  /// No description provided for @failedToSaveSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save schedule'**
+  String get failedToSaveSchedule;
+
+  /// No description provided for @failedToDeleteSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete schedule'**
+  String get failedToDeleteSchedule;
+
+  /// No description provided for @schedulesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedules'**
+  String get schedulesSection;
+
+  /// No description provided for @addScheduleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up reminders for this medication'**
+  String get addScheduleSubtitle;
 }
 
 class _AppLocalizationsDelegate

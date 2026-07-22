@@ -1,14 +1,30 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/data/database/app_database.dart' as db;
+import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
+import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
+import 'package:rehab_track/presentation/providers/notification_provider.dart';
 
 class MedicationRepositoryImpl implements MedicationRepository {
   final db.AppDatabase _database;
+  final Ref? _ref;
 
-  MedicationRepositoryImpl(this._database);
+  MedicationRepositoryImpl(this._database, {this._ref});
+
+  NotificationScheduler? get _scheduler {
+    if (_ref == null) return null;
+    try {
+      return _ref.read(notificationSchedulerProvider);
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Stream<List<Medication>> watchMedications(int profileId) {
@@ -91,8 +107,14 @@ class MedicationRepositoryImpl implements MedicationRepository {
   }
 
   @override
+  Future<MedicationSchedule?> getSchedule(int id) async {
+    final row = await _database.medicationDao.getSchedule(id);
+    return row != null ? _scheduleToDomain(row) : null;
+  }
+
+  @override
   Future<int> createSchedule(MedicationSchedule schedule) async {
-    return _database.medicationDao.insertSchedule(
+    final scheduleId = await _database.medicationDao.insertSchedule(
       db.MedicationSchedulesCompanion.insert(
         medicationId: schedule.medicationId,
         scheduleType: schedule.scheduleType,
@@ -103,6 +125,11 @@ class MedicationRepositoryImpl implements MedicationRepository {
         active: Value(schedule.active),
       ),
     );
+
+    final savedSchedule = schedule.copyWith(id: scheduleId);
+    await _scheduleNotifications(savedSchedule);
+
+    return scheduleId;
   }
 
   @override
@@ -120,10 +147,17 @@ class MedicationRepositoryImpl implements MedicationRepository {
         active: Value(schedule.active),
       ),
     );
+
+    await _scheduleNotifications(schedule);
   }
 
   @override
   Future<void> deleteSchedule(int id) async {
+    final scheduleRow = await _database.medicationDao.getSchedule(id);
+    if (scheduleRow != null) {
+      final schedule = _scheduleToDomain(scheduleRow);
+      await _cancelNotifications(schedule);
+    }
     await _database.medicationDao.deleteSchedule(id);
   }
 
@@ -225,6 +259,75 @@ class MedicationRepositoryImpl implements MedicationRepository {
       notes: row.notes,
       createdAt: row.createdAt,
     );
+  }
+
+  Future<void> _scheduleNotifications(MedicationSchedule schedule) async {
+    final scheduler = _scheduler;
+    if (scheduler == null) return;
+    if (!schedule.active) return;
+
+    try {
+      final medication = await getMedication(schedule.medicationId);
+      if (medication == null) return;
+
+      final title = 'Time to take ${medication.name}';
+      final body = _buildNotificationBody(medication, schedule);
+      final payload = jsonEncode({
+        'medicationId': medication.id,
+        'scheduleId': schedule.id,
+      });
+
+      await scheduler.scheduleFromConfig(
+        notificationId: schedule.id!,
+        title: title,
+        body: body,
+        config: schedule.scheduleConfig,
+        channelType: NotificationChannelType.medication,
+        payload: payload,
+        includeActions: true,
+      );
+    } catch (_) {
+      // Notification scheduling is best-effort; database is already saved.
+    }
+  }
+
+  Future<void> _cancelNotifications(MedicationSchedule schedule) async {
+    final scheduler = _scheduler;
+    if (scheduler == null) return;
+    if (schedule.id == null) return;
+
+    try {
+      await scheduler.cancelNotificationsForSchedule(
+        baseNotificationId: schedule.id!,
+        config: schedule.scheduleConfig,
+      );
+    } catch (_) {
+      // Best-effort cancellation.
+    }
+  }
+
+  String _buildNotificationBody(
+    Medication medication,
+    MedicationSchedule schedule,
+  ) {
+    final parts = <String>[];
+    final dose = _formatDoseShort(medication);
+    if (dose.isNotEmpty) parts.add(dose);
+    if (schedule.instructions != null && schedule.instructions!.isNotEmpty) {
+      parts.add(schedule.instructions!);
+    }
+    return parts.isEmpty ? '' : parts.join(' — ');
+  }
+
+  String _formatDoseShort(Medication medication) {
+    final parts = <String>[];
+    if (medication.doseAmount != null && medication.doseAmount!.isNotEmpty) {
+      parts.add(medication.doseAmount!);
+    }
+    if (medication.doseUnit != null && medication.doseUnit!.isNotEmpty) {
+      parts.add(medication.doseUnit!);
+    }
+    return parts.join(' ');
   }
 
   @override

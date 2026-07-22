@@ -240,7 +240,8 @@ class AppLocalizationsKa extends AppLocalizations {
   String get morningOnly => 'მხოლოდ დილით';
 
   @override
-  String get noSchedulesYet => 'გრაფიკები ჯერ არ არის';
+  String get noSchedulesYet =>
+      'გრაფიკები ჯერ არ არის. დაამატეთ შეხსენებებისთვის.';
 
   @override
   String get noAlternativesYet => 'ალტერნატივები ჯერ არ არის';
@@ -260,4 +261,47 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get invalidRoute => 'არასწორი გვერდი';
+
+  @override
+  String get schedules => 'გრაფიკები';
+
+  @override
+  String get deleteSchedule => 'გრაფიკის წაშლა';
+
+  @override
+  String get deleteScheduleConfirmation =>
+      'წაშალოთ ეს გრაფიკი? შეტყობინებები გაუქმდება.';
+
+  @override
+  String get selectTime => 'აირჩიეთ დრო';
+
+  @override
+  String get addTime => 'დროის დამატება';
+
+  @override
+  String get removeTime => 'წაშლა';
+
+  @override
+  String get intervalDays => 'ინტერვალი (დღე)';
+
+  @override
+  String get atLeastOneTimeRequired => 'სულ მცირე ერთი დრო საჭიროა';
+
+  @override
+  String get duplicateTimesNotAllowed => 'დუბლიკატი დროები არ დაიშვება';
+
+  @override
+  String get invalidInterval => 'ინტერვალი უნდა იყოს 1-დან 30-მდე';
+
+  @override
+  String get failedToSaveSchedule => 'გრაფიკის შენახვა ვერ მოხერხდა';
+
+  @override
+  String get failedToDeleteSchedule => 'გრაფიკის წაშლა ვერ მოხერხდა';
+
+  @override
+  String get schedulesSection => 'გრაფიკები';
+
+  @override
+  String get addScheduleSubtitle => 'დააყენეთ შეხსენებები ამ მედიკამენტისთვის';
 }

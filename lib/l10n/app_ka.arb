@@ -97,5 +97,20 @@
   "days": "დღე",
   "deactivate": "დეაქტივაცია",
   "confirmDeactivate": "მედიკამენტი დეაქტივირდება. გრაფიკები და ისტორია შენარჩუნდება.",
-  "invalidRoute": "არასწორი გვერდი"
+  "invalidRoute": "არასწორი გვერდი",
+  "schedules": "გრაფიკები",
+  "deleteSchedule": "გრაფიკის წაშლა",
+  "deleteScheduleConfirmation": "წაშალოთ ეს გრაფიკი? შეტყობინებები გაუქმდება.",
+  "noSchedulesYet": "გრაფიკები ჯერ არ არის. დაამატეთ შეხსენებებისთვის.",
+  "selectTime": "აირჩიეთ დრო",
+  "addTime": "დროის დამატება",
+  "removeTime": "წაშლა",
+  "intervalDays": "ინტერვალი (დღე)",
+  "atLeastOneTimeRequired": "სულ მცირე ერთი დრო საჭიროა",
+  "duplicateTimesNotAllowed": "დუბლიკატი დროები არ დაიშვება",
+  "invalidInterval": "ინტერვალი უნდა იყოს 1-დან 30-მდე",
+  "failedToSaveSchedule": "გრაფიკის შენახვა ვერ მოხერხდა",
+  "failedToDeleteSchedule": "გრაფიკის წაშლა ვერ მოხერხდა",
+  "schedulesSection": "გრაფიკები",
+  "addScheduleSubtitle": "დააყენეთ შეხსენებები ამ მედიკამენტისთვის"
 }

@@ -69,6 +69,11 @@ class MedicationDao extends DatabaseAccessor<AppDatabase>
       ..where((t) => t.id.equals(id))).go();
   }
 
+  Future<MedicationSchedule?> getSchedule(int id) {
+    return (select(medicationSchedules)
+      ..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
   Stream<List<MedicationLog>> watchLogs(
     int scheduleId, {
     DateTime? from,

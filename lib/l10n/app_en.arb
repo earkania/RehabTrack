@@ -97,5 +97,20 @@
   "days": "days",
   "deactivate": "Deactivate",
   "confirmDeactivate": "This medication will be deactivated. Schedules and history will be preserved.",
-  "invalidRoute": "Invalid page"
+  "invalidRoute": "Invalid page",
+  "schedules": "Schedules",
+  "deleteSchedule": "Delete Schedule",
+  "deleteScheduleConfirmation": "Remove this schedule? Notifications will be cancelled.",
+  "noSchedulesYet": "No schedules yet. Add one to get reminders.",
+  "selectTime": "Select Time",
+  "addTime": "Add Time",
+  "removeTime": "Remove",
+  "intervalDays": "Interval (days)",
+  "atLeastOneTimeRequired": "At least one time is required",
+  "duplicateTimesNotAllowed": "Duplicate times are not allowed",
+  "invalidInterval": "Interval must be between 1 and 30",
+  "failedToSaveSchedule": "Failed to save schedule",
+  "failedToDeleteSchedule": "Failed to delete schedule",
+  "schedulesSection": "Schedules",
+  "addScheduleSubtitle": "Set up reminders for this medication"
 }

@@ -11,6 +11,7 @@ abstract class MedicationRepository {
   Future<void> deleteMedication(int id);
 
   Stream<List<MedicationSchedule>> watchSchedules(int medicationId);
+  Future<MedicationSchedule?> getSchedule(int id);
   Future<int> createSchedule(MedicationSchedule schedule);
   Future<void> updateSchedule(MedicationSchedule schedule);
   Future<void> deleteSchedule(int id);

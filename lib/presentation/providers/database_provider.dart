@@ -27,7 +27,8 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 
 final medicationRepositoryProvider =
     Provider<MedicationRepository>((ref) {
-  return MedicationRepositoryImpl(ref.watch(databaseProvider));
+  final db = ref.watch(databaseProvider);
+  return MedicationRepositoryImpl(db, ref: ref);
 });
 
 final measurementRepositoryProvider =

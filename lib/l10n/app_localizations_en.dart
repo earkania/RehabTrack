@@ -240,7 +240,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get morningOnly => 'Morning only';
 
   @override
-  String get noSchedulesYet => 'No schedules yet';
+  String get noSchedulesYet => 'No schedules yet. Add one to get reminders.';
 
   @override
   String get noAlternativesYet => 'No alternatives yet';
@@ -260,4 +260,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidRoute => 'Invalid page';
+
+  @override
+  String get schedules => 'Schedules';
+
+  @override
+  String get deleteSchedule => 'Delete Schedule';
+
+  @override
+  String get deleteScheduleConfirmation =>
+      'Remove this schedule? Notifications will be cancelled.';
+
+  @override
+  String get selectTime => 'Select Time';
+
+  @override
+  String get addTime => 'Add Time';
+
+  @override
+  String get removeTime => 'Remove';
+
+  @override
+  String get intervalDays => 'Interval (days)';
+
+  @override
+  String get atLeastOneTimeRequired => 'At least one time is required';
+
+  @override
+  String get duplicateTimesNotAllowed => 'Duplicate times are not allowed';
+
+  @override
+  String get invalidInterval => 'Interval must be between 1 and 30';
+
+  @override
+  String get failedToSaveSchedule => 'Failed to save schedule';
+
+  @override
+  String get failedToDeleteSchedule => 'Failed to delete schedule';
+
+  @override
+  String get schedulesSection => 'Schedules';
+
+  @override
+  String get addScheduleSubtitle => 'Set up reminders for this medication';
 }

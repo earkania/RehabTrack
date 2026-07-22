@@ -9,6 +9,8 @@ import 'package:rehab_track/presentation/screens/activities/medication_list_scre
 import 'package:rehab_track/presentation/screens/activities/add_medication_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/edit_medication_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/medication_detail_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/add_schedule_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/edit_schedule_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
 
@@ -80,6 +82,31 @@ final routerProvider = Provider<GoRouter>((ref) {
             return const _InvalidRouteScreen();
           }
           return EditMedicationScreen(medicationId: id);
+        },
+      ),
+      GoRoute(
+        path: '/activities/medication/:id/schedule/add',
+        builder: (context, state) {
+          final medicationId = int.tryParse(state.pathParameters['id'] ?? '');
+          if (medicationId == null) {
+            return const _InvalidRouteScreen();
+          }
+          return AddScheduleScreen(medicationId: medicationId);
+        },
+      ),
+      GoRoute(
+        path: '/activities/medication/:id/schedule/:scheduleId/edit',
+        builder: (context, state) {
+          final medicationId = int.tryParse(state.pathParameters['id'] ?? '');
+          final scheduleId =
+              int.tryParse(state.pathParameters['scheduleId'] ?? '');
+          if (medicationId == null || scheduleId == null) {
+            return const _InvalidRouteScreen();
+          }
+          return EditScheduleScreen(
+            medicationId: medicationId,
+            scheduleId: scheduleId,
+          );
         },
       ),
     ],
