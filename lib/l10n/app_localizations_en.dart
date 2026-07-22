@@ -339,4 +339,78 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get confirmDeleteAlternative =>
       'Are you sure you want to delete this alternative?';
+
+  @override
+  String get historySection => 'History & Adherence';
+
+  @override
+  String get viewHistory => 'View History';
+
+  @override
+  String get historyScreenTitle => 'Medication History';
+
+  @override
+  String get last7Days => 'Last 7 Days';
+
+  @override
+  String get last30Days => 'Last 30 Days';
+
+  @override
+  String get allTime => 'All Time';
+
+  @override
+  String adherencePercentage(double percentage) {
+    return '$percentage%';
+  }
+
+  @override
+  String get noLogsYet => 'No logs yet';
+
+  @override
+  String get noLogsDescription =>
+      'Log doses to track your medication adherence';
+
+  @override
+  String get logDoseNow => 'Log Dose';
+
+  @override
+  String get selectStatus => 'Select Status';
+
+  @override
+  String get doseNotes => 'Notes (optional)';
+
+  @override
+  String get doseLogged => 'Dose logged';
+
+  @override
+  String get logDoseError => 'Failed to log dose';
+
+  @override
+  String get totalDoses => 'Total Doses';
+
+  @override
+  String get completedDoses => 'Completed';
+
+  @override
+  String get adherenceRate => 'Adherence Rate';
+
+  @override
+  String get doseHistory => 'Dose History';
+
+  @override
+  String get noHistoryYet => 'No history yet';
+
+  @override
+  String get noHistoryDescription =>
+      'Your medication log history will appear here';
+
+  @override
+  String scheduledFor(String time) {
+    return 'Scheduled for $time';
+  }
+
+  @override
+  String takenAt(String time) {
+    return 'Taken at $time';
+  }
 }

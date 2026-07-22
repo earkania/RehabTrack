@@ -739,6 +739,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete this alternative?'**
   String get confirmDeleteAlternative;
+
+  /// No description provided for @historySection.
+  ///
+  /// In en, this message translates to:
+  /// **'History & Adherence'**
+  String get historySection;
+
+  /// No description provided for @viewHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View History'**
+  String get viewHistory;
+
+  /// No description provided for @historyScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication History'**
+  String get historyScreenTitle;
+
+  /// No description provided for @last7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 Days'**
+  String get last7Days;
+
+  /// No description provided for @last30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get last30Days;
+
+  /// No description provided for @allTime.
+  ///
+  /// In en, this message translates to:
+  /// **'All Time'**
+  String get allTime;
+
+  /// No description provided for @adherencePercentage.
+  ///
+  /// In en, this message translates to:
+  /// **'{percentage}%'**
+  String adherencePercentage(double percentage);
+
+  /// No description provided for @noLogsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No logs yet'**
+  String get noLogsYet;
+
+  /// No description provided for @noLogsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Log doses to track your medication adherence'**
+  String get noLogsDescription;
+
+  /// No description provided for @logDoseNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Dose'**
+  String get logDoseNow;
+
+  /// No description provided for @selectStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Status'**
+  String get selectStatus;
+
+  /// No description provided for @doseNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get doseNotes;
+
+  /// No description provided for @doseLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose logged'**
+  String get doseLogged;
+
+  /// No description provided for @logDoseError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to log dose'**
+  String get logDoseError;
+
+  /// No description provided for @totalDoses.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Doses'**
+  String get totalDoses;
+
+  /// No description provided for @completedDoses.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedDoses;
+
+  /// No description provided for @adherenceRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Adherence Rate'**
+  String get adherenceRate;
+
+  /// No description provided for @doseHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose History'**
+  String get doseHistory;
+
+  /// No description provided for @noHistoryYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet'**
+  String get noHistoryYet;
+
+  /// No description provided for @noHistoryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your medication log history will appear here'**
+  String get noHistoryDescription;
+
+  /// No description provided for @scheduledFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled for {time}'**
+  String scheduledFor(String time);
+
+  /// No description provided for @takenAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken at {time}'**
+  String takenAt(String time);
 }
 
 class _AppLocalizationsDelegate

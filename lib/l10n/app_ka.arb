@@ -122,5 +122,42 @@
   "noAlternativesDescription": "დაამატეთ ექიმის მიერ დამტკიცებული შემცვლელები ამ მედიკამენტისთვის",
   "alternativesSection": "ალტერნატივები",
   "genericSubstitute": "გენერიკული შემცვლელი",
-  "confirmDeleteAlternative": "დარწმუნებული ხართ, რომ გსურთ ამ ალტერნატივის წაშლა?"
+  "confirmDeleteAlternative": "დარწმუნებული ხართ, რომ გსურთ ამ ალტერნატივის წაშლა?",
+  "historySection": "ისტორია და მიყოლა",
+  "viewHistory": "ისტორიის ნახვა",
+  "historyScreenTitle": "მედიკამენტის ისტორია",
+  "last7Days": "ბოლო 7 დღე",
+  "last30Days": "ბოლო 30 დღე",
+  "allTime": "მთელი დრო",
+  "adherencePercentage": "{percentage}%",
+  "@adherencePercentage": {
+    "placeholders": {
+      "percentage": {"type": "double"}
+    }
+  },
+  "noLogsYet": "ჩანაწერები ჯერ არ არის",
+  "noLogsDescription": "აღრიცხეთ დოზები თქვენი მედიკამენტის მიყოლის თვალყურის სანახავად",
+  "logDoseNow": "დოზის აღრიცხვა",
+  "selectStatus": "აირჩიეთ სტატუსი",
+  "doseNotes": "შენიშვნები (სურვილისამებრ)",
+  "doseLogged": "დოზა აღირიცხა",
+  "logDoseError": "დოზის აღრიცხვა ვერ მოხერხდა",
+  "totalDoses": "სულ დოზები",
+  "completedDoses": "დასრულებული",
+  "adherenceRate": "მიყოლის მაჩვენებელი",
+  "doseHistory": "დოზების ისტორია",
+  "noHistoryYet": "ისტორია ჯერ არ არის",
+  "noHistoryDescription": "თქვენი მედიკამენტის ჩანაწერების ისტორია აქ გამოჩნდება",
+  "scheduledFor": "დაგეგმილია {time}",
+  "@scheduledFor": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "takenAt": "მიღებულია {time}",
+  "@takenAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  }
 }

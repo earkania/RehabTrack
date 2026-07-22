@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rehab_track/domain/entities/history_period.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
@@ -28,6 +29,13 @@ class MedicationDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.medications),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              context.push('/activities/medication/$medicationId/history');
+            },
+            tooltip: l10n.history,
+          ),
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
@@ -152,6 +160,35 @@ class MedicationDetailScreen extends ConsumerWidget {
                 context,
                 ref,
                 alternativesAsync,
+                l10n,
+                colorScheme,
+                textTheme,
+              ),
+
+              const Divider(height: 32),
+
+              // History & Adherence Section
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.historySection,
+                      style: textTheme.titleMedium,
+                    ),
+                  ),
+                  FilledButton.tonal(
+                    onPressed: () {
+                      context.push(
+                          '/activities/medication/$medicationId/history');
+                    },
+                    child: Text(l10n.viewHistory),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _buildHistoryPreview(
+                context,
+                ref,
                 l10n,
                 colorScheme,
                 textTheme,
@@ -363,6 +400,58 @@ class MedicationDetailScreen extends ConsumerWidget {
           }).toList(),
         );
       },
+    );
+  }
+
+  Widget _buildHistoryPreview(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    final stats = ref.watch(medicationAdherenceStatsProvider(
+      (medicationId: medicationId, period: HistoryPeriod.last30Days),
+    ));
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(
+              Icons.pie_chart_outline,
+              color: colorScheme.primary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.adherenceRate,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${stats.percentage.round()}% '
+                    '(${stats.taken}/${stats.taken + stats.missed + stats.skipped})',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

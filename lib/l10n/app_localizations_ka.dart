@@ -339,4 +339,78 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get confirmDeleteAlternative =>
       'დარწმუნებული ხართ, რომ გსურთ ამ ალტერნატივის წაშლა?';
+
+  @override
+  String get historySection => 'ისტორია და მიყოლა';
+
+  @override
+  String get viewHistory => 'ისტორიის ნახვა';
+
+  @override
+  String get historyScreenTitle => 'მედიკამენტის ისტორია';
+
+  @override
+  String get last7Days => 'ბოლო 7 დღე';
+
+  @override
+  String get last30Days => 'ბოლო 30 დღე';
+
+  @override
+  String get allTime => 'მთელი დრო';
+
+  @override
+  String adherencePercentage(double percentage) {
+    return '$percentage%';
+  }
+
+  @override
+  String get noLogsYet => 'ჩანაწერები ჯერ არ არის';
+
+  @override
+  String get noLogsDescription =>
+      'აღრიცხეთ დოზები თქვენი მედიკამენტის მიყოლის თვალყურის სანახავად';
+
+  @override
+  String get logDoseNow => 'დოზის აღრიცხვა';
+
+  @override
+  String get selectStatus => 'აირჩიეთ სტატუსი';
+
+  @override
+  String get doseNotes => 'შენიშვნები (სურვილისამებრ)';
+
+  @override
+  String get doseLogged => 'დოზა აღირიცხა';
+
+  @override
+  String get logDoseError => 'დოზის აღრიცხვა ვერ მოხერხდა';
+
+  @override
+  String get totalDoses => 'სულ დოზები';
+
+  @override
+  String get completedDoses => 'დასრულებული';
+
+  @override
+  String get adherenceRate => 'მიყოლის მაჩვენებელი';
+
+  @override
+  String get doseHistory => 'დოზების ისტორია';
+
+  @override
+  String get noHistoryYet => 'ისტორია ჯერ არ არის';
+
+  @override
+  String get noHistoryDescription =>
+      'თქვენი მედიკამენტის ჩანაწერების ისტორია აქ გამოჩნდება';
+
+  @override
+  String scheduledFor(String time) {
+    return 'დაგეგმილია $time';
+  }
+
+  @override
+  String takenAt(String time) {
+    return 'მიღებულია $time';
+  }
 }

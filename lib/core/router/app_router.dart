@@ -13,6 +13,7 @@ import 'package:rehab_track/presentation/screens/activities/add_schedule_screen.
 import 'package:rehab_track/presentation/screens/activities/edit_schedule_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/add_alternative_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/edit_alternative_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/medication_history_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
 
@@ -74,6 +75,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             return const _InvalidRouteScreen();
           }
           return MedicationDetailScreen(medicationId: id);
+        },
+      ),
+      GoRoute(
+        path: '/activities/medication/:id/history',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return MedicationHistoryScreen(medicationId: id);
         },
       ),
       GoRoute(

@@ -122,5 +122,42 @@
   "noAlternativesDescription": "Add doctor-approved substitutes for this medication",
   "alternativesSection": "Alternatives",
   "genericSubstitute": "Generic substitute",
-  "confirmDeleteAlternative": "Are you sure you want to delete this alternative?"
+  "confirmDeleteAlternative": "Are you sure you want to delete this alternative?",
+  "historySection": "History & Adherence",
+  "viewHistory": "View History",
+  "historyScreenTitle": "Medication History",
+  "last7Days": "Last 7 Days",
+  "last30Days": "Last 30 Days",
+  "allTime": "All Time",
+  "adherencePercentage": "{percentage}%",
+  "@adherencePercentage": {
+    "placeholders": {
+      "percentage": {"type": "double"}
+    }
+  },
+  "noLogsYet": "No logs yet",
+  "noLogsDescription": "Log doses to track your medication adherence",
+  "logDoseNow": "Log Dose",
+  "selectStatus": "Select Status",
+  "doseNotes": "Notes (optional)",
+  "doseLogged": "Dose logged",
+  "logDoseError": "Failed to log dose",
+  "totalDoses": "Total Doses",
+  "completedDoses": "Completed",
+  "adherenceRate": "Adherence Rate",
+  "doseHistory": "Dose History",
+  "noHistoryYet": "No history yet",
+  "noHistoryDescription": "Your medication log history will appear here",
+  "scheduledFor": "Scheduled for {time}",
+  "@scheduledFor": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "takenAt": "Taken at {time}",
+  "@takenAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  }
 }
