@@ -28,5 +28,71 @@
   "retry": "ხელახლა",
   "ok": "OK",
   "yes": "დიახ",
-  "no": "არა"
+  "no": "არა",
+  "medications": "მედიკამენტები",
+  "addMedication": "მედიკამენტის დამატება",
+  "editMedication": "მედიკამენტის რედაქტირება",
+  "medicationName": "მედიკამენტის სახელი",
+  "description": "აღწერა",
+  "doseAmount": "დოზა",
+  "doseUnit": "დოზის ერთეული",
+  "active": "აქტიური",
+  "startDate": "დაწყების თარიღი",
+  "endDate": "დასრულების თარიღი",
+  "notes": "შენიშვნები",
+  "scheduleType": "გრაფიკის ტიპი",
+  "dailySchedule": "ყოველდღიური",
+  "fixedTimesSchedule": "ფიქსირებული დრო",
+  "intervalSchedule": "ინტერვალი დღეებში",
+  "instructions": "ინსტრუქციები",
+  "alternatives": "ალტერნატივები",
+  "addAlternative": "ალტერნატივის დამატება",
+  "doctorApproved": "ექიმის მიერ დამტკიცებული",
+  "history": "ისტორია",
+  "adherence": "მიყოლა",
+  "taken": "მიღებული",
+  "missed": "გამოტოვილი",
+  "skipped": "გაცდენილი",
+  "pending": "მოლოდინში",
+  "noMedicationsYet": "მედიკამენტები ჯერ არ არის",
+  "addFirstMedication": "დაამატეთ თქვენი პირველი მედიკამენტი",
+  "scheduleAdded": "გრაფიკი დაემატა",
+  "scheduleDeleted": "გრაფიკი წაიშალა",
+  "confirmDelete": "დარწმუნებული ხართ?",
+  "nextDose": "შემდეგი დოზა",
+  "logDose": "დოზის აღრიცხვა",
+  "medicationAdded": "მედიკამენტი დაემატა",
+  "medicationUpdated": "მედიკამენტი განახლდა",
+  "medicationDeleted": "მედიკამენტი წაიშალა",
+  "addSchedule": "გრაფიკის დამატება",
+  "editSchedule": "გრაფიკის რედაქტირება",
+  "dailyAt": "ყოველდღიურად {time}",
+  "@dailyAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "fixedTimes": "ფიქსირებული დრო: {times}",
+  "@fixedTimes": {
+    "placeholders": {
+      "times": {"type": "String"}
+    }
+  },
+  "everyNDays": "ყოველ {count} დღეში {time}",
+  "@everyNDays": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "time": {"type": "String"}
+    }
+  },
+  "beforeMeal": "ჭამამდე",
+  "afterMeal": "ჭამის შემდეგ",
+  "withMeal": "ჭამასთან ერთად",
+  "emptyStomach": "ცარიელ კუჭზე",
+  "beforeBedtime": "ძილის წინ",
+  "morningOnly": "მხოლოდ დილით",
+  "noSchedulesYet": "გრაფიკები ჯერ არ არის",
+  "noAlternativesYet": "ალტერნატივები ჯერ არ არის",
+  "addScheduleToMedication": "დაამატეთ გრაფიკი ამ მედიკამენტისთვის",
+  "days": "დღე"
 }

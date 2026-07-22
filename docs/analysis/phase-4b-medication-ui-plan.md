@@ -1,7 +1,7 @@
 # Phase 4B — Medication UI & Notification Integration Plan
 
 **Date:** 2026-07-21
-**Status:** Planning (no code changes)
+**Status:** Step 1 (Foundation) Completed
 **Depends on:** Phase 4A (completed — schema v2, dose fields, MedicationAlternatives)
 
 ---
@@ -963,14 +963,14 @@ No changes to existing routes needed. Only new routes are added.
 
 ## 10. Implementation Order
 
-### Step 1: Foundation (no UI yet)
+### Step 1: Foundation (no UI yet) ✅ COMPLETED
 
-1. Create `AdherenceStats` domain entity
-2. Create `activeProfileIdProvider`
-3. Create `EmptyState` shared widget
-4. Update existing placeholder screens to use `EmptyState`
-5. Add localization keys for medication module
-6. Run `build_runner` if any new entities require code generation
+1. Create `AdherenceStats` domain entity ✅
+2. Create `activeProfileIdProvider` ✅
+3. Create `EmptyState` shared widget ✅
+4. Update existing placeholder screens to use `EmptyState` ✅
+5. Add localization keys for medication module ✅
+6. Run `build_runner` if any new entities require code generation (not needed — AdherenceStats is pure Dart, no code generation required)
 
 ### Step 2: Medication CRUD
 

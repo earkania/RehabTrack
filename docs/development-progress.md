@@ -337,13 +337,89 @@ Note: Diet module has a DAO but no dedicated repository yet.
 | `flutter analyze` | Passed (0 issues) |
 | `flutter test` | Passed (1/1) |
 
+### Phase 4B — Step 1: Foundation
+
+**Status:** Completed
+
+**What was done:**
+
+**AdherenceStats Domain Entity:**
+- Created `lib/domain/entities/adherence_stats.dart`
+- Separate entity from Medication, following Clean Architecture domain purity (no Flutter, Drift, or Riverpod imports)
+- Fields: `taken`, `missed`, `skipped`, `pending`, `total`, `percentage`
+- Factory `AdherenceStats.fromLogs(List<MedicationLog> logs)` calculates statistics from medication logs
+- Percentage formula: `taken / (taken + missed + skipped) * 100`
+- Pending items excluded from denominator
+- Division by zero handled safely (returns 0.0)
+- Static `empty` const for zero-state
+
+**Active Profile Provider:**
+- Created `lib/presentation/providers/profile_provider.dart`
+- `activeProfileIdProvider` — `Provider<int?>` returning hardcoded profile ID 1
+- Temporary implementation with comment indicating future multi-profile replacement
+
+
+**EmptyState Widget:**
+- Created `lib/presentation/widgets/empty_state.dart`
+- Reusable Material 3 widget with properties: `icon`, `title`, `subtitle`, optional `actionLabel`, optional `onAction`
+- No medication-specific logic, no hardcoded text
+- Used across all 4 placeholder screens (Today, Health, Activities, Records)
+
+**Placeholder Screen Refactoring:**
+- Replaced duplicated inline placeholder code in 4 screens with `EmptyState` widget:
+  - `lib/presentation/screens/today/today_screen.dart`
+  - `lib/presentation/screens/health/health_screen.dart`
+  - `lib/presentation/screens/activities/activities_screen.dart`
+  - `lib/presentation/screens/records/records_screen.dart`
+- Activities screen remains a placeholder — not yet replaced with medication list
+
+**Localization Additions:**
+- Added 40+ medication-related keys to `lib/l10n/app_en.arb` and `lib/l10n/app_ka.arb`
+- Includes: medication CRUD labels, schedule types, adherence statuses, instructions, placeholders
+- Parameterized keys: `dailyAt`, `fixedTimes`, `everyNDays` with placeholders
+- Follows existing ARB conventions
+
+**Files Created:**
+- `lib/domain/entities/adherence_stats.dart`
+- `lib/presentation/providers/profile_provider.dart`
+- `lib/presentation/widgets/empty_state.dart`
+
+**Files Modified:**
+- `lib/presentation/screens/today/today_screen.dart`
+- `lib/presentation/screens/health/health_screen.dart`
+- `lib/presentation/screens/activities/activities_screen.dart`
+- `lib/presentation/screens/records/records_screen.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_ka.arb`
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (1/1) |
+
+**Architecture Verification:**
+- Presentation layer does not access DAOs directly
+- Presentation layer does not use NotificationService directly (pre-existing `notification_provider.dart` pattern unchanged)
+- No medication CRUD functionality implemented
+- No notification scheduling implemented
+- Existing architecture conventions preserved
+
+**Note:** Pre-existing pattern where `notification_provider.dart` imports data-layer notification services directly (not introduced in this step) remains unchanged. All new code follows Clean Architecture boundaries.
+
 ## Next Planned Phase
 
-### Phase 4B — Medication UI
+### Phase 4B — Step 2: Medication CRUD
 
 **Planned work:**
 
-- Medication CRUD screens
+- Add medication routes to `app_router.dart`
+- Create `MedicationListScreen` (replaces Activities placeholder)
+- Create `AddMedicationScreen`
+- Create `EditMedicationScreen`
+- Create `MedicationDetailScreen`
+- Create medication providers (`medicationListProvider`, `medicationProvider`, `activeProfileIdProvider` integration)
 - Medication list with status indicators
 - Visual schedule editor (daily, fixed times, interval days)
 - Medication history (calendar/timeline + adherence stats)

@@ -271,6 +271,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No'**
   String get no;
+
+  /// No description provided for @medications.
+  ///
+  /// In en, this message translates to:
+  /// **'Medications'**
+  String get medications;
+
+  /// No description provided for @addMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Medication'**
+  String get addMedication;
+
+  /// No description provided for @editMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Medication'**
+  String get editMedication;
+
+  /// No description provided for @medicationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Name'**
+  String get medicationName;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @doseAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose Amount'**
+  String get doseAmount;
+
+  /// No description provided for @doseUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose Unit'**
+  String get doseUnit;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get endDate;
+
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// No description provided for @scheduleType.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule Type'**
+  String get scheduleType;
+
+  /// No description provided for @dailySchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get dailySchedule;
+
+  /// No description provided for @fixedTimesSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Times'**
+  String get fixedTimesSchedule;
+
+  /// No description provided for @intervalSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval Days'**
+  String get intervalSchedule;
+
+  /// No description provided for @instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions'**
+  String get instructions;
+
+  /// No description provided for @alternatives.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternatives'**
+  String get alternatives;
+
+  /// No description provided for @addAlternative.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Alternative'**
+  String get addAlternative;
+
+  /// No description provided for @doctorApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Approved'**
+  String get doctorApproved;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @adherence.
+  ///
+  /// In en, this message translates to:
+  /// **'Adherence'**
+  String get adherence;
+
+  /// No description provided for @taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get taken;
+
+  /// No description provided for @missed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get missed;
+
+  /// No description provided for @skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get skipped;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @noMedicationsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No medications yet'**
+  String get noMedicationsYet;
+
+  /// No description provided for @addFirstMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first medication'**
+  String get addFirstMedication;
+
+  /// No description provided for @scheduleAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule added'**
+  String get scheduleAdded;
+
+  /// No description provided for @scheduleDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule deleted'**
+  String get scheduleDeleted;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure?'**
+  String get confirmDelete;
+
+  /// No description provided for @nextDose.
+  ///
+  /// In en, this message translates to:
+  /// **'Next dose'**
+  String get nextDose;
+
+  /// No description provided for @logDose.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a dose'**
+  String get logDose;
+
+  /// No description provided for @medicationAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication added'**
+  String get medicationAdded;
+
+  /// No description provided for @medicationUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication updated'**
+  String get medicationUpdated;
+
+  /// No description provided for @medicationDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication deleted'**
+  String get medicationDeleted;
+
+  /// No description provided for @addSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Schedule'**
+  String get addSchedule;
+
+  /// No description provided for @editSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Schedule'**
+  String get editSchedule;
+
+  /// No description provided for @dailyAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily at {time}'**
+  String dailyAt(String time);
+
+  /// No description provided for @fixedTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed times: {times}'**
+  String fixedTimes(String times);
+
+  /// No description provided for @everyNDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Every {count} days at {time}'**
+  String everyNDays(int count, String time);
+
+  /// No description provided for @beforeMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Before meal'**
+  String get beforeMeal;
+
+  /// No description provided for @afterMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'After meal'**
+  String get afterMeal;
+
+  /// No description provided for @withMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'With meal'**
+  String get withMeal;
+
+  /// No description provided for @emptyStomach.
+  ///
+  /// In en, this message translates to:
+  /// **'On empty stomach'**
+  String get emptyStomach;
+
+  /// No description provided for @beforeBedtime.
+  ///
+  /// In en, this message translates to:
+  /// **'Before bedtime'**
+  String get beforeBedtime;
+
+  /// No description provided for @morningOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning only'**
+  String get morningOnly;
+
+  /// No description provided for @noSchedulesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No schedules yet'**
+  String get noSchedulesYet;
+
+  /// No description provided for @noAlternativesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No alternatives yet'**
+  String get noAlternativesYet;
+
+  /// No description provided for @addScheduleToMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a schedule for this medication'**
+  String get addScheduleToMedication;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get days;
 }
 
 class _AppLocalizationsDelegate

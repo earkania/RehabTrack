@@ -94,4 +94,160 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no => 'No';
+
+  @override
+  String get medications => 'Medications';
+
+  @override
+  String get addMedication => 'Add Medication';
+
+  @override
+  String get editMedication => 'Edit Medication';
+
+  @override
+  String get medicationName => 'Medication Name';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get doseAmount => 'Dose Amount';
+
+  @override
+  String get doseUnit => 'Dose Unit';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get endDate => 'End Date';
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get scheduleType => 'Schedule Type';
+
+  @override
+  String get dailySchedule => 'Daily';
+
+  @override
+  String get fixedTimesSchedule => 'Fixed Times';
+
+  @override
+  String get intervalSchedule => 'Interval Days';
+
+  @override
+  String get instructions => 'Instructions';
+
+  @override
+  String get alternatives => 'Alternatives';
+
+  @override
+  String get addAlternative => 'Add Alternative';
+
+  @override
+  String get doctorApproved => 'Doctor Approved';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get adherence => 'Adherence';
+
+  @override
+  String get taken => 'Taken';
+
+  @override
+  String get missed => 'Missed';
+
+  @override
+  String get skipped => 'Skipped';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get noMedicationsYet => 'No medications yet';
+
+  @override
+  String get addFirstMedication => 'Add your first medication';
+
+  @override
+  String get scheduleAdded => 'Schedule added';
+
+  @override
+  String get scheduleDeleted => 'Schedule deleted';
+
+  @override
+  String get confirmDelete => 'Are you sure?';
+
+  @override
+  String get nextDose => 'Next dose';
+
+  @override
+  String get logDose => 'Log a dose';
+
+  @override
+  String get medicationAdded => 'Medication added';
+
+  @override
+  String get medicationUpdated => 'Medication updated';
+
+  @override
+  String get medicationDeleted => 'Medication deleted';
+
+  @override
+  String get addSchedule => 'Add Schedule';
+
+  @override
+  String get editSchedule => 'Edit Schedule';
+
+  @override
+  String dailyAt(String time) {
+    return 'Daily at $time';
+  }
+
+  @override
+  String fixedTimes(String times) {
+    return 'Fixed times: $times';
+  }
+
+  @override
+  String everyNDays(int count, String time) {
+    return 'Every $count days at $time';
+  }
+
+  @override
+  String get beforeMeal => 'Before meal';
+
+  @override
+  String get afterMeal => 'After meal';
+
+  @override
+  String get withMeal => 'With meal';
+
+  @override
+  String get emptyStomach => 'On empty stomach';
+
+  @override
+  String get beforeBedtime => 'Before bedtime';
+
+  @override
+  String get morningOnly => 'Morning only';
+
+  @override
+  String get noSchedulesYet => 'No schedules yet';
+
+  @override
+  String get noAlternativesYet => 'No alternatives yet';
+
+  @override
+  String get addScheduleToMedication => 'Add a schedule for this medication';
+
+  @override
+  String get days => 'days';
 }

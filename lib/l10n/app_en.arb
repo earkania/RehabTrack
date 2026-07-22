@@ -28,5 +28,71 @@
   "retry": "Retry",
   "ok": "OK",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "medications": "Medications",
+  "addMedication": "Add Medication",
+  "editMedication": "Edit Medication",
+  "medicationName": "Medication Name",
+  "description": "Description",
+  "doseAmount": "Dose Amount",
+  "doseUnit": "Dose Unit",
+  "active": "Active",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "notes": "Notes",
+  "scheduleType": "Schedule Type",
+  "dailySchedule": "Daily",
+  "fixedTimesSchedule": "Fixed Times",
+  "intervalSchedule": "Interval Days",
+  "instructions": "Instructions",
+  "alternatives": "Alternatives",
+  "addAlternative": "Add Alternative",
+  "doctorApproved": "Doctor Approved",
+  "history": "History",
+  "adherence": "Adherence",
+  "taken": "Taken",
+  "missed": "Missed",
+  "skipped": "Skipped",
+  "pending": "Pending",
+  "noMedicationsYet": "No medications yet",
+  "addFirstMedication": "Add your first medication",
+  "scheduleAdded": "Schedule added",
+  "scheduleDeleted": "Schedule deleted",
+  "confirmDelete": "Are you sure?",
+  "nextDose": "Next dose",
+  "logDose": "Log a dose",
+  "medicationAdded": "Medication added",
+  "medicationUpdated": "Medication updated",
+  "medicationDeleted": "Medication deleted",
+  "addSchedule": "Add Schedule",
+  "editSchedule": "Edit Schedule",
+  "dailyAt": "Daily at {time}",
+  "@dailyAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "fixedTimes": "Fixed times: {times}",
+  "@fixedTimes": {
+    "placeholders": {
+      "times": {"type": "String"}
+    }
+  },
+  "everyNDays": "Every {count} days at {time}",
+  "@everyNDays": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "time": {"type": "String"}
+    }
+  },
+  "beforeMeal": "Before meal",
+  "afterMeal": "After meal",
+  "withMeal": "With meal",
+  "emptyStomach": "On empty stomach",
+  "beforeBedtime": "Before bedtime",
+  "morningOnly": "Morning only",
+  "noSchedulesYet": "No schedules yet",
+  "noAlternativesYet": "No alternatives yet",
+  "addScheduleToMedication": "Add a schedule for this medication",
+  "days": "days"
 }

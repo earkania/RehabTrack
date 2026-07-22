@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/widgets/empty_state.dart';
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
@@ -12,29 +13,10 @@ class ActivitiesScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(l10n.activities),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.directions_walk,
-              size: 64,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.noDataYet,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.addFirstItem,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
+      body: EmptyState(
+        icon: Icons.directions_walk,
+        title: l10n.noDataYet,
+        subtitle: l10n.addFirstItem,
       ),
     );
   }
