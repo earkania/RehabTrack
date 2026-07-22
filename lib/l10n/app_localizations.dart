@@ -571,6 +571,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'days'**
   String get days;
+
+  /// No description provided for @deactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get deactivate;
+
+  /// No description provided for @confirmDeactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'This medication will be deactivated. Schedules and history will be preserved.'**
+  String get confirmDeactivate;
+
+  /// No description provided for @invalidRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid page'**
+  String get invalidRoute;
 }
 
 class _AppLocalizationsDelegate

@@ -94,5 +94,8 @@
   "noSchedulesYet": "No schedules yet",
   "noAlternativesYet": "No alternatives yet",
   "addScheduleToMedication": "Add a schedule for this medication",
-  "days": "days"
+  "days": "days",
+  "deactivate": "Deactivate",
+  "confirmDeactivate": "This medication will be deactivated. Schedules and history will be preserved.",
+  "invalidRoute": "Invalid page"
 }

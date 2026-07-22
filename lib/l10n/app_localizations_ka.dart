@@ -250,4 +250,14 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get days => 'დღე';
+
+  @override
+  String get deactivate => 'დეაქტივაცია';
+
+  @override
+  String get confirmDeactivate =>
+      'მედიკამენტი დეაქტივირდება. გრაფიკები და ისტორია შენარჩუნდება.';
+
+  @override
+  String get invalidRoute => 'არასწორი გვერდი';
 }

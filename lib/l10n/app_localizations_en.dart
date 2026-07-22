@@ -250,4 +250,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get days => 'days';
+
+  @override
+  String get deactivate => 'Deactivate';
+
+  @override
+  String get confirmDeactivate =>
+      'This medication will be deactivated. Schedules and history will be preserved.';
+
+  @override
+  String get invalidRoute => 'Invalid page';
 }

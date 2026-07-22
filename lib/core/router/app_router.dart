@@ -5,7 +5,10 @@ import 'package:rehab_track/l10n/app_localizations.dart';
 
 import 'package:rehab_track/presentation/screens/today/today_screen.dart';
 import 'package:rehab_track/presentation/screens/health/health_screen.dart';
-import 'package:rehab_track/presentation/screens/activities/activities_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/medication_list_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/add_medication_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/edit_medication_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/medication_detail_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
 
@@ -38,7 +41,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/activities',
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: ActivitiesScreen(),
+              child: MedicationListScreen(),
             ),
           ),
           GoRoute(
@@ -55,9 +58,67 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      GoRoute(
+        path: '/activities/medication/add',
+        builder: (context, state) => const AddMedicationScreen(),
+      ),
+      GoRoute(
+        path: '/activities/medication/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return MedicationDetailScreen(medicationId: id);
+        },
+      ),
+      GoRoute(
+        path: '/activities/medication/:id/edit',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return EditMedicationScreen(medicationId: id);
+        },
+      ),
     ],
   );
 });
+
+class _InvalidRouteScreen extends StatelessWidget {
+  const _InvalidRouteScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.error)),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.invalidRoute,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 16),
+            FilledButton.tonal(
+              onPressed: () => context.go('/'),
+              child: Text(l10n.back),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class ScaffoldWithNavBar extends StatelessWidget {
   final Widget child;

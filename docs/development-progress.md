@@ -206,7 +206,7 @@ Note: Diet module has a DAO but no dedicated repository yet.
 |---|---|---|---|
 | Today | `/` | TodayScreen | Placeholder — icon + "No data yet" |
 | Health | `/health` | HealthScreen | Placeholder — icon + "No data yet" |
-| Activities | `/activities` | ActivitiesScreen | Placeholder — icon + "No data yet" |
+| Activities | `/activities` | MedicationListScreen | Medication list — shows empty state or medication cards |
 | Records | `/records` | RecordsScreen | Placeholder — icon + "No data yet" |
 | Settings | `/settings` | SettingsScreen | Functional — language switching works |
 
@@ -408,23 +408,101 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 **Note:** Pre-existing pattern where `notification_provider.dart` imports data-layer notification services directly (not introduced in this step) remains unchanged. All new code follows Clean Architecture boundaries.
 
+### Phase 4B — Step 2: Medication CRUD
+
+**Status:** Completed
+
+**What was done:**
+
+**Routing Updated (`app_router.dart`):**
+- Added routes for `/activities/medication/add`, `/activities/medication/:id`, `/activities/medication/:id/edit`
+- Routes are outside ShellRoute (no bottom nav during detail/form screens)
+- `int.tryParse` safety on all `:id` parameters with `_InvalidRouteScreen` for invalid IDs
+- `ScaffoldWithNavBar` updated: Activities tab now highlights for all `/activities/medication/*` routes
+
+**Providers Created (`medication_provider.dart`):**
+- `medicationListProvider(profileId)` — `StreamProvider.autoDispose.family<List<Medication>, int>` wrapping `watchActiveMedications`
+- `medicationProvider(id)` — `FutureProvider.autoDispose.family<Medication?, int>` for single medication lookup
+
+**Medication List Screen (`medication_list_screen.dart`):**
+- Replaced old `ActivitiesScreen` placeholder entirely (old file deleted)
+- Loads medications via `medicationListProvider` with `activeProfileIdProvider`
+- Shows empty state when no medications, loading spinner, error state
+- FAB navigates to add screen
+
+**Add Medication Screen (`add_medication_screen.dart`):**
+- Uses shared `MedicationForm` widget
+- Reads `activeProfileIdProvider` for profile ID
+- Calls `medicationRepository.createMedication()`, pops on success
+
+**Edit Medication Screen (`edit_medication_screen.dart`):**
+- Loads existing medication from `medicationProvider`
+- Preserves original `id`, `profileId`, `createdAt`
+- Updates `updatedAt` on save, calls `medicationRepository.updateMedication()`
+
+**Medication Detail Screen (`medication_detail_screen.dart`):**
+- Displays all medication fields (name, dose, status, notes, dates)
+- Edit button navigates to edit screen
+- Deactivate action with confirmation dialog (sets `active = false`, updates `updatedAt`)
+
+**Shared MedicationForm Widget (`medication_form.dart`):**
+- Reusable form for add and edit screens
+- Fields: name (required), dose amount (numeric), dose unit (dropdown), description, notes, active switch
+- Validation: name required, dose amount must be positive
+- `MedicationFormData` data class for passing initial/saved data
+
+**MedicationCard Widget (`medication_card.dart`):**
+- Shows medication name, dose display (e.g., "5 mg"), active status
+- Reusable across list views, search results, dashboards
+
+**Localization Additions:**
+- Added `deactivate`, `confirmDeactivate`, `invalidRoute` keys to both ARB files
+
+**Files Created:**
+- `lib/presentation/providers/medication_provider.dart`
+- `lib/presentation/screens/activities/medication_list_screen.dart`
+- `lib/presentation/screens/activities/add_medication_screen.dart`
+- `lib/presentation/screens/activities/edit_medication_screen.dart`
+- `lib/presentation/screens/activities/medication_detail_screen.dart`
+- `lib/presentation/widgets/medication/medication_form.dart`
+- `lib/presentation/widgets/medication/medication_card.dart`
+
+**Files Modified:**
+- `lib/core/router/app_router.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_ka.arb`
+
+**Files Deleted:**
+- `lib/presentation/screens/activities/activities_screen.dart`
+
+**Tests:**
+- 10 widget tests covering MedicationCard, MedicationForm, app rendering, and integration
+- Tests use `pump()` instead of `pumpAndSettle()` to handle Drift stream timing
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (10/10) |
+
+**Architecture Verification:**
+- Presentation layer accesses medication data only through providers and repositories
+- No direct DAO access from UI
+- No notification service access from UI
+- All CRUD operations go through `MedicationRepository`
+
 ## Next Planned Phase
 
-### Phase 4B — Step 2: Medication CRUD
+### Phase 4B — Step 3: Schedule Editor
 
 **Planned work:**
 
-- Add medication routes to `app_router.dart`
-- Create `MedicationListScreen` (replaces Activities placeholder)
-- Create `AddMedicationScreen`
-- Create `EditMedicationScreen`
-- Create `MedicationDetailScreen`
-- Create medication providers (`medicationListProvider`, `medicationProvider`, `activeProfileIdProvider` integration)
-- Medication list with status indicators
-- Visual schedule editor (daily, fixed times, interval days)
-- Medication history (calendar/timeline + adherence stats)
-- Notification integration test on real device
-- Condition-check flow at reminder time (future)
+- Create `AddScheduleScreen` with type selector (daily, fixed times, interval days)
+- Create `EditScheduleScreen`
+- Create `medicationSchedulesProvider`
+- Visual schedule editors for each type
+- Schedule instructions with quick-select chips
 
 ## Development Rules
 

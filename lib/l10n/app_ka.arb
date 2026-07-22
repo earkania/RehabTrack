@@ -94,5 +94,8 @@
   "noSchedulesYet": "გრაფიკები ჯერ არ არის",
   "noAlternativesYet": "ალტერნატივები ჯერ არ არის",
   "addScheduleToMedication": "დაამატეთ გრაფიკი ამ მედიკამენტისთვის",
-  "days": "დღე"
+  "days": "დღე",
+  "deactivate": "დეაქტივაცია",
+  "confirmDeactivate": "მედიკამენტი დეაქტივირდება. გრაფიკები და ისტორია შენარჩუნდება.",
+  "invalidRoute": "არასწორი გვერდი"
 }

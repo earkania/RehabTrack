@@ -1,7 +1,7 @@
 # Phase 4B — Medication UI & Notification Integration Plan
 
 **Date:** 2026-07-21
-**Status:** Step 1 (Foundation) Completed
+**Status:** Step 2 (Medication CRUD) Completed
 **Depends on:** Phase 4A (completed — schema v2, dose fields, MedicationAlternatives)
 
 ---
@@ -972,14 +972,14 @@ No changes to existing routes needed. Only new routes are added.
 5. Add localization keys for medication module ✅
 6. Run `build_runner` if any new entities require code generation (not needed — AdherenceStats is pure Dart, no code generation required)
 
-### Step 2: Medication CRUD
+### Step 2: Medication CRUD ✅ COMPLETED
 
-7. Add medication routes to `app_router.dart`
-8. Create `MedicationListScreen` (replaces Activities placeholder)
-9. Create `AddMedicationScreen`
-10. Create `EditMedicationScreen`
-11. Create `MedicationDetailScreen`
-12. Create medication providers (`medicationListProvider`, `medicationProvider`)
+7. Add medication routes to `app_router.dart` ✅
+8. Create `MedicationListScreen` (replaces Activities placeholder) ✅
+9. Create `AddMedicationScreen` ✅
+10. Create `EditMedicationScreen` ✅
+11. Create `MedicationDetailScreen` ✅
+12. Create medication providers (`medicationListProvider`, `medicationProvider`) ✅
 
 ### Step 3: Schedule Editor
 
@@ -1029,6 +1029,7 @@ No changes to existing routes needed. Only new routes are added.
 | `lib/domain/entities/adherence_stats.dart` | AdherenceStats entity |
 | `lib/presentation/providers/medication_provider.dart` | All medication UI providers |
 | `lib/presentation/providers/profile_provider.dart` | Active profile ID provider |
+| `lib/presentation/screens/activities/medication_list_screen.dart` | Medication list (replaces ActivitiesScreen) |
 | `lib/presentation/screens/activities/add_medication_screen.dart` | Add medication form |
 | `lib/presentation/screens/activities/edit_medication_screen.dart` | Edit medication form |
 | `lib/presentation/screens/activities/medication_detail_screen.dart` | Medication detail |
@@ -1036,6 +1037,8 @@ No changes to existing routes needed. Only new routes are added.
 | `lib/presentation/screens/activities/edit_schedule_screen.dart` | Schedule editor (edit) |
 | `lib/presentation/screens/activities/medication_history_screen.dart` | History + adherence |
 | `lib/presentation/widgets/empty_state.dart` | Shared empty state widget |
+| `lib/presentation/widgets/medication/medication_card.dart` | Medication summary card widget |
+| `lib/presentation/widgets/medication/medication_form.dart` | Shared medication form for add/edit |
 | `lib/presentation/widgets/medication/dose_display.dart` | Dose formatting widget |
 | `lib/presentation/widgets/medication/schedule_type_selector.dart` | Schedule type picker |
 | `lib/presentation/widgets/medication/time_picker_field.dart` | Time input widget |
@@ -1046,8 +1049,8 @@ No changes to existing routes needed. Only new routes are added.
 
 | File | Change |
 |---|---|
-| `lib/core/router/app_router.dart` | Add medication routes |
-| `lib/presentation/screens/activities/activities_screen.dart` | Replace placeholder with medication list |
+| `lib/core/router/app_router.dart` | Add medication routes, update ScaffoldWithNavBar |
+| `lib/presentation/screens/activities/activities_screen.dart` | Deleted — replaced by MedicationListScreen |
 | `lib/presentation/screens/today/today_screen.dart` | Use EmptyState widget |
 | `lib/presentation/screens/health/health_screen.dart` | Use EmptyState widget |
 | `lib/presentation/screens/records/records_screen.dart` | Use EmptyState widget |
