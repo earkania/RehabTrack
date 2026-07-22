@@ -494,15 +494,109 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 ## Next Planned Phase
 
-### Phase 4B — Step 3: Schedule Editor
+### Phase 4B — Step 4: Medication Alternatives
 
-**Planned work:**
+**Status:** Completed
 
-- Create `AddScheduleScreen` with type selector (daily, fixed times, interval days)
-- Create `EditScheduleScreen`
-- Create `medicationSchedulesProvider`
-- Visual schedule editors for each type
-- Schedule instructions with quick-select chips
+**What was done:**
+
+**Providers Added (`medication_provider.dart`):**
+- `medicationAlternativesProvider(medicationId)` — `StreamProvider.autoDispose.family<List<MedicationAlternative>, int>` for alternatives list
+- `medicationAlternativeProvider(alternativeId)` — `FutureProvider.autoDispose.family<MedicationAlternative?, int>` for single alternative lookup
+
+**Routing Updated (`app_router.dart`):**
+- Added `/activities/medication/:id/alternative/add` route
+- Added `/activities/medication/:id/alternative/:alternativeId/edit` route
+- Routes parse both `id` and `alternativeId` parameters with `int.tryParse`
+- Invalid IDs show `_InvalidRouteScreen`
+- New imports for `AddAlternativeScreen` and `EditAlternativeScreen`
+
+**MedicationAlternativeCard Widget (`medication_alternative_card.dart`):**
+- Displays alternative name, dose (e.g., "5 mg"), doctor approved badge, notes preview
+- Reusable across list views and detail screens
+- Optional `onTap` callback for navigation
+
+**MedicationAlternativeForm Widget (`medication_alternative_form.dart`):**
+- Shared form for both add and edit screens
+- Fields: name (required), dose amount (optional, numeric), dose unit (optional), doctor approved (switch), notes (optional)
+- Validation: name required, dose must be positive when entered
+- `MedicationAlternativeFormData` data class with `fromAlternative` factory
+- Trims whitespace on save
+
+**AddAlternativeScreen (`add_alternative_screen.dart`):**
+- `ConsumerStatefulWidget` using shared form
+- Verifies medication exists before save
+- Saves through `MedicationRepository.createAlternative()`
+- Returns to MedicationDetailScreen after success
+
+**EditAlternativeScreen (`edit_alternative_screen.dart`):**
+- Loads alternative using `medicationAlternativeProvider`
+- Verifies alternative belongs to medication via `medicationId` check
+- Saves through `MedicationRepository.updateAlternative()`
+- Delete action in AppBar with confirmation dialog
+- Delete through `MedicationRepository.deleteAlternative()`
+
+**MedicationDetailScreen Updated:**
+- Added `medicationAlternativesProvider(medicationId)` watch
+- Alternatives section with "Add Alternative" button (only for active medications)
+- Uses `MedicationAlternativeCard` for each alternative
+- Uses `EmptyState` widget when no alternatives exist
+- Tapping a card navigates to EditAlternativeScreen
+- Delete does not affect Medication, MedicationSchedule, or MedicationLog
+
+**Localization Keys Added:**
+- `editAlternative`, `deleteAlternative`, `deleteAlternativeConfirmation`
+- `alternativeAdded`, `alternativeUpdated`, `alternativeDeleted`
+- `noAlternatives`, `noAlternativesDescription`, `alternativesSection`
+- `genericSubstitute`, `confirmDeleteAlternative`
+- Added to both `app_en.arb` and `app_ka.arb`
+- Fixed duplicate `noSchedulesYet` key in both ARB files
+
+**Files Created:**
+- `lib/presentation/widgets/medication/medication_alternative_card.dart`
+- `lib/presentation/widgets/medication/medication_alternative_form.dart`
+- `lib/presentation/screens/activities/add_alternative_screen.dart`
+- `lib/presentation/screens/activities/edit_alternative_screen.dart`
+- `test/alternative_test.dart`
+
+**Files Modified:**
+- `lib/presentation/providers/medication_provider.dart`
+- `lib/core/router/app_router.dart`
+- `lib/presentation/screens/activities/medication_detail_screen.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_ka.arb`
+- `test/schedule_test.dart` (fixed unused variable warning)
+
+**Tests:**
+- 14 widget tests covering MedicationAlternativeCard, MedicationAlternativeForm, and data classes
+- Tests: rendering name, dose, doctor approved badge, notes preview, onTap callback
+- Tests: form validation (empty name, invalid dose), save with valid data, pre-populate fields, trim whitespace
+- Tests: `fromAlternative` factory with all fields and with null optional fields
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (39/39) |
+
+**Architecture Verification:**
+- All CRUD operations go through `MedicationRepository`
+- No direct DAO access from presentation layer
+- No notification service access from presentation layer
+- Delete does not affect medication, schedules, or logs
+- Shared form widget used for both add and edit screens
+
+**Validation Rules:**
+- Name: required, trimmed
+- Dose Amount: optional, must be positive when entered
+- Dose Unit: optional, free text
+- Doctor Approved: boolean switch, defaults to false
+- Notes: optional, trimmed
+
+**Known Limitations:**
+- No medication interaction checking (by design — deferred)
+- No automatic alternative suggestions (by design — user-entered only)
 
 ## Development Rules
 

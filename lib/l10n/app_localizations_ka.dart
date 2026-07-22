@@ -240,8 +240,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get morningOnly => 'მხოლოდ დილით';
 
   @override
-  String get noSchedulesYet =>
-      'გრაფიკები ჯერ არ არის. დაამატეთ შეხსენებებისთვის.';
+  String get noSchedulesYet => 'გრაფიკები ჯერ არ არის';
 
   @override
   String get noAlternativesYet => 'ალტერნატივები ჯერ არ არის';
@@ -304,4 +303,40 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get addScheduleSubtitle => 'დააყენეთ შეხსენებები ამ მედიკამენტისთვის';
+
+  @override
+  String get editAlternative => 'ალტერნატივის რედაქტირება';
+
+  @override
+  String get deleteAlternative => 'ალტერნატივის წაშლა';
+
+  @override
+  String get deleteAlternativeConfirmation =>
+      'წაშალოთ ეს ალტერნატივა? ეს არ იმოქმედებს მედიკამენტზე ან მის გრაფიკებზე.';
+
+  @override
+  String get alternativeAdded => 'ალტერნატივა დაემატა';
+
+  @override
+  String get alternativeUpdated => 'ალტერნატივა განახლდა';
+
+  @override
+  String get alternativeDeleted => 'ალტერნატივა წაიშალა';
+
+  @override
+  String get noAlternatives => 'ალტერნატივები არ არის';
+
+  @override
+  String get noAlternativesDescription =>
+      'დაამატეთ ექიმის მიერ დამტკიცებული შემცვლელები ამ მედიკამენტისთვის';
+
+  @override
+  String get alternativesSection => 'ალტერნატივები';
+
+  @override
+  String get genericSubstitute => 'გენერიკული შემცვლელი';
+
+  @override
+  String get confirmDeleteAlternative =>
+      'დარწმუნებული ხართ, რომ გსურთ ამ ალტერნატივის წაშლა?';
 }

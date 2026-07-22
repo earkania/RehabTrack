@@ -101,7 +101,6 @@
   "schedules": "გრაფიკები",
   "deleteSchedule": "გრაფიკის წაშლა",
   "deleteScheduleConfirmation": "წაშალოთ ეს გრაფიკი? შეტყობინებები გაუქმდება.",
-  "noSchedulesYet": "გრაფიკები ჯერ არ არის. დაამატეთ შეხსენებებისთვის.",
   "selectTime": "აირჩიეთ დრო",
   "addTime": "დროის დამატება",
   "removeTime": "წაშლა",
@@ -112,5 +111,16 @@
   "failedToSaveSchedule": "გრაფიკის შენახვა ვერ მოხერხდა",
   "failedToDeleteSchedule": "გრაფიკის წაშლა ვერ მოხერხდა",
   "schedulesSection": "გრაფიკები",
-  "addScheduleSubtitle": "დააყენეთ შეხსენებები ამ მედიკამენტისთვის"
+  "addScheduleSubtitle": "დააყენეთ შეხსენებები ამ მედიკამენტისთვის",
+  "editAlternative": "ალტერნატივის რედაქტირება",
+  "deleteAlternative": "ალტერნატივის წაშლა",
+  "deleteAlternativeConfirmation": "წაშალოთ ეს ალტერნატივა? ეს არ იმოქმედებს მედიკამენტზე ან მის გრაფიკებზე.",
+  "alternativeAdded": "ალტერნატივა დაემატა",
+  "alternativeUpdated": "ალტერნატივა განახლდა",
+  "alternativeDeleted": "ალტერნატივა წაიშალა",
+  "noAlternatives": "ალტერნატივები არ არის",
+  "noAlternativesDescription": "დაამატეთ ექიმის მიერ დამტკიცებული შემცვლელები ამ მედიკამენტისთვის",
+  "alternativesSection": "ალტერნატივები",
+  "genericSubstitute": "გენერიკული შემცვლელი",
+  "confirmDeleteAlternative": "დარწმუნებული ხართ, რომ გსურთ ამ ალტერნატივის წაშლა?"
 }

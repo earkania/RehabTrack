@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
+import 'package:rehab_track/presentation/widgets/empty_state.dart';
+import 'package:rehab_track/presentation/widgets/medication/medication_alternative_card.dart';
 
 class MedicationDetailScreen extends ConsumerWidget {
   final int medicationId;
@@ -18,6 +21,8 @@ class MedicationDetailScreen extends ConsumerWidget {
     final medicationAsync = ref.watch(medicationProvider(medicationId));
     final schedulesAsync =
         ref.watch(medicationSchedulesProvider(medicationId));
+    final alternativesAsync =
+        ref.watch(medicationAlternativesProvider(medicationId));
 
     return Scaffold(
       appBar: AppBar(
@@ -115,6 +120,38 @@ class MedicationDetailScreen extends ConsumerWidget {
                 context,
                 ref,
                 schedulesAsync,
+                l10n,
+                colorScheme,
+                textTheme,
+              ),
+
+              const Divider(height: 32),
+
+              // Alternatives Section
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.alternativesSection,
+                      style: textTheme.titleMedium,
+                    ),
+                  ),
+                  if (medication.active)
+                    FilledButton.tonalIcon(
+                      onPressed: () {
+                        context.push(
+                            '/activities/medication/$medicationId/alternative/add');
+                      },
+                      icon: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.addAlternative),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _buildAlternativesSection(
+                context,
+                ref,
+                alternativesAsync,
                 l10n,
                 colorScheme,
                 textTheme,
@@ -265,6 +302,63 @@ class MedicationDetailScreen extends ConsumerWidget {
                   );
                 },
               ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildAlternativesSection(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<MedicationAlternative>> alternativesAsync,
+    AppLocalizations l10n,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    return alternativesAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Center(
+          child: Column(
+            children: [
+              Text(l10n.error),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => ref
+                    .invalidate(medicationAlternativesProvider(medicationId)),
+                child: Text(l10n.retry),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (alternatives) {
+        if (alternatives.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: EmptyState(
+              icon: Icons.medication_outlined,
+              title: l10n.noAlternatives,
+              subtitle: l10n.noAlternativesDescription,
+            ),
+          );
+        }
+
+        return Column(
+          children: alternatives.map((alternative) {
+            return MedicationAlternativeCard(
+              alternative: alternative,
+              onTap: () {
+                context.push(
+                  '/activities/medication/$medicationId/alternative/${alternative.id}/edit',
+                );
+              },
             );
           }).toList(),
         );

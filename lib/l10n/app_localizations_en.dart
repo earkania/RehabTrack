@@ -240,7 +240,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get morningOnly => 'Morning only';
 
   @override
-  String get noSchedulesYet => 'No schedules yet. Add one to get reminders.';
+  String get noSchedulesYet => 'No schedules yet';
 
   @override
   String get noAlternativesYet => 'No alternatives yet';
@@ -303,4 +303,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addScheduleSubtitle => 'Set up reminders for this medication';
+
+  @override
+  String get editAlternative => 'Edit Alternative';
+
+  @override
+  String get deleteAlternative => 'Delete Alternative';
+
+  @override
+  String get deleteAlternativeConfirmation =>
+      'Remove this alternative? This will not affect the medication or its schedules.';
+
+  @override
+  String get alternativeAdded => 'Alternative added';
+
+  @override
+  String get alternativeUpdated => 'Alternative updated';
+
+  @override
+  String get alternativeDeleted => 'Alternative deleted';
+
+  @override
+  String get noAlternatives => 'No alternatives';
+
+  @override
+  String get noAlternativesDescription =>
+      'Add doctor-approved substitutes for this medication';
+
+  @override
+  String get alternativesSection => 'Alternatives';
+
+  @override
+  String get genericSubstitute => 'Generic substitute';
+
+  @override
+  String get confirmDeleteAlternative =>
+      'Are you sure you want to delete this alternative?';
 }

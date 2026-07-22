@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
@@ -31,4 +32,18 @@ final medicationScheduleProvider =
         (ref, scheduleId) async {
   final repo = ref.watch(medicationRepositoryProvider);
   return repo.getSchedule(scheduleId);
+});
+
+final medicationAlternativesProvider =
+    StreamProvider.autoDispose.family<List<MedicationAlternative>, int>(
+        (ref, medicationId) {
+  final repo = ref.watch(medicationRepositoryProvider);
+  return repo.watchAlternatives(medicationId);
+});
+
+final medicationAlternativeProvider =
+    FutureProvider.autoDispose.family<MedicationAlternative?, int>(
+        (ref, alternativeId) async {
+  final repo = ref.watch(medicationRepositoryProvider);
+  return repo.getAlternative(alternativeId);
 });

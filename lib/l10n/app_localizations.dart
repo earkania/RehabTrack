@@ -551,7 +551,7 @@ abstract class AppLocalizations {
   /// No description provided for @noSchedulesYet.
   ///
   /// In en, this message translates to:
-  /// **'No schedules yet. Add one to get reminders.'**
+  /// **'No schedules yet'**
   String get noSchedulesYet;
 
   /// No description provided for @noAlternativesYet.
@@ -673,6 +673,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set up reminders for this medication'**
   String get addScheduleSubtitle;
+
+  /// No description provided for @editAlternative.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Alternative'**
+  String get editAlternative;
+
+  /// No description provided for @deleteAlternative.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Alternative'**
+  String get deleteAlternative;
+
+  /// No description provided for @deleteAlternativeConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this alternative? This will not affect the medication or its schedules.'**
+  String get deleteAlternativeConfirmation;
+
+  /// No description provided for @alternativeAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternative added'**
+  String get alternativeAdded;
+
+  /// No description provided for @alternativeUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternative updated'**
+  String get alternativeUpdated;
+
+  /// No description provided for @alternativeDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternative deleted'**
+  String get alternativeDeleted;
+
+  /// No description provided for @noAlternatives.
+  ///
+  /// In en, this message translates to:
+  /// **'No alternatives'**
+  String get noAlternatives;
+
+  /// No description provided for @noAlternativesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add doctor-approved substitutes for this medication'**
+  String get noAlternativesDescription;
+
+  /// No description provided for @alternativesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternatives'**
+  String get alternativesSection;
+
+  /// No description provided for @genericSubstitute.
+  ///
+  /// In en, this message translates to:
+  /// **'Generic substitute'**
+  String get genericSubstitute;
+
+  /// No description provided for @confirmDeleteAlternative.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this alternative?'**
+  String get confirmDeleteAlternative;
 }
 
 class _AppLocalizationsDelegate

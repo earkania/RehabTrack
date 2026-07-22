@@ -101,7 +101,6 @@
   "schedules": "Schedules",
   "deleteSchedule": "Delete Schedule",
   "deleteScheduleConfirmation": "Remove this schedule? Notifications will be cancelled.",
-  "noSchedulesYet": "No schedules yet. Add one to get reminders.",
   "selectTime": "Select Time",
   "addTime": "Add Time",
   "removeTime": "Remove",
@@ -112,5 +111,16 @@
   "failedToSaveSchedule": "Failed to save schedule",
   "failedToDeleteSchedule": "Failed to delete schedule",
   "schedulesSection": "Schedules",
-  "addScheduleSubtitle": "Set up reminders for this medication"
+  "addScheduleSubtitle": "Set up reminders for this medication",
+  "editAlternative": "Edit Alternative",
+  "deleteAlternative": "Delete Alternative",
+  "deleteAlternativeConfirmation": "Remove this alternative? This will not affect the medication or its schedules.",
+  "alternativeAdded": "Alternative added",
+  "alternativeUpdated": "Alternative updated",
+  "alternativeDeleted": "Alternative deleted",
+  "noAlternatives": "No alternatives",
+  "noAlternativesDescription": "Add doctor-approved substitutes for this medication",
+  "alternativesSection": "Alternatives",
+  "genericSubstitute": "Generic substitute",
+  "confirmDeleteAlternative": "Are you sure you want to delete this alternative?"
 }

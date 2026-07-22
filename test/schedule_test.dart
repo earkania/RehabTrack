@@ -215,8 +215,6 @@ void main() {
 
     testWidgets('calls onSave with daily config',
         (WidgetTester tester) async {
-      ScheduleFormData? savedData;
-
       await tester.pumpWidget(
         _wrapWithL10n(
           MedicationScheduleForm(
@@ -224,7 +222,7 @@ void main() {
               scheduleType: ScheduleType.daily,
               dailyTime: '09:00',
             ),
-            onSave: (data) => savedData = data,
+            onSave: (_) {},
             saveButtonLabel: 'Save',
           ),
         ),
