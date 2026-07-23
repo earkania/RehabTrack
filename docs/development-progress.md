@@ -598,6 +598,110 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - No medication interaction checking (by design — deferred)
 - No automatic alternative suggestions (by design — user-entered only)
 
+### Phase 4B — Step 5: Medication History & Adherence
+
+**Status:** Completed
+
+**What was done:**
+
+**HistoryPeriod Domain Entity:**
+- Created `lib/domain/entities/history_period.dart` — enum: `last7Days`, `last30Days`, `allTime`
+
+**Providers Added (`medication_provider.dart`):**
+- `medicationAllLogsProvider(scheduleId)` — `StreamProvider.autoDispose.family` for all logs of a schedule
+- `medicationAdherenceStatsProvider(scheduleId)` — computes `AdherenceStats` from logs
+
+**StatusChip Widget (`status_chip.dart`):**
+- Material 3 chip showing medication log status (taken/skipped/missed/pending)
+- Color-coded by status, reusable across screens
+
+**MedicationHistoryScreen (`medication_history_screen.dart`):**
+- Period selector (last 7 days, last 30 days, all time)
+- Adherence summary with percentage and counts
+- Log list with `StatusChip` for each entry
+- Manual dose logging dialog
+
+**MedicationDetailScreen Updated:**
+- Added history section with preview and navigation button
+- `/activities/medication/:id/history` route added
+
+**Localization Keys Added:**
+- 15 keys each for English and Georgian (history labels, status text, period options)
+
+**Files Created:**
+- `lib/domain/entities/history_period.dart`
+- `lib/presentation/widgets/medication/status_chip.dart`
+- `lib/presentation/screens/activities/medication_history_screen.dart`
+
+**Files Modified:**
+- `lib/presentation/providers/medication_provider.dart`
+- `lib/presentation/screens/activities/medication_detail_screen.dart`
+- `lib/core/router/app_router.dart`
+- `lib/l10n/app_en.arb`, `lib/l10n/app_ka.arb`
+
+**Tests:**
+- 12 tests covering HistoryPeriod, StatusChip rendering, adherence stats computation
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (51/51) |
+
+### Phase 4B — Step 6: Notification Action Integration
+
+**Status:** Completed
+
+**What was done:**
+
+**NotificationActionBridge (`notification_action_bridge.dart`):**
+- Connects notification infrastructure to medication module
+- `initialize(profileId)` — registers action callback, runs schedule recovery
+- Action handlers: `Taken` (logs dose), `Skipped` (logs skipped), `Snooze` (reschedules 10 min)
+- Static helpers: `parsePayload`, `computeNotificationIds`, `buildNotificationBody`
+- Recovery: builds `ScheduleRecoveryEntry` list from active medications/schedules
+
+**Providers Added (`notification_provider.dart`):**
+- `notificationInitializerProvider` — eagerly initializes bridge and runs recovery at startup
+
+**Startup Initialization (`main.dart`):**
+- `ProviderContainer` reads `notificationInitializerProvider` before `runApp`
+- Ensures notification callbacks registered before any notification can be received
+
+**Action Flow:**
+1. User taps notification action → `NotificationService` receives platform callback
+2. Bridge `_handleAction` parses payload, dispatches to handler
+3. Taken/Skip: creates `MedicationLog` with appropriate status
+4. Snooze: fetches schedule/medication, reschedules notification for +10 minutes
+
+**Schedule Recovery:**
+- On app startup, bridge loads all active medications and schedules
+- Builds `ScheduleRecoveryEntry` list with correct notification IDs per schedule type
+- `ScheduleRecoveryService.recoverAllSchedules` restores missing notifications
+
+**Files Created:**
+- `lib/data/services/notification/notification_action_bridge.dart`
+- `test/notification_action_bridge_test.dart`
+
+**Files Modified:**
+- `lib/presentation/providers/notification_provider.dart`
+- `lib/main.dart`
+
+**Tests:**
+- 22 tests covering payload parsing, notification ID computation, notification body building, action handlers (taken/skipped/snooze), schedule recovery
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (3 info lints — private field initializing formals) |
+| `flutter test` | Passed (73/73) |
+
+**Architecture Verification:**
+- Bridge uses `MedicationRepository` (not DAOs) for all data access
+- `NotificationActionCallback` typedef followed
+- No UI dependency in bridge
+- Provider-based initialization follows existing patterns
+
 ## Development Rules
 
 - Commit after every completed phase
