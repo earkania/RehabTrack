@@ -12,7 +12,7 @@ Widget _wrapWithL10n(Widget child) {
   return MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
-    home: Scaffold(body: child),
+    home: ProviderScope(child: Scaffold(body: child)),
   );
 }
 
@@ -50,26 +50,7 @@ void main() {
       expect(find.text('Aspirin'), findsOneWidget);
     });
 
-    testWidgets('renders dose when present', (WidgetTester tester) async {
-      final medication = Medication(
-        id: 1,
-        profileId: 1,
-        name: 'Aspirin',
-        doseAmount: '100',
-        doseUnit: 'mg',
-        active: true,
-        createdAt: DateTime(2026),
-        updatedAt: DateTime(2026),
-      );
-
-      await tester.pumpWidget(
-        _wrapWithL10n(MedicationCard(medication: medication)),
-      );
-
-      expect(find.text('100 mg'), findsOneWidget);
-    });
-
-    testWidgets('does not render dose when absent',
+    testWidgets('does not render dose without components',
         (WidgetTester tester) async {
       final medication = Medication(
         id: 1,
@@ -127,6 +108,11 @@ void main() {
         ),
       );
 
+      await tester.scrollUntilVisible(
+        find.text('Save'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
@@ -149,6 +135,11 @@ void main() {
       await tester.enterText(find.byType(TextFormField).first, 'Aspirin');
       await tester.pump();
 
+      await tester.scrollUntilVisible(
+        find.text('Save'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
@@ -160,8 +151,6 @@ void main() {
         (WidgetTester tester) async {
       final data = MedicationFormData(
         name: 'Bisoprolol',
-        doseAmount: '5',
-        doseUnit: 'mg',
         active: true,
       );
 
@@ -176,7 +165,6 @@ void main() {
       );
 
       expect(find.text('Bisoprolol'), findsOneWidget);
-      expect(find.text('5'), findsOneWidget);
     });
   });
 

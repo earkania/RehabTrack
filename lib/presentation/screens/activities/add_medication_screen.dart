@@ -30,8 +30,6 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
         profileId: profileId,
         name: data.name,
         description: data.description.isNotEmpty ? data.description : null,
-        doseAmount: data.doseAmount.isNotEmpty ? data.doseAmount : null,
-        doseUnit: data.doseUnit.isNotEmpty ? data.doseUnit : null,
         active: data.active,
         startDate: data.startDate,
         endDate: data.endDate,
@@ -41,7 +39,12 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
       );
 
       final repo = ref.read(medicationRepositoryProvider);
-      await repo.createMedication(medication);
+      final medicationId = await repo.createMedication(medication);
+
+      final components = data.components
+          .map((c) => c.copyWith(medicationId: medicationId))
+          .toList();
+      await repo.replaceMedicationComponents(medicationId, components);
 
       if (mounted) {
         ref.invalidate(medicationListProvider);

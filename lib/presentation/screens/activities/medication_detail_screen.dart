@@ -8,7 +8,7 @@ import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
-import 'package:rehab_track/presentation/utils/dose_formatter.dart';
+import 'package:rehab_track/presentation/utils/component_formatter.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_alternative_card.dart';
 
@@ -78,10 +78,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                   ),
                 ),
               const Divider(),
-              _DetailRow(
-                label: l10n.doseAmount,
-                value: DoseFormatter.format(medication),
-              ),
+              _ComponentsSection(medicationId: medicationId),
               _DetailRow(
                 label: l10n.active,
                 value: medication.active ? l10n.yes : l10n.no,
@@ -541,6 +538,37 @@ class MedicationDetailScreen extends ConsumerWidget {
         );
       }
     }
+  }
+}
+
+class _ComponentsSection extends ConsumerWidget {
+  final int medicationId;
+
+  const _ComponentsSection({required this.medicationId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final componentsAsync = ref.watch(
+      medicationComponentsProvider(medicationId),
+    );
+
+    return componentsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (components) {
+        if (components.isEmpty) return const SizedBox.shrink();
+        final hasNames =
+            components.any((c) => c.componentName != null && c.componentName!.isNotEmpty);
+        final doseText = hasNames
+            ? ComponentFormatter.formatComponentsDetailed(components)
+            : ComponentFormatter.formatComponents(components);
+        return _DetailRow(
+          label: l10n.doseAmount,
+          value: doseText,
+        );
+      },
+    );
   }
 }
 

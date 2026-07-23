@@ -52,14 +52,21 @@ class _EditAlternativeScreenState extends ConsumerState<EditAlternativeScreen> {
 
       final updated = current.copyWith(
         name: data.name,
-        doseAmount: data.doseAmount.isNotEmpty ? data.doseAmount : null,
-        doseUnit: data.doseUnit.isNotEmpty ? data.doseUnit : null,
         doctorApproved: data.doctorApproved,
         notes: data.notes.isNotEmpty ? data.notes : null,
       );
 
       final repo = ref.read(medicationRepositoryProvider);
       await repo.updateAlternative(updated);
+
+      final components = data.components
+          .map((c) =>
+              c.copyWith(medicationAlternativeId: widget.alternativeId))
+          .toList();
+      await repo.replaceAlternativeComponents(
+        widget.alternativeId,
+        components,
+      );
 
       if (mounted) {
         ref.invalidate(
@@ -165,15 +172,55 @@ class _EditAlternativeScreenState extends ConsumerState<EditAlternativeScreen> {
             return Center(child: Text(l10n.error));
           }
 
-          return MedicationAlternativeForm(
-            initialData: MedicationAlternativeFormData.fromAlternative(
-                alternative),
+          return _EditAlternativeBody(
+            alternative: alternative,
+            medicationId: widget.medicationId,
+            alternativeId: widget.alternativeId,
             onSave: _onSave,
-            isLoading: _isSaving,
-            saveButtonLabel: l10n.save,
+            isSaving: _isSaving,
           );
         },
       ),
+    );
+  }
+}
+
+class _EditAlternativeBody extends ConsumerWidget {
+  final dynamic alternative;
+  final int medicationId;
+  final int alternativeId;
+  final void Function(MedicationAlternativeFormData) onSave;
+  final bool isSaving;
+
+  const _EditAlternativeBody({
+    required this.alternative,
+    required this.medicationId,
+    required this.alternativeId,
+    required this.onSave,
+    required this.isSaving,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final componentsAsync = ref.watch(
+      medicationAlternativeComponentsProvider(alternativeId),
+    );
+
+    return componentsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text(l10n.error)),
+      data: (components) {
+        final initialData =
+            MedicationAlternativeFormData.fromAlternative(alternative);
+        return MedicationAlternativeForm(
+          initialData: initialData,
+          existingComponents: components,
+          onSave: onSave,
+          isLoading: isSaving,
+          saveButtonLabel: l10n.save,
+        );
+      },
     );
   }
 }

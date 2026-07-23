@@ -52,3 +52,27 @@ class MedicationAlternatives extends Table {
   TextColumn get notes => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 }
+
+class MedicationComponents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get medicationId =>
+      integer().references(Medications, #id)();
+  TextColumn get componentName => text().nullable()();
+  TextColumn get doseAmount => text()();
+  TextColumn get doseUnit => text()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+}
+
+class MedicationAlternativeComponents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get medicationAlternativeId =>
+      integer().references(MedicationAlternatives, #id)();
+  TextColumn get componentName => text().nullable()();
+  TextColumn get doseAmount => text()();
+  TextColumn get doseUnit => text()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+}

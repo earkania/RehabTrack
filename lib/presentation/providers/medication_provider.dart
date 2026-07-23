@@ -3,6 +3,8 @@ import 'package:rehab_track/domain/entities/adherence_stats.dart';
 import 'package:rehab_track/domain/entities/history_period.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
+import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
+import 'package:rehab_track/domain/entities/medication_component.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
@@ -48,6 +50,20 @@ final medicationAlternativeProvider =
         (ref, alternativeId) async {
   final repo = ref.watch(medicationRepositoryProvider);
   return repo.getAlternative(alternativeId);
+});
+
+final medicationComponentsProvider =
+    StreamProvider.autoDispose.family<List<MedicationComponent>, int>(
+        (ref, medicationId) {
+  final repo = ref.watch(medicationRepositoryProvider);
+  return repo.watchComponents(medicationId);
+});
+
+final medicationAlternativeComponentsProvider =
+    StreamProvider.autoDispose.family<List<MedicationAlternativeComponent>, int>(
+        (ref, alternativeId) {
+  final repo = ref.watch(medicationRepositoryProvider);
+  return repo.watchAlternativeComponents(alternativeId);
 });
 
 final _medicationScheduleLogsProvider = FutureProvider.autoDispose

@@ -1,5 +1,7 @@
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
+import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
+import 'package:rehab_track/domain/entities/medication_component.dart';
 
 abstract class MedicationRepository {
   Stream<List<Medication>> watchMedications(int profileId);
@@ -39,4 +41,20 @@ abstract class MedicationRepository {
   Future<int> createAlternative(MedicationAlternative alternative);
   Future<void> updateAlternative(MedicationAlternative alternative);
   Future<void> deleteAlternative(int id);
+
+  Stream<List<MedicationComponent>> watchComponents(int medicationId);
+  Future<List<MedicationComponent>> getComponents(int medicationId);
+  Future<void> replaceMedicationComponents(
+    int medicationId,
+    List<MedicationComponent> components,
+  );
+
+  Stream<List<MedicationAlternativeComponent>>
+      watchAlternativeComponents(int alternativeId);
+  Future<List<MedicationAlternativeComponent>>
+      getAlternativeComponents(int alternativeId);
+  Future<void> replaceAlternativeComponents(
+    int alternativeId,
+    List<MedicationAlternativeComponent> components,
+  );
 }

@@ -2,7 +2,9 @@ class MedicationAlternative {
   final int? id;
   final int medicationId;
   final String name;
+  /// @deprecated Use MedicationAlternativeComponents table instead. Kept temporarily for migration compatibility.
   final String? doseAmount;
+  /// @deprecated Use MedicationAlternativeComponents table instead. Kept temporarily for migration compatibility.
   final String? doseUnit;
   final bool doctorApproved;
   final String? notes;

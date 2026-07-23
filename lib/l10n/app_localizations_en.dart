@@ -429,4 +429,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noSchedulesAvailable => 'No schedules available to log a dose';
+
+  @override
+  String get dosageComponents => 'Dosage Components';
+
+  @override
+  String get addComponent => 'Add Component';
+
+  @override
+  String get removeComponent => 'Remove component';
+
+  @override
+  String get componentName => 'Component Name';
+
+  @override
+  String get componentNameOptional => 'Component Name (optional)';
 }

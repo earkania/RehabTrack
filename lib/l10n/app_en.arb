@@ -164,5 +164,10 @@
   "invalidDose": "Invalid dose amount",
   "endDateBeforeStartDate": "End date must be on or after start date",
   "scheduleUpdated": "Schedule updated",
-  "noSchedulesAvailable": "No schedules available to log a dose"
+  "noSchedulesAvailable": "No schedules available to log a dose",
+  "dosageComponents": "Dosage Components",
+  "addComponent": "Add Component",
+  "removeComponent": "Remove component",
+  "componentName": "Component Name",
+  "componentNameOptional": "Component Name (optional)"
 }

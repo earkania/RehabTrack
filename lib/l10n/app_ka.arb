@@ -164,5 +164,10 @@
   "invalidDose": "არასწორი დოზის რაოდენობა",
   "endDateBeforeStartDate": "დასრულების თარიღი უნდა იყოს დაწყების თარიღის შემდეგ",
   "scheduleUpdated": "გრაფიკი განახლდა",
-  "noSchedulesAvailable": "გრაფიკები არ არის დოზის აღსარიცხავად"
+  "noSchedulesAvailable": "გრაფიკები არ არის დოზის აღსარიცხავად",
+  "dosageComponents": "დოზის კომპონენტები",
+  "addComponent": "კომპონენტის დამატება",
+  "removeComponent": "კომპონენტის წაშლა",
+  "componentName": "კომპონენტის სახელი",
+  "componentNameOptional": "კომპონენტის სახელი (სურვილისამებრ)"
 }

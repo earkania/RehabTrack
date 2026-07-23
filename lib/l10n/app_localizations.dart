@@ -901,6 +901,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No schedules available to log a dose'**
   String get noSchedulesAvailable;
+
+  /// No description provided for @dosageComponents.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage Components'**
+  String get dosageComponents;
+
+  /// No description provided for @addComponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Component'**
+  String get addComponent;
+
+  /// No description provided for @removeComponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove component'**
+  String get removeComponent;
+
+  /// No description provided for @componentName.
+  ///
+  /// In en, this message translates to:
+  /// **'Component Name'**
+  String get componentName;
+
+  /// No description provided for @componentNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Component Name (optional)'**
+  String get componentNameOptional;
 }
 
 class _AppLocalizationsDelegate

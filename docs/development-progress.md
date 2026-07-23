@@ -702,6 +702,143 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - No UI dependency in bridge
 - Provider-based initialization follows existing patterns
 
+### Phase 4B — Step 7: Code Cleanup & Form Validation
+
+**Status:** Completed
+
+**What was done:**
+
+- Extracted `DoseFormatter` utility (`lib/presentation/utils/dose_formatter.dart`) — replaced 4 duplicate `_formatDose` methods
+- Extracted `DateField` widget (`lib/presentation/widgets/common/date_field.dart`) — replaced 2 duplicate `_DateField` classes
+- Fixed `edit_schedule_screen.dart:89` wrong snackbar: "Medication Updated" → "Schedule Updated"
+- Added empty-schedule guard in `medication_history_screen.dart` with user-facing snackbar
+- Fixed form validators: name validators now use `l10n.nameRequired`, dose validators use `l10n.invalidDose`
+- Fixed date validation error text from raw `${l10n.endDate} >= ${l10n.startDate}` to `l10n.endDateBeforeStartDate`
+- Added 5 l10n keys: `nameRequired`, `invalidDose`, `endDateBeforeStartDate`, `scheduleUpdated`, `noSchedulesAvailable` (en + ka)
+
+**Tests:** 87/87 passing (73→87)
+
+### Phase 4C — Multi-Component Medication Dosage
+
+**Status:** Completed
+
+**What was done:**
+
+Replaced single-dose UI model with structured medication components supporting both single and multi-component medications (e.g., Tripliksam 10/2.5/10 mg).
+
+**Database Layer:**
+- Schema version: 2 → 3
+- New tables: `MedicationComponents`, `MedicationAlternativeComponents`
+- Migration v2→v3: creates new tables and migrates existing dose data into component rows
+- Legacy `doseAmount`/`doseUnit` columns preserved (deprecated) for backward compatibility
+- New DAOs: `MedicationComponentsDao`, `MedicationAlternativeComponentsDao` with CRUD + `replaceAllComponents` for atomic swap
+- `AppDatabase` updated with new DAOs, tables, and migration strategy
+
+**Domain Layer:**
+- New entities: `MedicationComponent`, `MedicationAlternativeComponent`
+- Legacy dose fields marked with `@deprecated` comments in `Medication` and `MedicationAlternative`
+
+**Repository Layer:**
+- `MedicationRepository` interface extended with 6 new methods:
+  - `watchComponents`, `getComponents`, `replaceMedicationComponents`
+  - `watchAlternativeComponents`, `getAlternativeComponents`, `replaceAlternativeComponents`
+- `MedicationRepositoryImpl` implements all new methods with domain converters
+- Notification body builder now uses components when available, falls back to legacy dose
+
+**Presentation Layer:**
+- New `ComponentFormatter` utility (`lib/presentation/utils/component_formatter.dart`) — compact dosage formatting (e.g., "10 mg/2.5 mg/10 mg")
+- New `MedicationComponentsForm` widget (`lib/presentation/widgets/medication/medication_components_form.dart`) — reusable component editor with add/remove/dose validation, supports both medication and alternative modes
+- `MedicationForm` updated: replaced dose/doseUnit fields with `MedicationComponentsForm.forMedication`
+- `MedicationAlternativeForm` updated: replaced dose/doseUnit fields with `MedicationComponentsForm.forAlternative`
+- `MedicationCard` converted to `ConsumerWidget` — reads components from provider for dose display
+- `MedicationAlternativeCard` converted to `ConsumerWidget` — reads components from provider
+- `MedicationDetailScreen` shows component-based dose via `_ComponentsSection` widget
+- All 4 create/edit screens (add/edit medication, add/edit alternative) updated to save/replace components
+- New `AppSpacing` widget for consistent spacing constants
+- New providers: `medicationComponentsProvider`, `medicationAlternativeComponentsProvider`
+
+**Localization:**
+- 3 new l10n keys: `dosageComponents`, `addComponent`, `removeComponent` (en + ka)
+
+**Files Created:**
+- `lib/domain/entities/medication_component.dart`
+- `lib/domain/entities/medication_alternative_component.dart`
+- `lib/data/database/daos/medication_components_dao.dart`
+- `lib/data/database/daos/medication_alternative_components_dao.dart`
+- `lib/presentation/utils/component_formatter.dart`
+- `lib/presentation/widgets/medication/medication_components_form.dart`
+- `lib/presentation/theme/app_spacing.dart`
+- `test/component_formatter_test.dart`
+
+**Files Modified:**
+- `lib/data/database/tables/medication_tables.dart`
+- `lib/data/database/app_database.dart`
+- `lib/domain/entities/medication.dart`
+- `lib/domain/entities/medication_alternative.dart`
+- `lib/domain/repositories/medication_repository.dart`
+- `lib/data/repositories/medication_repository_impl.dart`
+- `lib/presentation/providers/medication_provider.dart`
+- `lib/presentation/widgets/medication/medication_form.dart`
+- `lib/presentation/widgets/medication/medication_alternative_form.dart`
+- `lib/presentation/widgets/medication/medication_card.dart`
+- `lib/presentation/widgets/medication/medication_alternative_card.dart`
+- `lib/presentation/screens/activities/medication_detail_screen.dart`
+- `lib/presentation/screens/activities/add_medication_screen.dart`
+- `lib/presentation/screens/activities/edit_medication_screen.dart`
+- `lib/presentation/screens/activities/add_alternative_screen.dart`
+- `lib/presentation/screens/activities/edit_alternative_screen.dart`
+- `lib/l10n/app_en.arb`, `lib/l10n/app_ka.arb`
+- `test/widget_test.dart`, `test/alternative_test.dart`, `test/notification_action_bridge_test.dart`
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (3 info lints — pre-existing notification_action_bridge field init) |
+| `flutter test` | Passed (92/92) |
+
+### Phase 4C — Dosage Component Layout Improvement
+
+**Status:** Completed
+
+**What was done:**
+
+Improved the `MedicationComponentsForm` layout so each component row is more visually natural: component name appears on top, dose amount and dose unit appear on the row below with the delete action.
+
+**Layout Change:**
+
+Before:
+```
+[Dose Amount] [Dose Unit] [Delete]
+Component Name (optional)
+```
+
+After:
+```
+Component Name (optional)
+[Dose Amount] [Dose Unit] [Delete]
+```
+
+**Responsive Layout:**
+- Dose amount and dose unit use `Expanded` (flex: 1) for equal flexible widths on narrow screens
+- Header "Dosage Components" title uses `Flexible` to prevent overflow on320px-wide screens
+- Verified no overflow on a320px-wide simulated screen (Pixel 7 test width)
+
+**Files Modified:**
+- `lib/presentation/widgets/medication/medication_components_form.dart` — reordered fields in `_buildComponentRow`, added `Flexible` to header title
+- `test/medication_components_form_test.dart` — added 3 layout ordering tests, updated field index references in existing tests
+
+**Tests Added:**
+- `component name field appears above dose fields` — verifies Y-position ordering
+- `does not overflow on a narrow screen (320px)` — verifies no RenderFlex overflow with 2 named components
+- `alternative form uses same layout` — verifies Y-position ordering for alternative mode
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (3 info lints — pre-existing) |
+| `flutter test` | Passed (114/114) |
+| Pixel 7 build/run | App launched successfully |
+
 ## Development Rules
 
 - Commit after every completed phase

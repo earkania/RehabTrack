@@ -40,15 +40,22 @@ class _AddAlternativeScreenState extends ConsumerState<AddAlternativeScreen> {
       final alternative = MedicationAlternative(
         medicationId: widget.medicationId,
         name: data.name,
-        doseAmount: data.doseAmount.isNotEmpty ? data.doseAmount : null,
-        doseUnit: data.doseUnit.isNotEmpty ? data.doseUnit : null,
         doctorApproved: data.doctorApproved,
         notes: data.notes.isNotEmpty ? data.notes : null,
         createdAt: DateTime.now(),
       );
 
       final repo = ref.read(medicationRepositoryProvider);
-      await repo.createAlternative(alternative);
+      final alternativeId = await repo.createAlternative(alternative);
+
+      final components = data.components
+          .map((c) =>
+              c.copyWith(medicationAlternativeId: alternativeId))
+          .toList();
+      await repo.replaceAlternativeComponents(
+        alternativeId,
+        components,
+      );
 
       if (mounted) {
         ref.invalidate(

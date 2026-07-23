@@ -7,6 +7,8 @@ import 'package:rehab_track/data/services/notification/notification_scheduler.da
 import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
+import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
+import 'package:rehab_track/domain/entities/medication_component.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
@@ -270,8 +272,10 @@ class MedicationRepositoryImpl implements MedicationRepository {
       final medication = await getMedication(schedule.medicationId);
       if (medication == null) return;
 
+      final components = await getComponents(medication.id!);
+
       final title = 'Time to take ${medication.name}';
-      final body = _buildNotificationBody(medication, schedule);
+      final body = _buildNotificationBody(medication, schedule, components);
       final payload = jsonEncode({
         'medicationId': medication.id,
         'scheduleId': schedule.id,
@@ -309,14 +313,39 @@ class MedicationRepositoryImpl implements MedicationRepository {
   String _buildNotificationBody(
     Medication medication,
     MedicationSchedule schedule,
+    List<MedicationComponent> components,
   ) {
     final parts = <String>[];
-    final dose = _formatDoseShort(medication);
+    final dose = components.isNotEmpty
+        ? _formatDoseFromComponents(components)
+        : _formatDoseShort(medication);
     if (dose.isNotEmpty) parts.add(dose);
     if (schedule.instructions != null && schedule.instructions!.isNotEmpty) {
       parts.add(schedule.instructions!);
     }
     return parts.isEmpty ? '' : parts.join(' — ');
+  }
+
+  String _formatDoseFromComponents(List<MedicationComponent> components) {
+    if (components.isEmpty) return '';
+    if (components.length == 1) {
+      return _formatSingleComponent(components.first.doseAmount, components.first.doseUnit);
+    }
+    final buffer = StringBuffer();
+    for (var i = 0; i < components.length; i++) {
+      if (i > 0) buffer.write('/');
+      buffer.write(components[i].doseAmount);
+      if (components[i].doseUnit.isNotEmpty) {
+        buffer.write(' ${components[i].doseUnit}');
+      }
+    }
+    return buffer.toString();
+  }
+
+  String _formatSingleComponent(String amount, String unit) {
+    if (amount.isEmpty) return '';
+    if (unit.isEmpty) return amount;
+    return '$amount $unit';
   }
 
   String _formatDoseShort(Medication medication) {
@@ -395,6 +424,84 @@ class MedicationRepositoryImpl implements MedicationRepository {
     await _database.medicationAlternativesDao.deleteAlternative(id);
   }
 
+  @override
+  Stream<List<MedicationComponent>> watchComponents(
+    int medicationId,
+  ) {
+    return _database.medicationComponentsDao
+        .watchComponents(medicationId)
+        .map((rows) => rows.map(_componentToDomain).toList());
+  }
+
+  @override
+  Future<List<MedicationComponent>> getComponents(
+    int medicationId,
+  ) async {
+    final rows = await _database.medicationComponentsDao
+        .getComponents(medicationId);
+    return rows.map(_componentToDomain).toList();
+  }
+
+  @override
+  Future<void> replaceMedicationComponents(
+    int medicationId,
+    List<MedicationComponent> components,
+  ) async {
+    final companions = components.map((c) {
+      return db.MedicationComponentsCompanion(
+        id: c.id != null ? Value(c.id!) : const Value.absent(),
+        medicationId: Value(medicationId),
+        componentName: Value(c.componentName),
+        doseAmount: Value(c.doseAmount),
+        doseUnit: Value(c.doseUnit),
+        sortOrder: Value(c.sortOrder),
+        createdAt: Value(c.createdAt),
+        updatedAt: Value(c.updatedAt),
+      );
+    }).toList();
+    await _database.medicationComponentsDao.replaceAllComponents(
+      medicationId,
+      companions,
+    );
+  }
+
+  @override
+  Stream<List<MedicationAlternativeComponent>>
+      watchAlternativeComponents(int alternativeId) {
+    return _database.medicationAlternativeComponentsDao
+        .watchComponents(alternativeId)
+        .map((rows) => rows.map(_altComponentToDomain).toList());
+  }
+
+  @override
+  Future<List<MedicationAlternativeComponent>>
+      getAlternativeComponents(int alternativeId) async {
+    final rows = await _database.medicationAlternativeComponentsDao
+        .getComponents(alternativeId);
+    return rows.map(_altComponentToDomain).toList();
+  }
+
+  @override
+  Future<void> replaceAlternativeComponents(
+    int alternativeId,
+    List<MedicationAlternativeComponent> components,
+  ) async {
+    final companions = components.map((c) {
+      return db.MedicationAlternativeComponentsCompanion(
+        id: c.id != null ? Value(c.id!) : const Value.absent(),
+        medicationAlternativeId: Value(alternativeId),
+        componentName: Value(c.componentName),
+        doseAmount: Value(c.doseAmount),
+        doseUnit: Value(c.doseUnit),
+        sortOrder: Value(c.sortOrder),
+        createdAt: Value(c.createdAt),
+        updatedAt: Value(c.updatedAt),
+      );
+    }).toList();
+    await _database.medicationAlternativeComponentsDao
+        .replaceAllComponents(alternativeId, companions);
+  }
+
   MedicationAlternative _alternativeToDomain(
     db.MedicationAlternative row,
   ) {
@@ -407,6 +514,36 @@ class MedicationRepositoryImpl implements MedicationRepository {
       doctorApproved: row.doctorApproved,
       notes: row.notes,
       createdAt: row.createdAt,
+    );
+  }
+
+  MedicationComponent _componentToDomain(
+    db.MedicationComponent row,
+  ) {
+    return MedicationComponent(
+      id: row.id,
+      medicationId: row.medicationId,
+      componentName: row.componentName,
+      doseAmount: row.doseAmount,
+      doseUnit: row.doseUnit,
+      sortOrder: row.sortOrder,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    );
+  }
+
+  MedicationAlternativeComponent _altComponentToDomain(
+    db.MedicationAlternativeComponent row,
+  ) {
+    return MedicationAlternativeComponent(
+      id: row.id,
+      medicationAlternativeId: row.medicationAlternativeId,
+      componentName: row.componentName,
+      doseAmount: row.doseAmount,
+      doseUnit: row.doseUnit,
+      sortOrder: row.sortOrder,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
     );
   }
 }

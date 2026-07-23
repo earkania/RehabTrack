@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
-import 'package:rehab_track/presentation/utils/dose_formatter.dart';
+import 'package:rehab_track/presentation/providers/medication_provider.dart';
+import 'package:rehab_track/presentation/utils/component_formatter.dart';
 
-class MedicationCard extends StatelessWidget {
+class MedicationCard extends ConsumerWidget {
   final Medication medication;
   final VoidCallback? onTap;
 
@@ -13,11 +15,21 @@ class MedicationCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final doseText = DoseFormatter.format(medication);
+    final componentsAsync = ref.watch(
+      medicationComponentsProvider(medication.id!),
+    );
+    final doseText = componentsAsync.when(
+      data: (components) {
+        if (components.isEmpty) return '';
+        return ComponentFormatter.formatComponents(components);
+      },
+      loading: () => '',
+      error: (_, _) => '',
+    );
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

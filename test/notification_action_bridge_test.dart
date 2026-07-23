@@ -11,6 +11,8 @@ import 'package:rehab_track/data/services/notification/notification_service.dart
 import 'package:rehab_track/data/services/notification/schedule_recovery_service.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
+import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
+import 'package:rehab_track/domain/entities/medication_component.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 
@@ -19,6 +21,8 @@ class FakeMedicationRepository implements MedicationRepository {
   final Map<int, Medication> medications = {};
   final Map<int, MedicationSchedule> schedules = {};
   final Map<int, List<MedicationSchedule>> schedulesByMedicationId = {};
+  final Map<int, List<MedicationComponent>> componentsByMedicationId = {};
+  final Map<int, List<MedicationAlternativeComponent>> componentsByAlternativeId = {};
 
   @override
   Future<int> logDose(MedicationLog log) async {
@@ -91,6 +95,42 @@ class FakeMedicationRepository implements MedicationRepository {
 
   @override
   Future<void> deleteAlternative(int id) async {}
+
+  @override
+  Stream<List<MedicationComponent>> watchComponents(int medicationId) async* {
+    yield componentsByMedicationId[medicationId] ?? [];
+  }
+
+  @override
+  Future<List<MedicationComponent>> getComponents(int medicationId) async =>
+      componentsByMedicationId[medicationId] ?? [];
+
+  @override
+  Future<void> replaceMedicationComponents(
+    int medicationId,
+    List<MedicationComponent> components,
+  ) async {
+    componentsByMedicationId[medicationId] = components;
+  }
+
+  @override
+  Stream<List<MedicationAlternativeComponent>>
+      watchAlternativeComponents(int alternativeId) async* {
+    yield componentsByAlternativeId[alternativeId] ?? [];
+  }
+
+  @override
+  Future<List<MedicationAlternativeComponent>>
+      getAlternativeComponents(int alternativeId) async =>
+          componentsByAlternativeId[alternativeId] ?? [];
+
+  @override
+  Future<void> replaceAlternativeComponents(
+    int alternativeId,
+    List<MedicationAlternativeComponent> components,
+  ) async {
+    componentsByAlternativeId[alternativeId] = components;
+  }
 }
 
 class FakeNotificationService implements NotificationService {

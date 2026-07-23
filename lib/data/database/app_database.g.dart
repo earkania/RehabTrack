@@ -3046,6 +3046,1067 @@ class MedicationAlternativesCompanion
   }
 }
 
+class $MedicationComponentsTable extends MedicationComponents
+    with TableInfo<$MedicationComponentsTable, MedicationComponent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MedicationComponentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicationIdMeta = const VerificationMeta(
+    'medicationId',
+  );
+  @override
+  late final GeneratedColumn<int> medicationId = GeneratedColumn<int>(
+    'medication_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medications (id)',
+    ),
+  );
+  static const VerificationMeta _componentNameMeta = const VerificationMeta(
+    'componentName',
+  );
+  @override
+  late final GeneratedColumn<String> componentName = GeneratedColumn<String>(
+    'component_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _doseAmountMeta = const VerificationMeta(
+    'doseAmount',
+  );
+  @override
+  late final GeneratedColumn<String> doseAmount = GeneratedColumn<String>(
+    'dose_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _doseUnitMeta = const VerificationMeta(
+    'doseUnit',
+  );
+  @override
+  late final GeneratedColumn<String> doseUnit = GeneratedColumn<String>(
+    'dose_unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    medicationId,
+    componentName,
+    doseAmount,
+    doseUnit,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'medication_components';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MedicationComponent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('medication_id')) {
+      context.handle(
+        _medicationIdMeta,
+        medicationId.isAcceptableOrUnknown(
+          data['medication_id']!,
+          _medicationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_medicationIdMeta);
+    }
+    if (data.containsKey('component_name')) {
+      context.handle(
+        _componentNameMeta,
+        componentName.isAcceptableOrUnknown(
+          data['component_name']!,
+          _componentNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dose_amount')) {
+      context.handle(
+        _doseAmountMeta,
+        doseAmount.isAcceptableOrUnknown(data['dose_amount']!, _doseAmountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_doseAmountMeta);
+    }
+    if (data.containsKey('dose_unit')) {
+      context.handle(
+        _doseUnitMeta,
+        doseUnit.isAcceptableOrUnknown(data['dose_unit']!, _doseUnitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_doseUnitMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MedicationComponent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MedicationComponent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      medicationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medication_id'],
+      )!,
+      componentName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}component_name'],
+      ),
+      doseAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dose_amount'],
+      )!,
+      doseUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dose_unit'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $MedicationComponentsTable createAlias(String alias) {
+    return $MedicationComponentsTable(attachedDatabase, alias);
+  }
+}
+
+class MedicationComponent extends DataClass
+    implements Insertable<MedicationComponent> {
+  final int id;
+  final int medicationId;
+  final String? componentName;
+  final String doseAmount;
+  final String doseUnit;
+  final int sortOrder;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  const MedicationComponent({
+    required this.id,
+    required this.medicationId,
+    this.componentName,
+    required this.doseAmount,
+    required this.doseUnit,
+    required this.sortOrder,
+    required this.createdAt,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['medication_id'] = Variable<int>(medicationId);
+    if (!nullToAbsent || componentName != null) {
+      map['component_name'] = Variable<String>(componentName);
+    }
+    map['dose_amount'] = Variable<String>(doseAmount);
+    map['dose_unit'] = Variable<String>(doseUnit);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  MedicationComponentsCompanion toCompanion(bool nullToAbsent) {
+    return MedicationComponentsCompanion(
+      id: Value(id),
+      medicationId: Value(medicationId),
+      componentName: componentName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(componentName),
+      doseAmount: Value(doseAmount),
+      doseUnit: Value(doseUnit),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory MedicationComponent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MedicationComponent(
+      id: serializer.fromJson<int>(json['id']),
+      medicationId: serializer.fromJson<int>(json['medicationId']),
+      componentName: serializer.fromJson<String?>(json['componentName']),
+      doseAmount: serializer.fromJson<String>(json['doseAmount']),
+      doseUnit: serializer.fromJson<String>(json['doseUnit']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'medicationId': serializer.toJson<int>(medicationId),
+      'componentName': serializer.toJson<String?>(componentName),
+      'doseAmount': serializer.toJson<String>(doseAmount),
+      'doseUnit': serializer.toJson<String>(doseUnit),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  MedicationComponent copyWith({
+    int? id,
+    int? medicationId,
+    Value<String?> componentName = const Value.absent(),
+    String? doseAmount,
+    String? doseUnit,
+    int? sortOrder,
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => MedicationComponent(
+    id: id ?? this.id,
+    medicationId: medicationId ?? this.medicationId,
+    componentName: componentName.present
+        ? componentName.value
+        : this.componentName,
+    doseAmount: doseAmount ?? this.doseAmount,
+    doseUnit: doseUnit ?? this.doseUnit,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  MedicationComponent copyWithCompanion(MedicationComponentsCompanion data) {
+    return MedicationComponent(
+      id: data.id.present ? data.id.value : this.id,
+      medicationId: data.medicationId.present
+          ? data.medicationId.value
+          : this.medicationId,
+      componentName: data.componentName.present
+          ? data.componentName.value
+          : this.componentName,
+      doseAmount: data.doseAmount.present
+          ? data.doseAmount.value
+          : this.doseAmount,
+      doseUnit: data.doseUnit.present ? data.doseUnit.value : this.doseUnit,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationComponent(')
+          ..write('id: $id, ')
+          ..write('medicationId: $medicationId, ')
+          ..write('componentName: $componentName, ')
+          ..write('doseAmount: $doseAmount, ')
+          ..write('doseUnit: $doseUnit, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    medicationId,
+    componentName,
+    doseAmount,
+    doseUnit,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MedicationComponent &&
+          other.id == this.id &&
+          other.medicationId == this.medicationId &&
+          other.componentName == this.componentName &&
+          other.doseAmount == this.doseAmount &&
+          other.doseUnit == this.doseUnit &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MedicationComponentsCompanion
+    extends UpdateCompanion<MedicationComponent> {
+  final Value<int> id;
+  final Value<int> medicationId;
+  final Value<String?> componentName;
+  final Value<String> doseAmount;
+  final Value<String> doseUnit;
+  final Value<int> sortOrder;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  const MedicationComponentsCompanion({
+    this.id = const Value.absent(),
+    this.medicationId = const Value.absent(),
+    this.componentName = const Value.absent(),
+    this.doseAmount = const Value.absent(),
+    this.doseUnit = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  MedicationComponentsCompanion.insert({
+    this.id = const Value.absent(),
+    required int medicationId,
+    this.componentName = const Value.absent(),
+    required String doseAmount,
+    required String doseUnit,
+    this.sortOrder = const Value.absent(),
+    required DateTime createdAt,
+    this.updatedAt = const Value.absent(),
+  }) : medicationId = Value(medicationId),
+       doseAmount = Value(doseAmount),
+       doseUnit = Value(doseUnit),
+       createdAt = Value(createdAt);
+  static Insertable<MedicationComponent> custom({
+    Expression<int>? id,
+    Expression<int>? medicationId,
+    Expression<String>? componentName,
+    Expression<String>? doseAmount,
+    Expression<String>? doseUnit,
+    Expression<int>? sortOrder,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (medicationId != null) 'medication_id': medicationId,
+      if (componentName != null) 'component_name': componentName,
+      if (doseAmount != null) 'dose_amount': doseAmount,
+      if (doseUnit != null) 'dose_unit': doseUnit,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  MedicationComponentsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? medicationId,
+    Value<String?>? componentName,
+    Value<String>? doseAmount,
+    Value<String>? doseUnit,
+    Value<int>? sortOrder,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+  }) {
+    return MedicationComponentsCompanion(
+      id: id ?? this.id,
+      medicationId: medicationId ?? this.medicationId,
+      componentName: componentName ?? this.componentName,
+      doseAmount: doseAmount ?? this.doseAmount,
+      doseUnit: doseUnit ?? this.doseUnit,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (medicationId.present) {
+      map['medication_id'] = Variable<int>(medicationId.value);
+    }
+    if (componentName.present) {
+      map['component_name'] = Variable<String>(componentName.value);
+    }
+    if (doseAmount.present) {
+      map['dose_amount'] = Variable<String>(doseAmount.value);
+    }
+    if (doseUnit.present) {
+      map['dose_unit'] = Variable<String>(doseUnit.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationComponentsCompanion(')
+          ..write('id: $id, ')
+          ..write('medicationId: $medicationId, ')
+          ..write('componentName: $componentName, ')
+          ..write('doseAmount: $doseAmount, ')
+          ..write('doseUnit: $doseUnit, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MedicationAlternativeComponentsTable
+    extends MedicationAlternativeComponents
+    with
+        TableInfo<
+          $MedicationAlternativeComponentsTable,
+          MedicationAlternativeComponent
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MedicationAlternativeComponentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicationAlternativeIdMeta =
+      const VerificationMeta('medicationAlternativeId');
+  @override
+  late final GeneratedColumn<int> medicationAlternativeId =
+      GeneratedColumn<int>(
+        'medication_alternative_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES medication_alternatives (id)',
+        ),
+      );
+  static const VerificationMeta _componentNameMeta = const VerificationMeta(
+    'componentName',
+  );
+  @override
+  late final GeneratedColumn<String> componentName = GeneratedColumn<String>(
+    'component_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _doseAmountMeta = const VerificationMeta(
+    'doseAmount',
+  );
+  @override
+  late final GeneratedColumn<String> doseAmount = GeneratedColumn<String>(
+    'dose_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _doseUnitMeta = const VerificationMeta(
+    'doseUnit',
+  );
+  @override
+  late final GeneratedColumn<String> doseUnit = GeneratedColumn<String>(
+    'dose_unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    medicationAlternativeId,
+    componentName,
+    doseAmount,
+    doseUnit,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'medication_alternative_components';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MedicationAlternativeComponent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('medication_alternative_id')) {
+      context.handle(
+        _medicationAlternativeIdMeta,
+        medicationAlternativeId.isAcceptableOrUnknown(
+          data['medication_alternative_id']!,
+          _medicationAlternativeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_medicationAlternativeIdMeta);
+    }
+    if (data.containsKey('component_name')) {
+      context.handle(
+        _componentNameMeta,
+        componentName.isAcceptableOrUnknown(
+          data['component_name']!,
+          _componentNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dose_amount')) {
+      context.handle(
+        _doseAmountMeta,
+        doseAmount.isAcceptableOrUnknown(data['dose_amount']!, _doseAmountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_doseAmountMeta);
+    }
+    if (data.containsKey('dose_unit')) {
+      context.handle(
+        _doseUnitMeta,
+        doseUnit.isAcceptableOrUnknown(data['dose_unit']!, _doseUnitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_doseUnitMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MedicationAlternativeComponent map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MedicationAlternativeComponent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      medicationAlternativeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medication_alternative_id'],
+      )!,
+      componentName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}component_name'],
+      ),
+      doseAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dose_amount'],
+      )!,
+      doseUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dose_unit'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $MedicationAlternativeComponentsTable createAlias(String alias) {
+    return $MedicationAlternativeComponentsTable(attachedDatabase, alias);
+  }
+}
+
+class MedicationAlternativeComponent extends DataClass
+    implements Insertable<MedicationAlternativeComponent> {
+  final int id;
+  final int medicationAlternativeId;
+  final String? componentName;
+  final String doseAmount;
+  final String doseUnit;
+  final int sortOrder;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  const MedicationAlternativeComponent({
+    required this.id,
+    required this.medicationAlternativeId,
+    this.componentName,
+    required this.doseAmount,
+    required this.doseUnit,
+    required this.sortOrder,
+    required this.createdAt,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['medication_alternative_id'] = Variable<int>(medicationAlternativeId);
+    if (!nullToAbsent || componentName != null) {
+      map['component_name'] = Variable<String>(componentName);
+    }
+    map['dose_amount'] = Variable<String>(doseAmount);
+    map['dose_unit'] = Variable<String>(doseUnit);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  MedicationAlternativeComponentsCompanion toCompanion(bool nullToAbsent) {
+    return MedicationAlternativeComponentsCompanion(
+      id: Value(id),
+      medicationAlternativeId: Value(medicationAlternativeId),
+      componentName: componentName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(componentName),
+      doseAmount: Value(doseAmount),
+      doseUnit: Value(doseUnit),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory MedicationAlternativeComponent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MedicationAlternativeComponent(
+      id: serializer.fromJson<int>(json['id']),
+      medicationAlternativeId: serializer.fromJson<int>(
+        json['medicationAlternativeId'],
+      ),
+      componentName: serializer.fromJson<String?>(json['componentName']),
+      doseAmount: serializer.fromJson<String>(json['doseAmount']),
+      doseUnit: serializer.fromJson<String>(json['doseUnit']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'medicationAlternativeId': serializer.toJson<int>(
+        medicationAlternativeId,
+      ),
+      'componentName': serializer.toJson<String?>(componentName),
+      'doseAmount': serializer.toJson<String>(doseAmount),
+      'doseUnit': serializer.toJson<String>(doseUnit),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  MedicationAlternativeComponent copyWith({
+    int? id,
+    int? medicationAlternativeId,
+    Value<String?> componentName = const Value.absent(),
+    String? doseAmount,
+    String? doseUnit,
+    int? sortOrder,
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => MedicationAlternativeComponent(
+    id: id ?? this.id,
+    medicationAlternativeId:
+        medicationAlternativeId ?? this.medicationAlternativeId,
+    componentName: componentName.present
+        ? componentName.value
+        : this.componentName,
+    doseAmount: doseAmount ?? this.doseAmount,
+    doseUnit: doseUnit ?? this.doseUnit,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  MedicationAlternativeComponent copyWithCompanion(
+    MedicationAlternativeComponentsCompanion data,
+  ) {
+    return MedicationAlternativeComponent(
+      id: data.id.present ? data.id.value : this.id,
+      medicationAlternativeId: data.medicationAlternativeId.present
+          ? data.medicationAlternativeId.value
+          : this.medicationAlternativeId,
+      componentName: data.componentName.present
+          ? data.componentName.value
+          : this.componentName,
+      doseAmount: data.doseAmount.present
+          ? data.doseAmount.value
+          : this.doseAmount,
+      doseUnit: data.doseUnit.present ? data.doseUnit.value : this.doseUnit,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationAlternativeComponent(')
+          ..write('id: $id, ')
+          ..write('medicationAlternativeId: $medicationAlternativeId, ')
+          ..write('componentName: $componentName, ')
+          ..write('doseAmount: $doseAmount, ')
+          ..write('doseUnit: $doseUnit, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    medicationAlternativeId,
+    componentName,
+    doseAmount,
+    doseUnit,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MedicationAlternativeComponent &&
+          other.id == this.id &&
+          other.medicationAlternativeId == this.medicationAlternativeId &&
+          other.componentName == this.componentName &&
+          other.doseAmount == this.doseAmount &&
+          other.doseUnit == this.doseUnit &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MedicationAlternativeComponentsCompanion
+    extends UpdateCompanion<MedicationAlternativeComponent> {
+  final Value<int> id;
+  final Value<int> medicationAlternativeId;
+  final Value<String?> componentName;
+  final Value<String> doseAmount;
+  final Value<String> doseUnit;
+  final Value<int> sortOrder;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  const MedicationAlternativeComponentsCompanion({
+    this.id = const Value.absent(),
+    this.medicationAlternativeId = const Value.absent(),
+    this.componentName = const Value.absent(),
+    this.doseAmount = const Value.absent(),
+    this.doseUnit = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  MedicationAlternativeComponentsCompanion.insert({
+    this.id = const Value.absent(),
+    required int medicationAlternativeId,
+    this.componentName = const Value.absent(),
+    required String doseAmount,
+    required String doseUnit,
+    this.sortOrder = const Value.absent(),
+    required DateTime createdAt,
+    this.updatedAt = const Value.absent(),
+  }) : medicationAlternativeId = Value(medicationAlternativeId),
+       doseAmount = Value(doseAmount),
+       doseUnit = Value(doseUnit),
+       createdAt = Value(createdAt);
+  static Insertable<MedicationAlternativeComponent> custom({
+    Expression<int>? id,
+    Expression<int>? medicationAlternativeId,
+    Expression<String>? componentName,
+    Expression<String>? doseAmount,
+    Expression<String>? doseUnit,
+    Expression<int>? sortOrder,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (medicationAlternativeId != null)
+        'medication_alternative_id': medicationAlternativeId,
+      if (componentName != null) 'component_name': componentName,
+      if (doseAmount != null) 'dose_amount': doseAmount,
+      if (doseUnit != null) 'dose_unit': doseUnit,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  MedicationAlternativeComponentsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? medicationAlternativeId,
+    Value<String?>? componentName,
+    Value<String>? doseAmount,
+    Value<String>? doseUnit,
+    Value<int>? sortOrder,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+  }) {
+    return MedicationAlternativeComponentsCompanion(
+      id: id ?? this.id,
+      medicationAlternativeId:
+          medicationAlternativeId ?? this.medicationAlternativeId,
+      componentName: componentName ?? this.componentName,
+      doseAmount: doseAmount ?? this.doseAmount,
+      doseUnit: doseUnit ?? this.doseUnit,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (medicationAlternativeId.present) {
+      map['medication_alternative_id'] = Variable<int>(
+        medicationAlternativeId.value,
+      );
+    }
+    if (componentName.present) {
+      map['component_name'] = Variable<String>(componentName.value);
+    }
+    if (doseAmount.present) {
+      map['dose_amount'] = Variable<String>(doseAmount.value);
+    }
+    if (doseUnit.present) {
+      map['dose_unit'] = Variable<String>(doseUnit.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationAlternativeComponentsCompanion(')
+          ..write('id: $id, ')
+          ..write('medicationAlternativeId: $medicationAlternativeId, ')
+          ..write('componentName: $componentName, ')
+          ..write('doseAmount: $doseAmount, ')
+          ..write('doseUnit: $doseUnit, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MeasurementTypesTable extends MeasurementTypes
     with TableInfo<$MeasurementTypesTable, MeasurementType> {
   @override
@@ -9310,6 +10371,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MedicationLogsTable medicationLogs = $MedicationLogsTable(this);
   late final $MedicationAlternativesTable medicationAlternatives =
       $MedicationAlternativesTable(this);
+  late final $MedicationComponentsTable medicationComponents =
+      $MedicationComponentsTable(this);
+  late final $MedicationAlternativeComponentsTable
+  medicationAlternativeComponents = $MedicationAlternativeComponentsTable(this);
   late final $MeasurementTypesTable measurementTypes = $MeasurementTypesTable(
     this,
   );
@@ -9340,6 +10405,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     medicationSchedules,
     medicationLogs,
     medicationAlternatives,
+    medicationComponents,
+    medicationAlternativeComponents,
     measurementTypes,
     measurementRecords,
     measurementSchedules,
@@ -10889,6 +11956,31 @@ final class $$MedicationsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $MedicationComponentsTable,
+    List<MedicationComponent>
+  >
+  _medicationComponentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.medicationComponents,
+        aliasName: 'medications__id__medication_components__medication_id',
+      );
+
+  $$MedicationComponentsTableProcessedTableManager
+  get medicationComponentsRefs {
+    final manager = $$MedicationComponentsTableTableManager(
+      $_db,
+      $_db.medicationComponents,
+    ).filter((f) => f.medicationId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _medicationComponentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MedicationsTableFilterComposer
@@ -11026,6 +12118,31 @@ class $$MedicationsTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> medicationComponentsRefs(
+    Expression<bool> Function($$MedicationComponentsTableFilterComposer f) f,
+  ) {
+    final $$MedicationComponentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.medicationComponents,
+      getReferencedColumn: (t) => t.medicationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationComponentsTableFilterComposer(
+            $db: $db,
+            $table: $db.medicationComponents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -11238,6 +12355,32 @@ class $$MedicationsTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> medicationComponentsRefs<T extends Object>(
+    Expression<T> Function($$MedicationComponentsTableAnnotationComposer a) f,
+  ) {
+    final $$MedicationComponentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.medicationComponents,
+          getReferencedColumn: (t) => t.medicationId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationComponentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.medicationComponents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MedicationsTableTableManager
@@ -11257,6 +12400,7 @@ class $$MedicationsTableTableManager
             bool profileId,
             bool medicationSchedulesRefs,
             bool medicationAlternativesRefs,
+            bool medicationComponentsRefs,
           })
         > {
   $$MedicationsTableTableManager(_$AppDatabase db, $MedicationsTable table)
@@ -11339,12 +12483,14 @@ class $$MedicationsTableTableManager
                 profileId = false,
                 medicationSchedulesRefs = false,
                 medicationAlternativesRefs = false,
+                medicationComponentsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (medicationSchedulesRefs) db.medicationSchedules,
                     if (medicationAlternativesRefs) db.medicationAlternatives,
+                    if (medicationComponentsRefs) db.medicationComponents,
                   ],
                   addJoins:
                       <
@@ -11424,6 +12570,27 @@ class $$MedicationsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (medicationComponentsRefs)
+                        await $_getPrefetchedData<
+                          Medication,
+                          $MedicationsTable,
+                          MedicationComponent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicationsTableReferences
+                              ._medicationComponentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicationsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).medicationComponentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicationId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -11448,6 +12615,7 @@ typedef $$MedicationsTableProcessedTableManager =
         bool profileId,
         bool medicationSchedulesRefs,
         bool medicationAlternativesRefs,
+        bool medicationComponentsRefs,
       })
     >;
 typedef $$MedicationSchedulesTableCreateCompanionBuilder =
@@ -12356,6 +13524,37 @@ final class $$MedicationAlternativesTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<
+    $MedicationAlternativeComponentsTable,
+    List<MedicationAlternativeComponent>
+  >
+  _medicationAlternativeComponentsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.medicationAlternativeComponents,
+    aliasName:
+        'medication_alternatives__id__medication_alternative_components__medication_alternative_id',
+  );
+
+  $$MedicationAlternativeComponentsTableProcessedTableManager
+  get medicationAlternativeComponentsRefs {
+    final manager =
+        $$MedicationAlternativeComponentsTableTableManager(
+          $_db,
+          $_db.medicationAlternativeComponents,
+        ).filter(
+          (f) =>
+              f.medicationAlternativeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _medicationAlternativeComponentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MedicationAlternativesTableFilterComposer
@@ -12423,6 +13622,35 @@ class $$MedicationAlternativesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> medicationAlternativeComponentsRefs(
+    Expression<bool> Function(
+      $$MedicationAlternativeComponentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$MedicationAlternativeComponentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.medicationAlternativeComponents,
+          getReferencedColumn: (t) => t.medicationAlternativeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationAlternativeComponentsTableFilterComposer(
+                $db: $db,
+                $table: $db.medicationAlternativeComponents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 }
 
@@ -12550,6 +13778,35 @@ class $$MedicationAlternativesTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> medicationAlternativeComponentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$MedicationAlternativeComponentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$MedicationAlternativeComponentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.medicationAlternativeComponents,
+          getReferencedColumn: (t) => t.medicationAlternativeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationAlternativeComponentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.medicationAlternativeComponents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MedicationAlternativesTableTableManager
@@ -12565,7 +13822,10 @@ class $$MedicationAlternativesTableTableManager
           $$MedicationAlternativesTableUpdateCompanionBuilder,
           (MedicationAlternative, $$MedicationAlternativesTableReferences),
           MedicationAlternative,
-          PrefetchHooks Function({bool medicationId})
+          PrefetchHooks Function({
+            bool medicationId,
+            bool medicationAlternativeComponentsRefs,
+          })
         > {
   $$MedicationAlternativesTableTableManager(
     _$AppDatabase db,
@@ -12637,6 +13897,433 @@ class $$MedicationAlternativesTableTableManager
                 ),
               )
               .toList(),
+          prefetchHooksCallback:
+              ({
+                medicationId = false,
+                medicationAlternativeComponentsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (medicationAlternativeComponentsRefs)
+                      db.medicationAlternativeComponents,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (medicationId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.medicationId,
+                                    referencedTable:
+                                        $$MedicationAlternativesTableReferences
+                                            ._medicationIdTable(db),
+                                    referencedColumn:
+                                        $$MedicationAlternativesTableReferences
+                                            ._medicationIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (medicationAlternativeComponentsRefs)
+                        await $_getPrefetchedData<
+                          MedicationAlternative,
+                          $MedicationAlternativesTable,
+                          MedicationAlternativeComponent
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$MedicationAlternativesTableReferences
+                                  ._medicationAlternativeComponentsRefsTable(
+                                    db,
+                                  ),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicationAlternativesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).medicationAlternativeComponentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicationAlternativeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$MedicationAlternativesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MedicationAlternativesTable,
+      MedicationAlternative,
+      $$MedicationAlternativesTableFilterComposer,
+      $$MedicationAlternativesTableOrderingComposer,
+      $$MedicationAlternativesTableAnnotationComposer,
+      $$MedicationAlternativesTableCreateCompanionBuilder,
+      $$MedicationAlternativesTableUpdateCompanionBuilder,
+      (MedicationAlternative, $$MedicationAlternativesTableReferences),
+      MedicationAlternative,
+      PrefetchHooks Function({
+        bool medicationId,
+        bool medicationAlternativeComponentsRefs,
+      })
+    >;
+typedef $$MedicationComponentsTableCreateCompanionBuilder =
+    MedicationComponentsCompanion Function({
+      Value<int> id,
+      required int medicationId,
+      Value<String?> componentName,
+      required String doseAmount,
+      required String doseUnit,
+      Value<int> sortOrder,
+      required DateTime createdAt,
+      Value<DateTime?> updatedAt,
+    });
+typedef $$MedicationComponentsTableUpdateCompanionBuilder =
+    MedicationComponentsCompanion Function({
+      Value<int> id,
+      Value<int> medicationId,
+      Value<String?> componentName,
+      Value<String> doseAmount,
+      Value<String> doseUnit,
+      Value<int> sortOrder,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+
+final class $$MedicationComponentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MedicationComponentsTable,
+          MedicationComponent
+        > {
+  $$MedicationComponentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MedicationsTable _medicationIdTable(_$AppDatabase db) => db
+      .medications
+      .createAlias('medication_components__medication_id__medications__id');
+
+  $$MedicationsTableProcessedTableManager get medicationId {
+    final $_column = $_itemColumn<int>('medication_id')!;
+
+    final manager = $$MedicationsTableTableManager(
+      $_db,
+      $_db.medications,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicationIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MedicationComponentsTableFilterComposer
+    extends Composer<_$AppDatabase, $MedicationComponentsTable> {
+  $$MedicationComponentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get componentName => $composableBuilder(
+    column: $table.componentName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get doseAmount => $composableBuilder(
+    column: $table.doseAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get doseUnit => $composableBuilder(
+    column: $table.doseUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicationsTableFilterComposer get medicationId {
+    final $$MedicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationComponentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MedicationComponentsTable> {
+  $$MedicationComponentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get componentName => $composableBuilder(
+    column: $table.componentName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get doseAmount => $composableBuilder(
+    column: $table.doseAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get doseUnit => $composableBuilder(
+    column: $table.doseUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicationsTableOrderingComposer get medicationId {
+    final $$MedicationsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableOrderingComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationComponentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MedicationComponentsTable> {
+  $$MedicationComponentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get componentName => $composableBuilder(
+    column: $table.componentName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get doseAmount => $composableBuilder(
+    column: $table.doseAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get doseUnit =>
+      $composableBuilder(column: $table.doseUnit, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$MedicationsTableAnnotationComposer get medicationId {
+    final $$MedicationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MedicationComponentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MedicationComponentsTable,
+          MedicationComponent,
+          $$MedicationComponentsTableFilterComposer,
+          $$MedicationComponentsTableOrderingComposer,
+          $$MedicationComponentsTableAnnotationComposer,
+          $$MedicationComponentsTableCreateCompanionBuilder,
+          $$MedicationComponentsTableUpdateCompanionBuilder,
+          (MedicationComponent, $$MedicationComponentsTableReferences),
+          MedicationComponent,
+          PrefetchHooks Function({bool medicationId})
+        > {
+  $$MedicationComponentsTableTableManager(
+    _$AppDatabase db,
+    $MedicationComponentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MedicationComponentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MedicationComponentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MedicationComponentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> medicationId = const Value.absent(),
+                Value<String?> componentName = const Value.absent(),
+                Value<String> doseAmount = const Value.absent(),
+                Value<String> doseUnit = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => MedicationComponentsCompanion(
+                id: id,
+                medicationId: medicationId,
+                componentName: componentName,
+                doseAmount: doseAmount,
+                doseUnit: doseUnit,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int medicationId,
+                Value<String?> componentName = const Value.absent(),
+                required String doseAmount,
+                required String doseUnit,
+                Value<int> sortOrder = const Value.absent(),
+                required DateTime createdAt,
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => MedicationComponentsCompanion.insert(
+                id: id,
+                medicationId: medicationId,
+                componentName: componentName,
+                doseAmount: doseAmount,
+                doseUnit: doseUnit,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MedicationComponentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
           prefetchHooksCallback: ({medicationId = false}) {
             return PrefetchHooks(
               db: db,
@@ -12663,10 +14350,10 @@ class $$MedicationAlternativesTableTableManager
                                 currentTable: table,
                                 currentColumn: table.medicationId,
                                 referencedTable:
-                                    $$MedicationAlternativesTableReferences
+                                    $$MedicationComponentsTableReferences
                                         ._medicationIdTable(db),
                                 referencedColumn:
-                                    $$MedicationAlternativesTableReferences
+                                    $$MedicationComponentsTableReferences
                                         ._medicationIdTable(db)
                                         .id,
                               )
@@ -12684,19 +14371,432 @@ class $$MedicationAlternativesTableTableManager
       );
 }
 
-typedef $$MedicationAlternativesTableProcessedTableManager =
+typedef $$MedicationComponentsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $MedicationAlternativesTable,
-      MedicationAlternative,
-      $$MedicationAlternativesTableFilterComposer,
-      $$MedicationAlternativesTableOrderingComposer,
-      $$MedicationAlternativesTableAnnotationComposer,
-      $$MedicationAlternativesTableCreateCompanionBuilder,
-      $$MedicationAlternativesTableUpdateCompanionBuilder,
-      (MedicationAlternative, $$MedicationAlternativesTableReferences),
-      MedicationAlternative,
+      $MedicationComponentsTable,
+      MedicationComponent,
+      $$MedicationComponentsTableFilterComposer,
+      $$MedicationComponentsTableOrderingComposer,
+      $$MedicationComponentsTableAnnotationComposer,
+      $$MedicationComponentsTableCreateCompanionBuilder,
+      $$MedicationComponentsTableUpdateCompanionBuilder,
+      (MedicationComponent, $$MedicationComponentsTableReferences),
+      MedicationComponent,
       PrefetchHooks Function({bool medicationId})
+    >;
+typedef $$MedicationAlternativeComponentsTableCreateCompanionBuilder =
+    MedicationAlternativeComponentsCompanion Function({
+      Value<int> id,
+      required int medicationAlternativeId,
+      Value<String?> componentName,
+      required String doseAmount,
+      required String doseUnit,
+      Value<int> sortOrder,
+      required DateTime createdAt,
+      Value<DateTime?> updatedAt,
+    });
+typedef $$MedicationAlternativeComponentsTableUpdateCompanionBuilder =
+    MedicationAlternativeComponentsCompanion Function({
+      Value<int> id,
+      Value<int> medicationAlternativeId,
+      Value<String?> componentName,
+      Value<String> doseAmount,
+      Value<String> doseUnit,
+      Value<int> sortOrder,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+
+final class $$MedicationAlternativeComponentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MedicationAlternativeComponentsTable,
+          MedicationAlternativeComponent
+        > {
+  $$MedicationAlternativeComponentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MedicationAlternativesTable _medicationAlternativeIdTable(
+    _$AppDatabase db,
+  ) => db.medicationAlternatives.createAlias(
+    'medication_alternative_components__medication_alternative_id__medication_alternatives__id',
+  );
+
+  $$MedicationAlternativesTableProcessedTableManager
+  get medicationAlternativeId {
+    final $_column = $_itemColumn<int>('medication_alternative_id')!;
+
+    final manager = $$MedicationAlternativesTableTableManager(
+      $_db,
+      $_db.medicationAlternatives,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _medicationAlternativeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MedicationAlternativeComponentsTableFilterComposer
+    extends Composer<_$AppDatabase, $MedicationAlternativeComponentsTable> {
+  $$MedicationAlternativeComponentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get componentName => $composableBuilder(
+    column: $table.componentName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get doseAmount => $composableBuilder(
+    column: $table.doseAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get doseUnit => $composableBuilder(
+    column: $table.doseUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicationAlternativesTableFilterComposer get medicationAlternativeId {
+    final $$MedicationAlternativesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicationAlternativeId,
+          referencedTable: $db.medicationAlternatives,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationAlternativesTableFilterComposer(
+                $db: $db,
+                $table: $db.medicationAlternatives,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$MedicationAlternativeComponentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MedicationAlternativeComponentsTable> {
+  $$MedicationAlternativeComponentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get componentName => $composableBuilder(
+    column: $table.componentName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get doseAmount => $composableBuilder(
+    column: $table.doseAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get doseUnit => $composableBuilder(
+    column: $table.doseUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicationAlternativesTableOrderingComposer get medicationAlternativeId {
+    final $$MedicationAlternativesTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicationAlternativeId,
+          referencedTable: $db.medicationAlternatives,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationAlternativesTableOrderingComposer(
+                $db: $db,
+                $table: $db.medicationAlternatives,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$MedicationAlternativeComponentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MedicationAlternativeComponentsTable> {
+  $$MedicationAlternativeComponentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get componentName => $composableBuilder(
+    column: $table.componentName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get doseAmount => $composableBuilder(
+    column: $table.doseAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get doseUnit =>
+      $composableBuilder(column: $table.doseUnit, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$MedicationAlternativesTableAnnotationComposer get medicationAlternativeId {
+    final $$MedicationAlternativesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.medicationAlternativeId,
+          referencedTable: $db.medicationAlternatives,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationAlternativesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.medicationAlternatives,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$MedicationAlternativeComponentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MedicationAlternativeComponentsTable,
+          MedicationAlternativeComponent,
+          $$MedicationAlternativeComponentsTableFilterComposer,
+          $$MedicationAlternativeComponentsTableOrderingComposer,
+          $$MedicationAlternativeComponentsTableAnnotationComposer,
+          $$MedicationAlternativeComponentsTableCreateCompanionBuilder,
+          $$MedicationAlternativeComponentsTableUpdateCompanionBuilder,
+          (
+            MedicationAlternativeComponent,
+            $$MedicationAlternativeComponentsTableReferences,
+          ),
+          MedicationAlternativeComponent,
+          PrefetchHooks Function({bool medicationAlternativeId})
+        > {
+  $$MedicationAlternativeComponentsTableTableManager(
+    _$AppDatabase db,
+    $MedicationAlternativeComponentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MedicationAlternativeComponentsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$MedicationAlternativeComponentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MedicationAlternativeComponentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> medicationAlternativeId = const Value.absent(),
+                Value<String?> componentName = const Value.absent(),
+                Value<String> doseAmount = const Value.absent(),
+                Value<String> doseUnit = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => MedicationAlternativeComponentsCompanion(
+                id: id,
+                medicationAlternativeId: medicationAlternativeId,
+                componentName: componentName,
+                doseAmount: doseAmount,
+                doseUnit: doseUnit,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int medicationAlternativeId,
+                Value<String?> componentName = const Value.absent(),
+                required String doseAmount,
+                required String doseUnit,
+                Value<int> sortOrder = const Value.absent(),
+                required DateTime createdAt,
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => MedicationAlternativeComponentsCompanion.insert(
+                id: id,
+                medicationAlternativeId: medicationAlternativeId,
+                componentName: componentName,
+                doseAmount: doseAmount,
+                doseUnit: doseUnit,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MedicationAlternativeComponentsTableReferences(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({medicationAlternativeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (medicationAlternativeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.medicationAlternativeId,
+                                referencedTable:
+                                    $$MedicationAlternativeComponentsTableReferences
+                                        ._medicationAlternativeIdTable(db),
+                                referencedColumn:
+                                    $$MedicationAlternativeComponentsTableReferences
+                                        ._medicationAlternativeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MedicationAlternativeComponentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MedicationAlternativeComponentsTable,
+      MedicationAlternativeComponent,
+      $$MedicationAlternativeComponentsTableFilterComposer,
+      $$MedicationAlternativeComponentsTableOrderingComposer,
+      $$MedicationAlternativeComponentsTableAnnotationComposer,
+      $$MedicationAlternativeComponentsTableCreateCompanionBuilder,
+      $$MedicationAlternativeComponentsTableUpdateCompanionBuilder,
+      (
+        MedicationAlternativeComponent,
+        $$MedicationAlternativeComponentsTableReferences,
+      ),
+      MedicationAlternativeComponent,
+      PrefetchHooks Function({bool medicationAlternativeId})
     >;
 typedef $$MeasurementTypesTableCreateCompanionBuilder =
     MeasurementTypesCompanion Function({
@@ -18248,6 +20348,14 @@ class $AppDatabaseManager {
       $$MedicationAlternativesTableTableManager(
         _db,
         _db.medicationAlternatives,
+      );
+  $$MedicationComponentsTableTableManager get medicationComponents =>
+      $$MedicationComponentsTableTableManager(_db, _db.medicationComponents);
+  $$MedicationAlternativeComponentsTableTableManager
+  get medicationAlternativeComponents =>
+      $$MedicationAlternativeComponentsTableTableManager(
+        _db,
+        _db.medicationAlternativeComponents,
       );
   $$MeasurementTypesTableTableManager get measurementTypes =>
       $$MeasurementTypesTableTableManager(_db, _db.measurementTypes);

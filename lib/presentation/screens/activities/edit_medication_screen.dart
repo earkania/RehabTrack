@@ -39,8 +39,6 @@ class _EditMedicationScreenState extends ConsumerState<EditMedicationScreen> {
       final updated = current.copyWith(
         name: data.name,
         description: data.description.isNotEmpty ? data.description : null,
-        doseAmount: data.doseAmount.isNotEmpty ? data.doseAmount : null,
-        doseUnit: data.doseUnit.isNotEmpty ? data.doseUnit : null,
         active: data.active,
         startDate: data.startDate,
         endDate: data.endDate,
@@ -50,6 +48,14 @@ class _EditMedicationScreenState extends ConsumerState<EditMedicationScreen> {
 
       final repo = ref.read(medicationRepositoryProvider);
       await repo.updateMedication(updated);
+
+      final components = data.components
+          .map((c) => c.copyWith(medicationId: widget.medicationId))
+          .toList();
+      await repo.replaceMedicationComponents(
+        widget.medicationId,
+        components,
+      );
 
       if (mounted) {
         ref.invalidate(medicationProvider(widget.medicationId));
@@ -91,14 +97,51 @@ class _EditMedicationScreenState extends ConsumerState<EditMedicationScreen> {
             return Center(child: Text(l10n.error));
           }
 
-          return MedicationForm(
-            initialData: MedicationFormData.fromMedication(medication),
+          return _EditMedicationBody(
+            medicationId: widget.medicationId,
+            medication: medication,
             onSave: _onSave,
-            isLoading: _isSaving,
-            saveButtonLabel: l10n.save,
+            isSaving: _isSaving,
           );
         },
       ),
+    );
+  }
+}
+
+class _EditMedicationBody extends ConsumerWidget {
+  final int medicationId;
+  final dynamic medication;
+  final void Function(MedicationFormData) onSave;
+  final bool isSaving;
+
+  const _EditMedicationBody({
+    required this.medicationId,
+    required this.medication,
+    required this.onSave,
+    required this.isSaving,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final componentsAsync = ref.watch(
+      medicationComponentsProvider(medicationId),
+    );
+
+    return componentsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text(l10n.error)),
+      data: (components) {
+        final initialData = MedicationFormData.fromMedication(medication);
+        return MedicationForm(
+          initialData: initialData,
+          existingComponents: components,
+          onSave: onSave,
+          isLoading: isSaving,
+          saveButtonLabel: l10n.save,
+        );
+      },
     );
   }
 }

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
+import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/theme/app_spacing.dart';
+import 'package:rehab_track/presentation/widgets/medication/medication_components_form.dart';
 
 class MedicationAlternativeFormData {
   String name;
-  String doseAmount;
-  String doseUnit;
+  List<MedicationAlternativeComponent> components;
   bool doctorApproved;
   String notes;
 
   MedicationAlternativeFormData({
     this.name = '',
-    this.doseAmount = '',
-    this.doseUnit = '',
+    this.components = const [],
     this.doctorApproved = false,
     this.notes = '',
   });
@@ -23,8 +23,6 @@ class MedicationAlternativeFormData {
   ) {
     return MedicationAlternativeFormData(
       name: alternative.name,
-      doseAmount: alternative.doseAmount ?? '',
-      doseUnit: alternative.doseUnit ?? '',
       doctorApproved: alternative.doctorApproved,
       notes: alternative.notes ?? '',
     );
@@ -36,6 +34,7 @@ class MedicationAlternativeForm extends StatefulWidget {
   final ValueChanged<MedicationAlternativeFormData> onSave;
   final bool isLoading;
   final String saveButtonLabel;
+  final List<MedicationAlternativeComponent> existingComponents;
 
   const MedicationAlternativeForm({
     super.key,
@@ -43,6 +42,7 @@ class MedicationAlternativeForm extends StatefulWidget {
     required this.onSave,
     this.isLoading = false,
     required this.saveButtonLabel,
+    this.existingComponents = const [],
   });
 
   @override
@@ -53,27 +53,27 @@ class MedicationAlternativeForm extends StatefulWidget {
 class _MedicationAlternativeFormState extends State<MedicationAlternativeForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
-  late final TextEditingController _doseAmountController;
-  late final TextEditingController _doseUnitController;
   late final TextEditingController _notesController;
   late bool _doctorApproved;
+  late List<MedicationAlternativeComponent> _components;
 
   @override
   void initState() {
     super.initState();
     final d = widget.initialData;
     _nameController = TextEditingController(text: d.name);
-    _doseAmountController = TextEditingController(text: d.doseAmount);
-    _doseUnitController = TextEditingController(text: d.doseUnit);
     _notesController = TextEditingController(text: d.notes);
     _doctorApproved = d.doctorApproved;
+    _components = List<MedicationAlternativeComponent>.from(
+      widget.existingComponents.isNotEmpty
+          ? widget.existingComponents
+          : d.components,
+    );
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _doseAmountController.dispose();
-    _doseUnitController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -83,8 +83,7 @@ class _MedicationAlternativeFormState extends State<MedicationAlternativeForm> {
     widget.onSave(
       MedicationAlternativeFormData(
         name: _nameController.text.trim(),
-        doseAmount: _doseAmountController.text.trim(),
-        doseUnit: _doseUnitController.text.trim(),
+        components: _components,
         doctorApproved: _doctorApproved,
         notes: _notesController.text.trim(),
       ),
@@ -114,54 +113,19 @@ class _MedicationAlternativeFormState extends State<MedicationAlternativeForm> {
               return null;
             },
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _doseAmountController,
-                  decoration: InputDecoration(
-                    labelText: l10n.doseAmount,
-                    border: const OutlineInputBorder(),
-                  ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d*\.?\d{0,2}')),
-                  ],
-                  validator: (value) {
-                    if (value != null && value.trim().isNotEmpty) {
-                      final num = double.tryParse(value.trim());
-                      if (num == null || num <= 0) {
-                        return l10n.invalidDose;
-                      }
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
-                  controller: _doseUnitController,
-                  decoration: InputDecoration(
-                    labelText: l10n.doseUnit,
-                    border: const OutlineInputBorder(),
-                  ),
-                  textCapitalization: TextCapitalization.none,
-                ),
-              ),
-            ],
+          AppSpacing.mdH,
+          MedicationComponentsForm.forAlternative(
+            components: _components,
+            onChanged: (value) => setState(() => _components = value),
           ),
-          const SizedBox(height: 16),
+          AppSpacing.mdH,
           SwitchListTile(
             title: Text(l10n.doctorApproved),
             value: _doctorApproved,
             onChanged: (value) => setState(() => _doctorApproved = value),
             contentPadding: EdgeInsets.zero,
           ),
-          const SizedBox(height: 8),
+          AppSpacing.smH,
           TextFormField(
             controller: _notesController,
             decoration: InputDecoration(
@@ -171,7 +135,7 @@ class _MedicationAlternativeFormState extends State<MedicationAlternativeForm> {
             maxLines: 3,
             textCapitalization: TextCapitalization.sentences,
           ),
-          const SizedBox(height: 24),
+          AppSpacing.lgH,
           FilledButton(
             onPressed: widget.isLoading ? null : _save,
             child: widget.isLoading

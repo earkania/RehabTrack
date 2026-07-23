@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_alternative_card.dart';
@@ -9,7 +10,7 @@ Widget _wrapWithL10n(Widget child) {
   return MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
-    home: Scaffold(body: child),
+    home: ProviderScope(child: Scaffold(body: child)),
   );
 }
 
@@ -29,24 +30,6 @@ void main() {
       );
 
       expect(find.text('Bisoprolol'), findsOneWidget);
-    });
-
-    testWidgets('renders dose when present', (WidgetTester tester) async {
-      final alternative = MedicationAlternative(
-        id: 1,
-        medicationId: 1,
-        name: 'Bisoprolol',
-        doseAmount: '5',
-        doseUnit: 'mg',
-        doctorApproved: false,
-        createdAt: DateTime(2026),
-      );
-
-      await tester.pumpWidget(
-        _wrapWithL10n(MedicationAlternativeCard(alternative: alternative)),
-      );
-
-      expect(find.text('5 mg'), findsOneWidget);
     });
 
     testWidgets('renders doctor approved badge when approved',
@@ -173,8 +156,6 @@ void main() {
         (WidgetTester tester) async {
       final data = MedicationAlternativeFormData(
         name: 'Metformin',
-        doseAmount: '500',
-        doseUnit: 'mg',
         doctorApproved: true,
         notes: 'Generic substitute',
       );
@@ -190,7 +171,6 @@ void main() {
       );
 
       expect(find.text('Metformin'), findsOneWidget);
-      expect(find.text('500'), findsOneWidget);
       expect(find.text('Generic substitute'), findsOneWidget);
     });
 
@@ -218,34 +198,6 @@ void main() {
       expect(savedData!.name, 'Bisoprolol');
     });
 
-    testWidgets('shows validation error for invalid dose amount',
-        (WidgetTester tester) async {
-      bool saved = false;
-
-      await tester.pumpWidget(
-        _wrapWithL10n(
-          MedicationAlternativeForm(
-            initialData: MedicationAlternativeFormData(),
-            onSave: (_) => saved = true,
-            saveButtonLabel: 'Save',
-          ),
-        ),
-      );
-
-      // Enter name first (required)
-      await tester.enterText(find.byType(TextFormField).first, 'Test');
-      await tester.pump();
-
-      // Enter invalid dose (zero - input filter allows digits but validator rejects <= 0)
-      await tester.enterText(find.byType(TextFormField).at(1), '0');
-      await tester.pump();
-
-      await tester.tap(find.text('Save'));
-      await tester.pumpAndSettle();
-
-      expect(saved, isFalse);
-    });
-
     testWidgets('fromAlternative creates correct form data',
         (WidgetTester tester) async {
       final alternative = MedicationAlternative(
@@ -263,8 +215,6 @@ void main() {
           MedicationAlternativeFormData.fromAlternative(alternative);
 
       expect(formData.name, 'Bisoprolol');
-      expect(formData.doseAmount, '5');
-      expect(formData.doseUnit, 'mg');
       expect(formData.doctorApproved, isTrue);
       expect(formData.notes, 'Generic substitute');
     });
@@ -283,8 +233,6 @@ void main() {
           MedicationAlternativeFormData.fromAlternative(alternative);
 
       expect(formData.name, 'Aspirin');
-      expect(formData.doseAmount, '');
-      expect(formData.doseUnit, '');
       expect(formData.doctorApproved, isFalse);
       expect(formData.notes, '');
     });

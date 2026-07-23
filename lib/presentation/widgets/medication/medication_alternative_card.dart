@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/providers/medication_provider.dart';
+import 'package:rehab_track/presentation/utils/component_formatter.dart';
 
-class MedicationAlternativeCard extends StatelessWidget {
+class MedicationAlternativeCard extends ConsumerWidget {
   final MedicationAlternative alternative;
   final VoidCallback? onTap;
 
@@ -13,12 +16,22 @@ class MedicationAlternativeCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final doseText = _formatDose();
+    final componentsAsync = ref.watch(
+      medicationAlternativeComponentsProvider(alternative.id!),
+    );
+    final doseText = componentsAsync.when(
+      data: (components) {
+        if (components.isEmpty) return '';
+        return ComponentFormatter.formatAlternativeComponents(components);
+      },
+      loading: () => '',
+      error: (_, _) => '',
+    );
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -83,16 +96,5 @@ class MedicationAlternativeCard extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right),
       ),
     );
-  }
-
-  String _formatDose() {
-    final parts = <String>[];
-    if (alternative.doseAmount != null && alternative.doseAmount!.isNotEmpty) {
-      parts.add(alternative.doseAmount!);
-    }
-    if (alternative.doseUnit != null && alternative.doseUnit!.isNotEmpty) {
-      parts.add(alternative.doseUnit!);
-    }
-    return parts.join(' ');
   }
 }

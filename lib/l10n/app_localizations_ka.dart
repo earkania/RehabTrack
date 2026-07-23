@@ -429,4 +429,19 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get noSchedulesAvailable => 'გრაფიკები არ არის დოზის აღსარიცხავად';
+
+  @override
+  String get dosageComponents => 'დოზის კომპონენტები';
+
+  @override
+  String get addComponent => 'კომპონენტის დამატება';
+
+  @override
+  String get removeComponent => 'კომპონენტის წაშლა';
+
+  @override
+  String get componentName => 'კომპონენტის სახელი';
+
+  @override
+  String get componentNameOptional => 'კომპონენტის სახელი (სურვილისამებრ)';
 }

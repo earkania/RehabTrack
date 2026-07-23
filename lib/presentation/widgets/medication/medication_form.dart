@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/domain/entities/medication_component.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/widgets/common/date_field.dart';
+import 'package:rehab_track/presentation/widgets/medication/medication_components_form.dart';
 
 class MedicationFormData {
   String name;
   String description;
-  String doseAmount;
-  String doseUnit;
+  List<MedicationComponent> components;
   bool active;
   DateTime? startDate;
   DateTime? endDate;
@@ -17,8 +18,7 @@ class MedicationFormData {
   MedicationFormData({
     this.name = '',
     this.description = '',
-    this.doseAmount = '',
-    this.doseUnit = '',
+    this.components = const [],
     this.active = true,
     this.startDate,
     this.endDate,
@@ -29,8 +29,6 @@ class MedicationFormData {
     return MedicationFormData(
       name: m.name,
       description: m.description ?? '',
-      doseAmount: m.doseAmount ?? '',
-      doseUnit: m.doseUnit ?? '',
       active: m.active,
       startDate: m.startDate,
       endDate: m.endDate,
@@ -44,6 +42,7 @@ class MedicationForm extends StatefulWidget {
   final ValueChanged<MedicationFormData> onSave;
   final bool isLoading;
   final String saveButtonLabel;
+  final List<MedicationComponent> existingComponents;
 
   const MedicationForm({
     super.key,
@@ -51,6 +50,7 @@ class MedicationForm extends StatefulWidget {
     required this.onSave,
     this.isLoading = false,
     required this.saveButtonLabel,
+    this.existingComponents = const [],
   });
 
   @override
@@ -59,14 +59,14 @@ class MedicationForm extends StatefulWidget {
 
 class _MedicationFormState extends State<MedicationForm> {
   final _formKey = GlobalKey<FormState>();
+  final _componentsFormKey = GlobalKey<MedicationComponentsFormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
-  late final TextEditingController _doseAmountController;
-  late final TextEditingController _doseUnitController;
   late final TextEditingController _notesController;
   late bool _active;
   DateTime? _startDate;
   DateTime? _endDate;
+  late List<MedicationComponent> _components;
 
   @override
   void initState() {
@@ -74,20 +74,21 @@ class _MedicationFormState extends State<MedicationForm> {
     final d = widget.initialData;
     _nameController = TextEditingController(text: d.name);
     _descriptionController = TextEditingController(text: d.description);
-    _doseAmountController = TextEditingController(text: d.doseAmount);
-    _doseUnitController = TextEditingController(text: d.doseUnit);
     _notesController = TextEditingController(text: d.notes);
     _active = d.active;
     _startDate = d.startDate;
     _endDate = d.endDate;
+    _components = List<MedicationComponent>.from(
+      widget.existingComponents.isNotEmpty
+          ? widget.existingComponents
+          : d.components,
+    );
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _doseAmountController.dispose();
-    _doseUnitController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -98,8 +99,7 @@ class _MedicationFormState extends State<MedicationForm> {
       MedicationFormData(
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim(),
-        doseAmount: _doseAmountController.text.trim(),
-        doseUnit: _doseUnitController.text.trim(),
+        components: _components,
         active: _active,
         startDate: _startDate,
         endDate: _endDate,
@@ -159,7 +159,7 @@ class _MedicationFormState extends State<MedicationForm> {
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          AppSpacing.mdH,
           TextFormField(
             controller: _descriptionController,
             decoration: InputDecoration(
@@ -169,54 +169,20 @@ class _MedicationFormState extends State<MedicationForm> {
             maxLines: 2,
             textCapitalization: TextCapitalization.sentences,
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _doseAmountController,
-                  decoration: InputDecoration(
-                    labelText: l10n.doseAmount,
-                    border: const OutlineInputBorder(),
-                  ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d*\.?\d{0,2}')),
-                  ],
-                  validator: (value) {
-                    if (value != null && value.trim().isNotEmpty) {
-                      final num = double.tryParse(value.trim());
-                      if (num == null || num <= 0) {
-                        return l10n.invalidDose;
-                      }
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
-                  controller: _doseUnitController,
-                  decoration: InputDecoration(
-                    labelText: l10n.doseUnit,
-                    border: const OutlineInputBorder(),
-                  ),
-                  textCapitalization: TextCapitalization.none,
-                ),
-              ),
-            ],
+          AppSpacing.mdH,
+          MedicationComponentsForm.forMedication(
+            key: _componentsFormKey,
+            components: _components,
+            onChanged: (value) => setState(() => _components = value),
           ),
-          const SizedBox(height: 16),
+          AppSpacing.mdH,
           SwitchListTile(
             title: Text(l10n.active),
             value: _active,
             onChanged: (value) => setState(() => _active = value),
             contentPadding: EdgeInsets.zero,
           ),
-          const SizedBox(height: 8),
+          AppSpacing.smH,
           Row(
             children: [
               Expanded(
@@ -227,7 +193,7 @@ class _MedicationFormState extends State<MedicationForm> {
                   onClear: () => setState(() => _startDate = null),
                 ),
               ),
-              const SizedBox(width: 12),
+              AppSpacing.mdW,
               Expanded(
                 child: DateField(
                   label: l10n.endDate,
@@ -251,7 +217,7 @@ class _MedicationFormState extends State<MedicationForm> {
                 ),
               ),
             ),
-          const SizedBox(height: 16),
+          AppSpacing.mdH,
           TextFormField(
             controller: _notesController,
             decoration: InputDecoration(
@@ -261,7 +227,7 @@ class _MedicationFormState extends State<MedicationForm> {
             maxLines: 3,
             textCapitalization: TextCapitalization.sentences,
           ),
-          const SizedBox(height: 24),
+          AppSpacing.lgH,
           FilledButton(
             onPressed: widget.isLoading ? null : _save,
             child: widget.isLoading

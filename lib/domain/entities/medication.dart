@@ -5,7 +5,9 @@ class Medication {
   final int profileId;
   final String name;
   final String? description;
+  /// @deprecated Use MedicationComponents table instead. Kept temporarily for migration compatibility.
   final String? doseAmount;
+  /// @deprecated Use MedicationComponents table instead. Kept temporarily for migration compatibility.
   final String? doseUnit;
   final bool active;
   final DateTime? startDate;
