@@ -140,11 +140,17 @@ class _MedicationHistoryScreenState
       );
       try {
         final repo = ref.read(medicationRepositoryProvider);
-        // Get the first schedule for this medication
         final schedules = await repo
             .watchSchedules(widget.medicationId)
             .first;
-        if (schedules.isEmpty) return;
+        if (schedules.isEmpty) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.noSchedulesAvailable)),
+            );
+          }
+          return;
+        }
         final scheduleLog = log.copyWith(
           medicationScheduleId: schedules.first.id!,
         );

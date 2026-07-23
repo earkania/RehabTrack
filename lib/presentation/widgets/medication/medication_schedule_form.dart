@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/widgets/common/date_field.dart';
 import 'package:rehab_track/presentation/widgets/medication/schedule_type_selector.dart';
 import 'package:rehab_track/presentation/widgets/medication/time_picker_field.dart';
 
@@ -222,7 +223,7 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
           Row(
             children: [
               Expanded(
-                child: _DateField(
+                child: DateField(
                   label: l10n.startDate,
                   date: _startDate,
                   onTap: () => _pickDate(isStart: true),
@@ -231,7 +232,7 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _DateField(
+                child: DateField(
                   label: l10n.endDate,
                   date: _endDate,
                   onTap: () => _pickDate(isStart: false),
@@ -246,7 +247,7 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                '${l10n.endDate} >= ${l10n.startDate}',
+                l10n.endDateBeforeStartDate,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.error,
                   fontSize: 12,
@@ -400,51 +401,6 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
           onPressed: () => _applyInstructionChip(label),
         );
       }).toList(),
-    );
-  }
-}
-
-class _DateField extends StatelessWidget {
-  final String label;
-  final DateTime? date;
-  final VoidCallback onTap;
-  final VoidCallback? onClear;
-
-  const _DateField({
-    required this.label,
-    required this.date,
-    required this.onTap,
-    this.onClear,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final displayText = date != null
-        ? '${date!.day.toString().padLeft(2, '0')}.${date!.month.toString().padLeft(2, '0')}.${date!.year}'
-        : label;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-          suffixIcon: date != null && onClear != null
-              ? IconButton(
-                  icon: const Icon(Icons.clear, size: 18),
-                  onPressed: onClear,
-                )
-              : const Icon(Icons.calendar_today, size: 18),
-        ),
-        child: Text(
-          displayText,
-          style: TextStyle(
-            color: date != null ? null : colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ),
     );
   }
 }

@@ -159,5 +159,10 @@
     "placeholders": {
       "time": {"type": "String"}
     }
-  }
+  },
+  "nameRequired": "სახელი საჭიროა",
+  "invalidDose": "არასწორი დოზის რაოდენობა",
+  "endDateBeforeStartDate": "დასრულების თარიღი უნდა იყოს დაწყების თარიღის შემდეგ",
+  "scheduleUpdated": "გრაფიკი განახლდა",
+  "noSchedulesAvailable": "გრაფიკები არ არის დოზის აღსარიცხავად"
 }

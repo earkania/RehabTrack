@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/presentation/utils/dose_formatter.dart';
 
 class MedicationCard extends StatelessWidget {
   final Medication medication;
@@ -16,7 +17,7 @@ class MedicationCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final doseText = _formatDose(medication);
+    final doseText = DoseFormatter.format(medication);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -51,14 +52,4 @@ class MedicationCard extends StatelessWidget {
     );
   }
 
-  String _formatDose(Medication m) {
-    final parts = <String>[];
-    if (m.doseAmount != null && m.doseAmount!.isNotEmpty) {
-      parts.add(m.doseAmount!);
-    }
-    if (m.doseUnit != null && m.doseUnit!.isNotEmpty) {
-      parts.add(m.doseUnit!);
-    }
-    return parts.join(' ');
-  }
 }

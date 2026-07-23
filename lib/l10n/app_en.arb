@@ -159,5 +159,10 @@
     "placeholders": {
       "time": {"type": "String"}
     }
-  }
+  },
+  "nameRequired": "Name is required",
+  "invalidDose": "Invalid dose amount",
+  "endDateBeforeStartDate": "End date must be on or after start date",
+  "scheduleUpdated": "Schedule updated",
+  "noSchedulesAvailable": "No schedules available to log a dose"
 }

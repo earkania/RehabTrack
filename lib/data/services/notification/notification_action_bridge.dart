@@ -9,6 +9,7 @@ import 'package:rehab_track/data/services/notification/schedule_recovery_service
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
+import 'package:rehab_track/presentation/utils/dose_formatter.dart';
 
 class NotificationActionBridge {
   NotificationActionBridge({
@@ -254,7 +255,7 @@ class NotificationActionBridge {
     MedicationSchedule schedule,
   ) {
     final parts = <String>[];
-    final dose = _formatDoseShort(medication);
+    final dose = DoseFormatter.format(medication);
     if (dose.isNotEmpty) parts.add(dose);
     if (schedule.instructions != null && schedule.instructions!.isNotEmpty) {
       parts.add(schedule.instructions!);
@@ -262,16 +263,6 @@ class NotificationActionBridge {
     return parts.isEmpty ? '' : parts.join(' — ');
   }
 
-  static String _formatDoseShort(Medication medication) {
-    final parts = <String>[];
-    if (medication.doseAmount != null && medication.doseAmount!.isNotEmpty) {
-      parts.add(medication.doseAmount!);
-    }
-    if (medication.doseUnit != null && medication.doseUnit!.isNotEmpty) {
-      parts.add(medication.doseUnit!);
-    }
-    return parts.join(' ');
-  }
 }
 
 /// Parsed notification payload containing medication and schedule IDs.

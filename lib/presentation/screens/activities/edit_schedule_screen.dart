@@ -59,7 +59,7 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
         ref.invalidate(medicationSchedulesProvider(widget.medicationId));
         ref.invalidate(medicationScheduleProvider(widget.scheduleId));
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.medicationUpdated)),
+          SnackBar(content: Text(AppLocalizations.of(context)!.scheduleUpdated)),
         );
         context.pop();
       }

@@ -413,4 +413,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String takenAt(String time) {
     return 'Taken at $time';
   }
+
+  @override
+  String get nameRequired => 'Name is required';
+
+  @override
+  String get invalidDose => 'Invalid dose amount';
+
+  @override
+  String get endDateBeforeStartDate =>
+      'End date must be on or after start date';
+
+  @override
+  String get scheduleUpdated => 'Schedule updated';
+
+  @override
+  String get noSchedulesAvailable => 'No schedules available to log a dose';
 }

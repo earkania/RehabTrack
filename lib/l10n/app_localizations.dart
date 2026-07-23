@@ -871,6 +871,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Taken at {time}'**
   String takenAt(String time);
+
+  /// No description provided for @nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get nameRequired;
+
+  /// No description provided for @invalidDose.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid dose amount'**
+  String get invalidDose;
+
+  /// No description provided for @endDateBeforeStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End date must be on or after start date'**
+  String get endDateBeforeStartDate;
+
+  /// No description provided for @scheduleUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule updated'**
+  String get scheduleUpdated;
+
+  /// No description provided for @noSchedulesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No schedules available to log a dose'**
+  String get noSchedulesAvailable;
 }
 
 class _AppLocalizationsDelegate

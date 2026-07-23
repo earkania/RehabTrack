@@ -8,6 +8,7 @@ import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
+import 'package:rehab_track/presentation/utils/dose_formatter.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_alternative_card.dart';
 
@@ -79,7 +80,7 @@ class MedicationDetailScreen extends ConsumerWidget {
               const Divider(),
               _DetailRow(
                 label: l10n.doseAmount,
-                value: _formatDose(medication),
+                value: DoseFormatter.format(medication),
               ),
               _DetailRow(
                 label: l10n.active,
@@ -473,17 +474,6 @@ class MedicationDetailScreen extends ConsumerWidget {
       case IntervalDaysSchedule(:final interval, :final time):
         return l10n.everyNDays(interval, time);
     }
-  }
-
-  String _formatDose(Medication medication) {
-    final parts = <String>[];
-    if (medication.doseAmount != null && medication.doseAmount!.isNotEmpty) {
-      parts.add(medication.doseAmount!);
-    }
-    if (medication.doseUnit != null && medication.doseUnit!.isNotEmpty) {
-      parts.add(medication.doseUnit!);
-    }
-    return parts.isEmpty ? '-' : parts.join(' ');
   }
 
   String _formatDate(DateTime date) {

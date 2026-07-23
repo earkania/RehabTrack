@@ -109,7 +109,7 @@ class _MedicationAlternativeFormState extends State<MedicationAlternativeForm> {
             textCapitalization: TextCapitalization.words,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return l10n.medicationName;
+                return l10n.nameRequired;
               }
               return null;
             },
@@ -134,7 +134,7 @@ class _MedicationAlternativeFormState extends State<MedicationAlternativeForm> {
                     if (value != null && value.trim().isNotEmpty) {
                       final num = double.tryParse(value.trim());
                       if (num == null || num <= 0) {
-                        return l10n.doseAmount;
+                        return l10n.invalidDose;
                       }
                     }
                     return null;

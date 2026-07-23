@@ -413,4 +413,20 @@ class AppLocalizationsKa extends AppLocalizations {
   String takenAt(String time) {
     return 'მიღებულია $time';
   }
+
+  @override
+  String get nameRequired => 'სახელი საჭიროა';
+
+  @override
+  String get invalidDose => 'არასწორი დოზის რაოდენობა';
+
+  @override
+  String get endDateBeforeStartDate =>
+      'დასრულების თარიღი უნდა იყოს დაწყების თარიღის შემდეგ';
+
+  @override
+  String get scheduleUpdated => 'გრაფიკი განახლდა';
+
+  @override
+  String get noSchedulesAvailable => 'გრაფიკები არ არის დოზის აღსარიცხავად';
 }
