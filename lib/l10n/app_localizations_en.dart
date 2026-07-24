@@ -135,7 +135,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dailySchedule => 'Daily';
 
   @override
-  String get fixedTimesSchedule => 'Fixed Times';
+  String get dailyScheduleDescription => 'Take at specified times every day';
+
+  @override
+  String get everyNDaysSchedule => 'Every N Days';
+
+  @override
+  String get everyNDaysScheduleDescription =>
+      'Take at specified times every N days';
 
   @override
   String get intervalSchedule => 'Interval Days';
@@ -207,19 +214,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editSchedule => 'Edit Schedule';
 
   @override
-  String dailyAt(String time) {
-    return 'Daily at $time';
+  String dailyAt(String times) {
+    return 'Daily at $times';
   }
 
   @override
-  String fixedTimes(String times) {
-    return 'Fixed times: $times';
+  String everyNDays(int count, String times) {
+    return 'Every $count days at $times';
   }
 
   @override
-  String everyNDays(int count, String time) {
-    return 'Every $count days at $time';
-  }
+  String get intakeQuantity => 'Intake Quantity';
+
+  @override
+  String get perIntake => 'per intake';
+
+  @override
+  String get dosageForm => 'Dosage Form';
+
+  @override
+  String get tablet => 'tablet';
+
+  @override
+  String get capsule => 'capsule';
+
+  @override
+  String get drop => 'drop';
+
+  @override
+  String get ml => 'ml';
+
+  @override
+  String get puff => 'puff';
+
+  @override
+  String get unit => 'Unit';
+
+  @override
+  String get sachet => 'sachet';
+
+  @override
+  String get spoon => 'spoon';
+
+  @override
+  String get injection => 'injection';
+
+  @override
+  String get topical => 'Apply';
+
+  @override
+  String get other => 'Other';
+
+  @override
+  String get customDosageForm => 'Custom dosage form name';
+
+  @override
+  String get customDosageFormRequired => 'Custom dosage form name is required';
+
+  @override
+  String get invalidIntakeQuantity => 'Enter a valid intake quantity';
 
   @override
   String get beforeMeal => 'Before meal';
@@ -501,9 +554,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fieldName => 'Field Name';
-
-  @override
-  String get unit => 'Unit';
 
   @override
   String get requiredField => 'Required';

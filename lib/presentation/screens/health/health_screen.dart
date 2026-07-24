@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
@@ -55,10 +56,10 @@ class HealthScreen extends ConsumerWidget {
               return _MeasurementTypeCard(
                 type: type,
                 onAdd: () => context.push(
-                  '/health/measurement/${type.id}/add',
+                  AppRoutes.measurementAdd(type.id!),
                 ),
                 onHistory: () => context.push(
-                  '/health/measurement/${type.id}/history',
+                  AppRoutes.measurementHistory(type.id!),
                 ),
               );
             },

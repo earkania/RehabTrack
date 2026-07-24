@@ -45,6 +45,11 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
       final updated = current.copyWith(
         scheduleType: data.scheduleTypeString,
         scheduleConfig: data.toScheduleConfig(),
+        intakeQuantity: data.intakeQuantity,
+        dosageForm: data.dosageForm,
+        customDosageForm:
+            data.customDosageForm.isNotEmpty ? data.customDosageForm : null,
+        clearCustomDosageForm: data.customDosageForm.isEmpty,
         startDate: data.startDate,
         endDate: data.endDate,
         instructions:

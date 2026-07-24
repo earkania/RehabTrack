@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
@@ -31,7 +32,7 @@ class MeasurementHistoryScreen extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () => context.push(
-              '/health/measurement/$measurementTypeId/add',
+              AppRoutes.measurementAdd(measurementTypeId),
             ),
             icon: const Icon(Icons.add_circle_outline),
             tooltip: l10n.addReadingTooltip,
@@ -120,7 +121,7 @@ class MeasurementHistoryScreen extends ConsumerWidget {
                               fields: fields,
                               type: type,
                               onEdit: () => context.push(
-                                '/health/measurement/record/${record.id}/edit',
+                                AppRoutes.measurementEdit(record.id!),
                               ),
                               onDelete: () => _confirmDelete(
                                 context,

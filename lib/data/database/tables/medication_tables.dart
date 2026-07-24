@@ -23,6 +23,9 @@ class MedicationSchedules extends Table {
       integer().references(Medications, #id)();
   TextColumn get scheduleType => text()();
   TextColumn get scheduleConfig => text()();
+  RealColumn get intakeQuantity => real().withDefault(const Constant(1.0))();
+  TextColumn get dosageForm => text().withDefault(const Constant('tablet'))();
+  TextColumn get customDosageForm => text().nullable()();
   DateTimeColumn get startDate => dateTime().nullable()();
   DateTimeColumn get endDate => dateTime().nullable()();
   TextColumn get instructions => text().nullable()();
@@ -38,6 +41,9 @@ class MedicationLogs extends Table {
   TextColumn get status => text()();
   TextColumn get notes => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
+  RealColumn get snapshotIntakeQuantity => real().nullable()();
+  TextColumn get snapshotDosageForm => text().nullable()();
+  TextColumn get snapshotCustomDosageForm => text().nullable()();
 }
 
 class MedicationAlternatives extends Table {

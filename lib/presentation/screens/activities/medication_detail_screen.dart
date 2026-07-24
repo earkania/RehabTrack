@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/history_period.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
@@ -9,6 +10,7 @@ import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
 import 'package:rehab_track/presentation/utils/component_formatter.dart';
+import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_alternative_card.dart';
 
@@ -33,14 +35,14 @@ class MedicationDetailScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () {
-              context.push('/activities/medication/$medicationId/history');
+              context.push(AppRoutes.medicationHistory(medicationId));
             },
             tooltip: l10n.history,
           ),
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              context.push('/activities/medication/$medicationId/edit');
+              context.push(AppRoutes.medicationEdit(medicationId));
             },
           ),
         ],
@@ -111,13 +113,13 @@ class MedicationDetailScreen extends ConsumerWidget {
                     ),
                   ),
                   if (medication.active)
-                    FilledButton.tonalIcon(
+                    IconButton(
                       onPressed: () {
                         context.push(
-                            '/activities/medication/$medicationId/schedule/add');
+                            AppRoutes.scheduleAdd(medicationId));
                       },
-                      icon: const Icon(Icons.add, size: 18),
-                      label: Text(l10n.addSchedule),
+                      icon: const Icon(Icons.add_circle_outline),
+                      tooltip: l10n.addSchedule,
                     ),
                 ],
               ),
@@ -143,13 +145,13 @@ class MedicationDetailScreen extends ConsumerWidget {
                     ),
                   ),
                   if (medication.active)
-                    FilledButton.tonalIcon(
+                    IconButton(
                       onPressed: () {
                         context.push(
-                            '/activities/medication/$medicationId/alternative/add');
+                            AppRoutes.alternativeAdd(medicationId));
                       },
-                      icon: const Icon(Icons.add, size: 18),
-                      label: Text(l10n.addAlternative),
+                      icon: const Icon(Icons.add_circle_outline),
+                      tooltip: l10n.addAlternative,
                     ),
                 ],
               ),
@@ -174,12 +176,13 @@ class MedicationDetailScreen extends ConsumerWidget {
                       style: textTheme.titleMedium,
                     ),
                   ),
-                  FilledButton.tonal(
+                  IconButton(
                     onPressed: () {
                       context.push(
-                          '/activities/medication/$medicationId/history');
+                          AppRoutes.medicationHistory(medicationId));
                     },
-                    child: Text(l10n.viewHistory),
+                    icon: const Icon(Icons.history),
+                    tooltip: l10n.viewHistory,
                   ),
                 ],
               ),
@@ -287,7 +290,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                 ),
                 title: Text(
                   _formatScheduleSummary(schedule, l10n),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 subtitle: Column(
@@ -333,7 +336,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                     schedule.instructions!.isNotEmpty,
                 onTap: () {
                   context.push(
-                    '/activities/medication/$medicationId/schedule/${schedule.id}/edit',
+                    AppRoutes.scheduleEdit(medicationId, schedule.id!),
                   );
                 },
               ),
@@ -391,7 +394,7 @@ class MedicationDetailScreen extends ConsumerWidget {
               alternative: alternative,
               onTap: () {
                 context.push(
-                  '/activities/medication/$medicationId/alternative/${alternative.id}/edit',
+                  AppRoutes.alternativeEdit(medicationId, alternative.id!),
                 );
               },
             );
@@ -455,7 +458,6 @@ class MedicationDetailScreen extends ConsumerWidget {
 
   IconData _scheduleIcon(String type) => switch (type) {
         'daily' => Icons.today,
-        'fixed_times' => Icons.access_time,
         'interval_days' => Icons.date_range,
         _ => Icons.schedule,
       };
@@ -463,14 +465,19 @@ class MedicationDetailScreen extends ConsumerWidget {
   String _formatScheduleSummary(
       MedicationSchedule schedule, AppLocalizations l10n) {
     final config = schedule.scheduleConfig;
-    switch (config) {
-      case DailySchedule(:final time):
-        return l10n.dailyAt(time);
-      case FixedTimesSchedule(:final times):
-        return l10n.fixedTimes(times.join(', '));
-      case IntervalDaysSchedule(:final interval, :final time):
-        return l10n.everyNDays(interval, time);
-    }
+    final timesStr = config.times.join(', ');
+    final typeLabel = switch (config) {
+      DailySchedule() => l10n.dailyAt(timesStr),
+      IntervalDaysSchedule(:final intervalDays) =>
+        l10n.everyNDays(intervalDays, timesStr),
+    };
+    final intakeLine = DosageFormLocalizer.localizeWithQuantity(
+      schedule.intakeQuantity,
+      schedule.dosageForm,
+      l10n,
+      customForm: schedule.customDosageForm,
+    );
+    return '$typeLabel\n$intakeLine';
   }
 
   String _formatDate(DateTime date) {

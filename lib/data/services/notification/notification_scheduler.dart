@@ -22,35 +22,24 @@ class NotificationScheduler {
     final tzLocation = location ?? tz.local;
 
     switch (config) {
-      case DailySchedule():
+      case DailySchedule(:final times):
         await _scheduleDaily(
-          notificationId: notificationId,
-          title: title,
-          body: body,
-          time: config.time,
-          channelType: channelType,
-          payload: payload,
-          includeActions: includeActions,
-          location: tzLocation,
-        );
-      case FixedTimesSchedule():
-        await _scheduleFixedTimes(
           baseNotificationId: notificationId,
           title: title,
           body: body,
-          times: config.times,
+          times: times,
           channelType: channelType,
           payload: payload,
           includeActions: includeActions,
           location: tzLocation,
         );
-      case IntervalDaysSchedule():
+      case IntervalDaysSchedule(:final intervalDays, :final times):
         await _scheduleIntervalDays(
-          notificationId: notificationId,
+          baseNotificationId: notificationId,
           title: title,
           body: body,
-          interval: config.interval,
-          time: config.time,
+          intervalDays: intervalDays,
+          times: times,
           channelType: channelType,
           payload: payload,
           includeActions: includeActions,
@@ -60,31 +49,6 @@ class NotificationScheduler {
   }
 
   Future<void> _scheduleDaily({
-    required int notificationId,
-    required String title,
-    required String body,
-    required String time,
-    required NotificationChannelType channelType,
-    String? payload,
-    bool includeActions = false,
-    tz.Location? location,
-  }) async {
-    final scheduledDate = _nextOccurrence(time, location: location);
-    if (scheduledDate == null) return;
-
-    await _notificationService.scheduleRecurringNotification(
-      id: notificationId,
-      title: title,
-      body: body,
-      scheduledDate: scheduledDate,
-      matchComponents: DateTimeComponents.time,
-      channelType: channelType,
-      payload: payload,
-      includeActions: includeActions,
-    );
-  }
-
-  Future<void> _scheduleFixedTimes({
     required int baseNotificationId,
     required String title,
     required String body,
@@ -113,32 +77,35 @@ class NotificationScheduler {
   }
 
   Future<void> _scheduleIntervalDays({
-    required int notificationId,
+    required int baseNotificationId,
     required String title,
     required String body,
-    required int interval,
-    required String time,
+    required int intervalDays,
+    required List<String> times,
     required NotificationChannelType channelType,
     String? payload,
     bool includeActions = false,
     tz.Location? location,
   }) async {
-    final scheduledDate = _nextOccurrence(
-      time,
-      interval: interval,
-      location: location,
-    );
-    if (scheduledDate == null) return;
+    for (var i = 0; i < times.length; i++) {
+      final notificationId = baseNotificationId + i;
+      final scheduledDate = _nextOccurrence(
+        times[i],
+        interval: intervalDays,
+        location: location,
+      );
+      if (scheduledDate == null) continue;
 
-    await _notificationService.scheduleNotification(
-      id: notificationId,
-      title: title,
-      body: body,
-      scheduledDate: scheduledDate,
-      channelType: channelType,
-      payload: payload,
-      includeActions: includeActions,
-    );
+      await _notificationService.scheduleNotification(
+        id: notificationId,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        channelType: channelType,
+        payload: payload,
+        includeActions: includeActions,
+      );
+    }
   }
 
   tz.TZDateTime? _nextOccurrence(
@@ -180,16 +147,9 @@ class NotificationScheduler {
     required int baseNotificationId,
     required ScheduleConfig config,
   }) async {
-    switch (config) {
-      case DailySchedule():
-        await _notificationService.cancelNotification(baseNotificationId);
-      case FixedTimesSchedule():
-        for (var i = 0; i < config.times.length; i++) {
-          await _notificationService
-              .cancelNotification(baseNotificationId + i);
-        }
-      case IntervalDaysSchedule():
-        await _notificationService.cancelNotification(baseNotificationId);
+    final times = config.times;
+    for (var i = 0; i < times.length; i++) {
+      await _notificationService.cancelNotification(baseNotificationId + i);
     }
   }
 }

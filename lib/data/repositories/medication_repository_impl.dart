@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/data/database/app_database.dart' as db;
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
+import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
@@ -44,8 +45,7 @@ class MedicationRepositoryImpl implements MedicationRepository {
 
   @override
   Future<List<Medication>> getMedications(int profileId) async {
-    final rows =
-        await _database.medicationDao.getMedications(profileId);
+    final rows = await _database.medicationDao.getMedications(profileId);
     return rows.map(_toDomain).toList();
   }
 
@@ -100,9 +100,7 @@ class MedicationRepositoryImpl implements MedicationRepository {
   }
 
   @override
-  Stream<List<MedicationSchedule>> watchSchedules(
-    int medicationId,
-  ) {
+  Stream<List<MedicationSchedule>> watchSchedules(int medicationId) {
     return _database.medicationDao
         .watchSchedules(medicationId)
         .map((rows) => rows.map(_scheduleToDomain).toList());
@@ -121,6 +119,9 @@ class MedicationRepositoryImpl implements MedicationRepository {
         medicationId: schedule.medicationId,
         scheduleType: schedule.scheduleType,
         scheduleConfig: schedule.scheduleConfig.toJsonString(),
+        intakeQuantity: Value(schedule.intakeQuantity),
+        dosageForm: Value(schedule.dosageForm.toStorageString()),
+        customDosageForm: Value(schedule.customDosageForm),
         startDate: Value(schedule.startDate),
         endDate: Value(schedule.endDate),
         instructions: Value(schedule.instructions),
@@ -136,13 +137,17 @@ class MedicationRepositoryImpl implements MedicationRepository {
 
   @override
   Future<void> updateSchedule(MedicationSchedule schedule) async {
+    await _cancelNotifications(schedule);
+
     await _database.medicationDao.updateSchedule(
       db.MedicationSchedulesCompanion(
         id: Value(schedule.id!),
         medicationId: Value(schedule.medicationId),
         scheduleType: Value(schedule.scheduleType),
-        scheduleConfig:
-            Value(schedule.scheduleConfig.toJsonString()),
+        scheduleConfig: Value(schedule.scheduleConfig.toJsonString()),
+        intakeQuantity: Value(schedule.intakeQuantity),
+        dosageForm: Value(schedule.dosageForm.toStorageString()),
+        customDosageForm: Value(schedule.customDosageForm),
         startDate: Value(schedule.startDate),
         endDate: Value(schedule.endDate),
         instructions: Value(schedule.instructions),
@@ -198,6 +203,9 @@ class MedicationRepositoryImpl implements MedicationRepository {
         status: log.status,
         notes: Value(log.notes),
         createdAt: log.createdAt,
+        snapshotIntakeQuantity: Value(log.snapshotIntakeQuantity),
+        snapshotDosageForm: Value(log.snapshotDosageForm?.toStorageString()),
+        snapshotCustomDosageForm: Value(log.snapshotCustomDosageForm),
       ),
     );
   }
@@ -207,13 +215,15 @@ class MedicationRepositoryImpl implements MedicationRepository {
     await _database.medicationDao.updateLog(
       db.MedicationLogsCompanion(
         id: Value(log.id!),
-        medicationScheduleId:
-            Value(log.medicationScheduleId),
+        medicationScheduleId: Value(log.medicationScheduleId),
         scheduledTime: Value(log.scheduledTime),
         takenTime: Value(log.takenTime),
         status: Value(log.status),
         notes: Value(log.notes),
         createdAt: Value(log.createdAt),
+        snapshotIntakeQuantity: Value(log.snapshotIntakeQuantity),
+        snapshotDosageForm: Value(log.snapshotDosageForm?.toStorageString()),
+        snapshotCustomDosageForm: Value(log.snapshotCustomDosageForm),
       ),
     );
   }
@@ -235,15 +245,16 @@ class MedicationRepositoryImpl implements MedicationRepository {
     );
   }
 
-  MedicationSchedule _scheduleToDomain(
-    db.MedicationSchedule row,
-  ) {
+  MedicationSchedule _scheduleToDomain(db.MedicationSchedule row) {
     return MedicationSchedule(
       id: row.id,
       medicationId: row.medicationId,
       scheduleType: row.scheduleType,
-      scheduleConfig:
-          ScheduleConfig.fromJsonString(row.scheduleConfig),
+      scheduleConfig: ScheduleConfig.fromJsonString(row.scheduleConfig),
+      intakeQuantity: row.intakeQuantity,
+      dosageForm: DosageFormExtension.fromStorageString(row.dosageForm) ??
+          DosageForm.tablet,
+      customDosageForm: row.customDosageForm,
       startDate: row.startDate,
       endDate: row.endDate,
       instructions: row.instructions,
@@ -260,6 +271,10 @@ class MedicationRepositoryImpl implements MedicationRepository {
       status: row.status,
       notes: row.notes,
       createdAt: row.createdAt,
+      snapshotIntakeQuantity: row.snapshotIntakeQuantity,
+      snapshotDosageForm:
+          DosageFormExtension.fromStorageString(row.snapshotDosageForm),
+      snapshotCustomDosageForm: row.snapshotCustomDosageForm,
     );
   }
 
@@ -275,7 +290,8 @@ class MedicationRepositoryImpl implements MedicationRepository {
       final components = await getComponents(medication.id!);
 
       final title = 'Time to take ${medication.name}';
-      final body = _buildNotificationBody(medication, schedule, components);
+      final body =
+          _buildNotificationBody(medication, schedule, components);
       final payload = jsonEncode({
         'medicationId': medication.id,
         'scheduleId': schedule.id,
@@ -316,20 +332,40 @@ class MedicationRepositoryImpl implements MedicationRepository {
     List<MedicationComponent> components,
   ) {
     final parts = <String>[];
+
     final dose = components.isNotEmpty
         ? _formatDoseFromComponents(components)
         : _formatDoseShort(medication);
     if (dose.isNotEmpty) parts.add(dose);
-    if (schedule.instructions != null && schedule.instructions!.isNotEmpty) {
+
+    final intakeText = _formatIntakeQuantity(schedule);
+    if (intakeText.isNotEmpty) parts.add('take $intakeText');
+
+    if (schedule.instructions != null &&
+        schedule.instructions!.isNotEmpty) {
       parts.add(schedule.instructions!);
     }
+
     return parts.isEmpty ? '' : parts.join(' — ');
+  }
+
+  String _formatIntakeQuantity(MedicationSchedule schedule) {
+    final qty = schedule.intakeQuantity;
+    final qtyStr = qty == qty.roundToDouble()
+        ? qty.toInt().toString()
+        : qty.toString();
+    final form = schedule.customDosageForm?.isNotEmpty == true
+        ? schedule.customDosageForm!
+        : schedule.dosageForm.name;
+    final pluralized = qty == 1 ? form : '${form}s';
+    return '$qtyStr $pluralized';
   }
 
   String _formatDoseFromComponents(List<MedicationComponent> components) {
     if (components.isEmpty) return '';
     if (components.length == 1) {
-      return _formatSingleComponent(components.first.doseAmount, components.first.doseUnit);
+      return _formatSingleComponent(
+          components.first.doseAmount, components.first.doseUnit);
     }
     final buffer = StringBuffer();
     for (var i = 0; i < components.length; i++) {

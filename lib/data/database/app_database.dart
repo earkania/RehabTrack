@@ -80,7 +80,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -142,6 +142,15 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await cleanupDuplicateMeasurementTypes(this);
+      }
+      if (from < 6) {
+        // Destructive migration for Phase 4E: Schedule Redesign
+        // Drop old medication schedules and logs (test data only)
+        await m.deleteTable(medicationSchedules.actualTableName);
+        await m.deleteTable(medicationLogs.actualTableName);
+        // Recreate with new columns (intakeQuantity, dosageForm, customDosageForm)
+        await m.createTable(medicationSchedules);
+        await m.createTable(medicationLogs);
       }
     },
   );

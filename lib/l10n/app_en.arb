@@ -42,7 +42,9 @@
   "notes": "Notes",
   "scheduleType": "Schedule Type",
   "dailySchedule": "Daily",
-  "fixedTimesSchedule": "Fixed Times",
+  "dailyScheduleDescription": "Take at specified times every day",
+  "everyNDaysSchedule": "Every N Days",
+  "everyNDaysScheduleDescription": "Take at specified times every N days",
   "intervalSchedule": "Interval Days",
   "instructions": "Instructions",
   "alternatives": "Alternatives",
@@ -66,25 +68,39 @@
   "medicationDeleted": "Medication deleted",
   "addSchedule": "Add Schedule",
   "editSchedule": "Edit Schedule",
-  "dailyAt": "Daily at {time}",
+  "dailyAt": "Daily at {times}",
   "@dailyAt": {
-    "placeholders": {
-      "time": {"type": "String"}
-    }
-  },
-  "fixedTimes": "Fixed times: {times}",
-  "@fixedTimes": {
     "placeholders": {
       "times": {"type": "String"}
     }
   },
-  "everyNDays": "Every {count} days at {time}",
+  "everyNDays": "Every {count} days at {times}",
   "@everyNDays": {
     "placeholders": {
       "count": {"type": "int"},
-      "time": {"type": "String"}
+      "times": {"type": "String"}
     }
   },
+  "intakeQuantity": "Intake Quantity",
+  "perIntake": "per intake",
+  "@perIntake": {
+    "placeholders": {}
+  },
+  "dosageForm": "Dosage Form",
+  "tablet": "tablet",
+  "capsule": "capsule",
+  "drop": "drop",
+  "ml": "ml",
+  "puff": "puff",
+  "unit": "unit",
+  "sachet": "sachet",
+  "spoon": "spoon",
+  "injection": "injection",
+  "topical": "Apply",
+  "other": "Other",
+  "customDosageForm": "Custom dosage form name",
+  "customDosageFormRequired": "Custom dosage form name is required",
+  "invalidIntakeQuantity": "Enter a valid intake quantity",
   "beforeMeal": "Before meal",
   "afterMeal": "After meal",
   "withMeal": "With meal",

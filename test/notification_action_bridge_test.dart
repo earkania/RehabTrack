@@ -9,6 +9,7 @@ import 'package:rehab_track/data/services/notification/notification_action_handl
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/data/services/notification/schedule_recovery_service.dart';
+import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
@@ -249,28 +250,37 @@ void main() {
   });
 
   group('computeNotificationIds', () {
-    test('DailySchedule returns single ID', () {
+    test('DailySchedule with single time returns single ID', () {
       final ids = NotificationActionBridge.computeNotificationIds(
         scheduleId: 10,
-        config: const DailySchedule(time: '08:00'),
+        config: const DailySchedule(times: ['08:00']),
       );
       expect(ids, [10]);
     });
 
-    test('FixedTimesSchedule returns sequential IDs', () {
+    test('DailySchedule with multiple times returns sequential IDs', () {
       final ids = NotificationActionBridge.computeNotificationIds(
         scheduleId: 10,
-        config: const FixedTimesSchedule(times: ['08:00', '14:00', '20:00']),
+        config: const DailySchedule(times: ['08:00', '14:00', '20:00']),
       );
       expect(ids, [10, 11, 12]);
     });
 
-    test('IntervalDaysSchedule returns single ID', () {
+    test('IntervalDaysSchedule returns sequential IDs', () {
       final ids = NotificationActionBridge.computeNotificationIds(
         scheduleId: 10,
-        config: const IntervalDaysSchedule(interval: 3, time: '09:00'),
+        config: const IntervalDaysSchedule(intervalDays: 3, times: ['09:00']),
       );
       expect(ids, [10]);
+    });
+
+    test('IntervalDaysSchedule with multiple times returns sequential IDs', () {
+      final ids = NotificationActionBridge.computeNotificationIds(
+        scheduleId: 10,
+        config: const IntervalDaysSchedule(
+            intervalDays: 3, times: ['09:00', '21:00']),
+      );
+      expect(ids, [10, 11]);
     });
   });
 
@@ -287,10 +297,13 @@ void main() {
       const schedule = MedicationSchedule(
         medicationId: 1,
         scheduleType: 'daily',
-        scheduleConfig: DailySchedule(time: '08:00'),
+        scheduleConfig: DailySchedule(times: ['08:00']),
+        intakeQuantity: 1,
+        dosageForm: DosageForm.tablet,
       );
       final body = NotificationActionBridge.buildNotificationBody(medication, schedule);
-      expect(body, '200 mg');
+      expect(body, contains('200 mg'));
+      expect(body, contains('1 tablet'));
     });
 
     test('includes instructions', () {
@@ -303,14 +316,16 @@ void main() {
       const schedule = MedicationSchedule(
         medicationId: 1,
         scheduleType: 'daily',
-        scheduleConfig: DailySchedule(time: '08:00'),
+        scheduleConfig: DailySchedule(times: ['08:00']),
+        intakeQuantity: 1,
+        dosageForm: DosageForm.unit,
         instructions: 'Take with food',
       );
       final body = NotificationActionBridge.buildNotificationBody(medication, schedule);
-      expect(body, 'Take with food');
+      expect(body, contains('Take with food'));
     });
 
-    test('combines dose and instructions with dash separator', () {
+    test('combines dose, intake quantity, and instructions', () {
       final medication = Medication(
         profileId: 1,
         name: 'Ibuprofen',
@@ -322,27 +337,34 @@ void main() {
       const schedule = MedicationSchedule(
         medicationId: 1,
         scheduleType: 'daily',
-        scheduleConfig: DailySchedule(time: '08:00'),
+        scheduleConfig: DailySchedule(times: ['08:00']),
+        intakeQuantity: 2,
+        dosageForm: DosageForm.capsule,
         instructions: 'After meals',
       );
       final body = NotificationActionBridge.buildNotificationBody(medication, schedule);
-      expect(body, '200 mg — After meals');
+      expect(body, contains('200 mg'));
+      expect(body, contains('2 capsules'));
+      expect(body, contains('After meals'));
     });
 
-    test('returns empty string when no dose or instructions', () {
+    test('includes intake quantity with custom dosage form', () {
       final medication = Medication(
         profileId: 1,
-        name: 'Vitamin D',
+        name: 'Insulin',
         createdAt: DateTime(2025),
         updatedAt: DateTime(2025),
       );
       const schedule = MedicationSchedule(
         medicationId: 1,
         scheduleType: 'daily',
-        scheduleConfig: DailySchedule(time: '08:00'),
+        scheduleConfig: DailySchedule(times: ['08:00']),
+        intakeQuantity: 1,
+        dosageForm: DosageForm.other,
+        customDosageForm: 'pump',
       );
       final body = NotificationActionBridge.buildNotificationBody(medication, schedule);
-      expect(body, '');
+      expect(body, contains('1 pump'));
     });
   });
 
@@ -414,7 +436,9 @@ void main() {
         id: 10,
         medicationId: 1,
         scheduleType: 'daily',
-        scheduleConfig: const DailySchedule(time: '08:00'),
+        scheduleConfig: const DailySchedule(times: ['08:00']),
+        intakeQuantity: 1,
+        dosageForm: DosageForm.tablet,
       );
       repo.schedules[10] = schedule;
       repo.medications[1] = Medication(
@@ -452,7 +476,11 @@ void main() {
       );
       expect(
         notificationService.scheduledNotifications.first['body'],
-        '200 mg',
+        contains('200 mg'),
+      );
+      expect(
+        notificationService.scheduledNotifications.first['body'],
+        contains('1 tablet'),
       );
       expect(notificationService.scheduledNotifications.first['includeActions'], true);
     });
@@ -509,7 +537,9 @@ void main() {
           id: 10,
           medicationId: 1,
           scheduleType: 'daily',
-          scheduleConfig: const DailySchedule(time: '08:00'),
+          scheduleConfig: const DailySchedule(times: ['08:00']),
+          intakeQuantity: 1,
+          dosageForm: DosageForm.tablet,
           active: true,
         ),
       ];
@@ -539,7 +569,9 @@ void main() {
           id: 10,
           medicationId: 1,
           scheduleType: 'daily',
-          scheduleConfig: const DailySchedule(time: '08:00'),
+          scheduleConfig: const DailySchedule(times: ['08:00']),
+          intakeQuantity: 1,
+          dosageForm: DosageForm.tablet,
           active: true,
         ),
       ];
@@ -563,7 +595,9 @@ void main() {
           id: 10,
           medicationId: 1,
           scheduleType: 'daily',
-          scheduleConfig: const DailySchedule(time: '08:00'),
+          scheduleConfig: const DailySchedule(times: ['08:00']),
+          intakeQuantity: 1,
+          dosageForm: DosageForm.tablet,
           active: false,
         ),
       ];

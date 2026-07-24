@@ -7,6 +7,7 @@ import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
+import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/widgets/medication/status_chip.dart';
 
 class MedicationHistoryScreen extends ConsumerStatefulWidget {
@@ -261,6 +262,7 @@ class _LogList extends StatelessWidget {
       itemCount: logs.length,
       itemBuilder: (context, index) {
         final log = logs[index];
+        final intakeStr = _formatIntakeSnapshot(log, l10n);
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
@@ -269,15 +271,27 @@ class _LogList extends StatelessWidget {
               _formatDateTime(log.scheduledTime),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            subtitle: log.takenTime != null
-                ? Text(
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (log.takenTime != null)
+                  Text(
                     l10n.takenAt(_formatTime(log.takenTime!)),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color:
                               Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
-                  )
-                : null,
+                  ),
+                if (intakeStr.isNotEmpty)
+                  Text(
+                    intakeStr,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+              ],
+            ),
             trailing: log.notes != null && log.notes!.isNotEmpty
                 ? Icon(
                     Icons.notes,
@@ -298,6 +312,15 @@ class _LogList extends StatelessWidget {
 
   String _formatTime(DateTime dt) {
     return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _formatIntakeSnapshot(MedicationLog log, AppLocalizations l10n) {
+    return DosageFormLocalizer.localizeSnapshot(
+      quantity: log.snapshotIntakeQuantity,
+      form: log.snapshotDosageForm,
+      l10n: l10n,
+      customForm: log.snapshotCustomDosageForm,
+    );
   }
 }
 

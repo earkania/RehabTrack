@@ -229,10 +229,10 @@ class MedicationComponentsFormState extends State<MedicationComponentsForm> {
             ),
             const Spacer(),
             if (!widget.isReadOnly)
-              TextButton.icon(
+              IconButton(
                 onPressed: _addComponent,
-                icon: const Icon(Icons.add, size: 18),
-                label: Text(l10n.addComponent),
+                icon: const Icon(Icons.add_circle_outline),
+                tooltip: l10n.addComponent,
               ),
           ],
         ),

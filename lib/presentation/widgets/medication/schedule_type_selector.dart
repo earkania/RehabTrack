@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 
-enum ScheduleType { daily, fixedTimes, intervalDays }
+enum ScheduleType { daily, intervalDays }
 
 class ScheduleTypeSelector extends StatelessWidget {
   final ScheduleType selectedType;
@@ -29,27 +29,16 @@ class ScheduleTypeSelector extends StatelessWidget {
         _TypeOption(
           icon: Icons.today,
           label: l10n.dailySchedule,
-          description: l10n.dailyAt('{time}').replaceAll('{time}', '08:00'),
+          description: l10n.dailyScheduleDescription,
           isSelected: selectedType == ScheduleType.daily,
           onTap: () => onChanged(ScheduleType.daily),
           colorScheme: colorScheme,
         ),
         const SizedBox(height: 4),
         _TypeOption(
-          icon: Icons.access_time,
-          label: l10n.fixedTimesSchedule,
-          description:
-              l10n.fixedTimes('{times}').replaceAll('{times}', '08:00, 20:00'),
-          isSelected: selectedType == ScheduleType.fixedTimes,
-          onTap: () => onChanged(ScheduleType.fixedTimes),
-          colorScheme: colorScheme,
-        ),
-        const SizedBox(height: 4),
-        _TypeOption(
           icon: Icons.date_range,
-          label: l10n.intervalSchedule,
-          description: l10n
-              .everyNDays(3, '09:00'),
+          label: l10n.everyNDaysSchedule,
+          description: l10n.everyNDaysScheduleDescription,
           isSelected: selectedType == ScheduleType.intervalDays,
           onTap: () => onChanged(ScheduleType.intervalDays),
           colorScheme: colorScheme,
@@ -100,7 +89,9 @@ class _TypeOption extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -110,7 +101,8 @@ class _TypeOption extends StatelessWidget {
                     Text(
                       label,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: isSelected ? FontWeight.bold : null,
+                            fontWeight:
+                                isSelected ? FontWeight.bold : null,
                           ),
                     ),
                     Text(

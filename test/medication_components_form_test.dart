@@ -451,7 +451,7 @@ void main() {
 
       expect(find.text('Component Name (optional)'), findsOneWidget);
 
-      await tester.tap(find.text('Add Component'));
+      await tester.tap(find.byIcon(Icons.add_circle_outline));
       await tester.pumpAndSettle();
 
       expect(find.text('Component Name (optional)'), findsNWidgets(2));

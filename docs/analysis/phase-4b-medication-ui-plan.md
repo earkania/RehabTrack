@@ -33,33 +33,33 @@ Phase 4B delivers the medication user interface and connects the notification in
 
 ### 2.1 Routing Strategy
 
-Current routing is flat (`/`, `/health`, `/activities`, `/records`, `/settings`). Phase 4B introduces the first nested/detail routes.
+Current routing is flat (`/`, `/measurements`, `/medications`, `/records`, `/settings`). Phase 4B introduces the first nested/detail routes.
 
 Decision:
 
-Medication screens live under the Activities tab (`/activities`).
+Medication screens live under the Medications tab (`/medications`).
 
 Routes:
 
-/activities
+/medications
     -> ActivitiesScreen (medication list)
 
-/activities/medication/add
+/medications/medication/add
     -> AddMedicationScreen
 
-/activities/medication/:id
+/medications/medication/:id
     -> MedicationDetailScreen
 
-/activities/medication/:id/edit
+/medications/medication/:id/edit
     -> EditMedicationScreen
 
-/activities/medication/:id/schedule/add
+/medications/medication/:id/schedule/add
     -> AddScheduleScreen
 
-/activities/medication/:id/schedule/:scheduleId/edit
+/medications/medication/:id/schedule/:scheduleId/edit
     -> EditScheduleScreen
 
-/activities/medication/:id/history
+/medications/medication/:id/history
     -> MedicationHistoryScreen
 
 
@@ -69,7 +69,7 @@ Reason:
 
 - Forms and timelines need maximum screen space
 - Bottom navigation should not appear during editing/details
-- Existing prefix matching for `/activities` continues to highlight the Activities tab
+- Existing prefix matching for `/medications` continues to highlight the Medications tab
 
 
 ### 2.2 Screen Widget Pattern
@@ -299,7 +299,7 @@ This screen replaces the current Activities placeholder and serves as the medica
 - AppBar: "Medications" + FAB (add medication)
 - Body: `ListView.builder` of medication cards
 - Each card shows: name, dose ("5 mg"), next dose time, schedule summary
-- Tap → push to `/activities/medication/:id`
+- Tap → push to `/medications/medication/:id`
 - Empty state: icon + "No medications yet" + "Add your first medication"
 
 **Card content per medication:**
@@ -944,7 +944,7 @@ Update existing placeholder screens to use it.
 
 ```dart
 GoRoute(
-  path: '/activities/medication/:id',
+  path: '/medications/medication/:id',
   builder: (context, state) {
     final id = int.tryParse(state.pathParameters['id'] ?? '');
 

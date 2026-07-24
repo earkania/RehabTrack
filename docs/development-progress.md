@@ -205,8 +205,8 @@ Note: Diet module has a DAO but no dedicated repository yet.
 | Tab | Route | Screen | State |
 |---|---|---|---|
 | Today | `/` | TodayScreen | Placeholder — icon + "No data yet" |
-| Health | `/health` | HealthScreen | Placeholder — icon + "No data yet" |
-| Activities | `/activities` | MedicationListScreen | Medication list — shows empty state or medication cards |
+| Health | `/measurements` | HealthScreen | Placeholder — icon + "No data yet" |
+| Activities | `/medications` | MedicationListScreen | Medication list — shows empty state or medication cards |
 | Records | `/records` | RecordsScreen | Placeholder — icon + "No data yet" |
 | Settings | `/settings` | SettingsScreen | Functional — language switching works |
 
@@ -415,10 +415,10 @@ Note: Diet module has a DAO but no dedicated repository yet.
 **What was done:**
 
 **Routing Updated (`app_router.dart`):**
-- Added routes for `/activities/medication/add`, `/activities/medication/:id`, `/activities/medication/:id/edit`
+- Added routes for `/medications/medication/add`, `/medications/medication/:id`, `/medications/medication/:id/edit`
 - Routes are outside ShellRoute (no bottom nav during detail/form screens)
 - `int.tryParse` safety on all `:id` parameters with `_InvalidRouteScreen` for invalid IDs
-- `ScaffoldWithNavBar` updated: Activities tab now highlights for all `/activities/medication/*` routes
+- `ScaffoldWithNavBar` updated: Activities tab now highlights for all `/medications/medication/*` routes
 
 **Providers Created (`medication_provider.dart`):**
 - `medicationListProvider(profileId)` — `StreamProvider.autoDispose.family<List<Medication>, int>` wrapping `watchActiveMedications`
@@ -585,11 +585,13 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - **MeasurementFormatter:** Centralized formatting for all 6 types; `pulseLabel` parameter for localized BP/SpO2 summaries
 - **MeasurementValidator:** Required field validation, numeric bounds, BP relationship checks
 - **MeasurementLocalizer:** New helper mapping type/field keys to localized display names
-- **Measurements screen:** Shows measurement type cards with `Symbols.weight` icon and `IconButton(Icons.add_circle_outline)` for add reading
+- **Measurements screen:** Shows measurement type cards with `Symbols.weight` icon, `IconButton(Icons.history)` for view history, and `IconButton(Icons.add_circle_outline)` for add reading
 - **Measurement entry/edit/history screens:** Generic form-driven UI for all measurement types, using `MeasurementLocalizer` for type names and field labels; Measurement History AppBar uses same `IconButton(Icons.add_circle_outline)` for add reading
+- **Medication Detail screen:** Schedules/Alternatives sections use `IconButton(Icons.add_circle_outline)` for add actions; History section uses `IconButton(Icons.history)` for view history; AppBar uses `IconButton(Icons.history)` for medication history
+- **Medication Components form:** Uses `IconButton(Icons.add_circle_outline)` for add component action
 - **Navigation:** Bottom nav uses custom `_CenteredNavigationBar` (replaces Flutter's `NavigationBar`) with only-selected labels, centered wrapped text (`TextAlign.center`, `maxLines: 2`), `monitor_heart_outlined` / `medication_outlined` icons
-- **Routes:** `/health/measurement/:typeId/add`, `/health/measurement/:typeId/history`, `/health/measurement/record/:recordId/edit`
-- **Localization corrections:** Georgian Blood Pressure → `არტერიული წნევა` (was `სისხლის წნევა`), `measuredAt` → `გაზომილია` (was `გაზომულია`), duplicate `viewHistory` key removed, new keys: `addReadingTooltip`, `pulseLabel`
+- **Routes:** `/measurements/measurement/:typeId/add`, `/measurements/measurement/:typeId/history`, `/measurements/measurement/record/:recordId/edit`
+- **Localization corrections:** Georgian Blood Pressure → `არტერიული წნევა` (was `სისხლის წნევა`), Georgian Blood Glucose → `გლუკოზა სისხლში` (was `სისხლში შაქარი`), `measuredAt` → `გაზომილია` (was `გაზომულია`), duplicate `viewHistory` key removed, new keys: `addReadingTooltip`, `pulseLabel`
 - **Dependencies:** Added `material_symbols_icons: ^4.2951.0` for `Symbols.weight`
 - **Tests:** 193 tests — `phase5a_correction_test.dart` (23), `measurement_formatter_test.dart` (16), `measurement_validator_test.dart` (16), `measurement_seed_test.dart` (23), `measurement_health_screen_test.dart` (3), plus existing widget/form tests
 
@@ -603,6 +605,87 @@ Note: Diet module has a DAO but no dedicated repository yet.
 3. Ensure all 6 canonical keyed types have field definitions (seed fields if missing)
 
 **Test Results:** 193/193 passing (flutter test), 1 pre-existing info lint (`prefer_initializing_formals` in `notification_action_bridge.dart:19`)
+
+### Phase 4E — Medication Schedule Redesign
+
+**Status:** Completed
+
+**What was done:**
+
+- **Schedule model simplified:** Replaced 3-type model (`DailySchedule(time)`, `FixedTimesSchedule(times)`, `IntervalDaysSchedule(interval, time)`) with 2-type model: `DailySchedule(times: List<String>)` and `IntervalDaysSchedule(intervalDays: int, times: List<String>)` — both support multiple times per day
+- **New domain entities:** `DosageForm` enum (tablet, capsule, drop, ml, puff, unit, sachet, spoon, injection, other) with storage mapping extension; `ScheduleConfig` sealed class with `validateTimes()` static method
+- **MedicationSchedule entity updated:** Added `intakeQuantity` (double), `dosageForm` (DosageForm), `customDosageForm` (String?) fields
+- **MedicationLog entity updated:** Added snapshot fields (`snapshotIntakeQuantity`, `snapshotDosageForm`, `snapshotCustomDosageForm`) to preserve intake details at log time
+- **Database schema v6:** Destructive migration — drops and recreates `MedicationSchedules` and `MedicationLogs` tables with new columns; `build_runner` regenerated (166 outputs)
+- **Notification system:** `NotificationScheduler` and `NotificationActionBridge` updated for new model; notification body now includes intake quantity and dosage form
+- **Schedule editor UI:** `MedicationScheduleForm` rewritten with dynamic time slots (add/remove), intake quantity input with quick-select chips, dosage form dropdown, custom "Other" field, instruction chips; `ScheduleTypeSelector` reduced to 2 options (Daily, Every N Days)
+- **Schedule display:** `ScheduleFormatter` updated for new model; `medication_detail_screen.dart` updated (`_formatScheduleSummary`, `_scheduleIcon`); medication history shows intake snapshots from logs
+- **Localization:** New keys added in EN and KA (dailyScheduleDescription, everyNDaysSchedule, everyNDaysScheduleDescription, intakeQuantity, perIntake, dosageForm, tablet..other, customDosageForm, customDosageFormRequired, invalidIntakeQuantity); obsolete keys removed (`fixedTimesSchedule`, `fixedTimes`)
+- **Screens updated:** `AddScheduleScreen` and `EditScheduleScreen` pass intake quantity, dosage form, and custom dosage form to schedule CRUD; `MedicationHistoryScreen` displays intake snapshot from log records
+- **Backward compatibility:** NOT required; old schedule data may be deleted
+
+**Files modified:**
+- `lib/domain/entities/dosage_form.dart` — NEW
+- `lib/domain/entities/schedule_config.dart` — REWRITTEN (2-type model)
+- `lib/domain/entities/medication.dart` — REWRITTEN (MedicationSchedule + MedicationLog)
+- `lib/data/database/tables/medication_tables.dart` — UPDATED (new columns)
+- `lib/data/database/app_database.dart` — UPDATED (schema v6, destructive migration)
+- `lib/data/repositories/medication_repository_impl.dart` — REWRITTEN (schedule CRUD, log snapshots)
+- `lib/data/services/notification/notification_scheduler.dart` — UPDATED
+- `lib/data/services/notification/notification_action_bridge.dart` — UPDATED
+- `lib/presentation/utils/schedule_formatter.dart` — REWRITTEN
+- `lib/presentation/widgets/medication/schedule_type_selector.dart` — REWRITTEN (2 options)
+- `lib/presentation/widgets/medication/medication_schedule_form.dart` — REWRITTEN
+- `lib/presentation/screens/activities/add_schedule_screen.dart` — UPDATED
+- `lib/presentation/screens/activities/edit_schedule_screen.dart` — UPDATED
+- `lib/presentation/screens/activities/medication_detail_screen.dart` — UPDATED
+- `lib/presentation/screens/activities/medication_history_screen.dart` — UPDATED
+- `lib/l10n/app_en.arb` — UPDATED (new keys, removed obsolete)
+- `lib/l10n/app_ka.arb` — UPDATED (new keys, removed obsolete)
+- `test/schedule_test.dart` — REWRITTEN
+- `test/notification_action_bridge_test.dart` — UPDATED
+
+**Test Results:** 198/198 passing (flutter test), 1 pre-existing info lint
+
+---
+
+### Phase 4E Polish — Localization & Dosage Form Centralization
+
+**Date:** 2026-07-24
+
+**Problem:** 6+ locations across the codebase used `schedule.dosageForm.name` (always English) for dosage form display. Georgian had wrong tablet translation (`აბა` → `აბი`). No `topical` dosage form existed.
+
+**Changes:**
+- Added `topical` to `DosageForm` enum (EN: "Apply", KA: "წასმა")
+- Fixed Georgian: აბა → აბი
+- Created centralized `DosageFormLocalizer` in `presentation/utils/` with `localize()`, `localizeWithQuantity()`, `localizeSnapshot()`
+- Updated `ScheduleFormatter` to accept `AppLocalizations` and use `DosageFormLocalizer`
+- Updated `medication_detail_screen.dart` `_formatScheduleSummary` to use centralized formatter
+- Updated `medication_history_screen.dart` `_formatIntakeSnapshot` to use centralized formatter
+- Updated `medication_schedule_form.dart` — removed duplicated `_localizedDosageForm`, now uses `DosageFormLocalizer.localize()`
+- Removed dead `dosageFormLabel` getter from `MedicationSchedule` (unused code using hardcoded English `.name`)
+- `notification_action_bridge.dart` and `medication_repository_impl.dart` left unchanged per constraints (data layer)
+
+**Files Created:**
+- `lib/presentation/utils/dosage_form_localizer.dart`
+
+**Files Modified:**
+- `lib/domain/entities/dosage_form.dart` — added `topical`
+- `lib/domain/entities/medication.dart` — removed dead `dosageFormLabel`
+- `lib/presentation/utils/schedule_formatter.dart` — uses `DosageFormLocalizer`
+- `lib/presentation/screens/activities/medication_detail_screen.dart` — uses centralized formatter
+- `lib/presentation/screens/activities/medication_history_screen.dart` — uses centralized formatter
+- `lib/presentation/widgets/medication/medication_schedule_form.dart` — removed duplicated logic
+- `lib/l10n/app_en.arb` — added `topical`
+- `lib/l10n/app_ka.arb` — added `topical`, fixed `აბა` → `აბი`
+- `test/schedule_test.dart` — updated for l10n, added `DosageFormLocalizer` tests
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (1 pre-existing info lint) |
+| `flutter test` | Passed (201/201) |
 
 ---
 

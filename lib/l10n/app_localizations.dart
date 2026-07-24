@@ -350,11 +350,23 @@ abstract class AppLocalizations {
   /// **'Daily'**
   String get dailySchedule;
 
-  /// No description provided for @fixedTimesSchedule.
+  /// No description provided for @dailyScheduleDescription.
   ///
   /// In en, this message translates to:
-  /// **'Fixed Times'**
-  String get fixedTimesSchedule;
+  /// **'Take at specified times every day'**
+  String get dailyScheduleDescription;
+
+  /// No description provided for @everyNDaysSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Every N Days'**
+  String get everyNDaysSchedule;
+
+  /// No description provided for @everyNDaysScheduleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Take at specified times every N days'**
+  String get everyNDaysScheduleDescription;
 
   /// No description provided for @intervalSchedule.
   ///
@@ -497,20 +509,116 @@ abstract class AppLocalizations {
   /// No description provided for @dailyAt.
   ///
   /// In en, this message translates to:
-  /// **'Daily at {time}'**
-  String dailyAt(String time);
-
-  /// No description provided for @fixedTimes.
-  ///
-  /// In en, this message translates to:
-  /// **'Fixed times: {times}'**
-  String fixedTimes(String times);
+  /// **'Daily at {times}'**
+  String dailyAt(String times);
 
   /// No description provided for @everyNDays.
   ///
   /// In en, this message translates to:
-  /// **'Every {count} days at {time}'**
-  String everyNDays(int count, String time);
+  /// **'Every {count} days at {times}'**
+  String everyNDays(int count, String times);
+
+  /// No description provided for @intakeQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Intake Quantity'**
+  String get intakeQuantity;
+
+  /// No description provided for @perIntake.
+  ///
+  /// In en, this message translates to:
+  /// **'per intake'**
+  String get perIntake;
+
+  /// No description provided for @dosageForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage Form'**
+  String get dosageForm;
+
+  /// No description provided for @tablet.
+  ///
+  /// In en, this message translates to:
+  /// **'tablet'**
+  String get tablet;
+
+  /// No description provided for @capsule.
+  ///
+  /// In en, this message translates to:
+  /// **'capsule'**
+  String get capsule;
+
+  /// No description provided for @drop.
+  ///
+  /// In en, this message translates to:
+  /// **'drop'**
+  String get drop;
+
+  /// No description provided for @ml.
+  ///
+  /// In en, this message translates to:
+  /// **'ml'**
+  String get ml;
+
+  /// No description provided for @puff.
+  ///
+  /// In en, this message translates to:
+  /// **'puff'**
+  String get puff;
+
+  /// No description provided for @unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get unit;
+
+  /// No description provided for @sachet.
+  ///
+  /// In en, this message translates to:
+  /// **'sachet'**
+  String get sachet;
+
+  /// No description provided for @spoon.
+  ///
+  /// In en, this message translates to:
+  /// **'spoon'**
+  String get spoon;
+
+  /// No description provided for @injection.
+  ///
+  /// In en, this message translates to:
+  /// **'injection'**
+  String get injection;
+
+  /// No description provided for @topical.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get topical;
+
+  /// No description provided for @other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other;
+
+  /// No description provided for @customDosageForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom dosage form name'**
+  String get customDosageForm;
+
+  /// No description provided for @customDosageFormRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom dosage form name is required'**
+  String get customDosageFormRequired;
+
+  /// No description provided for @invalidIntakeQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid intake quantity'**
+  String get invalidIntakeQuantity;
 
   /// No description provided for @beforeMeal.
   ///
@@ -1045,12 +1153,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Field Name'**
   String get fieldName;
-
-  /// No description provided for @unit.
-  ///
-  /// In en, this message translates to:
-  /// **'Unit'**
-  String get unit;
 
   /// No description provided for @requiredField.
   ///

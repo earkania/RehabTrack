@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/widgets/common/date_field.dart';
 import 'package:rehab_track/presentation/widgets/medication/schedule_type_selector.dart';
 import 'package:rehab_track/presentation/widgets/medication/time_picker_field.dart';
 
 class ScheduleFormData {
   ScheduleType scheduleType;
-  String dailyTime;
-  List<String> fixedTimes;
+  List<String> times;
   int intervalDays;
-  String intervalTime;
+  double intakeQuantity;
+  DosageForm dosageForm;
+  String customDosageForm;
   bool active;
   DateTime? startDate;
   DateTime? endDate;
@@ -19,42 +23,40 @@ class ScheduleFormData {
 
   ScheduleFormData({
     this.scheduleType = ScheduleType.daily,
-    this.dailyTime = '08:00',
-    List<String>? fixedTimes,
+    List<String>? times,
     this.intervalDays = 1,
-    this.intervalTime = '08:00',
+    this.intakeQuantity = 1.0,
+    this.dosageForm = DosageForm.tablet,
+    this.customDosageForm = '',
     this.active = true,
     this.startDate,
     this.endDate,
     this.instructions = '',
-  }) : fixedTimes = fixedTimes ?? ['08:00'];
+  }) : times = times ?? ['08:00'];
 
   factory ScheduleFormData.fromSchedule(MedicationSchedule schedule) {
     final config = schedule.scheduleConfig;
     switch (config) {
-      case DailySchedule(:final time):
+      case DailySchedule(:final times):
         return ScheduleFormData(
           scheduleType: ScheduleType.daily,
-          dailyTime: time,
+          times: List<String>.from(times),
+          intakeQuantity: schedule.intakeQuantity,
+          dosageForm: schedule.dosageForm,
+          customDosageForm: schedule.customDosageForm ?? '',
           active: schedule.active,
           startDate: schedule.startDate,
           endDate: schedule.endDate,
           instructions: schedule.instructions ?? '',
         );
-      case FixedTimesSchedule(:final times):
-        return ScheduleFormData(
-          scheduleType: ScheduleType.fixedTimes,
-          fixedTimes: List<String>.from(times),
-          active: schedule.active,
-          startDate: schedule.startDate,
-          endDate: schedule.endDate,
-          instructions: schedule.instructions ?? '',
-        );
-      case IntervalDaysSchedule(:final interval, :final time):
+      case IntervalDaysSchedule(:final intervalDays, :final times):
         return ScheduleFormData(
           scheduleType: ScheduleType.intervalDays,
-          intervalDays: interval,
-          intervalTime: time,
+          times: List<String>.from(times),
+          intervalDays: intervalDays,
+          intakeQuantity: schedule.intakeQuantity,
+          dosageForm: schedule.dosageForm,
+          customDosageForm: schedule.customDosageForm ?? '',
           active: schedule.active,
           startDate: schedule.startDate,
           endDate: schedule.endDate,
@@ -64,21 +66,17 @@ class ScheduleFormData {
   }
 
   ScheduleConfig toScheduleConfig() {
+    final sorted = List<String>.from(times)..sort();
     switch (scheduleType) {
       case ScheduleType.daily:
-        return DailySchedule(time: dailyTime);
-      case ScheduleType.fixedTimes:
-        final sorted = List<String>.from(fixedTimes)
-          ..sort((a, b) => a.compareTo(b));
-        return FixedTimesSchedule(times: sorted);
+        return DailySchedule(times: sorted);
       case ScheduleType.intervalDays:
-        return IntervalDaysSchedule(interval: intervalDays, time: intervalTime);
+        return IntervalDaysSchedule(intervalDays: intervalDays, times: sorted);
     }
   }
 
   String get scheduleTypeString => switch (scheduleType) {
         ScheduleType.daily => 'daily',
-        ScheduleType.fixedTimes => 'fixed_times',
         ScheduleType.intervalDays => 'interval_days',
       };
 }
@@ -104,45 +102,62 @@ class MedicationScheduleForm extends StatefulWidget {
 class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
   final _formKey = GlobalKey<FormState>();
   late ScheduleType _scheduleType;
-  late String _dailyTime;
-  late List<String> _fixedTimes;
+  late List<String> _times;
   late int _intervalDays;
-  late String _intervalTime;
+  late DosageForm _dosageForm;
+  late String _customDosageForm;
   late bool _active;
   DateTime? _startDate;
   DateTime? _endDate;
   late final TextEditingController _instructionsController;
+  late final TextEditingController _quantityController;
+  late final TextEditingController _customDosageController;
 
   @override
   void initState() {
     super.initState();
     final d = widget.initialData;
     _scheduleType = d.scheduleType;
-    _dailyTime = d.dailyTime;
-    _fixedTimes = List<String>.from(d.fixedTimes);
+    _times = List<String>.from(d.times);
     _intervalDays = d.intervalDays;
-    _intervalTime = d.intervalTime;
+    _dosageForm = d.dosageForm;
+    _customDosageForm = d.customDosageForm;
     _active = d.active;
     _startDate = d.startDate;
     _endDate = d.endDate;
     _instructionsController = TextEditingController(text: d.instructions);
+    _quantityController =
+        TextEditingController(text: _formatQuantity(d.intakeQuantity));
+    _customDosageController = TextEditingController(text: _customDosageForm);
   }
 
   @override
   void dispose() {
     _instructionsController.dispose();
+    _quantityController.dispose();
+    _customDosageController.dispose();
     super.dispose();
+  }
+
+  String _formatQuantity(double qty) {
+    if (qty == qty.roundToDouble()) return qty.toInt().toString();
+    return qty.toString();
   }
 
   void _save() {
     if (!_formKey.currentState!.validate()) return;
+
+    final customForm = _customDosageController.text.trim();
+    final qty = double.tryParse(_quantityController.text.trim()) ?? 0;
+
     widget.onSave(
       ScheduleFormData(
         scheduleType: _scheduleType,
-        dailyTime: _dailyTime,
-        fixedTimes: _fixedTimes,
+        times: List<String>.from(_times),
         intervalDays: _intervalDays,
-        intervalTime: _intervalTime,
+        intakeQuantity: qty,
+        dosageForm: _dosageForm,
+        customDosageForm: _dosageForm == DosageForm.other ? customForm : '',
         active: _active,
         startDate: _startDate,
         endDate: _endDate,
@@ -153,6 +168,17 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
 
   void _applyInstructionChip(String value) {
     _instructionsController.text = value;
+  }
+
+  void _addTime() {
+    final lastTime = _times.isNotEmpty ? _times.last : '08:00';
+    setState(() => _times.add(lastTime));
+  }
+
+  void _removeTime(int index) {
+    if (_times.length > 1) {
+      setState(() => _times.removeAt(index));
+    }
   }
 
   Future<void> _pickDate({required bool isStart}) async {
@@ -196,6 +222,10 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
           ),
           const SizedBox(height: 24),
           _buildTimeSection(l10n),
+          const SizedBox(height: 24),
+          _buildIntakeQuantitySection(l10n),
+          const SizedBox(height: 24),
+          _buildDosageFormSection(l10n),
           const SizedBox(height: 24),
           Text(
             l10n.instructions,
@@ -271,17 +301,6 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
   }
 
   Widget _buildTimeSection(AppLocalizations l10n) {
-    switch (_scheduleType) {
-      case ScheduleType.daily:
-        return _buildDailySection(l10n);
-      case ScheduleType.fixedTimes:
-        return _buildFixedTimesSection(l10n);
-      case ScheduleType.intervalDays:
-        return _buildIntervalSection(l10n);
-    }
-  }
-
-  Widget _buildDailySection(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -290,42 +309,22 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
-        TimePickerField(
-          time: _dailyTime,
-          onTimeSelected: (time) => setState(() => _dailyTime = time),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFixedTimesSection(AppLocalizations l10n) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.selectTime,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        ...List.generate(_fixedTimes.length, (index) {
+        ...List.generate(_times.length, (index) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: TimePickerField(
-              time: _fixedTimes[index],
+              time: _times[index],
               onTimeSelected: (time) {
-                setState(() => _fixedTimes[index] = time);
+                setState(() => _times[index] = time);
               },
-              onRemove: _fixedTimes.length > 1
-                  ? () => setState(() => _fixedTimes.removeAt(index))
+              onRemove: _times.length > 1
+                  ? () => _removeTime(index)
                   : null,
             ),
           );
         }),
         OutlinedButton.icon(
-          onPressed: () {
-            final lastTime = _fixedTimes.isNotEmpty ? _fixedTimes.last : '08:00';
-            setState(() => _fixedTimes.add(lastTime));
-          },
+          onPressed: _addTime,
           icon: const Icon(Icons.add, size: 18),
           label: Text(l10n.addTime),
         ),
@@ -333,51 +332,108 @@ class _MedicationScheduleFormState extends State<MedicationScheduleForm> {
     );
   }
 
-  Widget _buildIntervalSection(AppLocalizations l10n) {
+  Widget _buildIntakeQuantitySection(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.intervalDays,
+          l10n.intakeQuantity,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            Text('${l10n.intervalDays.split('(').first.trim()}: '),
             Expanded(
-              child: Slider(
-                value: _intervalDays.toDouble(),
-                min: 1,
-                max: 30,
-                divisions: 29,
-                label: _intervalDays.toString(),
-                onChanged: (value) {
-                  setState(() => _intervalDays = value.round());
+              child: TextFormField(
+                controller: _quantityController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d*\.?\d{0,2}$')),
+                ],
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  hintText: '1',
+                  suffixText: l10n.perIntake,
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return l10n.invalidIntakeQuantity;
+                  }
+                  final qty = double.tryParse(value.trim());
+                  if (qty == null || qty <= 0) {
+                    return l10n.invalidIntakeQuantity;
+                  }
+                  return null;
                 },
               ),
             ),
-            SizedBox(
-              width: 40,
-              child: Text(
-                _intervalDays.toString(),
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-            Text(' ${l10n.days}'),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: ['0.25', '0.5', '1', '1.5', '2'].map((qty) {
+            return ActionChip(
+              label: Text(qty, style: const TextStyle(fontSize: 12)),
+              onPressed: () {
+                setState(() {
+                  _quantityController.text = qty;
+                });
+              },
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDosageFormSection(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Text(
-          l10n.selectTime,
+          l10n.dosageForm,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
-        TimePickerField(
-          time: _intervalTime,
-          onTimeSelected: (time) => setState(() => _intervalTime = time),
+        DropdownButtonFormField<DosageForm>(
+          initialValue: _dosageForm,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+          items: DosageForm.values.map((form) {
+            return DropdownMenuItem(
+              value: form,
+              child: Text(DosageFormLocalizer.localize(form, l10n)),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              setState(() => _dosageForm = value);
+            }
+          },
         ),
+        if (_dosageForm == DosageForm.other) ...[
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: _customDosageController,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: l10n.customDosageForm,
+            ),
+            validator: (value) {
+              if (_dosageForm == DosageForm.other) {
+                if (value == null || value.trim().isEmpty) {
+                  return l10n.customDosageFormRequired;
+                }
+              }
+              return null;
+            },
+          ),
+        ],
       ],
     );
   }

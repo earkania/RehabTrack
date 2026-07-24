@@ -16,13 +16,12 @@ class NotificationActionBridge {
     required this._notificationService,
     required ScheduleRecoveryService scheduleRecoveryService,
     required this._medicationRepository,
-  })  : _scheduleRecoveryService = scheduleRecoveryService;
+  }) : _scheduleRecoveryService = scheduleRecoveryService;
 
   final NotificationService _notificationService;
   final ScheduleRecoveryService _scheduleRecoveryService;
   final MedicationRepository _medicationRepository;
 
-  /// Initialize the bridge: register action callback and recover schedules.
   Future<void> initialize({required int profileId}) async {
     _notificationService.setActionCallback(_handleAction);
     log('NotificationActionBridge: action callback registered');
@@ -30,7 +29,6 @@ class NotificationActionBridge {
     await _recoverSchedules(profileId);
   }
 
-  /// Handle notification action from the user.
   void _handleAction(NotificationActionResponse response) {
     log('NotificationActionBridge: action=${response.actionType.name}, '
         'notificationId=${response.notificationId}');
@@ -51,7 +49,6 @@ class NotificationActionBridge {
     }
   }
 
-  /// Parse notification payload JSON.
   static NotificationPayload? parsePayload(String? payload) {
     return _parsePayload(payload);
   }
@@ -75,15 +72,20 @@ class NotificationActionBridge {
     }
   }
 
-  /// Handle Taken action: create MedicationLog with status 'taken'.
   Future<void> _handleTaken(NotificationPayload payload) async {
     final now = DateTime.now();
+    final schedule =
+        await _medicationRepository.getSchedule(payload.scheduleId);
+
     final logEntry = MedicationLog(
       medicationScheduleId: payload.scheduleId,
       scheduledTime: now,
       takenTime: now,
       status: 'taken',
       createdAt: now,
+      snapshotIntakeQuantity: schedule?.intakeQuantity,
+      snapshotDosageForm: schedule?.dosageForm,
+      snapshotCustomDosageForm: schedule?.customDosageForm,
     );
 
     try {
@@ -95,14 +97,19 @@ class NotificationActionBridge {
     }
   }
 
-  /// Handle Skip action: create MedicationLog with status 'skipped'.
   Future<void> _handleSkipped(NotificationPayload payload) async {
     final now = DateTime.now();
+    final schedule =
+        await _medicationRepository.getSchedule(payload.scheduleId);
+
     final logEntry = MedicationLog(
       medicationScheduleId: payload.scheduleId,
       scheduledTime: now,
       status: 'skipped',
       createdAt: now,
+      snapshotIntakeQuantity: schedule?.intakeQuantity,
+      snapshotDosageForm: schedule?.dosageForm,
+      snapshotCustomDosageForm: schedule?.customDosageForm,
     );
 
     try {
@@ -114,7 +121,6 @@ class NotificationActionBridge {
     }
   }
 
-  /// Handle Snooze action: reschedule notification for 10 minutes later.
   Future<void> _handleSnooze(
     NotificationActionResponse response,
     NotificationPayload payload,
@@ -172,7 +178,6 @@ class NotificationActionBridge {
     }
   }
 
-  /// Recover all active medication schedules at app startup.
   Future<void> _recoverSchedules(int profileId) async {
     try {
       final medications =
@@ -208,7 +213,6 @@ class NotificationActionBridge {
     }
   }
 
-  /// Build a recovery entry for a medication schedule.
   ScheduleRecoveryEntry _buildRecoveryEntry(
     Medication medication,
     MedicationSchedule schedule,
@@ -234,36 +238,40 @@ class NotificationActionBridge {
     );
   }
 
-  /// Compute notification IDs for a schedule based on its config type.
   static List<int> computeNotificationIds({
     required int scheduleId,
     required ScheduleConfig config,
   }) {
-    return switch (config) {
-      DailySchedule() => [scheduleId],
-      FixedTimesSchedule(:final times) =>
-        List.generate(times.length, (i) => scheduleId + i),
-      IntervalDaysSchedule() => [scheduleId],
-    };
+    return List.generate(config.times.length, (i) => scheduleId + i);
   }
 
-  /// Build notification body from medication and schedule.
   static String buildNotificationBody(
     Medication medication,
     MedicationSchedule schedule,
   ) {
     final parts = <String>[];
+
     final dose = DoseFormatter.format(medication);
     if (dose.isNotEmpty) parts.add(dose);
+
+    final intakeQty = schedule.intakeQuantity;
+    final form = schedule.customDosageForm?.isNotEmpty == true
+        ? schedule.customDosageForm!
+        : schedule.dosageForm.name;
+    final qtyStr = intakeQty == intakeQty.roundToDouble()
+        ? intakeQty.toInt().toString()
+        : intakeQty.toString();
+    final pluralized = intakeQty == 1 ? form : '${form}s';
+    parts.add('take $qtyStr $pluralized');
+
     if (schedule.instructions != null && schedule.instructions!.isNotEmpty) {
       parts.add(schedule.instructions!);
     }
+
     return parts.isEmpty ? '' : parts.join(' — ');
   }
-
 }
 
-/// Parsed notification payload containing medication and schedule IDs.
 class NotificationPayload {
   const NotificationPayload({
     required this.medicationId,

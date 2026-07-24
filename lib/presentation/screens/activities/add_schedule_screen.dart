@@ -40,6 +40,10 @@ class _AddScheduleScreenState extends ConsumerState<AddScheduleScreen> {
         medicationId: widget.medicationId,
         scheduleType: data.scheduleTypeString,
         scheduleConfig: data.toScheduleConfig(),
+        intakeQuantity: data.intakeQuantity,
+        dosageForm: data.dosageForm,
+        customDosageForm:
+            data.customDosageForm.isNotEmpty ? data.customDosageForm : null,
         startDate: data.startDate,
         endDate: data.endDate,
         instructions:

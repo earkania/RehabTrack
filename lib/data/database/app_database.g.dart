@@ -1584,6 +1584,41 @@ class $MedicationSchedulesTable extends MedicationSchedules
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _intakeQuantityMeta = const VerificationMeta(
+    'intakeQuantity',
+  );
+  @override
+  late final GeneratedColumn<double> intakeQuantity = GeneratedColumn<double>(
+    'intake_quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1.0),
+  );
+  static const VerificationMeta _dosageFormMeta = const VerificationMeta(
+    'dosageForm',
+  );
+  @override
+  late final GeneratedColumn<String> dosageForm = GeneratedColumn<String>(
+    'dosage_form',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('tablet'),
+  );
+  static const VerificationMeta _customDosageFormMeta = const VerificationMeta(
+    'customDosageForm',
+  );
+  @override
+  late final GeneratedColumn<String> customDosageForm = GeneratedColumn<String>(
+    'custom_dosage_form',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _startDateMeta = const VerificationMeta(
     'startDate',
   );
@@ -1636,6 +1671,9 @@ class $MedicationSchedulesTable extends MedicationSchedules
     medicationId,
     scheduleType,
     scheduleConfig,
+    intakeQuantity,
+    dosageForm,
+    customDosageForm,
     startDate,
     endDate,
     instructions,
@@ -1689,6 +1727,30 @@ class $MedicationSchedulesTable extends MedicationSchedules
     } else if (isInserting) {
       context.missing(_scheduleConfigMeta);
     }
+    if (data.containsKey('intake_quantity')) {
+      context.handle(
+        _intakeQuantityMeta,
+        intakeQuantity.isAcceptableOrUnknown(
+          data['intake_quantity']!,
+          _intakeQuantityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dosage_form')) {
+      context.handle(
+        _dosageFormMeta,
+        dosageForm.isAcceptableOrUnknown(data['dosage_form']!, _dosageFormMeta),
+      );
+    }
+    if (data.containsKey('custom_dosage_form')) {
+      context.handle(
+        _customDosageFormMeta,
+        customDosageForm.isAcceptableOrUnknown(
+          data['custom_dosage_form']!,
+          _customDosageFormMeta,
+        ),
+      );
+    }
     if (data.containsKey('start_date')) {
       context.handle(
         _startDateMeta,
@@ -1741,6 +1803,18 @@ class $MedicationSchedulesTable extends MedicationSchedules
         DriftSqlType.string,
         data['${effectivePrefix}schedule_config'],
       )!,
+      intakeQuantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}intake_quantity'],
+      )!,
+      dosageForm: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dosage_form'],
+      )!,
+      customDosageForm: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}custom_dosage_form'],
+      ),
       startDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}start_date'],
@@ -1772,6 +1846,9 @@ class MedicationSchedule extends DataClass
   final int medicationId;
   final String scheduleType;
   final String scheduleConfig;
+  final double intakeQuantity;
+  final String dosageForm;
+  final String? customDosageForm;
   final DateTime? startDate;
   final DateTime? endDate;
   final String? instructions;
@@ -1781,6 +1858,9 @@ class MedicationSchedule extends DataClass
     required this.medicationId,
     required this.scheduleType,
     required this.scheduleConfig,
+    required this.intakeQuantity,
+    required this.dosageForm,
+    this.customDosageForm,
     this.startDate,
     this.endDate,
     this.instructions,
@@ -1793,6 +1873,11 @@ class MedicationSchedule extends DataClass
     map['medication_id'] = Variable<int>(medicationId);
     map['schedule_type'] = Variable<String>(scheduleType);
     map['schedule_config'] = Variable<String>(scheduleConfig);
+    map['intake_quantity'] = Variable<double>(intakeQuantity);
+    map['dosage_form'] = Variable<String>(dosageForm);
+    if (!nullToAbsent || customDosageForm != null) {
+      map['custom_dosage_form'] = Variable<String>(customDosageForm);
+    }
     if (!nullToAbsent || startDate != null) {
       map['start_date'] = Variable<DateTime>(startDate);
     }
@@ -1812,6 +1897,11 @@ class MedicationSchedule extends DataClass
       medicationId: Value(medicationId),
       scheduleType: Value(scheduleType),
       scheduleConfig: Value(scheduleConfig),
+      intakeQuantity: Value(intakeQuantity),
+      dosageForm: Value(dosageForm),
+      customDosageForm: customDosageForm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customDosageForm),
       startDate: startDate == null && nullToAbsent
           ? const Value.absent()
           : Value(startDate),
@@ -1835,6 +1925,9 @@ class MedicationSchedule extends DataClass
       medicationId: serializer.fromJson<int>(json['medicationId']),
       scheduleType: serializer.fromJson<String>(json['scheduleType']),
       scheduleConfig: serializer.fromJson<String>(json['scheduleConfig']),
+      intakeQuantity: serializer.fromJson<double>(json['intakeQuantity']),
+      dosageForm: serializer.fromJson<String>(json['dosageForm']),
+      customDosageForm: serializer.fromJson<String?>(json['customDosageForm']),
       startDate: serializer.fromJson<DateTime?>(json['startDate']),
       endDate: serializer.fromJson<DateTime?>(json['endDate']),
       instructions: serializer.fromJson<String?>(json['instructions']),
@@ -1849,6 +1942,9 @@ class MedicationSchedule extends DataClass
       'medicationId': serializer.toJson<int>(medicationId),
       'scheduleType': serializer.toJson<String>(scheduleType),
       'scheduleConfig': serializer.toJson<String>(scheduleConfig),
+      'intakeQuantity': serializer.toJson<double>(intakeQuantity),
+      'dosageForm': serializer.toJson<String>(dosageForm),
+      'customDosageForm': serializer.toJson<String?>(customDosageForm),
       'startDate': serializer.toJson<DateTime?>(startDate),
       'endDate': serializer.toJson<DateTime?>(endDate),
       'instructions': serializer.toJson<String?>(instructions),
@@ -1861,6 +1957,9 @@ class MedicationSchedule extends DataClass
     int? medicationId,
     String? scheduleType,
     String? scheduleConfig,
+    double? intakeQuantity,
+    String? dosageForm,
+    Value<String?> customDosageForm = const Value.absent(),
     Value<DateTime?> startDate = const Value.absent(),
     Value<DateTime?> endDate = const Value.absent(),
     Value<String?> instructions = const Value.absent(),
@@ -1870,6 +1969,11 @@ class MedicationSchedule extends DataClass
     medicationId: medicationId ?? this.medicationId,
     scheduleType: scheduleType ?? this.scheduleType,
     scheduleConfig: scheduleConfig ?? this.scheduleConfig,
+    intakeQuantity: intakeQuantity ?? this.intakeQuantity,
+    dosageForm: dosageForm ?? this.dosageForm,
+    customDosageForm: customDosageForm.present
+        ? customDosageForm.value
+        : this.customDosageForm,
     startDate: startDate.present ? startDate.value : this.startDate,
     endDate: endDate.present ? endDate.value : this.endDate,
     instructions: instructions.present ? instructions.value : this.instructions,
@@ -1887,6 +1991,15 @@ class MedicationSchedule extends DataClass
       scheduleConfig: data.scheduleConfig.present
           ? data.scheduleConfig.value
           : this.scheduleConfig,
+      intakeQuantity: data.intakeQuantity.present
+          ? data.intakeQuantity.value
+          : this.intakeQuantity,
+      dosageForm: data.dosageForm.present
+          ? data.dosageForm.value
+          : this.dosageForm,
+      customDosageForm: data.customDosageForm.present
+          ? data.customDosageForm.value
+          : this.customDosageForm,
       startDate: data.startDate.present ? data.startDate.value : this.startDate,
       endDate: data.endDate.present ? data.endDate.value : this.endDate,
       instructions: data.instructions.present
@@ -1903,6 +2016,9 @@ class MedicationSchedule extends DataClass
           ..write('medicationId: $medicationId, ')
           ..write('scheduleType: $scheduleType, ')
           ..write('scheduleConfig: $scheduleConfig, ')
+          ..write('intakeQuantity: $intakeQuantity, ')
+          ..write('dosageForm: $dosageForm, ')
+          ..write('customDosageForm: $customDosageForm, ')
           ..write('startDate: $startDate, ')
           ..write('endDate: $endDate, ')
           ..write('instructions: $instructions, ')
@@ -1917,6 +2033,9 @@ class MedicationSchedule extends DataClass
     medicationId,
     scheduleType,
     scheduleConfig,
+    intakeQuantity,
+    dosageForm,
+    customDosageForm,
     startDate,
     endDate,
     instructions,
@@ -1930,6 +2049,9 @@ class MedicationSchedule extends DataClass
           other.medicationId == this.medicationId &&
           other.scheduleType == this.scheduleType &&
           other.scheduleConfig == this.scheduleConfig &&
+          other.intakeQuantity == this.intakeQuantity &&
+          other.dosageForm == this.dosageForm &&
+          other.customDosageForm == this.customDosageForm &&
           other.startDate == this.startDate &&
           other.endDate == this.endDate &&
           other.instructions == this.instructions &&
@@ -1941,6 +2063,9 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
   final Value<int> medicationId;
   final Value<String> scheduleType;
   final Value<String> scheduleConfig;
+  final Value<double> intakeQuantity;
+  final Value<String> dosageForm;
+  final Value<String?> customDosageForm;
   final Value<DateTime?> startDate;
   final Value<DateTime?> endDate;
   final Value<String?> instructions;
@@ -1950,6 +2075,9 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
     this.medicationId = const Value.absent(),
     this.scheduleType = const Value.absent(),
     this.scheduleConfig = const Value.absent(),
+    this.intakeQuantity = const Value.absent(),
+    this.dosageForm = const Value.absent(),
+    this.customDosageForm = const Value.absent(),
     this.startDate = const Value.absent(),
     this.endDate = const Value.absent(),
     this.instructions = const Value.absent(),
@@ -1960,6 +2088,9 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
     required int medicationId,
     required String scheduleType,
     required String scheduleConfig,
+    this.intakeQuantity = const Value.absent(),
+    this.dosageForm = const Value.absent(),
+    this.customDosageForm = const Value.absent(),
     this.startDate = const Value.absent(),
     this.endDate = const Value.absent(),
     this.instructions = const Value.absent(),
@@ -1972,6 +2103,9 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
     Expression<int>? medicationId,
     Expression<String>? scheduleType,
     Expression<String>? scheduleConfig,
+    Expression<double>? intakeQuantity,
+    Expression<String>? dosageForm,
+    Expression<String>? customDosageForm,
     Expression<DateTime>? startDate,
     Expression<DateTime>? endDate,
     Expression<String>? instructions,
@@ -1982,6 +2116,9 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
       if (medicationId != null) 'medication_id': medicationId,
       if (scheduleType != null) 'schedule_type': scheduleType,
       if (scheduleConfig != null) 'schedule_config': scheduleConfig,
+      if (intakeQuantity != null) 'intake_quantity': intakeQuantity,
+      if (dosageForm != null) 'dosage_form': dosageForm,
+      if (customDosageForm != null) 'custom_dosage_form': customDosageForm,
       if (startDate != null) 'start_date': startDate,
       if (endDate != null) 'end_date': endDate,
       if (instructions != null) 'instructions': instructions,
@@ -1994,6 +2131,9 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
     Value<int>? medicationId,
     Value<String>? scheduleType,
     Value<String>? scheduleConfig,
+    Value<double>? intakeQuantity,
+    Value<String>? dosageForm,
+    Value<String?>? customDosageForm,
     Value<DateTime?>? startDate,
     Value<DateTime?>? endDate,
     Value<String?>? instructions,
@@ -2004,6 +2144,9 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
       medicationId: medicationId ?? this.medicationId,
       scheduleType: scheduleType ?? this.scheduleType,
       scheduleConfig: scheduleConfig ?? this.scheduleConfig,
+      intakeQuantity: intakeQuantity ?? this.intakeQuantity,
+      dosageForm: dosageForm ?? this.dosageForm,
+      customDosageForm: customDosageForm ?? this.customDosageForm,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       instructions: instructions ?? this.instructions,
@@ -2025,6 +2168,15 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
     }
     if (scheduleConfig.present) {
       map['schedule_config'] = Variable<String>(scheduleConfig.value);
+    }
+    if (intakeQuantity.present) {
+      map['intake_quantity'] = Variable<double>(intakeQuantity.value);
+    }
+    if (dosageForm.present) {
+      map['dosage_form'] = Variable<String>(dosageForm.value);
+    }
+    if (customDosageForm.present) {
+      map['custom_dosage_form'] = Variable<String>(customDosageForm.value);
     }
     if (startDate.present) {
       map['start_date'] = Variable<DateTime>(startDate.value);
@@ -2048,6 +2200,9 @@ class MedicationSchedulesCompanion extends UpdateCompanion<MedicationSchedule> {
           ..write('medicationId: $medicationId, ')
           ..write('scheduleType: $scheduleType, ')
           ..write('scheduleConfig: $scheduleConfig, ')
+          ..write('intakeQuantity: $intakeQuantity, ')
+          ..write('dosageForm: $dosageForm, ')
+          ..write('customDosageForm: $customDosageForm, ')
           ..write('startDate: $startDate, ')
           ..write('endDate: $endDate, ')
           ..write('instructions: $instructions, ')
@@ -2141,6 +2296,39 @@ class $MedicationLogsTable extends MedicationLogs
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _snapshotIntakeQuantityMeta =
+      const VerificationMeta('snapshotIntakeQuantity');
+  @override
+  late final GeneratedColumn<double> snapshotIntakeQuantity =
+      GeneratedColumn<double>(
+        'snapshot_intake_quantity',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _snapshotDosageFormMeta =
+      const VerificationMeta('snapshotDosageForm');
+  @override
+  late final GeneratedColumn<String> snapshotDosageForm =
+      GeneratedColumn<String>(
+        'snapshot_dosage_form',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _snapshotCustomDosageFormMeta =
+      const VerificationMeta('snapshotCustomDosageForm');
+  @override
+  late final GeneratedColumn<String> snapshotCustomDosageForm =
+      GeneratedColumn<String>(
+        'snapshot_custom_dosage_form',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2150,6 +2338,9 @@ class $MedicationLogsTable extends MedicationLogs
     status,
     notes,
     createdAt,
+    snapshotIntakeQuantity,
+    snapshotDosageForm,
+    snapshotCustomDosageForm,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2216,6 +2407,33 @@ class $MedicationLogsTable extends MedicationLogs
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('snapshot_intake_quantity')) {
+      context.handle(
+        _snapshotIntakeQuantityMeta,
+        snapshotIntakeQuantity.isAcceptableOrUnknown(
+          data['snapshot_intake_quantity']!,
+          _snapshotIntakeQuantityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('snapshot_dosage_form')) {
+      context.handle(
+        _snapshotDosageFormMeta,
+        snapshotDosageForm.isAcceptableOrUnknown(
+          data['snapshot_dosage_form']!,
+          _snapshotDosageFormMeta,
+        ),
+      );
+    }
+    if (data.containsKey('snapshot_custom_dosage_form')) {
+      context.handle(
+        _snapshotCustomDosageFormMeta,
+        snapshotCustomDosageForm.isAcceptableOrUnknown(
+          data['snapshot_custom_dosage_form']!,
+          _snapshotCustomDosageFormMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2253,6 +2471,18 @@ class $MedicationLogsTable extends MedicationLogs
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      snapshotIntakeQuantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}snapshot_intake_quantity'],
+      ),
+      snapshotDosageForm: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}snapshot_dosage_form'],
+      ),
+      snapshotCustomDosageForm: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}snapshot_custom_dosage_form'],
+      ),
     );
   }
 
@@ -2270,6 +2500,9 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
   final String status;
   final String? notes;
   final DateTime createdAt;
+  final double? snapshotIntakeQuantity;
+  final String? snapshotDosageForm;
+  final String? snapshotCustomDosageForm;
   const MedicationLog({
     required this.id,
     required this.medicationScheduleId,
@@ -2278,6 +2511,9 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
     required this.status,
     this.notes,
     required this.createdAt,
+    this.snapshotIntakeQuantity,
+    this.snapshotDosageForm,
+    this.snapshotCustomDosageForm,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2293,6 +2529,19 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
       map['notes'] = Variable<String>(notes);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || snapshotIntakeQuantity != null) {
+      map['snapshot_intake_quantity'] = Variable<double>(
+        snapshotIntakeQuantity,
+      );
+    }
+    if (!nullToAbsent || snapshotDosageForm != null) {
+      map['snapshot_dosage_form'] = Variable<String>(snapshotDosageForm);
+    }
+    if (!nullToAbsent || snapshotCustomDosageForm != null) {
+      map['snapshot_custom_dosage_form'] = Variable<String>(
+        snapshotCustomDosageForm,
+      );
+    }
     return map;
   }
 
@@ -2309,6 +2558,15 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
           ? const Value.absent()
           : Value(notes),
       createdAt: Value(createdAt),
+      snapshotIntakeQuantity: snapshotIntakeQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(snapshotIntakeQuantity),
+      snapshotDosageForm: snapshotDosageForm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(snapshotDosageForm),
+      snapshotCustomDosageForm: snapshotCustomDosageForm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(snapshotCustomDosageForm),
     );
   }
 
@@ -2327,6 +2585,15 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
       status: serializer.fromJson<String>(json['status']),
       notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      snapshotIntakeQuantity: serializer.fromJson<double?>(
+        json['snapshotIntakeQuantity'],
+      ),
+      snapshotDosageForm: serializer.fromJson<String?>(
+        json['snapshotDosageForm'],
+      ),
+      snapshotCustomDosageForm: serializer.fromJson<String?>(
+        json['snapshotCustomDosageForm'],
+      ),
     );
   }
   @override
@@ -2340,6 +2607,13 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
       'status': serializer.toJson<String>(status),
       'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'snapshotIntakeQuantity': serializer.toJson<double?>(
+        snapshotIntakeQuantity,
+      ),
+      'snapshotDosageForm': serializer.toJson<String?>(snapshotDosageForm),
+      'snapshotCustomDosageForm': serializer.toJson<String?>(
+        snapshotCustomDosageForm,
+      ),
     };
   }
 
@@ -2351,6 +2625,9 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
     String? status,
     Value<String?> notes = const Value.absent(),
     DateTime? createdAt,
+    Value<double?> snapshotIntakeQuantity = const Value.absent(),
+    Value<String?> snapshotDosageForm = const Value.absent(),
+    Value<String?> snapshotCustomDosageForm = const Value.absent(),
   }) => MedicationLog(
     id: id ?? this.id,
     medicationScheduleId: medicationScheduleId ?? this.medicationScheduleId,
@@ -2359,6 +2636,15 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
     status: status ?? this.status,
     notes: notes.present ? notes.value : this.notes,
     createdAt: createdAt ?? this.createdAt,
+    snapshotIntakeQuantity: snapshotIntakeQuantity.present
+        ? snapshotIntakeQuantity.value
+        : this.snapshotIntakeQuantity,
+    snapshotDosageForm: snapshotDosageForm.present
+        ? snapshotDosageForm.value
+        : this.snapshotDosageForm,
+    snapshotCustomDosageForm: snapshotCustomDosageForm.present
+        ? snapshotCustomDosageForm.value
+        : this.snapshotCustomDosageForm,
   );
   MedicationLog copyWithCompanion(MedicationLogsCompanion data) {
     return MedicationLog(
@@ -2373,6 +2659,15 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
       status: data.status.present ? data.status.value : this.status,
       notes: data.notes.present ? data.notes.value : this.notes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      snapshotIntakeQuantity: data.snapshotIntakeQuantity.present
+          ? data.snapshotIntakeQuantity.value
+          : this.snapshotIntakeQuantity,
+      snapshotDosageForm: data.snapshotDosageForm.present
+          ? data.snapshotDosageForm.value
+          : this.snapshotDosageForm,
+      snapshotCustomDosageForm: data.snapshotCustomDosageForm.present
+          ? data.snapshotCustomDosageForm.value
+          : this.snapshotCustomDosageForm,
     );
   }
 
@@ -2385,7 +2680,10 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
           ..write('takenTime: $takenTime, ')
           ..write('status: $status, ')
           ..write('notes: $notes, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('snapshotIntakeQuantity: $snapshotIntakeQuantity, ')
+          ..write('snapshotDosageForm: $snapshotDosageForm, ')
+          ..write('snapshotCustomDosageForm: $snapshotCustomDosageForm')
           ..write(')'))
         .toString();
   }
@@ -2399,6 +2697,9 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
     status,
     notes,
     createdAt,
+    snapshotIntakeQuantity,
+    snapshotDosageForm,
+    snapshotCustomDosageForm,
   );
   @override
   bool operator ==(Object other) =>
@@ -2410,7 +2711,10 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
           other.takenTime == this.takenTime &&
           other.status == this.status &&
           other.notes == this.notes &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.snapshotIntakeQuantity == this.snapshotIntakeQuantity &&
+          other.snapshotDosageForm == this.snapshotDosageForm &&
+          other.snapshotCustomDosageForm == this.snapshotCustomDosageForm);
 }
 
 class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
@@ -2421,6 +2725,9 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
   final Value<String> status;
   final Value<String?> notes;
   final Value<DateTime> createdAt;
+  final Value<double?> snapshotIntakeQuantity;
+  final Value<String?> snapshotDosageForm;
+  final Value<String?> snapshotCustomDosageForm;
   const MedicationLogsCompanion({
     this.id = const Value.absent(),
     this.medicationScheduleId = const Value.absent(),
@@ -2429,6 +2736,9 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     this.status = const Value.absent(),
     this.notes = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.snapshotIntakeQuantity = const Value.absent(),
+    this.snapshotDosageForm = const Value.absent(),
+    this.snapshotCustomDosageForm = const Value.absent(),
   });
   MedicationLogsCompanion.insert({
     this.id = const Value.absent(),
@@ -2438,6 +2748,9 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     required String status,
     this.notes = const Value.absent(),
     required DateTime createdAt,
+    this.snapshotIntakeQuantity = const Value.absent(),
+    this.snapshotDosageForm = const Value.absent(),
+    this.snapshotCustomDosageForm = const Value.absent(),
   }) : medicationScheduleId = Value(medicationScheduleId),
        scheduledTime = Value(scheduledTime),
        status = Value(status),
@@ -2450,6 +2763,9 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     Expression<String>? status,
     Expression<String>? notes,
     Expression<DateTime>? createdAt,
+    Expression<double>? snapshotIntakeQuantity,
+    Expression<String>? snapshotDosageForm,
+    Expression<String>? snapshotCustomDosageForm,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2460,6 +2776,12 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
       if (status != null) 'status': status,
       if (notes != null) 'notes': notes,
       if (createdAt != null) 'created_at': createdAt,
+      if (snapshotIntakeQuantity != null)
+        'snapshot_intake_quantity': snapshotIntakeQuantity,
+      if (snapshotDosageForm != null)
+        'snapshot_dosage_form': snapshotDosageForm,
+      if (snapshotCustomDosageForm != null)
+        'snapshot_custom_dosage_form': snapshotCustomDosageForm,
     });
   }
 
@@ -2471,6 +2793,9 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     Value<String>? status,
     Value<String?>? notes,
     Value<DateTime>? createdAt,
+    Value<double?>? snapshotIntakeQuantity,
+    Value<String?>? snapshotDosageForm,
+    Value<String?>? snapshotCustomDosageForm,
   }) {
     return MedicationLogsCompanion(
       id: id ?? this.id,
@@ -2480,6 +2805,11 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
       status: status ?? this.status,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
+      snapshotIntakeQuantity:
+          snapshotIntakeQuantity ?? this.snapshotIntakeQuantity,
+      snapshotDosageForm: snapshotDosageForm ?? this.snapshotDosageForm,
+      snapshotCustomDosageForm:
+          snapshotCustomDosageForm ?? this.snapshotCustomDosageForm,
     );
   }
 
@@ -2507,6 +2837,19 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (snapshotIntakeQuantity.present) {
+      map['snapshot_intake_quantity'] = Variable<double>(
+        snapshotIntakeQuantity.value,
+      );
+    }
+    if (snapshotDosageForm.present) {
+      map['snapshot_dosage_form'] = Variable<String>(snapshotDosageForm.value);
+    }
+    if (snapshotCustomDosageForm.present) {
+      map['snapshot_custom_dosage_form'] = Variable<String>(
+        snapshotCustomDosageForm.value,
+      );
+    }
     return map;
   }
 
@@ -2519,7 +2862,10 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
           ..write('takenTime: $takenTime, ')
           ..write('status: $status, ')
           ..write('notes: $notes, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('snapshotIntakeQuantity: $snapshotIntakeQuantity, ')
+          ..write('snapshotDosageForm: $snapshotDosageForm, ')
+          ..write('snapshotCustomDosageForm: $snapshotCustomDosageForm')
           ..write(')'))
         .toString();
   }
@@ -13934,6 +14280,9 @@ typedef $$MedicationSchedulesTableCreateCompanionBuilder =
       required int medicationId,
       required String scheduleType,
       required String scheduleConfig,
+      Value<double> intakeQuantity,
+      Value<String> dosageForm,
+      Value<String?> customDosageForm,
       Value<DateTime?> startDate,
       Value<DateTime?> endDate,
       Value<String?> instructions,
@@ -13945,6 +14294,9 @@ typedef $$MedicationSchedulesTableUpdateCompanionBuilder =
       Value<int> medicationId,
       Value<String> scheduleType,
       Value<String> scheduleConfig,
+      Value<double> intakeQuantity,
+      Value<String> dosageForm,
+      Value<String?> customDosageForm,
       Value<DateTime?> startDate,
       Value<DateTime?> endDate,
       Value<String?> instructions,
@@ -14023,6 +14375,21 @@ class $$MedicationSchedulesTableFilterComposer
 
   ColumnFilters<String> get scheduleConfig => $composableBuilder(
     column: $table.scheduleConfig,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get intakeQuantity => $composableBuilder(
+    column: $table.intakeQuantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dosageForm => $composableBuilder(
+    column: $table.dosageForm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get customDosageForm => $composableBuilder(
+    column: $table.customDosageForm,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -14119,6 +14486,21 @@ class $$MedicationSchedulesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get intakeQuantity => $composableBuilder(
+    column: $table.intakeQuantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dosageForm => $composableBuilder(
+    column: $table.dosageForm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get customDosageForm => $composableBuilder(
+    column: $table.customDosageForm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get startDate => $composableBuilder(
     column: $table.startDate,
     builder: (column) => ColumnOrderings(column),
@@ -14182,6 +14564,21 @@ class $$MedicationSchedulesTableAnnotationComposer
 
   GeneratedColumn<String> get scheduleConfig => $composableBuilder(
     column: $table.scheduleConfig,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get intakeQuantity => $composableBuilder(
+    column: $table.intakeQuantity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dosageForm => $composableBuilder(
+    column: $table.dosageForm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get customDosageForm => $composableBuilder(
+    column: $table.customDosageForm,
     builder: (column) => column,
   );
 
@@ -14288,6 +14685,9 @@ class $$MedicationSchedulesTableTableManager
                 Value<int> medicationId = const Value.absent(),
                 Value<String> scheduleType = const Value.absent(),
                 Value<String> scheduleConfig = const Value.absent(),
+                Value<double> intakeQuantity = const Value.absent(),
+                Value<String> dosageForm = const Value.absent(),
+                Value<String?> customDosageForm = const Value.absent(),
                 Value<DateTime?> startDate = const Value.absent(),
                 Value<DateTime?> endDate = const Value.absent(),
                 Value<String?> instructions = const Value.absent(),
@@ -14297,6 +14697,9 @@ class $$MedicationSchedulesTableTableManager
                 medicationId: medicationId,
                 scheduleType: scheduleType,
                 scheduleConfig: scheduleConfig,
+                intakeQuantity: intakeQuantity,
+                dosageForm: dosageForm,
+                customDosageForm: customDosageForm,
                 startDate: startDate,
                 endDate: endDate,
                 instructions: instructions,
@@ -14308,6 +14711,9 @@ class $$MedicationSchedulesTableTableManager
                 required int medicationId,
                 required String scheduleType,
                 required String scheduleConfig,
+                Value<double> intakeQuantity = const Value.absent(),
+                Value<String> dosageForm = const Value.absent(),
+                Value<String?> customDosageForm = const Value.absent(),
                 Value<DateTime?> startDate = const Value.absent(),
                 Value<DateTime?> endDate = const Value.absent(),
                 Value<String?> instructions = const Value.absent(),
@@ -14317,6 +14723,9 @@ class $$MedicationSchedulesTableTableManager
                 medicationId: medicationId,
                 scheduleType: scheduleType,
                 scheduleConfig: scheduleConfig,
+                intakeQuantity: intakeQuantity,
+                dosageForm: dosageForm,
+                customDosageForm: customDosageForm,
                 startDate: startDate,
                 endDate: endDate,
                 instructions: instructions,
@@ -14425,6 +14834,9 @@ typedef $$MedicationLogsTableCreateCompanionBuilder =
       required String status,
       Value<String?> notes,
       required DateTime createdAt,
+      Value<double?> snapshotIntakeQuantity,
+      Value<String?> snapshotDosageForm,
+      Value<String?> snapshotCustomDosageForm,
     });
 typedef $$MedicationLogsTableUpdateCompanionBuilder =
     MedicationLogsCompanion Function({
@@ -14435,6 +14847,9 @@ typedef $$MedicationLogsTableUpdateCompanionBuilder =
       Value<String> status,
       Value<String?> notes,
       Value<DateTime> createdAt,
+      Value<double?> snapshotIntakeQuantity,
+      Value<String?> snapshotDosageForm,
+      Value<String?> snapshotCustomDosageForm,
     });
 
 final class $$MedicationLogsTableReferences
@@ -14507,6 +14922,21 @@ class $$MedicationLogsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<double> get snapshotIntakeQuantity => $composableBuilder(
+    column: $table.snapshotIntakeQuantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get snapshotDosageForm => $composableBuilder(
+    column: $table.snapshotDosageForm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get snapshotCustomDosageForm => $composableBuilder(
+    column: $table.snapshotCustomDosageForm,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$MedicationSchedulesTableFilterComposer get medicationScheduleId {
     final $$MedicationSchedulesTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -14570,6 +15000,21 @@ class $$MedicationLogsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get snapshotIntakeQuantity => $composableBuilder(
+    column: $table.snapshotIntakeQuantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get snapshotDosageForm => $composableBuilder(
+    column: $table.snapshotDosageForm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get snapshotCustomDosageForm => $composableBuilder(
+    column: $table.snapshotCustomDosageForm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MedicationSchedulesTableOrderingComposer get medicationScheduleId {
     final $$MedicationSchedulesTableOrderingComposer composer =
         $composerBuilder(
@@ -14623,6 +15068,21 @@ class $$MedicationLogsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<double> get snapshotIntakeQuantity => $composableBuilder(
+    column: $table.snapshotIntakeQuantity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get snapshotDosageForm => $composableBuilder(
+    column: $table.snapshotDosageForm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get snapshotCustomDosageForm => $composableBuilder(
+    column: $table.snapshotCustomDosageForm,
+    builder: (column) => column,
+  );
 
   $$MedicationSchedulesTableAnnotationComposer get medicationScheduleId {
     final $$MedicationSchedulesTableAnnotationComposer composer =
@@ -14686,6 +15146,9 @@ class $$MedicationLogsTableTableManager
                 Value<String> status = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<double?> snapshotIntakeQuantity = const Value.absent(),
+                Value<String?> snapshotDosageForm = const Value.absent(),
+                Value<String?> snapshotCustomDosageForm = const Value.absent(),
               }) => MedicationLogsCompanion(
                 id: id,
                 medicationScheduleId: medicationScheduleId,
@@ -14694,6 +15157,9 @@ class $$MedicationLogsTableTableManager
                 status: status,
                 notes: notes,
                 createdAt: createdAt,
+                snapshotIntakeQuantity: snapshotIntakeQuantity,
+                snapshotDosageForm: snapshotDosageForm,
+                snapshotCustomDosageForm: snapshotCustomDosageForm,
               ),
           createCompanionCallback:
               ({
@@ -14704,6 +15170,9 @@ class $$MedicationLogsTableTableManager
                 required String status,
                 Value<String?> notes = const Value.absent(),
                 required DateTime createdAt,
+                Value<double?> snapshotIntakeQuantity = const Value.absent(),
+                Value<String?> snapshotDosageForm = const Value.absent(),
+                Value<String?> snapshotCustomDosageForm = const Value.absent(),
               }) => MedicationLogsCompanion.insert(
                 id: id,
                 medicationScheduleId: medicationScheduleId,
@@ -14712,6 +15181,9 @@ class $$MedicationLogsTableTableManager
                 status: status,
                 notes: notes,
                 createdAt: createdAt,
+                snapshotIntakeQuantity: snapshotIntakeQuantity,
+                snapshotDosageForm: snapshotDosageForm,
+                snapshotCustomDosageForm: snapshotCustomDosageForm,
               ),
           withReferenceMapper: (p0) => p0
               .map(

@@ -1,3 +1,4 @@
+import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 
 class Medication {
@@ -5,9 +6,7 @@ class Medication {
   final int profileId;
   final String name;
   final String? description;
-  /// @deprecated Use MedicationComponents table instead. Kept temporarily for migration compatibility.
   final String? doseAmount;
-  /// @deprecated Use MedicationComponents table instead. Kept temporarily for migration compatibility.
   final String? doseUnit;
   final bool active;
   final DateTime? startDate;
@@ -67,6 +66,9 @@ class MedicationSchedule {
   final int medicationId;
   final String scheduleType;
   final ScheduleConfig scheduleConfig;
+  final double intakeQuantity;
+  final DosageForm dosageForm;
+  final String? customDosageForm;
   final DateTime? startDate;
   final DateTime? endDate;
   final String? instructions;
@@ -77,6 +79,9 @@ class MedicationSchedule {
     required this.medicationId,
     required this.scheduleType,
     required this.scheduleConfig,
+    required this.intakeQuantity,
+    required this.dosageForm,
+    this.customDosageForm,
     this.startDate,
     this.endDate,
     this.instructions,
@@ -88,9 +93,15 @@ class MedicationSchedule {
     int? medicationId,
     String? scheduleType,
     ScheduleConfig? scheduleConfig,
+    double? intakeQuantity,
+    DosageForm? dosageForm,
+    String? customDosageForm,
+    bool clearCustomDosageForm = false,
     DateTime? startDate,
     DateTime? endDate,
+    bool clearEndDate = false,
     String? instructions,
+    bool clearInstructions = false,
     bool? active,
   }) {
     return MedicationSchedule(
@@ -98,12 +109,17 @@ class MedicationSchedule {
       medicationId: medicationId ?? this.medicationId,
       scheduleType: scheduleType ?? this.scheduleType,
       scheduleConfig: scheduleConfig ?? this.scheduleConfig,
+      intakeQuantity: intakeQuantity ?? this.intakeQuantity,
+      dosageForm: dosageForm ?? this.dosageForm,
+      customDosageForm:
+          clearCustomDosageForm ? null : (customDosageForm ?? this.customDosageForm),
       startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      instructions: instructions ?? this.instructions,
+      endDate: clearEndDate ? null : (endDate ?? this.endDate),
+      instructions: clearInstructions ? null : (instructions ?? this.instructions),
       active: active ?? this.active,
     );
   }
+
 }
 
 class MedicationLog {
@@ -114,6 +130,9 @@ class MedicationLog {
   final String status;
   final String? notes;
   final DateTime createdAt;
+  final double? snapshotIntakeQuantity;
+  final DosageForm? snapshotDosageForm;
+  final String? snapshotCustomDosageForm;
 
   const MedicationLog({
     this.id,
@@ -123,6 +142,9 @@ class MedicationLog {
     required this.status,
     this.notes,
     required this.createdAt,
+    this.snapshotIntakeQuantity,
+    this.snapshotDosageForm,
+    this.snapshotCustomDosageForm,
   });
 
   MedicationLog copyWith({
@@ -133,6 +155,9 @@ class MedicationLog {
     String? status,
     String? notes,
     DateTime? createdAt,
+    double? snapshotIntakeQuantity,
+    DosageForm? snapshotDosageForm,
+    String? snapshotCustomDosageForm,
   }) {
     return MedicationLog(
       id: id ?? this.id,
@@ -143,6 +168,12 @@ class MedicationLog {
       status: status ?? this.status,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
+      snapshotIntakeQuantity:
+          snapshotIntakeQuantity ?? this.snapshotIntakeQuantity,
+      snapshotDosageForm:
+          snapshotDosageForm ?? this.snapshotDosageForm,
+      snapshotCustomDosageForm:
+          snapshotCustomDosageForm ?? this.snapshotCustomDosageForm,
     );
   }
 }

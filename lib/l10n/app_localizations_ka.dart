@@ -135,7 +135,14 @@ class AppLocalizationsKa extends AppLocalizations {
   String get dailySchedule => 'ყოველდღიური';
 
   @override
-  String get fixedTimesSchedule => 'ფიქსირებული დრო';
+  String get dailyScheduleDescription => 'მიიღეთ მითითებულ დროს ყოველდღიურად';
+
+  @override
+  String get everyNDaysSchedule => 'ყოველ N დღეში';
+
+  @override
+  String get everyNDaysScheduleDescription =>
+      'მიიღეთ მითითებულ დროს ყოველ N დღეში';
 
   @override
   String get intervalSchedule => 'ინტერვალი დღეებში';
@@ -207,19 +214,66 @@ class AppLocalizationsKa extends AppLocalizations {
   String get editSchedule => 'გრაფიკის რედაქტირება';
 
   @override
-  String dailyAt(String time) {
-    return 'ყოველდღიურად $time';
+  String dailyAt(String times) {
+    return 'ყოველდღიურად $times';
   }
 
   @override
-  String fixedTimes(String times) {
-    return 'ფიქსირებული დრო: $times';
+  String everyNDays(int count, String times) {
+    return 'ყოველ $count დღეში $times';
   }
 
   @override
-  String everyNDays(int count, String time) {
-    return 'ყოველ $count დღეში $time';
-  }
+  String get intakeQuantity => 'მიღების რაოდენობა';
+
+  @override
+  String get perIntake => 'მიღებაზე';
+
+  @override
+  String get dosageForm => 'დოზის ფორმა';
+
+  @override
+  String get tablet => 'აბი';
+
+  @override
+  String get capsule => 'კაფსულა';
+
+  @override
+  String get drop => 'წვეთი';
+
+  @override
+  String get ml => 'მლ';
+
+  @override
+  String get puff => 'შესხურება';
+
+  @override
+  String get unit => 'ერთეული';
+
+  @override
+  String get sachet => 'პაკეტი';
+
+  @override
+  String get spoon => 'კოვზი';
+
+  @override
+  String get injection => 'ინექცია';
+
+  @override
+  String get topical => 'წასმა';
+
+  @override
+  String get other => 'სხვა';
+
+  @override
+  String get customDosageForm => 'მორგებული დოზის ფორმის სახელი';
+
+  @override
+  String get customDosageFormRequired =>
+      'მორგებული დოზის ფორმის სახელი საჭიროა';
+
+  @override
+  String get invalidIntakeQuantity => 'შეიყვანეთ სწორი მიღების რაოდენობა';
 
   @override
   String get beforeMeal => 'ჭამამდე';
@@ -488,7 +542,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get weight => 'წონა';
 
   @override
-  String get bloodGlucose => 'სისხლში შაქარი';
+  String get bloodGlucose => 'გლუკოზა სისხლში';
 
   @override
   String get spo2 => 'SpO2';
@@ -501,9 +555,6 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get fieldName => 'ველის სახელი';
-
-  @override
-  String get unit => 'ერთეული';
 
   @override
   String get requiredField => 'სავალდებულო';

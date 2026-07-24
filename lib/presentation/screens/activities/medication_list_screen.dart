@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
@@ -46,7 +47,7 @@ class MedicationListScreen extends ConsumerWidget {
               title: l10n.noMedicationsYet,
               subtitle: l10n.addFirstMedication,
               actionLabel: l10n.addMedication,
-              onAction: () => context.push('/activities/medication/add'),
+              onAction: () => context.push(AppRoutes.medicationAdd),
             );
           }
 
@@ -58,7 +59,7 @@ class MedicationListScreen extends ConsumerWidget {
               return MedicationCard(
                 medication: medication,
                 onTap: () => context.push(
-                  '/activities/medication/${medication.id}',
+                  AppRoutes.medicationDetail(medication.id!),
                 ),
               );
             },
@@ -66,7 +67,7 @@ class MedicationListScreen extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/activities/medication/add'),
+        onPressed: () => context.push(AppRoutes.medicationAdd),
         child: const Icon(Icons.add),
       ),
     );

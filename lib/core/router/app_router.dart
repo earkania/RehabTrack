@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/presentation/screens/today/today_screen.dart';
 import 'package:rehab_track/presentation/screens/health/health_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/medication_list_screen.dart';
@@ -27,6 +28,9 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
+    redirect: (context, state) {
+      return RouteRedirector.redirect(state.uri.toString());
+    },
     routes: [
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
@@ -35,31 +39,31 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
         routes: [
           GoRoute(
-            path: '/',
+            path: AppRoutes.home,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: TodayScreen(),
             ),
           ),
           GoRoute(
-            path: '/health',
+            path: AppRoutes.measurements,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: HealthScreen(),
             ),
           ),
           GoRoute(
-            path: '/activities',
+            path: AppRoutes.medications,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: MedicationListScreen(),
             ),
           ),
           GoRoute(
-            path: '/records',
+            path: AppRoutes.records,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: RecordsScreen(),
             ),
           ),
           GoRoute(
-            path: '/settings',
+            path: AppRoutes.settings,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: SettingsScreen(),
             ),
@@ -67,11 +71,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
-        path: '/activities/medication/add',
+        path: AppRoutes.medicationAdd,
         builder: (context, state) => const AddMedicationScreen(),
       ),
       GoRoute(
-        path: '/activities/medication/:id',
+        path: '/medications/medication/:id',
         builder: (context, state) {
           final id = int.tryParse(state.pathParameters['id'] ?? '');
           if (id == null) {
@@ -81,7 +85,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/activities/medication/:id/history',
+        path: '/medications/medication/:id/history',
         builder: (context, state) {
           final id = int.tryParse(state.pathParameters['id'] ?? '');
           if (id == null) {
@@ -91,7 +95,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/activities/medication/:id/edit',
+        path: '/medications/medication/:id/edit',
         builder: (context, state) {
           final id = int.tryParse(state.pathParameters['id'] ?? '');
           if (id == null) {
@@ -101,7 +105,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/activities/medication/:id/schedule/add',
+        path: '/medications/medication/:id/schedule/add',
         builder: (context, state) {
           final medicationId = int.tryParse(state.pathParameters['id'] ?? '');
           if (medicationId == null) {
@@ -111,7 +115,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/activities/medication/:id/schedule/:scheduleId/edit',
+        path: '/medications/medication/:id/schedule/:scheduleId/edit',
         builder: (context, state) {
           final medicationId = int.tryParse(state.pathParameters['id'] ?? '');
           final scheduleId =
@@ -126,7 +130,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/activities/medication/:id/alternative/add',
+        path: '/medications/medication/:id/alternative/add',
         builder: (context, state) {
           final medicationId = int.tryParse(state.pathParameters['id'] ?? '');
           if (medicationId == null) {
@@ -136,7 +140,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/activities/medication/:id/alternative/:alternativeId/edit',
+        path: '/medications/medication/:id/alternative/:alternativeId/edit',
         builder: (context, state) {
           final medicationId = int.tryParse(state.pathParameters['id'] ?? '');
           final alternativeId =
@@ -151,7 +155,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/health/measurement/:typeId/add',
+        path: '/measurements/measurement/:typeId/add',
         builder: (context, state) {
           final typeId =
               int.tryParse(state.pathParameters['typeId'] ?? '');
@@ -162,7 +166,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/health/measurement/:typeId/history',
+        path: '/measurements/measurement/:typeId/history',
         builder: (context, state) {
           final typeId =
               int.tryParse(state.pathParameters['typeId'] ?? '');
@@ -173,7 +177,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/health/measurement/record/:recordId/edit',
+        path: '/measurements/measurement/record/:recordId/edit',
         builder: (context, state) {
           final recordId =
               int.tryParse(state.pathParameters['recordId'] ?? '');
@@ -228,8 +232,8 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/health')) return 1;
-    if (location.startsWith('/activities')) return 2;
+    if (location.startsWith('/measurements')) return 1;
+    if (location.startsWith('/medications')) return 2;
     if (location.startsWith('/records')) return 3;
     if (location.startsWith('/settings')) return 4;
     return 0;
@@ -238,15 +242,15 @@ class ScaffoldWithNavBar extends StatelessWidget {
   void _onItemTapped(BuildContext context, int index) {
     switch (index) {
       case 0:
-        context.go('/');
+        context.go(AppRoutes.home);
       case 1:
-        context.go('/health');
+        context.go(AppRoutes.measurements);
       case 2:
-        context.go('/activities');
+        context.go(AppRoutes.medications);
       case 3:
-        context.go('/records');
+        context.go(AppRoutes.records);
       case 4:
-        context.go('/settings');
+        context.go(AppRoutes.settings);
     }
   }
 
