@@ -344,9 +344,6 @@ class AppLocalizationsKa extends AppLocalizations {
   String get historySection => 'ისტორია და მიყოლა';
 
   @override
-  String get viewHistory => 'ისტორიის ნახვა';
-
-  @override
   String get historyScreenTitle => 'მედიკამენტის ისტორია';
 
   @override
@@ -444,4 +441,139 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get componentNameOptional => 'კომპონენტის სახელი (სურვილისამებრ)';
+
+  @override
+  String get measurements => 'გაზომვები';
+
+  @override
+  String get measurementTypes => 'გაზომვის ტიპები';
+
+  @override
+  String get addMeasurement => 'გაზომვის დამატება';
+
+  @override
+  String get editMeasurement => 'გაზომვის რედაქტირება';
+
+  @override
+  String get measurementHistory => 'გაზომვის ისტორია';
+
+  @override
+  String get measuredAt => 'გაზომილია';
+
+  @override
+  String get latestReading => 'უახლესი ჩანაწერი';
+
+  @override
+  String get noMeasurementsYet => 'გაზომვის ტიპები ჯერ არ არის';
+
+  @override
+  String get noReadingsYet => 'ჩანაწერები ჯერ არ არის';
+
+  @override
+  String get addFirstReading => 'დაამატეთ პირველი ჩანაწერი';
+
+  @override
+  String get bloodPressure => 'არტერიული წნევა';
+
+  @override
+  String get systolic => 'სისტოლური';
+
+  @override
+  String get diastolic => 'დიასტოლური';
+
+  @override
+  String get pulse => 'პულსი';
+
+  @override
+  String get weight => 'წონა';
+
+  @override
+  String get bloodGlucose => 'სისხლში შაქარი';
+
+  @override
+  String get spo2 => 'SpO2';
+
+  @override
+  String get temperature => 'ტემპერატურა';
+
+  @override
+  String get pulseLabel => 'პულსი';
+
+  @override
+  String get fieldName => 'ველის სახელი';
+
+  @override
+  String get unit => 'ერთეული';
+
+  @override
+  String get requiredField => 'სავალდებულო';
+
+  @override
+  String get minimumValue => 'მინიმალური მნიშვნელობა';
+
+  @override
+  String get maximumValue => 'მაქსიმალური მნიშვნელობა';
+
+  @override
+  String get invalidMeasurementValue => 'არასწორი გაზომვის მნიშვნელობა';
+
+  @override
+  String get failedToSaveMeasurement => 'გაზომვის შენახვა ვერ მოხერხდა';
+
+  @override
+  String get measurementAdded => 'გაზომვა დაემატა';
+
+  @override
+  String get measurementUpdated => 'გაზომვა განახლდა';
+
+  @override
+  String get measurementDeleted => 'გაზომვა წაიშალა';
+
+  @override
+  String get confirmDeleteMeasurement =>
+      'დარწმუნებული ხართ, რომ გსურთ ამ ჩანაწერის წაშლა?';
+
+  @override
+  String get readingSaved => 'ჩანაწერი შეინახა';
+
+  @override
+  String get readingUpdated => 'ჩანაწერი განახლდა';
+
+  @override
+  String get readingDeleted => 'ჩანაწერი წაიშალა';
+
+  @override
+  String get noMeasurementsHistory => 'ისტორია ჯერ არ არის';
+
+  @override
+  String get noMeasurementsHistoryDescription =>
+      'თქვენი გაზომვების ისტორია აქ გამოჩნდება';
+
+  @override
+  String get measurementValue => 'მნიშვნელობა';
+
+  @override
+  String get measurementUnit => 'ერთეული';
+
+  @override
+  String get selectMeasurementType => 'აირჩიეთ გაზომვის ტიპი';
+
+  @override
+  String get addReading => 'ჩანაწერის დამატება';
+
+  @override
+  String get addReadingTooltip => 'ჩანაწერის დამატება';
+
+  @override
+  String get viewHistory => 'ისტორიის ნახვა';
+
+  @override
+  String get valueRequired => 'მნიშვნელობა საჭიროა';
+
+  @override
+  String get mustBePositive => 'მნიშვნელობა უნდა იყოს დადებითი';
+
+  @override
+  String get systolicGreaterThanDiastolic =>
+      'სისტოლური უნდა აღემატებოდეს დიასტოლურს';
 }

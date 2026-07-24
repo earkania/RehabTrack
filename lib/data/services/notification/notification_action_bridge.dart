@@ -13,12 +13,10 @@ import 'package:rehab_track/presentation/utils/dose_formatter.dart';
 
 class NotificationActionBridge {
   NotificationActionBridge({
-    required NotificationService notificationService,
+    required this._notificationService,
     required ScheduleRecoveryService scheduleRecoveryService,
-    required MedicationRepository medicationRepository,
-  })  : _notificationService = notificationService,
-        _scheduleRecoveryService = scheduleRecoveryService,
-        _medicationRepository = medicationRepository;
+    required this._medicationRepository,
+  })  : _scheduleRecoveryService = scheduleRecoveryService;
 
   final NotificationService _notificationService;
   final ScheduleRecoveryService _scheduleRecoveryService;

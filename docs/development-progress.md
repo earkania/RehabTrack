@@ -492,345 +492,38 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - No notification service access from UI
 - All CRUD operations go through `MedicationRepository`
 
-## Next Planned Phase
-
-### Phase 4B — Step 4: Medication Alternatives
+### Phase 4 — Medication Module: Complete
 
 **Status:** Completed
 
-**What was done:**
-
-**Providers Added (`medication_provider.dart`):**
-- `medicationAlternativesProvider(medicationId)` — `StreamProvider.autoDispose.family<List<MedicationAlternative>, int>` for alternatives list
-- `medicationAlternativeProvider(alternativeId)` — `FutureProvider.autoDispose.family<MedicationAlternative?, int>` for single alternative lookup
-
-**Routing Updated (`app_router.dart`):**
-- Added `/activities/medication/:id/alternative/add` route
-- Added `/activities/medication/:id/alternative/:alternativeId/edit` route
-- Routes parse both `id` and `alternativeId` parameters with `int.tryParse`
-- Invalid IDs show `_InvalidRouteScreen`
-- New imports for `AddAlternativeScreen` and `EditAlternativeScreen`
-
-**MedicationAlternativeCard Widget (`medication_alternative_card.dart`):**
-- Displays alternative name, dose (e.g., "5 mg"), doctor approved badge, notes preview
-- Reusable across list views and detail screens
-- Optional `onTap` callback for navigation
-
-**MedicationAlternativeForm Widget (`medication_alternative_form.dart`):**
-- Shared form for both add and edit screens
-- Fields: name (required), dose amount (optional, numeric), dose unit (optional), doctor approved (switch), notes (optional)
-- Validation: name required, dose must be positive when entered
-- `MedicationAlternativeFormData` data class with `fromAlternative` factory
-- Trims whitespace on save
-
-**AddAlternativeScreen (`add_alternative_screen.dart`):**
-- `ConsumerStatefulWidget` using shared form
-- Verifies medication exists before save
-- Saves through `MedicationRepository.createAlternative()`
-- Returns to MedicationDetailScreen after success
-
-**EditAlternativeScreen (`edit_alternative_screen.dart`):**
-- Loads alternative using `medicationAlternativeProvider`
-- Verifies alternative belongs to medication via `medicationId` check
-- Saves through `MedicationRepository.updateAlternative()`
-- Delete action in AppBar with confirmation dialog
-- Delete through `MedicationRepository.deleteAlternative()`
-
-**MedicationDetailScreen Updated:**
-- Added `medicationAlternativesProvider(medicationId)` watch
-- Alternatives section with "Add Alternative" button (only for active medications)
-- Uses `MedicationAlternativeCard` for each alternative
-- Uses `EmptyState` widget when no alternatives exist
-- Tapping a card navigates to EditAlternativeScreen
-- Delete does not affect Medication, MedicationSchedule, or MedicationLog
-
-**Localization Keys Added:**
-- `editAlternative`, `deleteAlternative`, `deleteAlternativeConfirmation`
-- `alternativeAdded`, `alternativeUpdated`, `alternativeDeleted`
-- `noAlternatives`, `noAlternativesDescription`, `alternativesSection`
-- `genericSubstitute`, `confirmDeleteAlternative`
-- Added to both `app_en.arb` and `app_ka.arb`
-- Fixed duplicate `noSchedulesYet` key in both ARB files
-
-**Files Created:**
-- `lib/presentation/widgets/medication/medication_alternative_card.dart`
-- `lib/presentation/widgets/medication/medication_alternative_form.dart`
-- `lib/presentation/screens/activities/add_alternative_screen.dart`
-- `lib/presentation/screens/activities/edit_alternative_screen.dart`
-- `test/alternative_test.dart`
-
-**Files Modified:**
-- `lib/presentation/providers/medication_provider.dart`
-- `lib/core/router/app_router.dart`
-- `lib/presentation/screens/activities/medication_detail_screen.dart`
-- `lib/l10n/app_en.arb`
-- `lib/l10n/app_ka.arb`
-- `test/schedule_test.dart` (fixed unused variable warning)
-
-**Tests:**
-- 14 widget tests covering MedicationAlternativeCard, MedicationAlternativeForm, and data classes
-- Tests: rendering name, dose, doctor approved badge, notes preview, onTap callback
-- Tests: form validation (empty name, invalid dose), save with valid data, pre-populate fields, trim whitespace
-- Tests: `fromAlternative` factory with all fields and with null optional fields
-
-**Validation Results:**
-| Check | Result |
-|---|---|
-| `flutter gen-l10n` | Completed successfully |
-| `flutter analyze` | Passed (0 issues) |
-| `flutter test` | Passed (39/39) |
-
-**Architecture Verification:**
-- All CRUD operations go through `MedicationRepository`
-- No direct DAO access from presentation layer
-- No notification service access from presentation layer
-- Delete does not affect medication, schedules, or logs
-- Shared form widget used for both add and edit screens
-
-**Validation Rules:**
-- Name: required, trimmed
-- Dose Amount: optional, must be positive when entered
-- Dose Unit: optional, free text
-- Doctor Approved: boolean switch, defaults to false
-- Notes: optional, trimmed
-
-**Known Limitations:**
-- No medication interaction checking (by design — deferred)
-- No automatic alternative suggestions (by design — user-entered only)
-
-### Phase 4B — Step 5: Medication History & Adherence
-
-**Status:** Completed
-
-**What was done:**
-
-**HistoryPeriod Domain Entity:**
-- Created `lib/domain/entities/history_period.dart` — enum: `last7Days`, `last30Days`, `allTime`
-
-**Providers Added (`medication_provider.dart`):**
-- `medicationAllLogsProvider(scheduleId)` — `StreamProvider.autoDispose.family` for all logs of a schedule
-- `medicationAdherenceStatsProvider(scheduleId)` — computes `AdherenceStats` from logs
-
-**StatusChip Widget (`status_chip.dart`):**
-- Material 3 chip showing medication log status (taken/skipped/missed/pending)
-- Color-coded by status, reusable across screens
-
-**MedicationHistoryScreen (`medication_history_screen.dart`):**
-- Period selector (last 7 days, last 30 days, all time)
-- Adherence summary with percentage and counts
-- Log list with `StatusChip` for each entry
-- Manual dose logging dialog
-
-**MedicationDetailScreen Updated:**
-- Added history section with preview and navigation button
-- `/activities/medication/:id/history` route added
-
-**Localization Keys Added:**
-- 15 keys each for English and Georgian (history labels, status text, period options)
-
-**Files Created:**
-- `lib/domain/entities/history_period.dart`
-- `lib/presentation/widgets/medication/status_chip.dart`
-- `lib/presentation/screens/activities/medication_history_screen.dart`
-
-**Files Modified:**
-- `lib/presentation/providers/medication_provider.dart`
-- `lib/presentation/screens/activities/medication_detail_screen.dart`
-- `lib/core/router/app_router.dart`
-- `lib/l10n/app_en.arb`, `lib/l10n/app_ka.arb`
-
-**Tests:**
-- 12 tests covering HistoryPeriod, StatusChip rendering, adherence stats computation
-
-**Validation Results:**
-| Check | Result |
-|---|---|
-| `flutter analyze` | Passed (0 issues) |
-| `flutter test` | Passed (51/51) |
-
-### Phase 4B — Step 6: Notification Action Integration
-
-**Status:** Completed
-
-**What was done:**
-
-**NotificationActionBridge (`notification_action_bridge.dart`):**
-- Connects notification infrastructure to medication module
-- `initialize(profileId)` — registers action callback, runs schedule recovery
-- Action handlers: `Taken` (logs dose), `Skipped` (logs skipped), `Snooze` (reschedules 10 min)
-- Static helpers: `parsePayload`, `computeNotificationIds`, `buildNotificationBody`
-- Recovery: builds `ScheduleRecoveryEntry` list from active medications/schedules
-
-**Providers Added (`notification_provider.dart`):**
-- `notificationInitializerProvider` — eagerly initializes bridge and runs recovery at startup
-
-**Startup Initialization (`main.dart`):**
-- `ProviderContainer` reads `notificationInitializerProvider` before `runApp`
-- Ensures notification callbacks registered before any notification can be received
-
-**Action Flow:**
-1. User taps notification action → `NotificationService` receives platform callback
-2. Bridge `_handleAction` parses payload, dispatches to handler
-3. Taken/Skip: creates `MedicationLog` with appropriate status
-4. Snooze: fetches schedule/medication, reschedules notification for +10 minutes
-
-**Schedule Recovery:**
-- On app startup, bridge loads all active medications and schedules
-- Builds `ScheduleRecoveryEntry` list with correct notification IDs per schedule type
-- `ScheduleRecoveryService.recoverAllSchedules` restores missing notifications
-
-**Files Created:**
-- `lib/data/services/notification/notification_action_bridge.dart`
-- `test/notification_action_bridge_test.dart`
-
-**Files Modified:**
-- `lib/presentation/providers/notification_provider.dart`
-- `lib/main.dart`
-
-**Tests:**
-- 22 tests covering payload parsing, notification ID computation, notification body building, action handlers (taken/skipped/snooze), schedule recovery
-
-**Validation Results:**
-| Check | Result |
-|---|---|
-| `flutter analyze` | Passed (3 info lints — private field initializing formals) |
-| `flutter test` | Passed (73/73) |
-
-**Architecture Verification:**
-- Bridge uses `MedicationRepository` (not DAOs) for all data access
-- `NotificationActionCallback` typedef followed
-- No UI dependency in bridge
-- Provider-based initialization follows existing patterns
-
-### Phase 4B — Step 7: Code Cleanup & Form Validation
-
-**Status:** Completed
-
-**What was done:**
-
-- Extracted `DoseFormatter` utility (`lib/presentation/utils/dose_formatter.dart`) — replaced 4 duplicate `_formatDose` methods
-- Extracted `DateField` widget (`lib/presentation/widgets/common/date_field.dart`) — replaced 2 duplicate `_DateField` classes
-- Fixed `edit_schedule_screen.dart:89` wrong snackbar: "Medication Updated" → "Schedule Updated"
-- Added empty-schedule guard in `medication_history_screen.dart` with user-facing snackbar
-- Fixed form validators: name validators now use `l10n.nameRequired`, dose validators use `l10n.invalidDose`
-- Fixed date validation error text from raw `${l10n.endDate} >= ${l10n.startDate}` to `l10n.endDateBeforeStartDate`
-- Added 5 l10n keys: `nameRequired`, `invalidDose`, `endDateBeforeStartDate`, `scheduleUpdated`, `noSchedulesAvailable` (en + ka)
-
-**Tests:** 87/87 passing (73→87)
-
-### Phase 4C — Multi-Component Medication Dosage
-
-**Status:** Completed
-
-**What was done:**
-
-Replaced single-dose UI model with structured medication components supporting both single and multi-component medications (e.g., Tripliksam 10/2.5/10 mg).
-
-**Database Layer:**
-- Schema version: 2 → 3
-- New tables: `MedicationComponents`, `MedicationAlternativeComponents`
-- Migration v2→v3: creates new tables and migrates existing dose data into component rows
-- Legacy `doseAmount`/`doseUnit` columns preserved (deprecated) for backward compatibility
-- New DAOs: `MedicationComponentsDao`, `MedicationAlternativeComponentsDao` with CRUD + `replaceAllComponents` for atomic swap
-- `AppDatabase` updated with new DAOs, tables, and migration strategy
-
-**Domain Layer:**
-- New entities: `MedicationComponent`, `MedicationAlternativeComponent`
-- Legacy dose fields marked with `@deprecated` comments in `Medication` and `MedicationAlternative`
-
-**Repository Layer:**
-- `MedicationRepository` interface extended with 6 new methods:
-  - `watchComponents`, `getComponents`, `replaceMedicationComponents`
-  - `watchAlternativeComponents`, `getAlternativeComponents`, `replaceAlternativeComponents`
-- `MedicationRepositoryImpl` implements all new methods with domain converters
-- Notification body builder now uses components when available, falls back to legacy dose
-
-**Presentation Layer:**
-- New `ComponentFormatter` utility (`lib/presentation/utils/component_formatter.dart`) — compact dosage formatting (e.g., "10 mg/2.5 mg/10 mg")
-- New `MedicationComponentsForm` widget (`lib/presentation/widgets/medication/medication_components_form.dart`) — reusable component editor with add/remove/dose validation, supports both medication and alternative modes
-- `MedicationForm` updated: replaced dose/doseUnit fields with `MedicationComponentsForm.forMedication`
-- `MedicationAlternativeForm` updated: replaced dose/doseUnit fields with `MedicationComponentsForm.forAlternative`
-- `MedicationCard` converted to `ConsumerWidget` — reads components from provider for dose display
-- `MedicationAlternativeCard` converted to `ConsumerWidget` — reads components from provider
-- `MedicationDetailScreen` shows component-based dose via `_ComponentsSection` widget
-- All 4 create/edit screens (add/edit medication, add/edit alternative) updated to save/replace components
-- New `AppSpacing` widget for consistent spacing constants
-- New providers: `medicationComponentsProvider`, `medicationAlternativeComponentsProvider`
-
-**Localization:**
-- 3 new l10n keys: `dosageComponents`, `addComponent`, `removeComponent` (en + ka)
-
-**Files Created:**
-- `lib/domain/entities/medication_component.dart`
-- `lib/domain/entities/medication_alternative_component.dart`
-- `lib/data/database/daos/medication_components_dao.dart`
-- `lib/data/database/daos/medication_alternative_components_dao.dart`
-- `lib/presentation/utils/component_formatter.dart`
-- `lib/presentation/widgets/medication/medication_components_form.dart`
-- `lib/presentation/theme/app_spacing.dart`
-- `test/component_formatter_test.dart`
-
-**Files Modified:**
-- `lib/data/database/tables/medication_tables.dart`
-- `lib/data/database/app_database.dart`
-- `lib/domain/entities/medication.dart`
-- `lib/domain/entities/medication_alternative.dart`
-- `lib/domain/repositories/medication_repository.dart`
-- `lib/data/repositories/medication_repository_impl.dart`
-- `lib/presentation/providers/medication_provider.dart`
-- `lib/presentation/widgets/medication/medication_form.dart`
-- `lib/presentation/widgets/medication/medication_alternative_form.dart`
-- `lib/presentation/widgets/medication/medication_card.dart`
-- `lib/presentation/widgets/medication/medication_alternative_card.dart`
-- `lib/presentation/screens/activities/medication_detail_screen.dart`
-- `lib/presentation/screens/activities/add_medication_screen.dart`
-- `lib/presentation/screens/activities/edit_medication_screen.dart`
-- `lib/presentation/screens/activities/add_alternative_screen.dart`
-- `lib/presentation/screens/activities/edit_alternative_screen.dart`
-- `lib/l10n/app_en.arb`, `lib/l10n/app_ka.arb`
-- `test/widget_test.dart`, `test/alternative_test.dart`, `test/notification_action_bridge_test.dart`
-
-**Validation Results:**
-| Check | Result |
-|---|---|
-| `flutter analyze` | Passed (3 info lints — pre-existing notification_action_bridge field init) |
-| `flutter test` | Passed (92/92) |
-
-### Phase 4C — Dosage Component Layout Improvement
-
-**Status:** Completed
-
-**What was done:**
-
-Improved the `MedicationComponentsForm` layout so each component row is more visually natural: component name appears on top, dose amount and dose unit appear on the row below with the delete action.
-
-**Layout Change:**
-
-Before:
-```
-[Dose Amount] [Dose Unit] [Delete]
-Component Name (optional)
-```
-
-After:
-```
-Component Name (optional)
-[Dose Amount] [Dose Unit] [Delete]
-```
-
-**Responsive Layout:**
-- Dose amount and dose unit use `Expanded` (flex: 1) for equal flexible widths on narrow screens
-- Header "Dosage Components" title uses `Flexible` to prevent overflow on320px-wide screens
-- Verified no overflow on a320px-wide simulated screen (Pixel 7 test width)
-
-**Files Modified:**
-- `lib/presentation/widgets/medication/medication_components_form.dart` — reordered fields in `_buildComponentRow`, added `Flexible` to header title
-- `test/medication_components_form_test.dart` — added 3 layout ordering tests, updated field index references in existing tests
-
-**Tests Added:**
-- `component name field appears above dose fields` — verifies Y-position ordering
-- `does not overflow on a narrow screen (320px)` — verifies no RenderFlex overflow with 2 named components
-- `alternative form uses same layout` — verifies Y-position ordering for alternative mode
+**Sub-phases:**
+
+| Sub-phase | Description | Status |
+|---|---|---|
+| 4A | Medication data layer (schema v2, alternatives table, entities) | Completed |
+| 4B Step 1 | Foundation (adherence stats, active profile, empty state, l10n) | Completed |
+| 4B Step 2 | Medication CRUD (routing, providers, screens, form, card) | Completed |
+| 4B Step 3 | Medication schedules (CRUD, notification scheduling) | Completed |
+| 4B Step 4 | Medication alternatives (CRUD, cards, forms) | Completed |
+| 4B Step 5 | Medication history & adherence (stats, logs, status chips) | Completed |
+| 4B Step 6 | Notification action integration (bridge, action handlers, recovery) | Completed |
+| 4B Step 7 | Code cleanup & form validation | Completed |
+| 4C | Multi-component medication dosage (schema v3, component entities, DAOs, formatter, component editor) | Completed |
+| 4C Layout | Dosage component layout improvement (name-on-top layout, responsive) | Completed |
+
+**Module Capabilities:**
+- Full medication CRUD with multi-component dosage (e.g., Tripliksam 10/2.5/10 mg)
+- Medication alternatives with doctor-approved status
+- Medication schedules (daily, fixed times, interval days)
+- Medication history & adherence tracking with period-based stats
+- Local notification scheduling with Taken/Skipped/Snooze actions
+- Schedule recovery on app startup
+- Shared form widgets for both medication and alternative editors
+- Responsive component editor that works on narrow Android screens
+
+**Test Coverage:**
+- 114 tests passing across 9 test files
+- Component formatter, component form, medication form, alternative form, schedule, history, status chip, notification bridge, app rendering
 
 **Validation Results:**
 | Check | Result |
@@ -838,6 +531,80 @@ Component Name (optional)
 | `flutter analyze` | Passed (3 info lints — pre-existing) |
 | `flutter test` | Passed (114/114) |
 | Pixel 7 build/run | App launched successfully |
+
+**Files Created (Phase 4 total):**
+- `lib/domain/entities/medication_component.dart`
+- `lib/domain/entities/medication_alternative_component.dart`
+- `lib/domain/entities/medication_alternative.dart`
+- `lib/domain/entities/history_period.dart`
+- `lib/domain/entities/adherence_stats.dart`
+- `lib/data/database/daos/medication_components_dao.dart`
+- `lib/data/database/daos/medication_alternative_components_dao.dart`
+- `lib/data/database/daos/medication_alternatives_dao.dart`
+- `lib/data/services/notification/notification_action_bridge.dart`
+- `lib/presentation/utils/component_formatter.dart`
+- `lib/presentation/utils/dose_formatter.dart`
+- `lib/presentation/widgets/medication/medication_components_form.dart`
+- `lib/presentation/widgets/medication/medication_alternative_card.dart`
+- `lib/presentation/widgets/medication/medication_alternative_form.dart`
+- `lib/presentation/widgets/medication/status_chip.dart`
+- `lib/presentation/widgets/common/date_field.dart`
+- `lib/presentation/screens/activities/medication_list_screen.dart`
+- `lib/presentation/screens/activities/add_medication_screen.dart`
+- `lib/presentation/screens/activities/edit_medication_screen.dart`
+- `lib/presentation/screens/activities/medication_detail_screen.dart`
+- `lib/presentation/screens/activities/add_alternative_screen.dart`
+- `lib/presentation/screens/activities/edit_alternative_screen.dart`
+- `lib/presentation/screens/activities/medication_history_screen.dart`
+- `lib/presentation/providers/profile_provider.dart`
+- `lib/presentation/theme/app_spacing.dart`
+- `test/component_formatter_test.dart`
+- `test/medication_components_form_test.dart`
+- `test/alternative_test.dart`
+- `test/notification_action_bridge_test.dart`
+- `test/medication_history_test.dart`
+- `test/schedule_test.dart`
+
+**Files Deleted:**
+- `lib/presentation/screens/activities/activities_screen.dart` (replaced by medication list)
+
+## Phase 5A — Health Measurements Foundation
+
+**Status:** Completed (correction pass applied)
+
+**What was done:**
+
+- **Schema v4:** Added `MeasurementTypeFields` and `MeasurementRecordValues` tables; added `key`, `defaultUnit`, `displayOrder` to `MeasurementTypes`; added `updatedAt` to `MeasurementRecords`
+- **Schema v5 — Duplicate cleanup migration:** Deactivates old keyless duplicate system types, migrates their records to canonical keyed types, consolidates Heart Rate → Pulse, ensures all canonical types have field definitions
+- **6 system measurement types seeded:** `blood_pressure`, `pulse`, `weight`, `blood_glucose`, `spo2`, `temperature` — each with complete field definitions (units, min/max, decimalPlaces)
+- **Idempotent seeding:** `seed_data.dart` now checks by key before inserting types and checks for existing fields before inserting fields
+- **Domain entities:** Updated `MeasurementType` (+key, defaultUnit, displayOrder), new `MeasurementTypeField`, `MeasurementRecordValue`; updated `MeasurementRecord` (+updatedAt)
+- **DAO methods:** `watchActiveMeasurementTypes`, `getMeasurementTypeByKey`, field/value CRUD, `replaceFields`, `replaceRecordValues`
+- **Repository:** Transactional `createRecord`/`updateRecord` with normalized value storage; `deactivateMeasurementType` for soft-delete
+- **Providers:** `activeMeasurementTypesProvider`, `measurementTypeByKeyProvider`, `measurementTypeFieldsProvider`, `measurementRecordsProvider`, `measurementRecordProvider`, `measurementRecordValuesProvider`
+- **MeasurementFormatter:** Centralized formatting for all 6 types; `pulseLabel` parameter for localized BP/SpO2 summaries
+- **MeasurementValidator:** Required field validation, numeric bounds, BP relationship checks
+- **MeasurementLocalizer:** New helper mapping type/field keys to localized display names
+- **Measurements screen:** Shows measurement type cards with `Symbols.weight` icon and `IconButton(Icons.add_circle_outline)` for add reading
+- **Measurement entry/edit/history screens:** Generic form-driven UI for all measurement types, using `MeasurementLocalizer` for type names and field labels; Measurement History AppBar uses same `IconButton(Icons.add_circle_outline)` for add reading
+- **Navigation:** Bottom nav uses custom `_CenteredNavigationBar` (replaces Flutter's `NavigationBar`) with only-selected labels, centered wrapped text (`TextAlign.center`, `maxLines: 2`), `monitor_heart_outlined` / `medication_outlined` icons
+- **Routes:** `/health/measurement/:typeId/add`, `/health/measurement/:typeId/history`, `/health/measurement/record/:recordId/edit`
+- **Localization corrections:** Georgian Blood Pressure → `არტერიული წნევა` (was `სისხლის წნევა`), `measuredAt` → `გაზომილია` (was `გაზომულია`), duplicate `viewHistory` key removed, new keys: `addReadingTooltip`, `pulseLabel`
+- **Dependencies:** Added `material_symbols_icons: ^4.2951.0` for `Symbols.weight`
+- **Tests:** 193 tests — `phase5a_correction_test.dart` (23), `measurement_formatter_test.dart` (16), `measurement_validator_test.dart` (16), `measurement_seed_test.dart` (23), `measurement_health_screen_test.dart` (3), plus existing widget/form tests
+
+**Root cause of duplicates:** The v3→v4 migration called `_seedMeasurementTypesV4()` which looked up existing types by `key`. But old types from v1-v3 had `NULL` keys (the column didn't exist before v4). So it never found them and inserted NEW types with keys, creating duplicates alongside the old fieldless types.
+
+**Root cause of Heart Rate duplication:** An older system type from pre-v4 that had NULL key and was never cleaned up, appearing alongside the new canonical "Pulse" type.
+
+**Migration strategy (v5):**
+1. Find all system types with same name where one has a key and one doesn't → deactivate the keyless one, migrate its records to the keyed canonical type
+2. Find active "Heart Rate" type → migrate its records to "Pulse" (deduplicating by timestamp+profile), deactivate it
+3. Ensure all 6 canonical keyed types have field definitions (seed fields if missing)
+
+**Test Results:** 193/193 passing (flutter test), 1 pre-existing info lint (`prefer_initializing_formals` in `notification_action_bridge.dart:19`)
+
+---
 
 ## Development Rules
 

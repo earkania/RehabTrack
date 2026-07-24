@@ -4140,6 +4140,15 @@ class $MeasurementTypesTable extends MeasurementTypes
       'REFERENCES profiles (id)',
     ),
   );
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -4157,6 +4166,17 @@ class $MeasurementTypesTable extends MeasurementTypes
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _defaultUnitMeta = const VerificationMeta(
+    'defaultUnit',
+  );
+  @override
+  late final GeneratedColumn<String> defaultUnit = GeneratedColumn<String>(
+    'default_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _measurementCategoryMeta =
       const VerificationMeta('measurementCategory');
@@ -4197,6 +4217,18 @@ class $MeasurementTypesTable extends MeasurementTypes
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _displayOrderMeta = const VerificationMeta(
+    'displayOrder',
+  );
+  @override
+  late final GeneratedColumn<int> displayOrder = GeneratedColumn<int>(
+    'display_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -4223,11 +4255,14 @@ class $MeasurementTypesTable extends MeasurementTypes
   List<GeneratedColumn> get $columns => [
     id,
     profileId,
+    key,
     name,
     unit,
+    defaultUnit,
     measurementCategory,
     isSystem,
     active,
+    displayOrder,
     createdAt,
     updatedAt,
   ];
@@ -4252,6 +4287,12 @@ class $MeasurementTypesTable extends MeasurementTypes
         profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
       );
     }
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    }
     if (data.containsKey('name')) {
       context.handle(
         _nameMeta,
@@ -4267,6 +4308,15 @@ class $MeasurementTypesTable extends MeasurementTypes
       );
     } else if (isInserting) {
       context.missing(_unitMeta);
+    }
+    if (data.containsKey('default_unit')) {
+      context.handle(
+        _defaultUnitMeta,
+        defaultUnit.isAcceptableOrUnknown(
+          data['default_unit']!,
+          _defaultUnitMeta,
+        ),
+      );
     }
     if (data.containsKey('measurement_category')) {
       context.handle(
@@ -4289,6 +4339,15 @@ class $MeasurementTypesTable extends MeasurementTypes
       context.handle(
         _activeMeta,
         active.isAcceptableOrUnknown(data['active']!, _activeMeta),
+      );
+    }
+    if (data.containsKey('display_order')) {
+      context.handle(
+        _displayOrderMeta,
+        displayOrder.isAcceptableOrUnknown(
+          data['display_order']!,
+          _displayOrderMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -4324,6 +4383,10 @@ class $MeasurementTypesTable extends MeasurementTypes
         DriftSqlType.int,
         data['${effectivePrefix}profile_id'],
       ),
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      ),
       name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}name'],
@@ -4332,6 +4395,10 @@ class $MeasurementTypesTable extends MeasurementTypes
         DriftSqlType.string,
         data['${effectivePrefix}unit'],
       )!,
+      defaultUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}default_unit'],
+      ),
       measurementCategory: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}measurement_category'],
@@ -4343,6 +4410,10 @@ class $MeasurementTypesTable extends MeasurementTypes
       active: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}active'],
+      )!,
+      displayOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}display_order'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -4364,21 +4435,27 @@ class $MeasurementTypesTable extends MeasurementTypes
 class MeasurementType extends DataClass implements Insertable<MeasurementType> {
   final int id;
   final int? profileId;
+  final String? key;
   final String name;
   final String unit;
+  final String? defaultUnit;
   final String measurementCategory;
   final bool isSystem;
   final bool active;
+  final int displayOrder;
   final DateTime createdAt;
   final DateTime updatedAt;
   const MeasurementType({
     required this.id,
     this.profileId,
+    this.key,
     required this.name,
     required this.unit,
+    this.defaultUnit,
     required this.measurementCategory,
     required this.isSystem,
     required this.active,
+    required this.displayOrder,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -4389,11 +4466,18 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
     if (!nullToAbsent || profileId != null) {
       map['profile_id'] = Variable<int>(profileId);
     }
+    if (!nullToAbsent || key != null) {
+      map['key'] = Variable<String>(key);
+    }
     map['name'] = Variable<String>(name);
     map['unit'] = Variable<String>(unit);
+    if (!nullToAbsent || defaultUnit != null) {
+      map['default_unit'] = Variable<String>(defaultUnit);
+    }
     map['measurement_category'] = Variable<String>(measurementCategory);
     map['is_system'] = Variable<bool>(isSystem);
     map['active'] = Variable<bool>(active);
+    map['display_order'] = Variable<int>(displayOrder);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -4405,11 +4489,16 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
       profileId: profileId == null && nullToAbsent
           ? const Value.absent()
           : Value(profileId),
+      key: key == null && nullToAbsent ? const Value.absent() : Value(key),
       name: Value(name),
       unit: Value(unit),
+      defaultUnit: defaultUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultUnit),
       measurementCategory: Value(measurementCategory),
       isSystem: Value(isSystem),
       active: Value(active),
+      displayOrder: Value(displayOrder),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -4423,13 +4512,16 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
     return MeasurementType(
       id: serializer.fromJson<int>(json['id']),
       profileId: serializer.fromJson<int?>(json['profileId']),
+      key: serializer.fromJson<String?>(json['key']),
       name: serializer.fromJson<String>(json['name']),
       unit: serializer.fromJson<String>(json['unit']),
+      defaultUnit: serializer.fromJson<String?>(json['defaultUnit']),
       measurementCategory: serializer.fromJson<String>(
         json['measurementCategory'],
       ),
       isSystem: serializer.fromJson<bool>(json['isSystem']),
       active: serializer.fromJson<bool>(json['active']),
+      displayOrder: serializer.fromJson<int>(json['displayOrder']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -4440,11 +4532,14 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'profileId': serializer.toJson<int?>(profileId),
+      'key': serializer.toJson<String?>(key),
       'name': serializer.toJson<String>(name),
       'unit': serializer.toJson<String>(unit),
+      'defaultUnit': serializer.toJson<String?>(defaultUnit),
       'measurementCategory': serializer.toJson<String>(measurementCategory),
       'isSystem': serializer.toJson<bool>(isSystem),
       'active': serializer.toJson<bool>(active),
+      'displayOrder': serializer.toJson<int>(displayOrder),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -4453,21 +4548,27 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
   MeasurementType copyWith({
     int? id,
     Value<int?> profileId = const Value.absent(),
+    Value<String?> key = const Value.absent(),
     String? name,
     String? unit,
+    Value<String?> defaultUnit = const Value.absent(),
     String? measurementCategory,
     bool? isSystem,
     bool? active,
+    int? displayOrder,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => MeasurementType(
     id: id ?? this.id,
     profileId: profileId.present ? profileId.value : this.profileId,
+    key: key.present ? key.value : this.key,
     name: name ?? this.name,
     unit: unit ?? this.unit,
+    defaultUnit: defaultUnit.present ? defaultUnit.value : this.defaultUnit,
     measurementCategory: measurementCategory ?? this.measurementCategory,
     isSystem: isSystem ?? this.isSystem,
     active: active ?? this.active,
+    displayOrder: displayOrder ?? this.displayOrder,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -4475,13 +4576,20 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
     return MeasurementType(
       id: data.id.present ? data.id.value : this.id,
       profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      key: data.key.present ? data.key.value : this.key,
       name: data.name.present ? data.name.value : this.name,
       unit: data.unit.present ? data.unit.value : this.unit,
+      defaultUnit: data.defaultUnit.present
+          ? data.defaultUnit.value
+          : this.defaultUnit,
       measurementCategory: data.measurementCategory.present
           ? data.measurementCategory.value
           : this.measurementCategory,
       isSystem: data.isSystem.present ? data.isSystem.value : this.isSystem,
       active: data.active.present ? data.active.value : this.active,
+      displayOrder: data.displayOrder.present
+          ? data.displayOrder.value
+          : this.displayOrder,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -4492,11 +4600,14 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
     return (StringBuffer('MeasurementType(')
           ..write('id: $id, ')
           ..write('profileId: $profileId, ')
+          ..write('key: $key, ')
           ..write('name: $name, ')
           ..write('unit: $unit, ')
+          ..write('defaultUnit: $defaultUnit, ')
           ..write('measurementCategory: $measurementCategory, ')
           ..write('isSystem: $isSystem, ')
           ..write('active: $active, ')
+          ..write('displayOrder: $displayOrder, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -4507,11 +4618,14 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
   int get hashCode => Object.hash(
     id,
     profileId,
+    key,
     name,
     unit,
+    defaultUnit,
     measurementCategory,
     isSystem,
     active,
+    displayOrder,
     createdAt,
     updatedAt,
   );
@@ -4521,11 +4635,14 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
       (other is MeasurementType &&
           other.id == this.id &&
           other.profileId == this.profileId &&
+          other.key == this.key &&
           other.name == this.name &&
           other.unit == this.unit &&
+          other.defaultUnit == this.defaultUnit &&
           other.measurementCategory == this.measurementCategory &&
           other.isSystem == this.isSystem &&
           other.active == this.active &&
+          other.displayOrder == this.displayOrder &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -4533,32 +4650,41 @@ class MeasurementType extends DataClass implements Insertable<MeasurementType> {
 class MeasurementTypesCompanion extends UpdateCompanion<MeasurementType> {
   final Value<int> id;
   final Value<int?> profileId;
+  final Value<String?> key;
   final Value<String> name;
   final Value<String> unit;
+  final Value<String?> defaultUnit;
   final Value<String> measurementCategory;
   final Value<bool> isSystem;
   final Value<bool> active;
+  final Value<int> displayOrder;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const MeasurementTypesCompanion({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
+    this.key = const Value.absent(),
     this.name = const Value.absent(),
     this.unit = const Value.absent(),
+    this.defaultUnit = const Value.absent(),
     this.measurementCategory = const Value.absent(),
     this.isSystem = const Value.absent(),
     this.active = const Value.absent(),
+    this.displayOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   MeasurementTypesCompanion.insert({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
+    this.key = const Value.absent(),
     required String name,
     required String unit,
+    this.defaultUnit = const Value.absent(),
     required String measurementCategory,
     this.isSystem = const Value.absent(),
     this.active = const Value.absent(),
+    this.displayOrder = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
   }) : name = Value(name),
@@ -4569,23 +4695,29 @@ class MeasurementTypesCompanion extends UpdateCompanion<MeasurementType> {
   static Insertable<MeasurementType> custom({
     Expression<int>? id,
     Expression<int>? profileId,
+    Expression<String>? key,
     Expression<String>? name,
     Expression<String>? unit,
+    Expression<String>? defaultUnit,
     Expression<String>? measurementCategory,
     Expression<bool>? isSystem,
     Expression<bool>? active,
+    Expression<int>? displayOrder,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (profileId != null) 'profile_id': profileId,
+      if (key != null) 'key': key,
       if (name != null) 'name': name,
       if (unit != null) 'unit': unit,
+      if (defaultUnit != null) 'default_unit': defaultUnit,
       if (measurementCategory != null)
         'measurement_category': measurementCategory,
       if (isSystem != null) 'is_system': isSystem,
       if (active != null) 'active': active,
+      if (displayOrder != null) 'display_order': displayOrder,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -4594,22 +4726,28 @@ class MeasurementTypesCompanion extends UpdateCompanion<MeasurementType> {
   MeasurementTypesCompanion copyWith({
     Value<int>? id,
     Value<int?>? profileId,
+    Value<String?>? key,
     Value<String>? name,
     Value<String>? unit,
+    Value<String?>? defaultUnit,
     Value<String>? measurementCategory,
     Value<bool>? isSystem,
     Value<bool>? active,
+    Value<int>? displayOrder,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
   }) {
     return MeasurementTypesCompanion(
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
+      key: key ?? this.key,
       name: name ?? this.name,
       unit: unit ?? this.unit,
+      defaultUnit: defaultUnit ?? this.defaultUnit,
       measurementCategory: measurementCategory ?? this.measurementCategory,
       isSystem: isSystem ?? this.isSystem,
       active: active ?? this.active,
+      displayOrder: displayOrder ?? this.displayOrder,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -4624,11 +4762,17 @@ class MeasurementTypesCompanion extends UpdateCompanion<MeasurementType> {
     if (profileId.present) {
       map['profile_id'] = Variable<int>(profileId.value);
     }
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
     if (unit.present) {
       map['unit'] = Variable<String>(unit.value);
+    }
+    if (defaultUnit.present) {
+      map['default_unit'] = Variable<String>(defaultUnit.value);
     }
     if (measurementCategory.present) {
       map['measurement_category'] = Variable<String>(measurementCategory.value);
@@ -4638,6 +4782,9 @@ class MeasurementTypesCompanion extends UpdateCompanion<MeasurementType> {
     }
     if (active.present) {
       map['active'] = Variable<bool>(active.value);
+    }
+    if (displayOrder.present) {
+      map['display_order'] = Variable<int>(displayOrder.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -4653,13 +4800,695 @@ class MeasurementTypesCompanion extends UpdateCompanion<MeasurementType> {
     return (StringBuffer('MeasurementTypesCompanion(')
           ..write('id: $id, ')
           ..write('profileId: $profileId, ')
+          ..write('key: $key, ')
           ..write('name: $name, ')
           ..write('unit: $unit, ')
+          ..write('defaultUnit: $defaultUnit, ')
           ..write('measurementCategory: $measurementCategory, ')
           ..write('isSystem: $isSystem, ')
           ..write('active: $active, ')
+          ..write('displayOrder: $displayOrder, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MeasurementTypeFieldsTable extends MeasurementTypeFields
+    with TableInfo<$MeasurementTypeFieldsTable, MeasurementTypeField> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MeasurementTypeFieldsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _measurementTypeIdMeta = const VerificationMeta(
+    'measurementTypeId',
+  );
+  @override
+  late final GeneratedColumn<int> measurementTypeId = GeneratedColumn<int>(
+    'measurement_type_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES measurement_types (id)',
+    ),
+  );
+  static const VerificationMeta _fieldKeyMeta = const VerificationMeta(
+    'fieldKey',
+  );
+  @override
+  late final GeneratedColumn<String> fieldKey = GeneratedColumn<String>(
+    'field_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _defaultUnitMeta = const VerificationMeta(
+    'defaultUnit',
+  );
+  @override
+  late final GeneratedColumn<String> defaultUnit = GeneratedColumn<String>(
+    'default_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _requiredMeta = const VerificationMeta(
+    'required',
+  );
+  @override
+  late final GeneratedColumn<bool> required = GeneratedColumn<bool>(
+    'required',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("required" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _minimumValueMeta = const VerificationMeta(
+    'minimumValue',
+  );
+  @override
+  late final GeneratedColumn<double> minimumValue = GeneratedColumn<double>(
+    'minimum_value',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maximumValueMeta = const VerificationMeta(
+    'maximumValue',
+  );
+  @override
+  late final GeneratedColumn<double> maximumValue = GeneratedColumn<double>(
+    'maximum_value',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _decimalPlacesMeta = const VerificationMeta(
+    'decimalPlaces',
+  );
+  @override
+  late final GeneratedColumn<int> decimalPlaces = GeneratedColumn<int>(
+    'decimal_places',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _displayOrderMeta = const VerificationMeta(
+    'displayOrder',
+  );
+  @override
+  late final GeneratedColumn<int> displayOrder = GeneratedColumn<int>(
+    'display_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    measurementTypeId,
+    fieldKey,
+    label,
+    defaultUnit,
+    required,
+    minimumValue,
+    maximumValue,
+    decimalPlaces,
+    displayOrder,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'measurement_type_fields';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MeasurementTypeField> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('measurement_type_id')) {
+      context.handle(
+        _measurementTypeIdMeta,
+        measurementTypeId.isAcceptableOrUnknown(
+          data['measurement_type_id']!,
+          _measurementTypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_measurementTypeIdMeta);
+    }
+    if (data.containsKey('field_key')) {
+      context.handle(
+        _fieldKeyMeta,
+        fieldKey.isAcceptableOrUnknown(data['field_key']!, _fieldKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fieldKeyMeta);
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_labelMeta);
+    }
+    if (data.containsKey('default_unit')) {
+      context.handle(
+        _defaultUnitMeta,
+        defaultUnit.isAcceptableOrUnknown(
+          data['default_unit']!,
+          _defaultUnitMeta,
+        ),
+      );
+    }
+    if (data.containsKey('required')) {
+      context.handle(
+        _requiredMeta,
+        required.isAcceptableOrUnknown(data['required']!, _requiredMeta),
+      );
+    }
+    if (data.containsKey('minimum_value')) {
+      context.handle(
+        _minimumValueMeta,
+        minimumValue.isAcceptableOrUnknown(
+          data['minimum_value']!,
+          _minimumValueMeta,
+        ),
+      );
+    }
+    if (data.containsKey('maximum_value')) {
+      context.handle(
+        _maximumValueMeta,
+        maximumValue.isAcceptableOrUnknown(
+          data['maximum_value']!,
+          _maximumValueMeta,
+        ),
+      );
+    }
+    if (data.containsKey('decimal_places')) {
+      context.handle(
+        _decimalPlacesMeta,
+        decimalPlaces.isAcceptableOrUnknown(
+          data['decimal_places']!,
+          _decimalPlacesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('display_order')) {
+      context.handle(
+        _displayOrderMeta,
+        displayOrder.isAcceptableOrUnknown(
+          data['display_order']!,
+          _displayOrderMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MeasurementTypeField map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MeasurementTypeField(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      measurementTypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}measurement_type_id'],
+      )!,
+      fieldKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}field_key'],
+      )!,
+      label: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}label'],
+      )!,
+      defaultUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}default_unit'],
+      ),
+      required: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}required'],
+      )!,
+      minimumValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}minimum_value'],
+      ),
+      maximumValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}maximum_value'],
+      ),
+      decimalPlaces: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}decimal_places'],
+      )!,
+      displayOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}display_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MeasurementTypeFieldsTable createAlias(String alias) {
+    return $MeasurementTypeFieldsTable(attachedDatabase, alias);
+  }
+}
+
+class MeasurementTypeField extends DataClass
+    implements Insertable<MeasurementTypeField> {
+  final int id;
+  final int measurementTypeId;
+  final String fieldKey;
+  final String label;
+  final String? defaultUnit;
+  final bool required;
+  final double? minimumValue;
+  final double? maximumValue;
+  final int decimalPlaces;
+  final int displayOrder;
+  final DateTime createdAt;
+  const MeasurementTypeField({
+    required this.id,
+    required this.measurementTypeId,
+    required this.fieldKey,
+    required this.label,
+    this.defaultUnit,
+    required this.required,
+    this.minimumValue,
+    this.maximumValue,
+    required this.decimalPlaces,
+    required this.displayOrder,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['measurement_type_id'] = Variable<int>(measurementTypeId);
+    map['field_key'] = Variable<String>(fieldKey);
+    map['label'] = Variable<String>(label);
+    if (!nullToAbsent || defaultUnit != null) {
+      map['default_unit'] = Variable<String>(defaultUnit);
+    }
+    map['required'] = Variable<bool>(required);
+    if (!nullToAbsent || minimumValue != null) {
+      map['minimum_value'] = Variable<double>(minimumValue);
+    }
+    if (!nullToAbsent || maximumValue != null) {
+      map['maximum_value'] = Variable<double>(maximumValue);
+    }
+    map['decimal_places'] = Variable<int>(decimalPlaces);
+    map['display_order'] = Variable<int>(displayOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  MeasurementTypeFieldsCompanion toCompanion(bool nullToAbsent) {
+    return MeasurementTypeFieldsCompanion(
+      id: Value(id),
+      measurementTypeId: Value(measurementTypeId),
+      fieldKey: Value(fieldKey),
+      label: Value(label),
+      defaultUnit: defaultUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultUnit),
+      required: Value(required),
+      minimumValue: minimumValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minimumValue),
+      maximumValue: maximumValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maximumValue),
+      decimalPlaces: Value(decimalPlaces),
+      displayOrder: Value(displayOrder),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory MeasurementTypeField.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MeasurementTypeField(
+      id: serializer.fromJson<int>(json['id']),
+      measurementTypeId: serializer.fromJson<int>(json['measurementTypeId']),
+      fieldKey: serializer.fromJson<String>(json['fieldKey']),
+      label: serializer.fromJson<String>(json['label']),
+      defaultUnit: serializer.fromJson<String?>(json['defaultUnit']),
+      required: serializer.fromJson<bool>(json['required']),
+      minimumValue: serializer.fromJson<double?>(json['minimumValue']),
+      maximumValue: serializer.fromJson<double?>(json['maximumValue']),
+      decimalPlaces: serializer.fromJson<int>(json['decimalPlaces']),
+      displayOrder: serializer.fromJson<int>(json['displayOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'measurementTypeId': serializer.toJson<int>(measurementTypeId),
+      'fieldKey': serializer.toJson<String>(fieldKey),
+      'label': serializer.toJson<String>(label),
+      'defaultUnit': serializer.toJson<String?>(defaultUnit),
+      'required': serializer.toJson<bool>(required),
+      'minimumValue': serializer.toJson<double?>(minimumValue),
+      'maximumValue': serializer.toJson<double?>(maximumValue),
+      'decimalPlaces': serializer.toJson<int>(decimalPlaces),
+      'displayOrder': serializer.toJson<int>(displayOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  MeasurementTypeField copyWith({
+    int? id,
+    int? measurementTypeId,
+    String? fieldKey,
+    String? label,
+    Value<String?> defaultUnit = const Value.absent(),
+    bool? required,
+    Value<double?> minimumValue = const Value.absent(),
+    Value<double?> maximumValue = const Value.absent(),
+    int? decimalPlaces,
+    int? displayOrder,
+    DateTime? createdAt,
+  }) => MeasurementTypeField(
+    id: id ?? this.id,
+    measurementTypeId: measurementTypeId ?? this.measurementTypeId,
+    fieldKey: fieldKey ?? this.fieldKey,
+    label: label ?? this.label,
+    defaultUnit: defaultUnit.present ? defaultUnit.value : this.defaultUnit,
+    required: required ?? this.required,
+    minimumValue: minimumValue.present ? minimumValue.value : this.minimumValue,
+    maximumValue: maximumValue.present ? maximumValue.value : this.maximumValue,
+    decimalPlaces: decimalPlaces ?? this.decimalPlaces,
+    displayOrder: displayOrder ?? this.displayOrder,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  MeasurementTypeField copyWithCompanion(MeasurementTypeFieldsCompanion data) {
+    return MeasurementTypeField(
+      id: data.id.present ? data.id.value : this.id,
+      measurementTypeId: data.measurementTypeId.present
+          ? data.measurementTypeId.value
+          : this.measurementTypeId,
+      fieldKey: data.fieldKey.present ? data.fieldKey.value : this.fieldKey,
+      label: data.label.present ? data.label.value : this.label,
+      defaultUnit: data.defaultUnit.present
+          ? data.defaultUnit.value
+          : this.defaultUnit,
+      required: data.required.present ? data.required.value : this.required,
+      minimumValue: data.minimumValue.present
+          ? data.minimumValue.value
+          : this.minimumValue,
+      maximumValue: data.maximumValue.present
+          ? data.maximumValue.value
+          : this.maximumValue,
+      decimalPlaces: data.decimalPlaces.present
+          ? data.decimalPlaces.value
+          : this.decimalPlaces,
+      displayOrder: data.displayOrder.present
+          ? data.displayOrder.value
+          : this.displayOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeasurementTypeField(')
+          ..write('id: $id, ')
+          ..write('measurementTypeId: $measurementTypeId, ')
+          ..write('fieldKey: $fieldKey, ')
+          ..write('label: $label, ')
+          ..write('defaultUnit: $defaultUnit, ')
+          ..write('required: $required, ')
+          ..write('minimumValue: $minimumValue, ')
+          ..write('maximumValue: $maximumValue, ')
+          ..write('decimalPlaces: $decimalPlaces, ')
+          ..write('displayOrder: $displayOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    measurementTypeId,
+    fieldKey,
+    label,
+    defaultUnit,
+    required,
+    minimumValue,
+    maximumValue,
+    decimalPlaces,
+    displayOrder,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MeasurementTypeField &&
+          other.id == this.id &&
+          other.measurementTypeId == this.measurementTypeId &&
+          other.fieldKey == this.fieldKey &&
+          other.label == this.label &&
+          other.defaultUnit == this.defaultUnit &&
+          other.required == this.required &&
+          other.minimumValue == this.minimumValue &&
+          other.maximumValue == this.maximumValue &&
+          other.decimalPlaces == this.decimalPlaces &&
+          other.displayOrder == this.displayOrder &&
+          other.createdAt == this.createdAt);
+}
+
+class MeasurementTypeFieldsCompanion
+    extends UpdateCompanion<MeasurementTypeField> {
+  final Value<int> id;
+  final Value<int> measurementTypeId;
+  final Value<String> fieldKey;
+  final Value<String> label;
+  final Value<String?> defaultUnit;
+  final Value<bool> required;
+  final Value<double?> minimumValue;
+  final Value<double?> maximumValue;
+  final Value<int> decimalPlaces;
+  final Value<int> displayOrder;
+  final Value<DateTime> createdAt;
+  const MeasurementTypeFieldsCompanion({
+    this.id = const Value.absent(),
+    this.measurementTypeId = const Value.absent(),
+    this.fieldKey = const Value.absent(),
+    this.label = const Value.absent(),
+    this.defaultUnit = const Value.absent(),
+    this.required = const Value.absent(),
+    this.minimumValue = const Value.absent(),
+    this.maximumValue = const Value.absent(),
+    this.decimalPlaces = const Value.absent(),
+    this.displayOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  MeasurementTypeFieldsCompanion.insert({
+    this.id = const Value.absent(),
+    required int measurementTypeId,
+    required String fieldKey,
+    required String label,
+    this.defaultUnit = const Value.absent(),
+    this.required = const Value.absent(),
+    this.minimumValue = const Value.absent(),
+    this.maximumValue = const Value.absent(),
+    this.decimalPlaces = const Value.absent(),
+    this.displayOrder = const Value.absent(),
+    required DateTime createdAt,
+  }) : measurementTypeId = Value(measurementTypeId),
+       fieldKey = Value(fieldKey),
+       label = Value(label),
+       createdAt = Value(createdAt);
+  static Insertable<MeasurementTypeField> custom({
+    Expression<int>? id,
+    Expression<int>? measurementTypeId,
+    Expression<String>? fieldKey,
+    Expression<String>? label,
+    Expression<String>? defaultUnit,
+    Expression<bool>? required,
+    Expression<double>? minimumValue,
+    Expression<double>? maximumValue,
+    Expression<int>? decimalPlaces,
+    Expression<int>? displayOrder,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (measurementTypeId != null) 'measurement_type_id': measurementTypeId,
+      if (fieldKey != null) 'field_key': fieldKey,
+      if (label != null) 'label': label,
+      if (defaultUnit != null) 'default_unit': defaultUnit,
+      if (required != null) 'required': required,
+      if (minimumValue != null) 'minimum_value': minimumValue,
+      if (maximumValue != null) 'maximum_value': maximumValue,
+      if (decimalPlaces != null) 'decimal_places': decimalPlaces,
+      if (displayOrder != null) 'display_order': displayOrder,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  MeasurementTypeFieldsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? measurementTypeId,
+    Value<String>? fieldKey,
+    Value<String>? label,
+    Value<String?>? defaultUnit,
+    Value<bool>? required,
+    Value<double?>? minimumValue,
+    Value<double?>? maximumValue,
+    Value<int>? decimalPlaces,
+    Value<int>? displayOrder,
+    Value<DateTime>? createdAt,
+  }) {
+    return MeasurementTypeFieldsCompanion(
+      id: id ?? this.id,
+      measurementTypeId: measurementTypeId ?? this.measurementTypeId,
+      fieldKey: fieldKey ?? this.fieldKey,
+      label: label ?? this.label,
+      defaultUnit: defaultUnit ?? this.defaultUnit,
+      required: required ?? this.required,
+      minimumValue: minimumValue ?? this.minimumValue,
+      maximumValue: maximumValue ?? this.maximumValue,
+      decimalPlaces: decimalPlaces ?? this.decimalPlaces,
+      displayOrder: displayOrder ?? this.displayOrder,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (measurementTypeId.present) {
+      map['measurement_type_id'] = Variable<int>(measurementTypeId.value);
+    }
+    if (fieldKey.present) {
+      map['field_key'] = Variable<String>(fieldKey.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (defaultUnit.present) {
+      map['default_unit'] = Variable<String>(defaultUnit.value);
+    }
+    if (required.present) {
+      map['required'] = Variable<bool>(required.value);
+    }
+    if (minimumValue.present) {
+      map['minimum_value'] = Variable<double>(minimumValue.value);
+    }
+    if (maximumValue.present) {
+      map['maximum_value'] = Variable<double>(maximumValue.value);
+    }
+    if (decimalPlaces.present) {
+      map['decimal_places'] = Variable<int>(decimalPlaces.value);
+    }
+    if (displayOrder.present) {
+      map['display_order'] = Variable<int>(displayOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeasurementTypeFieldsCompanion(')
+          ..write('id: $id, ')
+          ..write('measurementTypeId: $measurementTypeId, ')
+          ..write('fieldKey: $fieldKey, ')
+          ..write('label: $label, ')
+          ..write('defaultUnit: $defaultUnit, ')
+          ..write('required: $required, ')
+          ..write('minimumValue: $minimumValue, ')
+          ..write('maximumValue: $maximumValue, ')
+          ..write('decimalPlaces: $decimalPlaces, ')
+          ..write('displayOrder: $displayOrder, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -4785,6 +5614,17 @@ class $MeasurementRecordsTable extends MeasurementRecords
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -4797,6 +5637,7 @@ class $MeasurementRecordsTable extends MeasurementRecords
     unit,
     notes,
     createdAt,
+    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4891,6 +5732,12 @@ class $MeasurementRecordsTable extends MeasurementRecords
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -4940,6 +5787,10 @@ class $MeasurementRecordsTable extends MeasurementRecords
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
     );
   }
 
@@ -4961,6 +5812,7 @@ class MeasurementRecord extends DataClass
   final String unit;
   final String? notes;
   final DateTime createdAt;
+  final DateTime? updatedAt;
   const MeasurementRecord({
     required this.id,
     required this.profileId,
@@ -4972,6 +5824,7 @@ class MeasurementRecord extends DataClass
     required this.unit,
     this.notes,
     required this.createdAt,
+    this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4992,6 +5845,9 @@ class MeasurementRecord extends DataClass
       map['notes'] = Variable<String>(notes);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
     return map;
   }
 
@@ -5013,6 +5869,9 @@ class MeasurementRecord extends DataClass
           ? const Value.absent()
           : Value(notes),
       createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
     );
   }
 
@@ -5032,6 +5891,7 @@ class MeasurementRecord extends DataClass
       unit: serializer.fromJson<String>(json['unit']),
       notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
   }
   @override
@@ -5048,6 +5908,7 @@ class MeasurementRecord extends DataClass
       'unit': serializer.toJson<String>(unit),
       'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
   }
 
@@ -5062,6 +5923,7 @@ class MeasurementRecord extends DataClass
     String? unit,
     Value<String?> notes = const Value.absent(),
     DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
   }) => MeasurementRecord(
     id: id ?? this.id,
     profileId: profileId ?? this.profileId,
@@ -5077,6 +5939,7 @@ class MeasurementRecord extends DataClass
     unit: unit ?? this.unit,
     notes: notes.present ? notes.value : this.notes,
     createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
   MeasurementRecord copyWithCompanion(MeasurementRecordsCompanion data) {
     return MeasurementRecord(
@@ -5098,6 +5961,7 @@ class MeasurementRecord extends DataClass
       unit: data.unit.present ? data.unit.value : this.unit,
       notes: data.notes.present ? data.notes.value : this.notes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -5113,7 +5977,8 @@ class MeasurementRecord extends DataClass
           ..write('valueTertiary: $valueTertiary, ')
           ..write('unit: $unit, ')
           ..write('notes: $notes, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -5130,6 +5995,7 @@ class MeasurementRecord extends DataClass
     unit,
     notes,
     createdAt,
+    updatedAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -5144,7 +6010,8 @@ class MeasurementRecord extends DataClass
           other.valueTertiary == this.valueTertiary &&
           other.unit == this.unit &&
           other.notes == this.notes &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
 class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
@@ -5158,6 +6025,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
   final Value<String> unit;
   final Value<String?> notes;
   final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
   const MeasurementRecordsCompanion({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
@@ -5169,6 +6037,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     this.unit = const Value.absent(),
     this.notes = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
   MeasurementRecordsCompanion.insert({
     this.id = const Value.absent(),
@@ -5181,6 +6050,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     required String unit,
     this.notes = const Value.absent(),
     required DateTime createdAt,
+    this.updatedAt = const Value.absent(),
   }) : profileId = Value(profileId),
        measurementTypeId = Value(measurementTypeId),
        timestamp = Value(timestamp),
@@ -5198,6 +6068,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     Expression<String>? unit,
     Expression<String>? notes,
     Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5210,6 +6081,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
       if (unit != null) 'unit': unit,
       if (notes != null) 'notes': notes,
       if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
@@ -5224,6 +6096,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     Value<String>? unit,
     Value<String?>? notes,
     Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
   }) {
     return MeasurementRecordsCompanion(
       id: id ?? this.id,
@@ -5236,6 +6109,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
       unit: unit ?? this.unit,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -5272,6 +6146,9 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
     return map;
   }
 
@@ -5287,7 +6164,434 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
           ..write('valueTertiary: $valueTertiary, ')
           ..write('unit: $unit, ')
           ..write('notes: $notes, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MeasurementRecordValuesTable extends MeasurementRecordValues
+    with TableInfo<$MeasurementRecordValuesTable, MeasurementRecordValue> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MeasurementRecordValuesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _measurementRecordIdMeta =
+      const VerificationMeta('measurementRecordId');
+  @override
+  late final GeneratedColumn<int> measurementRecordId = GeneratedColumn<int>(
+    'measurement_record_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES measurement_records (id)',
+    ),
+  );
+  static const VerificationMeta _fieldKeyMeta = const VerificationMeta(
+    'fieldKey',
+  );
+  @override
+  late final GeneratedColumn<String> fieldKey = GeneratedColumn<String>(
+    'field_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _numericValueMeta = const VerificationMeta(
+    'numericValue',
+  );
+  @override
+  late final GeneratedColumn<double> numericValue = GeneratedColumn<double>(
+    'numeric_value',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayOrderMeta = const VerificationMeta(
+    'displayOrder',
+  );
+  @override
+  late final GeneratedColumn<int> displayOrder = GeneratedColumn<int>(
+    'display_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    measurementRecordId,
+    fieldKey,
+    numericValue,
+    unit,
+    displayOrder,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'measurement_record_values';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MeasurementRecordValue> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('measurement_record_id')) {
+      context.handle(
+        _measurementRecordIdMeta,
+        measurementRecordId.isAcceptableOrUnknown(
+          data['measurement_record_id']!,
+          _measurementRecordIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_measurementRecordIdMeta);
+    }
+    if (data.containsKey('field_key')) {
+      context.handle(
+        _fieldKeyMeta,
+        fieldKey.isAcceptableOrUnknown(data['field_key']!, _fieldKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fieldKeyMeta);
+    }
+    if (data.containsKey('numeric_value')) {
+      context.handle(
+        _numericValueMeta,
+        numericValue.isAcceptableOrUnknown(
+          data['numeric_value']!,
+          _numericValueMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_numericValueMeta);
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitMeta);
+    }
+    if (data.containsKey('display_order')) {
+      context.handle(
+        _displayOrderMeta,
+        displayOrder.isAcceptableOrUnknown(
+          data['display_order']!,
+          _displayOrderMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MeasurementRecordValue map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MeasurementRecordValue(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      measurementRecordId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}measurement_record_id'],
+      )!,
+      fieldKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}field_key'],
+      )!,
+      numericValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}numeric_value'],
+      )!,
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      displayOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}display_order'],
+      )!,
+    );
+  }
+
+  @override
+  $MeasurementRecordValuesTable createAlias(String alias) {
+    return $MeasurementRecordValuesTable(attachedDatabase, alias);
+  }
+}
+
+class MeasurementRecordValue extends DataClass
+    implements Insertable<MeasurementRecordValue> {
+  final int id;
+  final int measurementRecordId;
+  final String fieldKey;
+  final double numericValue;
+  final String unit;
+  final int displayOrder;
+  const MeasurementRecordValue({
+    required this.id,
+    required this.measurementRecordId,
+    required this.fieldKey,
+    required this.numericValue,
+    required this.unit,
+    required this.displayOrder,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['measurement_record_id'] = Variable<int>(measurementRecordId);
+    map['field_key'] = Variable<String>(fieldKey);
+    map['numeric_value'] = Variable<double>(numericValue);
+    map['unit'] = Variable<String>(unit);
+    map['display_order'] = Variable<int>(displayOrder);
+    return map;
+  }
+
+  MeasurementRecordValuesCompanion toCompanion(bool nullToAbsent) {
+    return MeasurementRecordValuesCompanion(
+      id: Value(id),
+      measurementRecordId: Value(measurementRecordId),
+      fieldKey: Value(fieldKey),
+      numericValue: Value(numericValue),
+      unit: Value(unit),
+      displayOrder: Value(displayOrder),
+    );
+  }
+
+  factory MeasurementRecordValue.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MeasurementRecordValue(
+      id: serializer.fromJson<int>(json['id']),
+      measurementRecordId: serializer.fromJson<int>(
+        json['measurementRecordId'],
+      ),
+      fieldKey: serializer.fromJson<String>(json['fieldKey']),
+      numericValue: serializer.fromJson<double>(json['numericValue']),
+      unit: serializer.fromJson<String>(json['unit']),
+      displayOrder: serializer.fromJson<int>(json['displayOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'measurementRecordId': serializer.toJson<int>(measurementRecordId),
+      'fieldKey': serializer.toJson<String>(fieldKey),
+      'numericValue': serializer.toJson<double>(numericValue),
+      'unit': serializer.toJson<String>(unit),
+      'displayOrder': serializer.toJson<int>(displayOrder),
+    };
+  }
+
+  MeasurementRecordValue copyWith({
+    int? id,
+    int? measurementRecordId,
+    String? fieldKey,
+    double? numericValue,
+    String? unit,
+    int? displayOrder,
+  }) => MeasurementRecordValue(
+    id: id ?? this.id,
+    measurementRecordId: measurementRecordId ?? this.measurementRecordId,
+    fieldKey: fieldKey ?? this.fieldKey,
+    numericValue: numericValue ?? this.numericValue,
+    unit: unit ?? this.unit,
+    displayOrder: displayOrder ?? this.displayOrder,
+  );
+  MeasurementRecordValue copyWithCompanion(
+    MeasurementRecordValuesCompanion data,
+  ) {
+    return MeasurementRecordValue(
+      id: data.id.present ? data.id.value : this.id,
+      measurementRecordId: data.measurementRecordId.present
+          ? data.measurementRecordId.value
+          : this.measurementRecordId,
+      fieldKey: data.fieldKey.present ? data.fieldKey.value : this.fieldKey,
+      numericValue: data.numericValue.present
+          ? data.numericValue.value
+          : this.numericValue,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      displayOrder: data.displayOrder.present
+          ? data.displayOrder.value
+          : this.displayOrder,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeasurementRecordValue(')
+          ..write('id: $id, ')
+          ..write('measurementRecordId: $measurementRecordId, ')
+          ..write('fieldKey: $fieldKey, ')
+          ..write('numericValue: $numericValue, ')
+          ..write('unit: $unit, ')
+          ..write('displayOrder: $displayOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    measurementRecordId,
+    fieldKey,
+    numericValue,
+    unit,
+    displayOrder,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MeasurementRecordValue &&
+          other.id == this.id &&
+          other.measurementRecordId == this.measurementRecordId &&
+          other.fieldKey == this.fieldKey &&
+          other.numericValue == this.numericValue &&
+          other.unit == this.unit &&
+          other.displayOrder == this.displayOrder);
+}
+
+class MeasurementRecordValuesCompanion
+    extends UpdateCompanion<MeasurementRecordValue> {
+  final Value<int> id;
+  final Value<int> measurementRecordId;
+  final Value<String> fieldKey;
+  final Value<double> numericValue;
+  final Value<String> unit;
+  final Value<int> displayOrder;
+  const MeasurementRecordValuesCompanion({
+    this.id = const Value.absent(),
+    this.measurementRecordId = const Value.absent(),
+    this.fieldKey = const Value.absent(),
+    this.numericValue = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.displayOrder = const Value.absent(),
+  });
+  MeasurementRecordValuesCompanion.insert({
+    this.id = const Value.absent(),
+    required int measurementRecordId,
+    required String fieldKey,
+    required double numericValue,
+    required String unit,
+    this.displayOrder = const Value.absent(),
+  }) : measurementRecordId = Value(measurementRecordId),
+       fieldKey = Value(fieldKey),
+       numericValue = Value(numericValue),
+       unit = Value(unit);
+  static Insertable<MeasurementRecordValue> custom({
+    Expression<int>? id,
+    Expression<int>? measurementRecordId,
+    Expression<String>? fieldKey,
+    Expression<double>? numericValue,
+    Expression<String>? unit,
+    Expression<int>? displayOrder,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (measurementRecordId != null)
+        'measurement_record_id': measurementRecordId,
+      if (fieldKey != null) 'field_key': fieldKey,
+      if (numericValue != null) 'numeric_value': numericValue,
+      if (unit != null) 'unit': unit,
+      if (displayOrder != null) 'display_order': displayOrder,
+    });
+  }
+
+  MeasurementRecordValuesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? measurementRecordId,
+    Value<String>? fieldKey,
+    Value<double>? numericValue,
+    Value<String>? unit,
+    Value<int>? displayOrder,
+  }) {
+    return MeasurementRecordValuesCompanion(
+      id: id ?? this.id,
+      measurementRecordId: measurementRecordId ?? this.measurementRecordId,
+      fieldKey: fieldKey ?? this.fieldKey,
+      numericValue: numericValue ?? this.numericValue,
+      unit: unit ?? this.unit,
+      displayOrder: displayOrder ?? this.displayOrder,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (measurementRecordId.present) {
+      map['measurement_record_id'] = Variable<int>(measurementRecordId.value);
+    }
+    if (fieldKey.present) {
+      map['field_key'] = Variable<String>(fieldKey.value);
+    }
+    if (numericValue.present) {
+      map['numeric_value'] = Variable<double>(numericValue.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (displayOrder.present) {
+      map['display_order'] = Variable<int>(displayOrder.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeasurementRecordValuesCompanion(')
+          ..write('id: $id, ')
+          ..write('measurementRecordId: $measurementRecordId, ')
+          ..write('fieldKey: $fieldKey, ')
+          ..write('numericValue: $numericValue, ')
+          ..write('unit: $unit, ')
+          ..write('displayOrder: $displayOrder')
           ..write(')'))
         .toString();
   }
@@ -10378,8 +11682,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MeasurementTypesTable measurementTypes = $MeasurementTypesTable(
     this,
   );
+  late final $MeasurementTypeFieldsTable measurementTypeFields =
+      $MeasurementTypeFieldsTable(this);
   late final $MeasurementRecordsTable measurementRecords =
       $MeasurementRecordsTable(this);
+  late final $MeasurementRecordValuesTable measurementRecordValues =
+      $MeasurementRecordValuesTable(this);
   late final $MeasurementSchedulesTable measurementSchedules =
       $MeasurementSchedulesTable(this);
   late final $ExerciseTypesTable exerciseTypes = $ExerciseTypesTable(this);
@@ -10408,7 +11716,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     medicationComponents,
     medicationAlternativeComponents,
     measurementTypes,
+    measurementTypeFields,
     measurementRecords,
+    measurementRecordValues,
     measurementSchedules,
     exerciseTypes,
     exerciseGoals,
@@ -14802,11 +16112,14 @@ typedef $$MeasurementTypesTableCreateCompanionBuilder =
     MeasurementTypesCompanion Function({
       Value<int> id,
       Value<int?> profileId,
+      Value<String?> key,
       required String name,
       required String unit,
+      Value<String?> defaultUnit,
       required String measurementCategory,
       Value<bool> isSystem,
       Value<bool> active,
+      Value<int> displayOrder,
       required DateTime createdAt,
       required DateTime updatedAt,
     });
@@ -14814,11 +16127,14 @@ typedef $$MeasurementTypesTableUpdateCompanionBuilder =
     MeasurementTypesCompanion Function({
       Value<int> id,
       Value<int?> profileId,
+      Value<String?> key,
       Value<String> name,
       Value<String> unit,
+      Value<String?> defaultUnit,
       Value<String> measurementCategory,
       Value<bool> isSystem,
       Value<bool> active,
+      Value<int> displayOrder,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
@@ -14846,6 +16162,33 @@ final class $$MeasurementTypesTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $MeasurementTypeFieldsTable,
+    List<MeasurementTypeField>
+  >
+  _measurementTypeFieldsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.measurementTypeFields,
+    aliasName:
+        'measurement_types__id__measurement_type_fields__measurement_type_id',
+  );
+
+  $$MeasurementTypeFieldsTableProcessedTableManager
+  get measurementTypeFieldsRefs {
+    final manager = $$MeasurementTypeFieldsTableTableManager(
+      $_db,
+      $_db.measurementTypeFields,
+    ).filter((f) => f.measurementTypeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _measurementTypeFieldsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 
@@ -14912,6 +16255,11 @@ class $$MeasurementTypesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get name => $composableBuilder(
     column: $table.name,
     builder: (column) => ColumnFilters(column),
@@ -14919,6 +16267,11 @@ class $$MeasurementTypesTableFilterComposer
 
   ColumnFilters<String> get unit => $composableBuilder(
     column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get defaultUnit => $composableBuilder(
+    column: $table.defaultUnit,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -14934,6 +16287,11 @@ class $$MeasurementTypesTableFilterComposer
 
   ColumnFilters<bool> get active => $composableBuilder(
     column: $table.active,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -14968,6 +16326,32 @@ class $$MeasurementTypesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> measurementTypeFieldsRefs(
+    Expression<bool> Function($$MeasurementTypeFieldsTableFilterComposer f) f,
+  ) {
+    final $$MeasurementTypeFieldsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.measurementTypeFields,
+          getReferencedColumn: (t) => t.measurementTypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementTypeFieldsTableFilterComposer(
+                $db: $db,
+                $table: $db.measurementTypeFields,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 
   Expression<bool> measurementRecordsRefs(
@@ -15035,6 +16419,11 @@ class $$MeasurementTypesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get name => $composableBuilder(
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
@@ -15042,6 +16431,11 @@ class $$MeasurementTypesTableOrderingComposer
 
   ColumnOrderings<String> get unit => $composableBuilder(
     column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get defaultUnit => $composableBuilder(
+    column: $table.defaultUnit,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -15057,6 +16451,11 @@ class $$MeasurementTypesTableOrderingComposer
 
   ColumnOrderings<bool> get active => $composableBuilder(
     column: $table.active,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -15106,11 +16505,19 @@ class $$MeasurementTypesTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
   GeneratedColumn<String> get unit =>
       $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<String> get defaultUnit => $composableBuilder(
+    column: $table.defaultUnit,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get measurementCategory => $composableBuilder(
     column: $table.measurementCategory,
@@ -15122,6 +16529,11 @@ class $$MeasurementTypesTableAnnotationComposer
 
   GeneratedColumn<bool> get active =>
       $composableBuilder(column: $table.active, builder: (column) => column);
+
+  GeneratedColumn<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -15150,6 +16562,32 @@ class $$MeasurementTypesTableAnnotationComposer
           ),
     );
     return composer;
+  }
+
+  Expression<T> measurementTypeFieldsRefs<T extends Object>(
+    Expression<T> Function($$MeasurementTypeFieldsTableAnnotationComposer a) f,
+  ) {
+    final $$MeasurementTypeFieldsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.measurementTypeFields,
+          getReferencedColumn: (t) => t.measurementTypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementTypeFieldsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.measurementTypeFields,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 
   Expression<T> measurementRecordsRefs<T extends Object>(
@@ -15220,6 +16658,7 @@ class $$MeasurementTypesTableTableManager
           MeasurementType,
           PrefetchHooks Function({
             bool profileId,
+            bool measurementTypeFieldsRefs,
             bool measurementRecordsRefs,
             bool measurementSchedulesRefs,
           })
@@ -15241,21 +16680,27 @@ class $$MeasurementTypesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> profileId = const Value.absent(),
+                Value<String?> key = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> unit = const Value.absent(),
+                Value<String?> defaultUnit = const Value.absent(),
                 Value<String> measurementCategory = const Value.absent(),
                 Value<bool> isSystem = const Value.absent(),
                 Value<bool> active = const Value.absent(),
+                Value<int> displayOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => MeasurementTypesCompanion(
                 id: id,
                 profileId: profileId,
+                key: key,
                 name: name,
                 unit: unit,
+                defaultUnit: defaultUnit,
                 measurementCategory: measurementCategory,
                 isSystem: isSystem,
                 active: active,
+                displayOrder: displayOrder,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -15263,21 +16708,27 @@ class $$MeasurementTypesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> profileId = const Value.absent(),
+                Value<String?> key = const Value.absent(),
                 required String name,
                 required String unit,
+                Value<String?> defaultUnit = const Value.absent(),
                 required String measurementCategory,
                 Value<bool> isSystem = const Value.absent(),
                 Value<bool> active = const Value.absent(),
+                Value<int> displayOrder = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
               }) => MeasurementTypesCompanion.insert(
                 id: id,
                 profileId: profileId,
+                key: key,
                 name: name,
                 unit: unit,
+                defaultUnit: defaultUnit,
                 measurementCategory: measurementCategory,
                 isSystem: isSystem,
                 active: active,
+                displayOrder: displayOrder,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -15292,12 +16743,14 @@ class $$MeasurementTypesTableTableManager
           prefetchHooksCallback:
               ({
                 profileId = false,
+                measurementTypeFieldsRefs = false,
                 measurementRecordsRefs = false,
                 measurementSchedulesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
+                    if (measurementTypeFieldsRefs) db.measurementTypeFields,
                     if (measurementRecordsRefs) db.measurementRecords,
                     if (measurementSchedulesRefs) db.measurementSchedules,
                   ],
@@ -15337,6 +16790,27 @@ class $$MeasurementTypesTableTableManager
                       },
                   getPrefetchedDataCallback: (items) async {
                     return [
+                      if (measurementTypeFieldsRefs)
+                        await $_getPrefetchedData<
+                          MeasurementType,
+                          $MeasurementTypesTable,
+                          MeasurementTypeField
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MeasurementTypesTableReferences
+                              ._measurementTypeFieldsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MeasurementTypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).measurementTypeFieldsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.measurementTypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (measurementRecordsRefs)
                         await $_getPrefetchedData<
                           MeasurementType,
@@ -15401,9 +16875,469 @@ typedef $$MeasurementTypesTableProcessedTableManager =
       MeasurementType,
       PrefetchHooks Function({
         bool profileId,
+        bool measurementTypeFieldsRefs,
         bool measurementRecordsRefs,
         bool measurementSchedulesRefs,
       })
+    >;
+typedef $$MeasurementTypeFieldsTableCreateCompanionBuilder =
+    MeasurementTypeFieldsCompanion Function({
+      Value<int> id,
+      required int measurementTypeId,
+      required String fieldKey,
+      required String label,
+      Value<String?> defaultUnit,
+      Value<bool> required,
+      Value<double?> minimumValue,
+      Value<double?> maximumValue,
+      Value<int> decimalPlaces,
+      Value<int> displayOrder,
+      required DateTime createdAt,
+    });
+typedef $$MeasurementTypeFieldsTableUpdateCompanionBuilder =
+    MeasurementTypeFieldsCompanion Function({
+      Value<int> id,
+      Value<int> measurementTypeId,
+      Value<String> fieldKey,
+      Value<String> label,
+      Value<String?> defaultUnit,
+      Value<bool> required,
+      Value<double?> minimumValue,
+      Value<double?> maximumValue,
+      Value<int> decimalPlaces,
+      Value<int> displayOrder,
+      Value<DateTime> createdAt,
+    });
+
+final class $$MeasurementTypeFieldsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MeasurementTypeFieldsTable,
+          MeasurementTypeField
+        > {
+  $$MeasurementTypeFieldsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MeasurementTypesTable _measurementTypeIdTable(_$AppDatabase db) =>
+      db.measurementTypes.createAlias(
+        'measurement_type_fields__measurement_type_id__measurement_types__id',
+      );
+
+  $$MeasurementTypesTableProcessedTableManager get measurementTypeId {
+    final $_column = $_itemColumn<int>('measurement_type_id')!;
+
+    final manager = $$MeasurementTypesTableTableManager(
+      $_db,
+      $_db.measurementTypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_measurementTypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MeasurementTypeFieldsTableFilterComposer
+    extends Composer<_$AppDatabase, $MeasurementTypeFieldsTable> {
+  $$MeasurementTypeFieldsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fieldKey => $composableBuilder(
+    column: $table.fieldKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get defaultUnit => $composableBuilder(
+    column: $table.defaultUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get required => $composableBuilder(
+    column: $table.required,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get minimumValue => $composableBuilder(
+    column: $table.minimumValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get maximumValue => $composableBuilder(
+    column: $table.maximumValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get decimalPlaces => $composableBuilder(
+    column: $table.decimalPlaces,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MeasurementTypesTableFilterComposer get measurementTypeId {
+    final $$MeasurementTypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.measurementTypeId,
+      referencedTable: $db.measurementTypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeasurementTypesTableFilterComposer(
+            $db: $db,
+            $table: $db.measurementTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeasurementTypeFieldsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MeasurementTypeFieldsTable> {
+  $$MeasurementTypeFieldsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fieldKey => $composableBuilder(
+    column: $table.fieldKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get defaultUnit => $composableBuilder(
+    column: $table.defaultUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get required => $composableBuilder(
+    column: $table.required,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get minimumValue => $composableBuilder(
+    column: $table.minimumValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get maximumValue => $composableBuilder(
+    column: $table.maximumValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get decimalPlaces => $composableBuilder(
+    column: $table.decimalPlaces,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MeasurementTypesTableOrderingComposer get measurementTypeId {
+    final $$MeasurementTypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.measurementTypeId,
+      referencedTable: $db.measurementTypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeasurementTypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.measurementTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeasurementTypeFieldsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MeasurementTypeFieldsTable> {
+  $$MeasurementTypeFieldsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fieldKey =>
+      $composableBuilder(column: $table.fieldKey, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<String> get defaultUnit => $composableBuilder(
+    column: $table.defaultUnit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get required =>
+      $composableBuilder(column: $table.required, builder: (column) => column);
+
+  GeneratedColumn<double> get minimumValue => $composableBuilder(
+    column: $table.minimumValue,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get maximumValue => $composableBuilder(
+    column: $table.maximumValue,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get decimalPlaces => $composableBuilder(
+    column: $table.decimalPlaces,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$MeasurementTypesTableAnnotationComposer get measurementTypeId {
+    final $$MeasurementTypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.measurementTypeId,
+      referencedTable: $db.measurementTypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeasurementTypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.measurementTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeasurementTypeFieldsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MeasurementTypeFieldsTable,
+          MeasurementTypeField,
+          $$MeasurementTypeFieldsTableFilterComposer,
+          $$MeasurementTypeFieldsTableOrderingComposer,
+          $$MeasurementTypeFieldsTableAnnotationComposer,
+          $$MeasurementTypeFieldsTableCreateCompanionBuilder,
+          $$MeasurementTypeFieldsTableUpdateCompanionBuilder,
+          (MeasurementTypeField, $$MeasurementTypeFieldsTableReferences),
+          MeasurementTypeField,
+          PrefetchHooks Function({bool measurementTypeId})
+        > {
+  $$MeasurementTypeFieldsTableTableManager(
+    _$AppDatabase db,
+    $MeasurementTypeFieldsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MeasurementTypeFieldsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$MeasurementTypeFieldsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MeasurementTypeFieldsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> measurementTypeId = const Value.absent(),
+                Value<String> fieldKey = const Value.absent(),
+                Value<String> label = const Value.absent(),
+                Value<String?> defaultUnit = const Value.absent(),
+                Value<bool> required = const Value.absent(),
+                Value<double?> minimumValue = const Value.absent(),
+                Value<double?> maximumValue = const Value.absent(),
+                Value<int> decimalPlaces = const Value.absent(),
+                Value<int> displayOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MeasurementTypeFieldsCompanion(
+                id: id,
+                measurementTypeId: measurementTypeId,
+                fieldKey: fieldKey,
+                label: label,
+                defaultUnit: defaultUnit,
+                required: required,
+                minimumValue: minimumValue,
+                maximumValue: maximumValue,
+                decimalPlaces: decimalPlaces,
+                displayOrder: displayOrder,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int measurementTypeId,
+                required String fieldKey,
+                required String label,
+                Value<String?> defaultUnit = const Value.absent(),
+                Value<bool> required = const Value.absent(),
+                Value<double?> minimumValue = const Value.absent(),
+                Value<double?> maximumValue = const Value.absent(),
+                Value<int> decimalPlaces = const Value.absent(),
+                Value<int> displayOrder = const Value.absent(),
+                required DateTime createdAt,
+              }) => MeasurementTypeFieldsCompanion.insert(
+                id: id,
+                measurementTypeId: measurementTypeId,
+                fieldKey: fieldKey,
+                label: label,
+                defaultUnit: defaultUnit,
+                required: required,
+                minimumValue: minimumValue,
+                maximumValue: maximumValue,
+                decimalPlaces: decimalPlaces,
+                displayOrder: displayOrder,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MeasurementTypeFieldsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({measurementTypeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (measurementTypeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.measurementTypeId,
+                                referencedTable:
+                                    $$MeasurementTypeFieldsTableReferences
+                                        ._measurementTypeIdTable(db),
+                                referencedColumn:
+                                    $$MeasurementTypeFieldsTableReferences
+                                        ._measurementTypeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MeasurementTypeFieldsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MeasurementTypeFieldsTable,
+      MeasurementTypeField,
+      $$MeasurementTypeFieldsTableFilterComposer,
+      $$MeasurementTypeFieldsTableOrderingComposer,
+      $$MeasurementTypeFieldsTableAnnotationComposer,
+      $$MeasurementTypeFieldsTableCreateCompanionBuilder,
+      $$MeasurementTypeFieldsTableUpdateCompanionBuilder,
+      (MeasurementTypeField, $$MeasurementTypeFieldsTableReferences),
+      MeasurementTypeField,
+      PrefetchHooks Function({bool measurementTypeId})
     >;
 typedef $$MeasurementRecordsTableCreateCompanionBuilder =
     MeasurementRecordsCompanion Function({
@@ -15417,6 +17351,7 @@ typedef $$MeasurementRecordsTableCreateCompanionBuilder =
       required String unit,
       Value<String?> notes,
       required DateTime createdAt,
+      Value<DateTime?> updatedAt,
     });
 typedef $$MeasurementRecordsTableUpdateCompanionBuilder =
     MeasurementRecordsCompanion Function({
@@ -15430,6 +17365,7 @@ typedef $$MeasurementRecordsTableUpdateCompanionBuilder =
       Value<String> unit,
       Value<String?> notes,
       Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
     });
 
 final class $$MeasurementRecordsTableReferences
@@ -15478,6 +17414,36 @@ final class $$MeasurementRecordsTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $MeasurementRecordValuesTable,
+    List<MeasurementRecordValue>
+  >
+  _measurementRecordValuesRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.measurementRecordValues,
+    aliasName:
+        'measurement_records__id__measurement_record_values__measurement_record_id',
+  );
+
+  $$MeasurementRecordValuesTableProcessedTableManager
+  get measurementRecordValuesRefs {
+    final manager =
+        $$MeasurementRecordValuesTableTableManager(
+          $_db,
+          $_db.measurementRecordValues,
+        ).filter(
+          (f) => f.measurementRecordId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _measurementRecordValuesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
@@ -15531,6 +17497,11 @@ class $$MeasurementRecordsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$ProfilesTableFilterComposer get profileId {
     final $$ProfilesTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -15575,6 +17546,32 @@ class $$MeasurementRecordsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> measurementRecordValuesRefs(
+    Expression<bool> Function($$MeasurementRecordValuesTableFilterComposer f) f,
+  ) {
+    final $$MeasurementRecordValuesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.measurementRecordValues,
+          getReferencedColumn: (t) => t.measurementRecordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementRecordValuesTableFilterComposer(
+                $db: $db,
+                $table: $db.measurementRecordValues,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 }
 
@@ -15624,6 +17621,11 @@ class $$MeasurementRecordsTableOrderingComposer
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -15713,6 +17715,9 @@ class $$MeasurementRecordsTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
   $$ProfilesTableAnnotationComposer get profileId {
     final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -15758,6 +17763,33 @@ class $$MeasurementRecordsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> measurementRecordValuesRefs<T extends Object>(
+    Expression<T> Function($$MeasurementRecordValuesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$MeasurementRecordValuesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.measurementRecordValues,
+          getReferencedColumn: (t) => t.measurementRecordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementRecordValuesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.measurementRecordValues,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MeasurementRecordsTableTableManager
@@ -15773,7 +17805,11 @@ class $$MeasurementRecordsTableTableManager
           $$MeasurementRecordsTableUpdateCompanionBuilder,
           (MeasurementRecord, $$MeasurementRecordsTableReferences),
           MeasurementRecord,
-          PrefetchHooks Function({bool profileId, bool measurementTypeId})
+          PrefetchHooks Function({
+            bool profileId,
+            bool measurementTypeId,
+            bool measurementRecordValuesRefs,
+          })
         > {
   $$MeasurementRecordsTableTableManager(
     _$AppDatabase db,
@@ -15803,6 +17839,7 @@ class $$MeasurementRecordsTableTableManager
                 Value<String> unit = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
               }) => MeasurementRecordsCompanion(
                 id: id,
                 profileId: profileId,
@@ -15814,6 +17851,7 @@ class $$MeasurementRecordsTableTableManager
                 unit: unit,
                 notes: notes,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
               ),
           createCompanionCallback:
               ({
@@ -15827,6 +17865,7 @@ class $$MeasurementRecordsTableTableManager
                 required String unit,
                 Value<String?> notes = const Value.absent(),
                 required DateTime createdAt,
+                Value<DateTime?> updatedAt = const Value.absent(),
               }) => MeasurementRecordsCompanion.insert(
                 id: id,
                 profileId: profileId,
@@ -15838,6 +17877,7 @@ class $$MeasurementRecordsTableTableManager
                 unit: unit,
                 notes: notes,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -15848,10 +17888,16 @@ class $$MeasurementRecordsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({profileId = false, measurementTypeId = false}) {
+              ({
+                profileId = false,
+                measurementTypeId = false,
+                measurementRecordValuesRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [],
+                  explicitlyWatchedTables: [
+                    if (measurementRecordValuesRefs) db.measurementRecordValues,
+                  ],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -15902,7 +17948,29 @@ class $$MeasurementRecordsTableTableManager
                         return state;
                       },
                   getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return [
+                      if (measurementRecordValuesRefs)
+                        await $_getPrefetchedData<
+                          MeasurementRecord,
+                          $MeasurementRecordsTable,
+                          MeasurementRecordValue
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MeasurementRecordsTableReferences
+                              ._measurementRecordValuesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MeasurementRecordsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).measurementRecordValuesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.measurementRecordId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
                 );
               },
@@ -15922,7 +17990,371 @@ typedef $$MeasurementRecordsTableProcessedTableManager =
       $$MeasurementRecordsTableUpdateCompanionBuilder,
       (MeasurementRecord, $$MeasurementRecordsTableReferences),
       MeasurementRecord,
-      PrefetchHooks Function({bool profileId, bool measurementTypeId})
+      PrefetchHooks Function({
+        bool profileId,
+        bool measurementTypeId,
+        bool measurementRecordValuesRefs,
+      })
+    >;
+typedef $$MeasurementRecordValuesTableCreateCompanionBuilder =
+    MeasurementRecordValuesCompanion Function({
+      Value<int> id,
+      required int measurementRecordId,
+      required String fieldKey,
+      required double numericValue,
+      required String unit,
+      Value<int> displayOrder,
+    });
+typedef $$MeasurementRecordValuesTableUpdateCompanionBuilder =
+    MeasurementRecordValuesCompanion Function({
+      Value<int> id,
+      Value<int> measurementRecordId,
+      Value<String> fieldKey,
+      Value<double> numericValue,
+      Value<String> unit,
+      Value<int> displayOrder,
+    });
+
+final class $$MeasurementRecordValuesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MeasurementRecordValuesTable,
+          MeasurementRecordValue
+        > {
+  $$MeasurementRecordValuesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MeasurementRecordsTable _measurementRecordIdTable(
+    _$AppDatabase db,
+  ) => db.measurementRecords.createAlias(
+    'measurement_record_values__measurement_record_id__measurement_records__id',
+  );
+
+  $$MeasurementRecordsTableProcessedTableManager get measurementRecordId {
+    final $_column = $_itemColumn<int>('measurement_record_id')!;
+
+    final manager = $$MeasurementRecordsTableTableManager(
+      $_db,
+      $_db.measurementRecords,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_measurementRecordIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MeasurementRecordValuesTableFilterComposer
+    extends Composer<_$AppDatabase, $MeasurementRecordValuesTable> {
+  $$MeasurementRecordValuesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fieldKey => $composableBuilder(
+    column: $table.fieldKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get numericValue => $composableBuilder(
+    column: $table.numericValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MeasurementRecordsTableFilterComposer get measurementRecordId {
+    final $$MeasurementRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.measurementRecordId,
+      referencedTable: $db.measurementRecords,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeasurementRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.measurementRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeasurementRecordValuesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MeasurementRecordValuesTable> {
+  $$MeasurementRecordValuesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fieldKey => $composableBuilder(
+    column: $table.fieldKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get numericValue => $composableBuilder(
+    column: $table.numericValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MeasurementRecordsTableOrderingComposer get measurementRecordId {
+    final $$MeasurementRecordsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.measurementRecordId,
+      referencedTable: $db.measurementRecords,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeasurementRecordsTableOrderingComposer(
+            $db: $db,
+            $table: $db.measurementRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeasurementRecordValuesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MeasurementRecordValuesTable> {
+  $$MeasurementRecordValuesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fieldKey =>
+      $composableBuilder(column: $table.fieldKey, builder: (column) => column);
+
+  GeneratedColumn<double> get numericValue => $composableBuilder(
+    column: $table.numericValue,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<int> get displayOrder => $composableBuilder(
+    column: $table.displayOrder,
+    builder: (column) => column,
+  );
+
+  $$MeasurementRecordsTableAnnotationComposer get measurementRecordId {
+    final $$MeasurementRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.measurementRecordId,
+          referencedTable: $db.measurementRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.measurementRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$MeasurementRecordValuesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MeasurementRecordValuesTable,
+          MeasurementRecordValue,
+          $$MeasurementRecordValuesTableFilterComposer,
+          $$MeasurementRecordValuesTableOrderingComposer,
+          $$MeasurementRecordValuesTableAnnotationComposer,
+          $$MeasurementRecordValuesTableCreateCompanionBuilder,
+          $$MeasurementRecordValuesTableUpdateCompanionBuilder,
+          (MeasurementRecordValue, $$MeasurementRecordValuesTableReferences),
+          MeasurementRecordValue,
+          PrefetchHooks Function({bool measurementRecordId})
+        > {
+  $$MeasurementRecordValuesTableTableManager(
+    _$AppDatabase db,
+    $MeasurementRecordValuesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MeasurementRecordValuesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$MeasurementRecordValuesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MeasurementRecordValuesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> measurementRecordId = const Value.absent(),
+                Value<String> fieldKey = const Value.absent(),
+                Value<double> numericValue = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<int> displayOrder = const Value.absent(),
+              }) => MeasurementRecordValuesCompanion(
+                id: id,
+                measurementRecordId: measurementRecordId,
+                fieldKey: fieldKey,
+                numericValue: numericValue,
+                unit: unit,
+                displayOrder: displayOrder,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int measurementRecordId,
+                required String fieldKey,
+                required double numericValue,
+                required String unit,
+                Value<int> displayOrder = const Value.absent(),
+              }) => MeasurementRecordValuesCompanion.insert(
+                id: id,
+                measurementRecordId: measurementRecordId,
+                fieldKey: fieldKey,
+                numericValue: numericValue,
+                unit: unit,
+                displayOrder: displayOrder,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MeasurementRecordValuesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({measurementRecordId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (measurementRecordId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.measurementRecordId,
+                                referencedTable:
+                                    $$MeasurementRecordValuesTableReferences
+                                        ._measurementRecordIdTable(db),
+                                referencedColumn:
+                                    $$MeasurementRecordValuesTableReferences
+                                        ._measurementRecordIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MeasurementRecordValuesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MeasurementRecordValuesTable,
+      MeasurementRecordValue,
+      $$MeasurementRecordValuesTableFilterComposer,
+      $$MeasurementRecordValuesTableOrderingComposer,
+      $$MeasurementRecordValuesTableAnnotationComposer,
+      $$MeasurementRecordValuesTableCreateCompanionBuilder,
+      $$MeasurementRecordValuesTableUpdateCompanionBuilder,
+      (MeasurementRecordValue, $$MeasurementRecordValuesTableReferences),
+      MeasurementRecordValue,
+      PrefetchHooks Function({bool measurementRecordId})
     >;
 typedef $$MeasurementSchedulesTableCreateCompanionBuilder =
     MeasurementSchedulesCompanion Function({
@@ -20359,8 +22791,15 @@ class $AppDatabaseManager {
       );
   $$MeasurementTypesTableTableManager get measurementTypes =>
       $$MeasurementTypesTableTableManager(_db, _db.measurementTypes);
+  $$MeasurementTypeFieldsTableTableManager get measurementTypeFields =>
+      $$MeasurementTypeFieldsTableTableManager(_db, _db.measurementTypeFields);
   $$MeasurementRecordsTableTableManager get measurementRecords =>
       $$MeasurementRecordsTableTableManager(_db, _db.measurementRecords);
+  $$MeasurementRecordValuesTableTableManager get measurementRecordValues =>
+      $$MeasurementRecordValuesTableTableManager(
+        _db,
+        _db.measurementRecordValues,
+      );
   $$MeasurementSchedulesTableTableManager get measurementSchedules =>
       $$MeasurementSchedulesTableTableManager(_db, _db.measurementSchedules);
   $$ExerciseTypesTableTableManager get exerciseTypes =>

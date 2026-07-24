@@ -746,12 +746,6 @@ abstract class AppLocalizations {
   /// **'History & Adherence'**
   String get historySection;
 
-  /// No description provided for @viewHistory.
-  ///
-  /// In en, this message translates to:
-  /// **'View History'**
-  String get viewHistory;
-
   /// No description provided for @historyScreenTitle.
   ///
   /// In en, this message translates to:
@@ -931,6 +925,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Component Name (optional)'**
   String get componentNameOptional;
+
+  /// No description provided for @measurements.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurements'**
+  String get measurements;
+
+  /// No description provided for @measurementTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement Types'**
+  String get measurementTypes;
+
+  /// No description provided for @addMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Measurement'**
+  String get addMeasurement;
+
+  /// No description provided for @editMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Measurement'**
+  String get editMeasurement;
+
+  /// No description provided for @measurementHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement History'**
+  String get measurementHistory;
+
+  /// No description provided for @measuredAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Measured at'**
+  String get measuredAt;
+
+  /// No description provided for @latestReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest reading'**
+  String get latestReading;
+
+  /// No description provided for @noMeasurementsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No measurement types available'**
+  String get noMeasurementsYet;
+
+  /// No description provided for @noReadingsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No readings yet'**
+  String get noReadingsYet;
+
+  /// No description provided for @addFirstReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first reading'**
+  String get addFirstReading;
+
+  /// No description provided for @bloodPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Pressure'**
+  String get bloodPressure;
+
+  /// No description provided for @systolic.
+  ///
+  /// In en, this message translates to:
+  /// **'Systolic'**
+  String get systolic;
+
+  /// No description provided for @diastolic.
+  ///
+  /// In en, this message translates to:
+  /// **'Diastolic'**
+  String get diastolic;
+
+  /// No description provided for @pulse.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulse'**
+  String get pulse;
+
+  /// No description provided for @weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get weight;
+
+  /// No description provided for @bloodGlucose.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Glucose'**
+  String get bloodGlucose;
+
+  /// No description provided for @spo2.
+  ///
+  /// In en, this message translates to:
+  /// **'SpO2'**
+  String get spo2;
+
+  /// No description provided for @temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get temperature;
+
+  /// No description provided for @pulseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'pulse'**
+  String get pulseLabel;
+
+  /// No description provided for @fieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Field Name'**
+  String get fieldName;
+
+  /// No description provided for @unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get unit;
+
+  /// No description provided for @requiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get requiredField;
+
+  /// No description provided for @minimumValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum Value'**
+  String get minimumValue;
+
+  /// No description provided for @maximumValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum Value'**
+  String get maximumValue;
+
+  /// No description provided for @invalidMeasurementValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid measurement value'**
+  String get invalidMeasurementValue;
+
+  /// No description provided for @failedToSaveMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save measurement'**
+  String get failedToSaveMeasurement;
+
+  /// No description provided for @measurementAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement added'**
+  String get measurementAdded;
+
+  /// No description provided for @measurementUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement updated'**
+  String get measurementUpdated;
+
+  /// No description provided for @measurementDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement deleted'**
+  String get measurementDeleted;
+
+  /// No description provided for @confirmDeleteMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this reading?'**
+  String get confirmDeleteMeasurement;
+
+  /// No description provided for @readingSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading saved'**
+  String get readingSaved;
+
+  /// No description provided for @readingUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading updated'**
+  String get readingUpdated;
+
+  /// No description provided for @readingDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading deleted'**
+  String get readingDeleted;
+
+  /// No description provided for @noMeasurementsHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet'**
+  String get noMeasurementsHistory;
+
+  /// No description provided for @noMeasurementsHistoryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your measurement history will appear here'**
+  String get noMeasurementsHistoryDescription;
+
+  /// No description provided for @measurementValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get measurementValue;
+
+  /// No description provided for @measurementUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get measurementUnit;
+
+  /// No description provided for @selectMeasurementType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select measurement type'**
+  String get selectMeasurementType;
+
+  /// No description provided for @addReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Reading'**
+  String get addReading;
+
+  /// No description provided for @addReadingTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Reading'**
+  String get addReadingTooltip;
+
+  /// No description provided for @viewHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View History'**
+  String get viewHistory;
+
+  /// No description provided for @valueRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Value is required'**
+  String get valueRequired;
+
+  /// No description provided for @mustBePositive.
+  ///
+  /// In en, this message translates to:
+  /// **'Value must be positive'**
+  String get mustBePositive;
+
+  /// No description provided for @systolicGreaterThanDiastolic.
+  ///
+  /// In en, this message translates to:
+  /// **'Systolic should be greater than diastolic'**
+  String get systolicGreaterThanDiastolic;
 }
 
 class _AppLocalizationsDelegate

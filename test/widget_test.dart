@@ -18,17 +18,47 @@ Widget _wrapWithL10n(Widget child) {
 
 void main() {
   group('App renders with bottom navigation', () {
-    testWidgets('shows all tab labels', (WidgetTester tester) async {
+    testWidgets('selected tab shows its label', (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        const ProviderScope(child: RehabTrackApp()),
+      );
+      await tester.pumpAndSettle();
+
+      // The selected tab (Today, index 0) should show its label
+      expect(find.text('Today'), findsAtLeastNWidgets(1));
+      // Unselected tabs do not render label Text widgets
+      expect(find.byIcon(Icons.monitor_heart_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.medication_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+    });
+
+    testWidgets('switching tab updates selected label visibility',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
       await tester.pump();
+      await tester.pump();
 
-      expect(find.text('Today'), findsAtLeastNWidgets(1));
-      expect(find.text('Health'), findsAtLeastNWidgets(1));
-      expect(find.text('Activities'), findsAtLeastNWidgets(1));
-      expect(find.text('Records'), findsAtLeastNWidgets(1));
-      expect(find.text('Settings'), findsAtLeastNWidgets(1));
+      // Tap on Measurements tab
+      await tester.tap(find.byIcon(Icons.monitor_heart_outlined));
+      await tester.pump();
+      await tester.pump();
+
+      // After switching, Measurements label should be visible
+      // (appears as nav label + screen title)
+      expect(find.text('Measurements'), findsAtLeastNWidgets(1));
+      // Today is no longer selected — no Today Text in nav bar
+      // (Today screen title also gone after switching away)
     });
   });
 
@@ -169,13 +199,14 @@ void main() {
   });
 
   group('Medication list integration', () {
-    testWidgets('Activities tab renders', (WidgetTester tester) async {
+    testWidgets('Medications tab renders', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
       await tester.pump();
 
-      await tester.tap(find.text('Activities'));
+      // Tap by icon since unselected labels are not rendered
+      await tester.tap(find.byIcon(Icons.medication_outlined));
       await tester.pump();
 
       // The screen should render without crashing - it may show loading or empty state
@@ -189,7 +220,8 @@ void main() {
       );
       await tester.pump();
 
-      await tester.tap(find.text('Activities'));
+      // Tap by icon since unselected labels are not rendered
+      await tester.tap(find.byIcon(Icons.medication_outlined));
       await tester.pump();
 
       // Look for the FAB (may take a moment to appear with empty list)

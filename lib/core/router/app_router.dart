@@ -14,6 +14,9 @@ import 'package:rehab_track/presentation/screens/activities/edit_schedule_screen
 import 'package:rehab_track/presentation/screens/activities/add_alternative_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/edit_alternative_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/medication_history_screen.dart';
+import 'package:rehab_track/presentation/screens/health/measurement_entry_screen.dart';
+import 'package:rehab_track/presentation/screens/health/measurement_edit_screen.dart';
+import 'package:rehab_track/presentation/screens/health/measurement_history_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
 
@@ -147,6 +150,39 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
+      GoRoute(
+        path: '/health/measurement/:typeId/add',
+        builder: (context, state) {
+          final typeId =
+              int.tryParse(state.pathParameters['typeId'] ?? '');
+          if (typeId == null) {
+            return const _InvalidRouteScreen();
+          }
+          return MeasurementEntryScreen(measurementTypeId: typeId);
+        },
+      ),
+      GoRoute(
+        path: '/health/measurement/:typeId/history',
+        builder: (context, state) {
+          final typeId =
+              int.tryParse(state.pathParameters['typeId'] ?? '');
+          if (typeId == null) {
+            return const _InvalidRouteScreen();
+          }
+          return MeasurementHistoryScreen(measurementTypeId: typeId);
+        },
+      ),
+      GoRoute(
+        path: '/health/measurement/record/:recordId/edit',
+        builder: (context, state) {
+          final recordId =
+              int.tryParse(state.pathParameters['recordId'] ?? '');
+          if (recordId == null) {
+            return const _InvalidRouteScreen();
+          }
+          return MeasurementEditScreen(recordId: recordId);
+        },
+      ),
     ],
   );
 });
@@ -220,36 +256,128 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: _CenteredNavigationBar(
         selectedIndex: _calculateSelectedIndex(context),
-        onDestinationSelected: (index) => _onItemTapped(context, index),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.today_outlined),
-            selectedIcon: const Icon(Icons.today),
+        onItemTapped: (index) => _onItemTapped(context, index),
+        items: [
+          _NavItem(
+            icon: Icons.today_outlined,
+            selectedIcon: Icons.today,
             label: l10n.today,
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.favorite_outline),
-            selectedIcon: const Icon(Icons.favorite),
-            label: l10n.health,
+          _NavItem(
+            icon: Icons.monitor_heart_outlined,
+            selectedIcon: Icons.monitor_heart,
+            label: l10n.measurements,
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.directions_walk_outlined),
-            selectedIcon: const Icon(Icons.directions_walk),
-            label: l10n.activities,
+          _NavItem(
+            icon: Icons.medication_outlined,
+            selectedIcon: Icons.medication,
+            label: l10n.medications,
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.folder_outlined),
-            selectedIcon: const Icon(Icons.folder),
+          _NavItem(
+            icon: Icons.folder_outlined,
+            selectedIcon: Icons.folder,
             label: l10n.records,
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
+          _NavItem(
+            icon: Icons.settings_outlined,
+            selectedIcon: Icons.settings,
             label: l10n.settings,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _NavItem {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+
+  const _NavItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+  });
+}
+
+class _CenteredNavigationBar extends StatelessWidget {
+  final int selectedIndex;
+  final ValueChanged<int> onItemTapped;
+  final List<_NavItem> items;
+
+  const _CenteredNavigationBar({
+    required this.selectedIndex,
+    required this.onItemTapped,
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Material(
+      color: isDark
+          ? colorScheme.surfaceContainer
+          : colorScheme.surfaceContainerLow,
+      elevation: 3,
+      child: SafeArea(
+        child: SizedBox(
+          height: 80,
+          child: Row(
+            children: List.generate(items.length, (index) {
+              final item = items[index];
+              final isSelected = index == selectedIndex;
+
+              return Expanded(
+                child: InkWell(
+                  onTap: () => onItemTapped(index),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 4),
+                      SizedBox(
+                        width: 64,
+                        height: 32,
+                        child: Center(
+                          child: isSelected
+                              ? Icon(item.selectedIcon, size: 24)
+                              : Icon(item.icon, size: 24),
+                        ),
+                      ),
+                      SizedBox(
+                        height: isSelected ? 36 : 0,
+                        child: isSelected
+                            ? Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  child: Text(
+                                    item.label,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.visible,
+                                    style: theme.textTheme.labelMedium!
+                                        .copyWith(
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
       ),
     );
   }

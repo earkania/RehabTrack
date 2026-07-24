@@ -10,6 +10,15 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
   MeasurementRepositoryImpl(this._database);
 
   @override
+  Stream<List<MeasurementType>> watchActiveMeasurementTypes(
+    int? profileId,
+  ) {
+    return _database.measurementDao
+        .watchActiveMeasurementTypes(profileId)
+        .map((rows) => rows.map(_typeToDomain).toList());
+  }
+
+  @override
   Stream<List<MeasurementType>> watchMeasurementTypes(
     int? profileId,
   ) {
@@ -35,16 +44,28 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
   }
 
   @override
+  Future<MeasurementType?> getMeasurementTypeByKey(
+    String key,
+  ) async {
+    final row = await _database.measurementDao
+        .getMeasurementTypeByKey(key);
+    return row != null ? _typeToDomain(row) : null;
+  }
+
+  @override
   Future<int> createMeasurementType(MeasurementType type) async {
     final now = DateTime.now();
     return _database.measurementDao.insertMeasurementType(
       db.MeasurementTypesCompanion.insert(
         name: type.name,
         unit: type.unit,
+        defaultUnit: Value(type.defaultUnit),
         measurementCategory: type.measurementCategory,
         isSystem: Value(type.isSystem),
         active: Value(type.active),
         profileId: Value(type.profileId),
+        key: Value(type.key),
+        displayOrder: Value(type.displayOrder),
         createdAt: now,
         updatedAt: now,
       ),
@@ -58,19 +79,51 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         id: Value(type.id!),
         name: Value(type.name),
         unit: Value(type.unit),
+        defaultUnit: Value(type.defaultUnit),
         measurementCategory:
             Value(type.measurementCategory),
         isSystem: Value(type.isSystem),
         active: Value(type.active),
         profileId: Value(type.profileId),
+        key: Value(type.key),
+        displayOrder: Value(type.displayOrder),
+        updatedAt: Value(DateTime.now()),
       ),
     );
   }
 
   @override
-  Future<void> deleteMeasurementType(int id) async {
-    await _database.measurementDao.deleteMeasurementType(id);
+  Future<void> deactivateMeasurementType(int id) async {
+    await _database.measurementDao.updateMeasurementType(
+      db.MeasurementTypesCompanion(
+        id: Value(id),
+        active: const Value(false),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
   }
+
+  // --- Fields ---
+
+  @override
+  Stream<List<MeasurementTypeField>> watchFieldsForType(
+    int measurementTypeId,
+  ) {
+    return _database.measurementDao
+        .watchFieldsForType(measurementTypeId)
+        .map((rows) => rows.map(_fieldToDomain).toList());
+  }
+
+  @override
+  Future<List<MeasurementTypeField>> getFieldsForType(
+    int measurementTypeId,
+  ) async {
+    final rows = await _database.measurementDao
+        .getFieldsForType(measurementTypeId);
+    return rows.map(_fieldToDomain).toList();
+  }
+
+  // --- Records ---
 
   @override
   Stream<List<MeasurementRecord>> watchRecords(
@@ -106,26 +159,109 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
   }
 
   @override
-  Future<int> createRecord(MeasurementRecord record) async {
-    return _database.measurementDao.insertRecord(
-      db.MeasurementRecordsCompanion.insert(
-        profileId: record.profileId,
-        measurementTypeId: record.measurementTypeId,
-        timestamp: record.timestamp,
-        valuePrimary: record.valuePrimary,
-        valueSecondary: Value(record.valueSecondary),
-        valueTertiary: Value(record.valueTertiary),
-        unit: record.unit,
-        notes: Value(record.notes),
-        createdAt: record.createdAt,
-      ),
-    );
+  Future<MeasurementRecord?> getRecord(int id) async {
+    final row = await _database.measurementDao.getRecord(id);
+    return row != null ? _recordToDomain(row) : null;
+  }
+
+  @override
+  Future<int> createRecord(
+    MeasurementRecord record,
+    List<MeasurementRecordValue> values,
+  ) async {
+    return _database.transaction(() async {
+      final now = DateTime.now();
+      final recordId = await _database.measurementDao.insertRecord(
+        db.MeasurementRecordsCompanion.insert(
+          profileId: record.profileId,
+          measurementTypeId: record.measurementTypeId,
+          timestamp: record.timestamp,
+          valuePrimary: record.valuePrimary,
+          valueSecondary: Value(record.valueSecondary),
+          valueTertiary: Value(record.valueTertiary),
+          unit: record.unit,
+          notes: Value(record.notes),
+          createdAt: now,
+          updatedAt: Value(now),
+        ),
+      );
+      if (values.isNotEmpty) {
+        await _database.measurementDao.replaceRecordValues(
+          recordId,
+          values
+              .map(
+                (v) => db.MeasurementRecordValuesCompanion.insert(
+                  measurementRecordId: recordId,
+                  fieldKey: v.fieldKey,
+                  numericValue: v.numericValue,
+                  unit: v.unit,
+                  displayOrder: Value(v.displayOrder),
+                ),
+              )
+              .toList(),
+        );
+      }
+      return recordId;
+    });
+  }
+
+  @override
+  Future<void> updateRecord(
+    MeasurementRecord record,
+    List<MeasurementRecordValue> values,
+  ) async {
+    await _database.transaction(() async {
+      await _database.measurementDao.updateRecord(
+        db.MeasurementRecordsCompanion(
+          id: Value(record.id!),
+          profileId: Value(record.profileId),
+          measurementTypeId: Value(record.measurementTypeId),
+          timestamp: Value(record.timestamp),
+          valuePrimary: Value(record.valuePrimary),
+          valueSecondary: Value(record.valueSecondary),
+          valueTertiary: Value(record.valueTertiary),
+          unit: Value(record.unit),
+          notes: Value(record.notes),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+      await _database.measurementDao.replaceRecordValues(
+        record.id!,
+        values
+            .map(
+              (v) => db.MeasurementRecordValuesCompanion(
+                id: v.id != null ? Value(v.id!) : const Value.absent(),
+                measurementRecordId: Value(record.id!),
+                fieldKey: Value(v.fieldKey),
+                numericValue: Value(v.numericValue),
+                unit: Value(v.unit),
+                displayOrder: Value(v.displayOrder),
+              ),
+            )
+            .toList(),
+      );
+    });
   }
 
   @override
   Future<void> deleteRecord(int id) async {
-    await _database.measurementDao.deleteRecord(id);
+    await _database.transaction(() async {
+      await _database.measurementDao.deleteRecord(id);
+    });
   }
+
+  // --- Record Values ---
+
+  @override
+  Future<List<MeasurementRecordValue>> getValuesForRecord(
+    int measurementRecordId,
+  ) async {
+    final rows = await _database.measurementDao
+        .getValuesForRecord(measurementRecordId);
+    return rows.map(_recordValueToDomain).toList();
+  }
+
+  // --- Schedules ---
 
   @override
   Stream<List<MeasurementSchedule>> watchSchedules(
@@ -173,15 +309,40 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
     await _database.measurementDao.deleteSchedule(id);
   }
 
+  // --- Mappers ---
+
   MeasurementType _typeToDomain(db.MeasurementType row) {
     return MeasurementType(
       id: row.id,
       profileId: row.profileId,
+      key: row.key,
       name: row.name,
       unit: row.unit,
+      defaultUnit: row.defaultUnit,
       measurementCategory: row.measurementCategory,
       isSystem: row.isSystem,
       active: row.active,
+      displayOrder: row.displayOrder,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    );
+  }
+
+  MeasurementTypeField _fieldToDomain(
+    db.MeasurementTypeField row,
+  ) {
+    return MeasurementTypeField(
+      id: row.id,
+      measurementTypeId: row.measurementTypeId,
+      fieldKey: row.fieldKey,
+      label: row.label,
+      defaultUnit: row.defaultUnit,
+      required: row.required,
+      minimumValue: row.minimumValue,
+      maximumValue: row.maximumValue,
+      decimalPlaces: row.decimalPlaces,
+      displayOrder: row.displayOrder,
+      createdAt: row.createdAt,
     );
   }
 
@@ -197,6 +358,20 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
       unit: row.unit,
       notes: row.notes,
       createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    );
+  }
+
+  MeasurementRecordValue _recordValueToDomain(
+    db.MeasurementRecordValue row,
+  ) {
+    return MeasurementRecordValue(
+      id: row.id,
+      measurementRecordId: row.measurementRecordId,
+      fieldKey: row.fieldKey,
+      numericValue: row.numericValue,
+      unit: row.unit,
+      displayOrder: row.displayOrder,
     );
   }
 

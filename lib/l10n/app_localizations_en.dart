@@ -344,9 +344,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historySection => 'History & Adherence';
 
   @override
-  String get viewHistory => 'View History';
-
-  @override
   String get historyScreenTitle => 'Medication History';
 
   @override
@@ -444,4 +441,139 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get componentNameOptional => 'Component Name (optional)';
+
+  @override
+  String get measurements => 'Measurements';
+
+  @override
+  String get measurementTypes => 'Measurement Types';
+
+  @override
+  String get addMeasurement => 'Add Measurement';
+
+  @override
+  String get editMeasurement => 'Edit Measurement';
+
+  @override
+  String get measurementHistory => 'Measurement History';
+
+  @override
+  String get measuredAt => 'Measured at';
+
+  @override
+  String get latestReading => 'Latest reading';
+
+  @override
+  String get noMeasurementsYet => 'No measurement types available';
+
+  @override
+  String get noReadingsYet => 'No readings yet';
+
+  @override
+  String get addFirstReading => 'Add your first reading';
+
+  @override
+  String get bloodPressure => 'Blood Pressure';
+
+  @override
+  String get systolic => 'Systolic';
+
+  @override
+  String get diastolic => 'Diastolic';
+
+  @override
+  String get pulse => 'Pulse';
+
+  @override
+  String get weight => 'Weight';
+
+  @override
+  String get bloodGlucose => 'Blood Glucose';
+
+  @override
+  String get spo2 => 'SpO2';
+
+  @override
+  String get temperature => 'Temperature';
+
+  @override
+  String get pulseLabel => 'pulse';
+
+  @override
+  String get fieldName => 'Field Name';
+
+  @override
+  String get unit => 'Unit';
+
+  @override
+  String get requiredField => 'Required';
+
+  @override
+  String get minimumValue => 'Minimum Value';
+
+  @override
+  String get maximumValue => 'Maximum Value';
+
+  @override
+  String get invalidMeasurementValue => 'Invalid measurement value';
+
+  @override
+  String get failedToSaveMeasurement => 'Failed to save measurement';
+
+  @override
+  String get measurementAdded => 'Measurement added';
+
+  @override
+  String get measurementUpdated => 'Measurement updated';
+
+  @override
+  String get measurementDeleted => 'Measurement deleted';
+
+  @override
+  String get confirmDeleteMeasurement =>
+      'Are you sure you want to delete this reading?';
+
+  @override
+  String get readingSaved => 'Reading saved';
+
+  @override
+  String get readingUpdated => 'Reading updated';
+
+  @override
+  String get readingDeleted => 'Reading deleted';
+
+  @override
+  String get noMeasurementsHistory => 'No history yet';
+
+  @override
+  String get noMeasurementsHistoryDescription =>
+      'Your measurement history will appear here';
+
+  @override
+  String get measurementValue => 'Value';
+
+  @override
+  String get measurementUnit => 'Unit';
+
+  @override
+  String get selectMeasurementType => 'Select measurement type';
+
+  @override
+  String get addReading => 'Add Reading';
+
+  @override
+  String get addReadingTooltip => 'Add Reading';
+
+  @override
+  String get viewHistory => 'View History';
+
+  @override
+  String get valueRequired => 'Value is required';
+
+  @override
+  String get mustBePositive => 'Value must be positive';
+
+  @override
+  String get systolicGreaterThanDiastolic =>
+      'Systolic should be greater than diastolic';
 }
