@@ -14,6 +14,7 @@ import 'package:rehab_track/data/database/tables/document_table.dart';
 import 'package:rehab_track/data/database/tables/diet_tables.dart';
 import 'package:rehab_track/data/database/tables/health_template_table.dart';
 import 'package:rehab_track/data/database/tables/app_setting_table.dart';
+import 'package:rehab_track/data/database/tables/profile_reference_range_tables.dart';
 import 'package:rehab_track/data/database/seed_data.dart';
 import 'package:rehab_track/data/database/daos/profile_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_dao.dart';
@@ -54,6 +55,7 @@ part 'app_database.g.dart';
     DietItems,
     HealthTemplates,
     AppSettings,
+    ProfileReferenceRanges,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -80,7 +82,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -158,6 +160,10 @@ class AppDatabase extends _$AppDatabase {
           measurementRecords,
           measurementRecords.irregularHeartbeatDetected,
         );
+      }
+      if (from < 8) {
+        // Phase 5A.1: Profile-specific reference ranges
+        await m.createTable(profileReferenceRanges);
       }
     },
   );

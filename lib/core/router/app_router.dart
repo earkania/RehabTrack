@@ -18,6 +18,7 @@ import 'package:rehab_track/presentation/screens/activities/medication_history_s
 import 'package:rehab_track/presentation/screens/health/measurement_entry_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurement_edit_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurement_history_screen.dart';
+import 'package:rehab_track/presentation/screens/health/reference_range_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
 
@@ -185,6 +186,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             return const _InvalidRouteScreen();
           }
           return MeasurementEditScreen(recordId: recordId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.measurementRanges,
+        builder: (context, state) => const ReferenceRangeScreen(),
+      ),
+      GoRoute(
+        path: '/measurements/ranges/:typeKey',
+        builder: (context, state) {
+          final typeKey = state.pathParameters['typeKey'] ?? '';
+          if (typeKey.isEmpty) {
+            return const _InvalidRouteScreen();
+          }
+          return TypeRangeDetailScreen(typeKey: typeKey);
         },
       ),
     ],

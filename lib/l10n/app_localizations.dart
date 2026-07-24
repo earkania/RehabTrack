@@ -1297,6 +1297,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Systolic should be greater than diastolic'**
   String get systolicGreaterThanDiastolic;
+
+  /// No description provided for @withinRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Within range'**
+  String get withinRange;
+
+  /// No description provided for @aboveRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Above range'**
+  String get aboveRange;
+
+  /// No description provided for @belowRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Below range'**
+  String get belowRange;
+
+  /// No description provided for @noReferenceRange.
+  ///
+  /// In en, this message translates to:
+  /// **'No reference range'**
+  String get noReferenceRange;
+
+  /// No description provided for @readingStatusLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading Status'**
+  String get readingStatusLegend;
+
+  /// No description provided for @referenceRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference Range'**
+  String get referenceRange;
+
+  /// No description provided for @legendWithinRangeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Within configured range'**
+  String get legendWithinRangeDescription;
+
+  /// No description provided for @legendAboveRangeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Above configured range'**
+  String get legendAboveRangeDescription;
+
+  /// No description provided for @legendBelowRangeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Below configured range'**
+  String get legendBelowRangeDescription;
+
+  /// No description provided for @legendNoReferenceRangeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No reference range configured'**
+  String get legendNoReferenceRangeDescription;
+
+  /// No description provided for @legendIrregularHeartbeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Irregular heartbeat detected'**
+  String get legendIrregularHeartbeat;
+
+  /// No description provided for @referenceRanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference Ranges'**
+  String get referenceRanges;
+
+  /// No description provided for @applicationDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Application default'**
+  String get applicationDefault;
+
+  /// No description provided for @lowerBound.
+  ///
+  /// In en, this message translates to:
+  /// **'Lower Bound'**
+  String get lowerBound;
+
+  /// No description provided for @upperBound.
+  ///
+  /// In en, this message translates to:
+  /// **'Upper Bound'**
+  String get upperBound;
+
+  /// No description provided for @resetToDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Default'**
+  String get resetToDefault;
+
+  /// No description provided for @rangeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Range saved'**
+  String get rangeSaved;
+
+  /// No description provided for @failedToSaveRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save range'**
+  String get failedToSaveRange;
+
+  /// No description provided for @lowerBoundAboveUpperBound.
+  ///
+  /// In en, this message translates to:
+  /// **'Lower bound must be less than upper bound'**
+  String get lowerBoundAboveUpperBound;
+
+  /// No description provided for @referenceRangeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =0{0 reference ranges} =1{1 reference range} other{{count} reference ranges}}'**
+  String referenceRangeCount(int count);
 }
 
 class _AppLocalizationsDelegate

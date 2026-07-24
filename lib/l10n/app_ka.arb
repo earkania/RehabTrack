@@ -229,5 +229,30 @@
   "viewHistory": "ისტორიის ნახვა",
   "valueRequired": "მნიშვნელობა საჭიროა",
   "mustBePositive": "მნიშვნელობა უნდა იყოს დადებითი",
-  "systolicGreaterThanDiastolic": "სისტოლური უნდა აღემატებოდეს დიასტოლურს"
+  "systolicGreaterThanDiastolic": "სისტოლური უნდა აღემატებოდეს დიასტოლურს",
+  "withinRange": "ნორმის ფარგლებში",
+  "aboveRange": "ნორმაზე მაღალი",
+  "belowRange": "ნორმაზე დაბალი",
+  "noReferenceRange": "უცნობი",
+  "readingStatusLegend": "ჩანაწერის სტატუსი",
+  "referenceRange": "ცნობილი დიაპაზონი",
+  "legendWithinRangeDescription": "კონფიგურირებულ დიაპაზონში",
+  "legendAboveRangeDescription": "კონფიგურირებულ დიაპაზონზე მაღალი",
+  "legendBelowRangeDescription": "კონფიგურირებულ დიაპაზონზე დაბალი",
+  "legendNoReferenceRangeDescription": "დიაპაზონი არ არის კონფიგურირებული",
+  "legendIrregularHeartbeat": "აღმოჩენილია არარეგულარული გულისცემა",
+  "referenceRanges": "ცნობილი დიაპაზონები",
+  "applicationDefault": "აპლიკაციის ნაგულისხმევი",
+  "lowerBound": "ქვედა ზღვარი",
+  "upperBound": "ზედა ზღვარი",
+  "resetToDefault": "ნაგულისხმევზე დაბრუნება",
+  "rangeSaved": "დიაპაზონი შეინახა",
+  "failedToSaveRange": "დიაპაზონის შენახვა ვერ მოხერხდა",
+  "lowerBoundAboveUpperBound": "ქვედა ზღვარი უნდა იყოს ზედა ზღვარზე ნაკლები",
+  "referenceRangeCount": "{count} ცნობილი დიაპაზონი",
+  "@referenceRangeCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  }
 }

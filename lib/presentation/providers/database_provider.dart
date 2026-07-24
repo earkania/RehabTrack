@@ -7,6 +7,7 @@ import 'package:rehab_track/data/repositories/exercise_repository_impl.dart';
 import 'package:rehab_track/data/repositories/doctor_repository_impl.dart';
 import 'package:rehab_track/data/repositories/document_repository_impl.dart';
 import 'package:rehab_track/data/repositories/settings_repository_impl.dart';
+import 'package:rehab_track/data/repositories/reference_range_repository_impl.dart';
 import 'package:rehab_track/domain/repositories/profile_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
@@ -14,6 +15,7 @@ import 'package:rehab_track/domain/repositories/exercise_repository.dart';
 import 'package:rehab_track/domain/repositories/doctor_repository.dart';
 import 'package:rehab_track/domain/repositories/document_repository.dart';
 import 'package:rehab_track/domain/repositories/settings_repository.dart';
+import 'package:rehab_track/domain/repositories/reference_range_repository.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final database = AppDatabase();
@@ -53,4 +55,9 @@ final documentRepositoryProvider =
 final settingsRepositoryProvider =
     Provider<SettingsRepository>((ref) {
   return SettingsRepositoryImpl(ref.watch(databaseProvider));
+});
+
+final referenceRangeRepositoryProvider =
+    Provider<ReferenceRangeRepository>((ref) {
+  return ReferenceRangeRepositoryImpl(ref.watch(databaseProvider));
 });

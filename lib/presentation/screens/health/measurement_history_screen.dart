@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
+import 'package:rehab_track/domain/entities/default_reference_ranges.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
+import 'package:rehab_track/domain/entities/reading_status.dart';
+import 'package:rehab_track/domain/services/reading_status_calculator.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
+import 'package:rehab_track/presentation/providers/reference_range_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/utils/measurement_formatter.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
+import 'package:rehab_track/presentation/widgets/common/reading_status_indicator.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 
 class MeasurementHistoryScreen extends ConsumerWidget {
@@ -31,6 +36,16 @@ class MeasurementHistoryScreen extends ConsumerWidget {
         title: Text(l10n.measurementHistory),
         actions: [
           IconButton(
+            onPressed: () => context.push(AppRoutes.measurementRanges),
+            icon: const Icon(Icons.tune),
+            tooltip: l10n.referenceRanges,
+          ),
+          IconButton(
+            onPressed: () => _showLegend(context, l10n),
+            icon: const Icon(Icons.info_outline),
+            tooltip: l10n.readingStatusLegend,
+          ),
+          IconButton(
             onPressed: () => context.push(
               AppRoutes.measurementAdd(measurementTypeId),
             ),
@@ -44,6 +59,11 @@ class MeasurementHistoryScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text(l10n.error)),
         data: (type) {
           if (type == null) return Center(child: Text(l10n.error));
+
+          final typeKey = type.key ?? '';
+          final effectiveRangesAsync = ref.watch(
+            effectiveRangesForCurrentProfileProvider(typeKey),
+          );
 
           final fieldsAsync = ref.watch(
             measurementTypeFieldsProvider(measurementTypeId),
@@ -116,10 +136,13 @@ class MeasurementHistoryScreen extends ConsumerWidget {
                               const Divider(height: 1),
                           itemBuilder: (context, index) {
                             final record = records[index];
+                            final effectiveRanges =
+                                effectiveRangesAsync.valueOrNull;
                             return _RecordTile(
                               record: record,
                               fields: fields,
                               type: type,
+                              effectiveRanges: effectiveRanges,
                               onEdit: () => context.push(
                                 AppRoutes.measurementEdit(record.id!),
                               ),
@@ -140,6 +163,79 @@ class MeasurementHistoryScreen extends ConsumerWidget {
             },
           );
         },
+      ),
+    );
+  }
+
+  void _showLegend(BuildContext context, AppLocalizations l10n) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.readingStatusLegend,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _LegendItem(
+                status: ReadingStatus.inRange,
+                label: l10n.withinRange,
+                description: l10n.legendWithinRangeDescription,
+              ),
+              _LegendItem(
+                status: ReadingStatus.belowRange,
+                label: l10n.belowRange,
+                description: l10n.legendBelowRangeDescription,
+              ),
+              _LegendItem(
+                status: ReadingStatus.aboveRange,
+                label: l10n.aboveRange,
+                description: l10n.legendAboveRangeDescription,
+              ),
+              _LegendItem(
+                status: ReadingStatus.unknown,
+                label: l10n.noReferenceRange,
+                description: l10n.legendNoReferenceRangeDescription,
+              ),
+              const Divider(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Icon(
+                    Icons.heart_broken,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.irregularHeartbeat,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        Text(
+                          l10n.legendIrregularHeartbeat,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -185,10 +281,53 @@ class MeasurementHistoryScreen extends ConsumerWidget {
   }
 }
 
+class _LegendItem extends StatelessWidget {
+  final ReadingStatus status;
+  final String label;
+  final String description;
+
+  const _LegendItem({
+    required this.status,
+    required this.label,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        children: [
+          ReadingStatusIndicator(status: status, size: 12),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _RecordTile extends StatelessWidget {
   final MeasurementRecord record;
   final List<MeasurementTypeField> fields;
   final MeasurementType type;
+  final MeasurementRanges? effectiveRanges;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -196,6 +335,7 @@ class _RecordTile extends StatelessWidget {
     required this.record,
     required this.fields,
     required this.type,
+    this.effectiveRanges,
     required this.onEdit,
     required this.onDelete,
   });
@@ -216,7 +356,10 @@ class _RecordTile extends StatelessWidget {
           pulseLabel: l10n.pulseLabel,
         );
 
+        final status = _calculateStatus(values);
+
         return ListTile(
+          leading: ReadingStatusIndicator(status: status),
           title: Text(
             formatted,
             style: theme.textTheme.titleMedium,
@@ -275,6 +418,21 @@ class _RecordTile extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  ReadingStatus _calculateStatus(List<MeasurementRecordValue> values) {
+    final fieldValues = <String, double>{};
+    for (final v in values) {
+      fieldValues[v.fieldKey] = v.numericValue;
+    }
+
+    final typeKey = type.key ?? '';
+    final ranges = effectiveRanges ?? DefaultReferenceRanges.rangesForType(typeKey);
+    return ReadingStatusCalculator.calculate(
+      typeKey: typeKey,
+      fieldValues: fieldValues,
+      ranges: ranges,
     );
   }
 

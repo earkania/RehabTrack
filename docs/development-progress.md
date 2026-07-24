@@ -767,6 +767,256 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - No data migration for existing BP records (they default to `null`)
 - Not connected to any conditional dose logic yet
 
+### Phase 5A.1 — Measurement Reference Ranges & Status Indicators
+
+**Status:** Completed
+
+**What was done:**
+
+- Created domain models for configurable reference ranges and reading status evaluation
+- Created `ReadingStatusIndicator` reusable widget (compact colored dot)
+- Updated measurement history screen with status indicators and legend bottom sheet
+- Added localization keys for status labels and legend
+- All new code is pure domain logic + presentation widget; no DB changes
+
+**Domain Models:**
+
+- `ReadingStatus` enum: `unknown`, `belowRange`, `inRange`, `aboveRange`
+- `ReferenceRange` class: `minValue`/`maxValue` (nullable for open-ended ranges), `contains()`, `isBelow()`, `isAbove()`, `hasRange`
+- `MeasurementRanges` class: wraps `Map<String, ReferenceRange>` keyed by field key (e.g., `'systolic'`, `'diastolic'`)
+- `DefaultReferenceRanges` class: centralized default ranges for all 6 measurement types
+
+**Default Reference Ranges:**
+
+| Type | Systolic | Diastolic | Range |
+|---|---|---|---|
+| Blood Pressure | 90–120 mmHg | 60–80 mmHg | Combined evaluation |
+| Pulse | — | — | 60–100 bpm |
+| Blood Glucose | — | — | 3.9–7.8 mmol/L |
+| Temperature | — | — | 36.1–37.2 °C |
+| SpO2 | — | — | 95–100 % |
+| Weight | — | — | No default range (unknown) |
+
+**Calculator Logic:**
+- `ReadingStatusCalculator.calculate()`: takes `typeKey`, `fieldValues`, `ranges`
+- For blood pressure: evaluates BOTH systolic and diastolic; `aboveRange` takes priority over `belowRange` when one is each
+- Falls back to `unknown` for missing values or missing ranges
+- Supports custom ranges via `MeasurementRanges` override
+
+**Status Indicator Widget:**
+- `ReadingStatusIndicator`: compact colored dot matching Medication module's visual language
+  - Green = `inRange`, Blue = `belowRange`, Red (error) = `aboveRange`, Grey outline = `unknown`
+
+**History Screen Updates:**
+- `_RecordTile`: status indicator as `leading` widget
+- AppBar info icon opens `_showLegend` `BottomSheet` with colored dots and descriptions
+- `_LegendItem` widget for each legend entry
+- Status calculated per record via `_calculateStatus` using `ReadingStatusCalculator`
+
+**Localization:**
+- 12 new keys added to both EN and KA: `withinRange`, `aboveRange`, `belowRange`, `noReferenceRange`, `readingStatusLegend`, `referenceRange`, `legendWithinRange`, `legendAboveRange`, `legendBelowRange`, `legendIrregularHeartbeat`, `legendNoReferenceRange`, `legendDescription`
+
+**Tests:** 44 new tests in `test/reading_status_test.dart`:
+- `ReferenceRange`: contains, open-ended ranges, isBelow, isAbove, hasRange
+- `MeasurementRanges`: rangeForField
+- `ReadingStatusCalculator`: BP (11 tests: in/above/below range, both above, both below, mixed, missing values), pulse (5: in/above/below/boundary), glucose (3), temperature (3), weight (1: unknown), spo2 (3), unknown type (1), missing values (3), custom range (2)
+- `DefaultReferenceRanges`: has all types, rangesForType, unknown type returns null, weight empty
+
+**Files Created:**
+- `lib/domain/entities/reading_status.dart`
+- `lib/domain/entities/default_reference_ranges.dart`
+- `lib/domain/services/reading_status_calculator.dart`
+- `lib/presentation/widgets/common/reading_status_indicator.dart`
+- `test/reading_status_test.dart`
+
+**Files Modified:**
+- `lib/l10n/app_en.arb` — 12 new keys
+- `lib/l10n/app_ka.arb` — 12 new Georgian translations
+- `lib/presentation/screens/health/measurement_history_screen.dart` — status indicator, legend, `_calculateStatus`
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (1 pre-existing info lint, 7 pre-existing test warnings) |
+| `flutter test` | Passed (230/230; 3 pre-existing loading failures excluded) |
+
+**Known Limitations:**
+- Reference ranges are in-memory defaults only; not persisted to DB or user-editable yet
+- Profile-specific ranges deferred to a later phase
+- Weight has no default range (unknown status always)
+- Status indicator is only on history screen; not on entry/edit forms yet
+
+---
+
+### Phase 5A.1 Correction — Measurement Edit Fix & Profile-Specific Reference Ranges
+
+**Date:** 2026-07-25
+
+**Status:** Completed
+
+**What was done:**
+
+#### Measurement Edit Root Cause Fix
+- **Root cause:** `MeasurementRepositoryImpl.updateRecord()` was missing `createdAt: Value(record.createdAt)` in the `MeasurementRecordsCompanion`. Since `createdAt` is non-nullable (`dateTime()()`) and Drift's `replace()` requires all non-nullable columns, the update was failing silently.
+- **Fix:** Added `createdAt: Value(record.createdAt)` to the companion in `updateRecord()` at `lib/data/repositories/measurement_repository_impl.dart:227`
+- **3 regression tests** in `test/measurement_edit_diagnosis_test.dart`: update succeeds, preserves createdAt/irregularHeartbeat, no duplicate values
+
+#### Profile-Specific Reference Range Configuration
+- **Schema v8:** New `ProfileReferenceRanges` table with columns: `id` (auto-increment), `profileId` (int), `typeKey` (text), `fieldKey` (text), `minValue` (double?), `maxValue` (double?), `createdAt`, `updatedAt`
+- **Domain entity:** `ProfileReferenceRange` in `lib/domain/entities/profile_reference_range.dart` with `copyWith`, `clearMinValue`/`clearMaxValue` support
+- **Repository interface:** `ReferenceRangeRepository` with `getEffectiveRanges`, `watchProfileRanges`, `getProfileRanges`, `saveProfileRange`, `removeProfileRange`, `clearAllProfileRanges`
+- **Repository implementation:** `ReferenceRangeRepositoryImpl` — merges profile overrides with `DefaultReferenceRanges`, upserts, deletes, streams
+- **Profile-aware providers:**
+  - `effectiveRangesForCurrentProfileProvider(typeKey)` — returns merged ranges for active profile
+  - `profileReferenceRangesProvider(profileId)` — streams profile-specific overrides
+- **Reference range config screen:** `ReferenceRangeScreen` (list view) + `TypeRangeDetailScreen` (min/max form per field)
+- **Routes:** `/measurements/ranges` and `/measurements/ranges/:typeKey`
+- **History screen updates:**
+  - AppBar tune button navigates to reference range config
+  - `_calculateStatus` now uses profile-aware effective ranges (falls back to defaults)
+- **Localization:** 8 new keys in EN and KA: `referenceRanges`, `applicationDefault`, `lowerBound`, `upperBound`, `resetToDefault`, `rangeSaved`, `failedToSaveRange`, `lowerBoundAboveUpperBound`
+
+**Domain Models:**
+
+- `ReadingStatus` enum: `unknown`, `belowRange`, `inRange`, `aboveRange`
+- `ReferenceRange` class: `minValue`/`maxValue` (nullable for open-ended ranges), `contains()`, `isBelow()`, `isAbove()`, `hasRange`
+- `MeasurementRanges` class: wraps `Map<String, ReferenceRange>` keyed by field key (e.g., `'systolic'`, `'diastolic'`)
+- `DefaultReferenceRanges` class: centralized default ranges for all 6 measurement types
+
+**Default Reference Ranges:**
+
+| Type | Systolic | Diastolic | Range |
+|---|---|---|---|
+| Blood Pressure | 90–120 mmHg | 60–80 mmHg | Combined evaluation |
+| Pulse | — | — | 60–100 bpm |
+| Blood Glucose | — | — | 3.9–7.8 mmol/L |
+| Temperature | — | — | 36.1–37.2 °C |
+| SpO2 | — | — | 95–100 % |
+| Weight | — | — | No default range (unknown) |
+
+**Calculator Logic:**
+- `ReadingStatusCalculator.calculate()`: takes `typeKey`, `fieldValues`, `ranges`
+- For blood pressure: evaluates BOTH systolic and diastolic; `aboveRange` takes priority over `belowRange` when one is each
+- Falls back to `unknown` for missing values or missing ranges
+- Supports custom ranges via `MeasurementRanges` override
+
+**Status Indicator Widget:**
+- `ReadingStatusIndicator`: compact colored dot matching Medication module's visual language
+  - Green = `inRange`, Blue = `belowRange`, Red (error) = `aboveRange`, Grey outline = `unknown`
+
+**History Screen Updates:**
+- `_RecordTile`: status indicator as `leading` widget
+- AppBar info icon opens `_showLegend` `BottomSheet` with colored dots and descriptions
+- AppBar tune icon navigates to reference range config
+- `_LegendItem` widget for each legend entry
+- Status calculated per record via `_calculateStatus` using profile-aware effective ranges
+
+**Localization:**
+- 20 new keys total in both EN and KA: `withinRange`, `aboveRange`, `belowRange`, `noReferenceRange`, `readingStatusLegend`, `referenceRange`, `referenceRanges`, `legendWithinRange`, `legendAboveRange`, `legendBelowRange`, `legendIrregularHeartbeat`, `legendNoReferenceRange`, `legendDescription`, `applicationDefault`, `lowerBound`, `upperBound`, `resetToDefault`, `rangeSaved`, `failedToSaveRange`, `lowerBoundAboveUpperBound`
+
+**Tests:** 16 new tests in `test/reference_range_test.dart`:
+- `ProfileReferenceRange` entity: copyWith, nullable fields, clearMinValue/clearMaxValue
+- `ReferenceRangeRepositoryImpl`: create/update/remove profile ranges, clear all, get profile ranges, effective ranges (defaults only, profile override, new field alongside defaults, unknown type)
+- `ReadingStatusCalculator` with custom ranges: above/below/inRange
+
+**Files Created:**
+- `lib/data/database/tables/profile_reference_range_tables.dart`
+- `lib/domain/entities/profile_reference_range.dart`
+- `lib/domain/repositories/reference_range_repository.dart`
+- `lib/data/repositories/reference_range_repository_impl.dart`
+- `lib/presentation/providers/reference_range_provider.dart`
+- `lib/presentation/screens/health/reference_range_screen.dart`
+- `test/reference_range_test.dart`
+- `test/measurement_edit_diagnosis_test.dart`
+
+**Files Modified:**
+- `lib/data/database/app_database.dart` — schema v8, migration
+- `lib/data/repositories/measurement_repository_impl.dart` — added `createdAt: Value(record.createdAt)` to `updateRecord()`
+- `lib/presentation/providers/database_provider.dart` — added `referenceRangeRepositoryProvider`
+- `lib/presentation/screens/health/measurement_history_screen.dart` — tune button, profile-aware `_calculateStatus`
+- `lib/core/router/app_routes.dart` — added `measurementRanges`
+- `lib/core/router/app_router.dart` — added reference range routes
+- `lib/l10n/app_en.arb` — 8 new keys
+- `lib/l10n/app_ka.arb` — 8 new Georgian translations
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (1 pre-existing info lint, 8 pre-existing test warnings) |
+| `flutter test` | Passed (282/282) |
+
+---
+
+### Phase 5A.1 Correction — Georgian Localization & Visual Consistency
+
+**Date:** 2026-07-25
+
+**Status:** Completed
+
+**What was done:**
+
+#### Georgian Reading-Status Translation Corrections
+- **belowRange:** "ნორმაზე დაბლა" → "ნორმაზე დაბალი" (adjective form, not adverb)
+- **aboveRange:** "ნორმაზე მაღლა" → "ნორმაზე მაღალი" (adjective form, not adverb)
+- **noReferenceRange:** "ცნობილი არ არის" → "უცნობი" (simpler, more natural)
+- **legendBelowRangeDescription:** "კონფიგურირებულ დიაპაზონზე დაბლა" → "კონფიგურირებულ დიაპაზონზე დაბალი"
+- **legendAboveRangeDescription:** "კონფიგურირებულ დიაპაზონზე მაღლა" → "კონფიგურირებულ დიაპაზონზე მაღალი"
+- **legendNoReferenceRangeDescription:** "ცნობილი დიაპაზონი არ არის კონფიგურირებული" → "დიაპაზონი არ არის კონფიგურირებული"
+- **legendIrregularHeartbeat:** "არარეგულარული გულისცემა აღმოჩენილია" → "აღმოჩენილია არარეგულარული გულისცემა" (verb-first word order)
+- English translations unchanged
+
+#### Irregular-Heartbeat Icon Consistency
+- **Problem:** Legend used hardcoded `Colors.red` while history row used `theme.colorScheme.error`
+- **Fix:** Updated legend icon to use `Theme.of(context).colorScheme.error` instead of `Colors.red`
+- **Result:** Legend now matches history row icon appearance in both light and dark themes
+
+#### Locale-Aware Reference-Range Count Formatting
+- **Problem:** `'$count ${l10n.referenceRange.toLowerCase()}${count > 1 ? 's' : ''}'` appended English "s" suffix to Georgian text
+- **Fix:** Added `referenceRangeCount` ARB key with ICU MessageFormat plural syntax for English (`{count,plural, =0{0 reference ranges} =1{1 reference range} other{{count} reference ranges}}`) and simple template for Georgian (`{count} ცნობილი დიაპაზონი`)
+- **Result:** Georgian always uses base form without English suffix; English pluralizes correctly
+
+**Localization Keys Corrected:**
+
+| Key | Old Georgian | New Georgian |
+|---|---|---|
+| belowRange | ნორმაზე დაბლა | ნორმაზე დაბალი |
+| aboveRange | ნორმაზე მაღლა | ნორმაზე მაღალი |
+| noReferenceRange | ცნობილი არ არის | უცნობი |
+| legendBelowRangeDescription | კონფიგურირებულ დიაპაზონზე დაბლა | კონფიგურირებულ დიაპაზონზე დაბალი |
+| legendAboveRangeDescription | კონფიგურირებულ დიაპაზონზე მაღლა | კონფიგურირებულ დიაპაზონზე მაღალი |
+| legendNoReferenceRangeDescription | ცნობილი დიაპაზონი არ არის კონფიგურირებული | დიაპაზონი არ არის კონფიგურირებული |
+| legendIrregularHeartbeat | არარეგულარული გულისცემა აღმოჩენილია | აღმოჩენილია არარეგულარული გულისცემა |
+
+**Localization Keys Added:**
+
+| Key | English | Georgian |
+|---|---|---|
+| referenceRangeCount | {count,plural, =0{0 reference ranges} =1{1 reference range} other{{count} reference ranges}} | {count} ცნობილი დიაპაზონი |
+
+**Files Modified:**
+- `lib/l10n/app_ka.arb` — corrected 7 Georgian translations, added `referenceRangeCount`
+- `lib/l10n/app_en.arb` — added `referenceRangeCount` with plural syntax
+- `lib/presentation/screens/health/measurement_history_screen.dart` — legend icon uses theme color
+- `lib/presentation/screens/health/reference_range_screen.dart` — uses `referenceRangeCount` localization
+
+**Files Created:**
+- `test/localization_correction_test.dart` — 33 tests verifying translations and formatting
+
+**Tests Added:** 33 new tests:
+- 10 Georgian reading-status translation verifications
+- 10 English reading-status translation verifications (unchanged)
+- 9 reference-range count formatting tests (English plural, Georgian no-suffix)
+- 4 irregular-heartbeat icon consistency tests
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (1 pre-existing info lint, 10 pre-existing test warnings) |
+| `flutter test` | Passed (315/315) |
+
 ---
 
 ## Development Rules

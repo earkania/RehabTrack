@@ -12081,6 +12081,517 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   }
 }
 
+class $ProfileReferenceRangesTable extends ProfileReferenceRanges
+    with TableInfo<$ProfileReferenceRangesTable, ProfileReferenceRange> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProfileReferenceRangesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _typeKeyMeta = const VerificationMeta(
+    'typeKey',
+  );
+  @override
+  late final GeneratedColumn<String> typeKey = GeneratedColumn<String>(
+    'type_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fieldKeyMeta = const VerificationMeta(
+    'fieldKey',
+  );
+  @override
+  late final GeneratedColumn<String> fieldKey = GeneratedColumn<String>(
+    'field_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _minValueMeta = const VerificationMeta(
+    'minValue',
+  );
+  @override
+  late final GeneratedColumn<double> minValue = GeneratedColumn<double>(
+    'min_value',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maxValueMeta = const VerificationMeta(
+    'maxValue',
+  );
+  @override
+  late final GeneratedColumn<double> maxValue = GeneratedColumn<double>(
+    'max_value',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    typeKey,
+    fieldKey,
+    minValue,
+    maxValue,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'profile_reference_ranges';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ProfileReferenceRange> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('type_key')) {
+      context.handle(
+        _typeKeyMeta,
+        typeKey.isAcceptableOrUnknown(data['type_key']!, _typeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeKeyMeta);
+    }
+    if (data.containsKey('field_key')) {
+      context.handle(
+        _fieldKeyMeta,
+        fieldKey.isAcceptableOrUnknown(data['field_key']!, _fieldKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fieldKeyMeta);
+    }
+    if (data.containsKey('min_value')) {
+      context.handle(
+        _minValueMeta,
+        minValue.isAcceptableOrUnknown(data['min_value']!, _minValueMeta),
+      );
+    }
+    if (data.containsKey('max_value')) {
+      context.handle(
+        _maxValueMeta,
+        maxValue.isAcceptableOrUnknown(data['max_value']!, _maxValueMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ProfileReferenceRange map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ProfileReferenceRange(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      typeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type_key'],
+      )!,
+      fieldKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}field_key'],
+      )!,
+      minValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}min_value'],
+      ),
+      maxValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}max_value'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ProfileReferenceRangesTable createAlias(String alias) {
+    return $ProfileReferenceRangesTable(attachedDatabase, alias);
+  }
+}
+
+class ProfileReferenceRange extends DataClass
+    implements Insertable<ProfileReferenceRange> {
+  final int id;
+  final int profileId;
+  final String typeKey;
+  final String fieldKey;
+  final double? minValue;
+  final double? maxValue;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ProfileReferenceRange({
+    required this.id,
+    required this.profileId,
+    required this.typeKey,
+    required this.fieldKey,
+    this.minValue,
+    this.maxValue,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['type_key'] = Variable<String>(typeKey);
+    map['field_key'] = Variable<String>(fieldKey);
+    if (!nullToAbsent || minValue != null) {
+      map['min_value'] = Variable<double>(minValue);
+    }
+    if (!nullToAbsent || maxValue != null) {
+      map['max_value'] = Variable<double>(maxValue);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ProfileReferenceRangesCompanion toCompanion(bool nullToAbsent) {
+    return ProfileReferenceRangesCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      typeKey: Value(typeKey),
+      fieldKey: Value(fieldKey),
+      minValue: minValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minValue),
+      maxValue: maxValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxValue),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ProfileReferenceRange.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ProfileReferenceRange(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      typeKey: serializer.fromJson<String>(json['typeKey']),
+      fieldKey: serializer.fromJson<String>(json['fieldKey']),
+      minValue: serializer.fromJson<double?>(json['minValue']),
+      maxValue: serializer.fromJson<double?>(json['maxValue']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'typeKey': serializer.toJson<String>(typeKey),
+      'fieldKey': serializer.toJson<String>(fieldKey),
+      'minValue': serializer.toJson<double?>(minValue),
+      'maxValue': serializer.toJson<double?>(maxValue),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ProfileReferenceRange copyWith({
+    int? id,
+    int? profileId,
+    String? typeKey,
+    String? fieldKey,
+    Value<double?> minValue = const Value.absent(),
+    Value<double?> maxValue = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ProfileReferenceRange(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    typeKey: typeKey ?? this.typeKey,
+    fieldKey: fieldKey ?? this.fieldKey,
+    minValue: minValue.present ? minValue.value : this.minValue,
+    maxValue: maxValue.present ? maxValue.value : this.maxValue,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ProfileReferenceRange copyWithCompanion(
+    ProfileReferenceRangesCompanion data,
+  ) {
+    return ProfileReferenceRange(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      typeKey: data.typeKey.present ? data.typeKey.value : this.typeKey,
+      fieldKey: data.fieldKey.present ? data.fieldKey.value : this.fieldKey,
+      minValue: data.minValue.present ? data.minValue.value : this.minValue,
+      maxValue: data.maxValue.present ? data.maxValue.value : this.maxValue,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProfileReferenceRange(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('typeKey: $typeKey, ')
+          ..write('fieldKey: $fieldKey, ')
+          ..write('minValue: $minValue, ')
+          ..write('maxValue: $maxValue, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    typeKey,
+    fieldKey,
+    minValue,
+    maxValue,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ProfileReferenceRange &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.typeKey == this.typeKey &&
+          other.fieldKey == this.fieldKey &&
+          other.minValue == this.minValue &&
+          other.maxValue == this.maxValue &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ProfileReferenceRangesCompanion
+    extends UpdateCompanion<ProfileReferenceRange> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> typeKey;
+  final Value<String> fieldKey;
+  final Value<double?> minValue;
+  final Value<double?> maxValue;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const ProfileReferenceRangesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.typeKey = const Value.absent(),
+    this.fieldKey = const Value.absent(),
+    this.minValue = const Value.absent(),
+    this.maxValue = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  ProfileReferenceRangesCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String typeKey,
+    required String fieldKey,
+    this.minValue = const Value.absent(),
+    this.maxValue = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : profileId = Value(profileId),
+       typeKey = Value(typeKey),
+       fieldKey = Value(fieldKey),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ProfileReferenceRange> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? typeKey,
+    Expression<String>? fieldKey,
+    Expression<double>? minValue,
+    Expression<double>? maxValue,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (typeKey != null) 'type_key': typeKey,
+      if (fieldKey != null) 'field_key': fieldKey,
+      if (minValue != null) 'min_value': minValue,
+      if (maxValue != null) 'max_value': maxValue,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  ProfileReferenceRangesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? profileId,
+    Value<String>? typeKey,
+    Value<String>? fieldKey,
+    Value<double?>? minValue,
+    Value<double?>? maxValue,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return ProfileReferenceRangesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      typeKey: typeKey ?? this.typeKey,
+      fieldKey: fieldKey ?? this.fieldKey,
+      minValue: minValue ?? this.minValue,
+      maxValue: maxValue ?? this.maxValue,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (typeKey.present) {
+      map['type_key'] = Variable<String>(typeKey.value);
+    }
+    if (fieldKey.present) {
+      map['field_key'] = Variable<String>(fieldKey.value);
+    }
+    if (minValue.present) {
+      map['min_value'] = Variable<double>(minValue.value);
+    }
+    if (maxValue.present) {
+      map['max_value'] = Variable<double>(maxValue.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProfileReferenceRangesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('typeKey: $typeKey, ')
+          ..write('fieldKey: $fieldKey, ')
+          ..write('minValue: $minValue, ')
+          ..write('maxValue: $maxValue, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -12119,6 +12630,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $ProfileReferenceRangesTable profileReferenceRanges =
+      $ProfileReferenceRangesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -12146,6 +12659,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     dietItems,
     healthTemplates,
     appSettings,
+    profileReferenceRanges,
   ];
 }
 
@@ -12400,6 +12914,31 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_dietPlansRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ProfileReferenceRangesTable,
+    List<ProfileReferenceRange>
+  >
+  _profileReferenceRangesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.profileReferenceRanges,
+        aliasName: 'profiles__id__profile_reference_ranges__profile_id',
+      );
+
+  $$ProfileReferenceRangesTableProcessedTableManager
+  get profileReferenceRangesRefs {
+    final manager = $$ProfileReferenceRangesTableTableManager(
+      $_db,
+      $_db.profileReferenceRanges,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _profileReferenceRangesRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -12757,6 +13296,32 @@ class $$ProfilesTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> profileReferenceRangesRefs(
+    Expression<bool> Function($$ProfileReferenceRangesTableFilterComposer f) f,
+  ) {
+    final $$ProfileReferenceRangesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.profileReferenceRanges,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProfileReferenceRangesTableFilterComposer(
+                $db: $db,
+                $table: $db.profileReferenceRanges,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -13173,6 +13738,32 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> profileReferenceRangesRefs<T extends Object>(
+    Expression<T> Function($$ProfileReferenceRangesTableAnnotationComposer a) f,
+  ) {
+    final $$ProfileReferenceRangesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.profileReferenceRanges,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProfileReferenceRangesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.profileReferenceRanges,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -13200,6 +13791,7 @@ class $$ProfilesTableTableManager
             bool doctorVisitsRefs,
             bool documentAttachmentsRefs,
             bool dietPlansRefs,
+            bool profileReferenceRangesRefs,
           })
         > {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
@@ -13298,6 +13890,7 @@ class $$ProfilesTableTableManager
                 doctorVisitsRefs = false,
                 documentAttachmentsRefs = false,
                 dietPlansRefs = false,
+                profileReferenceRangesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -13313,6 +13906,7 @@ class $$ProfilesTableTableManager
                     if (doctorVisitsRefs) db.doctorVisits,
                     if (documentAttachmentsRefs) db.documentAttachments,
                     if (dietPlansRefs) db.dietPlans,
+                    if (profileReferenceRangesRefs) db.profileReferenceRanges,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -13548,6 +14142,27 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (profileReferenceRangesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          ProfileReferenceRange
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._profileReferenceRangesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).profileReferenceRangesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -13580,6 +14195,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool doctorVisitsRefs,
         bool documentAttachmentsRefs,
         bool dietPlansRefs,
+        bool profileReferenceRangesRefs,
       })
     >;
 typedef $$MedicationsTableCreateCompanionBuilder =
@@ -23327,6 +23943,396 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSetting,
       PrefetchHooks Function()
     >;
+typedef $$ProfileReferenceRangesTableCreateCompanionBuilder =
+    ProfileReferenceRangesCompanion Function({
+      Value<int> id,
+      required int profileId,
+      required String typeKey,
+      required String fieldKey,
+      Value<double?> minValue,
+      Value<double?> maxValue,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$ProfileReferenceRangesTableUpdateCompanionBuilder =
+    ProfileReferenceRangesCompanion Function({
+      Value<int> id,
+      Value<int> profileId,
+      Value<String> typeKey,
+      Value<String> fieldKey,
+      Value<double?> minValue,
+      Value<double?> maxValue,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$ProfileReferenceRangesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ProfileReferenceRangesTable,
+          ProfileReferenceRange
+        > {
+  $$ProfileReferenceRangesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) => db.profiles
+      .createAlias('profile_reference_ranges__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ProfileReferenceRangesTableFilterComposer
+    extends Composer<_$AppDatabase, $ProfileReferenceRangesTable> {
+  $$ProfileReferenceRangesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get typeKey => $composableBuilder(
+    column: $table.typeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fieldKey => $composableBuilder(
+    column: $table.fieldKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get minValue => $composableBuilder(
+    column: $table.minValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get maxValue => $composableBuilder(
+    column: $table.maxValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProfileReferenceRangesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProfileReferenceRangesTable> {
+  $$ProfileReferenceRangesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get typeKey => $composableBuilder(
+    column: $table.typeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fieldKey => $composableBuilder(
+    column: $table.fieldKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get minValue => $composableBuilder(
+    column: $table.minValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get maxValue => $composableBuilder(
+    column: $table.maxValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProfileReferenceRangesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProfileReferenceRangesTable> {
+  $$ProfileReferenceRangesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get typeKey =>
+      $composableBuilder(column: $table.typeKey, builder: (column) => column);
+
+  GeneratedColumn<String> get fieldKey =>
+      $composableBuilder(column: $table.fieldKey, builder: (column) => column);
+
+  GeneratedColumn<double> get minValue =>
+      $composableBuilder(column: $table.minValue, builder: (column) => column);
+
+  GeneratedColumn<double> get maxValue =>
+      $composableBuilder(column: $table.maxValue, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProfileReferenceRangesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProfileReferenceRangesTable,
+          ProfileReferenceRange,
+          $$ProfileReferenceRangesTableFilterComposer,
+          $$ProfileReferenceRangesTableOrderingComposer,
+          $$ProfileReferenceRangesTableAnnotationComposer,
+          $$ProfileReferenceRangesTableCreateCompanionBuilder,
+          $$ProfileReferenceRangesTableUpdateCompanionBuilder,
+          (ProfileReferenceRange, $$ProfileReferenceRangesTableReferences),
+          ProfileReferenceRange,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$ProfileReferenceRangesTableTableManager(
+    _$AppDatabase db,
+    $ProfileReferenceRangesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProfileReferenceRangesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ProfileReferenceRangesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ProfileReferenceRangesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<String> typeKey = const Value.absent(),
+                Value<String> fieldKey = const Value.absent(),
+                Value<double?> minValue = const Value.absent(),
+                Value<double?> maxValue = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ProfileReferenceRangesCompanion(
+                id: id,
+                profileId: profileId,
+                typeKey: typeKey,
+                fieldKey: fieldKey,
+                minValue: minValue,
+                maxValue: maxValue,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int profileId,
+                required String typeKey,
+                required String fieldKey,
+                Value<double?> minValue = const Value.absent(),
+                Value<double?> maxValue = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => ProfileReferenceRangesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                typeKey: typeKey,
+                fieldKey: fieldKey,
+                minValue: minValue,
+                maxValue: maxValue,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ProfileReferenceRangesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$ProfileReferenceRangesTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$ProfileReferenceRangesTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ProfileReferenceRangesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProfileReferenceRangesTable,
+      ProfileReferenceRange,
+      $$ProfileReferenceRangesTableFilterComposer,
+      $$ProfileReferenceRangesTableOrderingComposer,
+      $$ProfileReferenceRangesTableAnnotationComposer,
+      $$ProfileReferenceRangesTableCreateCompanionBuilder,
+      $$ProfileReferenceRangesTableUpdateCompanionBuilder,
+      (ProfileReferenceRange, $$ProfileReferenceRangesTableReferences),
+      ProfileReferenceRange,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -23385,4 +24391,9 @@ class $AppDatabaseManager {
       $$HealthTemplatesTableTableManager(_db, _db.healthTemplates);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$ProfileReferenceRangesTableTableManager get profileReferenceRanges =>
+      $$ProfileReferenceRangesTableTableManager(
+        _db,
+        _db.profileReferenceRanges,
+      );
 }

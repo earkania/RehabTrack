@@ -629,4 +629,75 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get systolicGreaterThanDiastolic =>
       'Systolic should be greater than diastolic';
+
+  @override
+  String get withinRange => 'Within range';
+
+  @override
+  String get aboveRange => 'Above range';
+
+  @override
+  String get belowRange => 'Below range';
+
+  @override
+  String get noReferenceRange => 'No reference range';
+
+  @override
+  String get readingStatusLegend => 'Reading Status';
+
+  @override
+  String get referenceRange => 'Reference Range';
+
+  @override
+  String get legendWithinRangeDescription => 'Within configured range';
+
+  @override
+  String get legendAboveRangeDescription => 'Above configured range';
+
+  @override
+  String get legendBelowRangeDescription => 'Below configured range';
+
+  @override
+  String get legendNoReferenceRangeDescription =>
+      'No reference range configured';
+
+  @override
+  String get legendIrregularHeartbeat => 'Irregular heartbeat detected';
+
+  @override
+  String get referenceRanges => 'Reference Ranges';
+
+  @override
+  String get applicationDefault => 'Application default';
+
+  @override
+  String get lowerBound => 'Lower Bound';
+
+  @override
+  String get upperBound => 'Upper Bound';
+
+  @override
+  String get resetToDefault => 'Reset to Default';
+
+  @override
+  String get rangeSaved => 'Range saved';
+
+  @override
+  String get failedToSaveRange => 'Failed to save range';
+
+  @override
+  String get lowerBoundAboveUpperBound =>
+      'Lower bound must be less than upper bound';
+
+  @override
+  String referenceRangeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reference ranges',
+      one: '1 reference range',
+      zero: '0 reference ranges',
+    );
+    return '$_temp0';
+  }
 }

@@ -630,4 +630,68 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get systolicGreaterThanDiastolic =>
       'სისტოლური უნდა აღემატებოდეს დიასტოლურს';
+
+  @override
+  String get withinRange => 'ნორმის ფარგლებში';
+
+  @override
+  String get aboveRange => 'ნორმაზე მაღალი';
+
+  @override
+  String get belowRange => 'ნორმაზე დაბალი';
+
+  @override
+  String get noReferenceRange => 'უცნობი';
+
+  @override
+  String get readingStatusLegend => 'ჩანაწერის სტატუსი';
+
+  @override
+  String get referenceRange => 'ცნობილი დიაპაზონი';
+
+  @override
+  String get legendWithinRangeDescription => 'კონფიგურირებულ დიაპაზონში';
+
+  @override
+  String get legendAboveRangeDescription => 'კონფიგურირებულ დიაპაზონზე მაღალი';
+
+  @override
+  String get legendBelowRangeDescription => 'კონფიგურირებულ დიაპაზონზე დაბალი';
+
+  @override
+  String get legendNoReferenceRangeDescription =>
+      'დიაპაზონი არ არის კონფიგურირებული';
+
+  @override
+  String get legendIrregularHeartbeat => 'აღმოჩენილია არარეგულარული გულისცემა';
+
+  @override
+  String get referenceRanges => 'ცნობილი დიაპაზონები';
+
+  @override
+  String get applicationDefault => 'აპლიკაციის ნაგულისხმევი';
+
+  @override
+  String get lowerBound => 'ქვედა ზღვარი';
+
+  @override
+  String get upperBound => 'ზედა ზღვარი';
+
+  @override
+  String get resetToDefault => 'ნაგულისხმევზე დაბრუნება';
+
+  @override
+  String get rangeSaved => 'დიაპაზონი შეინახა';
+
+  @override
+  String get failedToSaveRange => 'დიაპაზონის შენახვა ვერ მოხერხდა';
+
+  @override
+  String get lowerBoundAboveUpperBound =>
+      'ქვედა ზღვარი უნდა იყოს ზედა ზღვარზე ნაკლები';
+
+  @override
+  String referenceRangeCount(int count) {
+    return '$count ცნობილი დიაპაზონი';
+  }
 }

@@ -224,6 +224,7 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
           unit: Value(record.unit),
           irregularHeartbeatDetected: Value(record.irregularHeartbeatDetected),
           notes: Value(record.notes),
+          createdAt: Value(record.createdAt),
           updatedAt: Value(DateTime.now()),
         ),
       );

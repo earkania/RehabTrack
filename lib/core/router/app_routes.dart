@@ -11,6 +11,7 @@ class AppRoutes {
   static String measurementAdd(int typeId) => '/measurements/measurement/$typeId/add';
   static String measurementHistory(int typeId) => '/measurements/measurement/$typeId/history';
   static String measurementEdit(int recordId) => '/measurements/measurement/record/$recordId/edit';
+  static const measurementRanges = '/measurements/ranges';
 
   // Medications
   static const medicationAdd = '/medications/medication/add';
