@@ -5940,6 +5940,20 @@ class $MeasurementRecordsTable extends MeasurementRecords
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _irregularHeartbeatDetectedMeta =
+      const VerificationMeta('irregularHeartbeatDetected');
+  @override
+  late final GeneratedColumn<bool> irregularHeartbeatDetected =
+      GeneratedColumn<bool>(
+        'irregular_heartbeat_detected',
+        aliasedName,
+        true,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("irregular_heartbeat_detected" IN (0, 1))',
+        ),
+      );
   static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
@@ -5981,6 +5995,7 @@ class $MeasurementRecordsTable extends MeasurementRecords
     valueSecondary,
     valueTertiary,
     unit,
+    irregularHeartbeatDetected,
     notes,
     createdAt,
     updatedAt,
@@ -6064,6 +6079,15 @@ class $MeasurementRecordsTable extends MeasurementRecords
     } else if (isInserting) {
       context.missing(_unitMeta);
     }
+    if (data.containsKey('irregular_heartbeat_detected')) {
+      context.handle(
+        _irregularHeartbeatDetectedMeta,
+        irregularHeartbeatDetected.isAcceptableOrUnknown(
+          data['irregular_heartbeat_detected']!,
+          _irregularHeartbeatDetectedMeta,
+        ),
+      );
+    }
     if (data.containsKey('notes')) {
       context.handle(
         _notesMeta,
@@ -6125,6 +6149,10 @@ class $MeasurementRecordsTable extends MeasurementRecords
         DriftSqlType.string,
         data['${effectivePrefix}unit'],
       )!,
+      irregularHeartbeatDetected: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}irregular_heartbeat_detected'],
+      ),
       notes: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
@@ -6156,6 +6184,7 @@ class MeasurementRecord extends DataClass
   final double? valueSecondary;
   final double? valueTertiary;
   final String unit;
+  final bool? irregularHeartbeatDetected;
   final String? notes;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -6168,6 +6197,7 @@ class MeasurementRecord extends DataClass
     this.valueSecondary,
     this.valueTertiary,
     required this.unit,
+    this.irregularHeartbeatDetected,
     this.notes,
     required this.createdAt,
     this.updatedAt,
@@ -6187,6 +6217,11 @@ class MeasurementRecord extends DataClass
       map['value_tertiary'] = Variable<double>(valueTertiary);
     }
     map['unit'] = Variable<String>(unit);
+    if (!nullToAbsent || irregularHeartbeatDetected != null) {
+      map['irregular_heartbeat_detected'] = Variable<bool>(
+        irregularHeartbeatDetected,
+      );
+    }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
@@ -6211,6 +6246,10 @@ class MeasurementRecord extends DataClass
           ? const Value.absent()
           : Value(valueTertiary),
       unit: Value(unit),
+      irregularHeartbeatDetected:
+          irregularHeartbeatDetected == null && nullToAbsent
+          ? const Value.absent()
+          : Value(irregularHeartbeatDetected),
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
@@ -6235,6 +6274,9 @@ class MeasurementRecord extends DataClass
       valueSecondary: serializer.fromJson<double?>(json['valueSecondary']),
       valueTertiary: serializer.fromJson<double?>(json['valueTertiary']),
       unit: serializer.fromJson<String>(json['unit']),
+      irregularHeartbeatDetected: serializer.fromJson<bool?>(
+        json['irregularHeartbeatDetected'],
+      ),
       notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
@@ -6252,6 +6294,9 @@ class MeasurementRecord extends DataClass
       'valueSecondary': serializer.toJson<double?>(valueSecondary),
       'valueTertiary': serializer.toJson<double?>(valueTertiary),
       'unit': serializer.toJson<String>(unit),
+      'irregularHeartbeatDetected': serializer.toJson<bool?>(
+        irregularHeartbeatDetected,
+      ),
       'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
@@ -6267,6 +6312,7 @@ class MeasurementRecord extends DataClass
     Value<double?> valueSecondary = const Value.absent(),
     Value<double?> valueTertiary = const Value.absent(),
     String? unit,
+    Value<bool?> irregularHeartbeatDetected = const Value.absent(),
     Value<String?> notes = const Value.absent(),
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
@@ -6283,6 +6329,9 @@ class MeasurementRecord extends DataClass
         ? valueTertiary.value
         : this.valueTertiary,
     unit: unit ?? this.unit,
+    irregularHeartbeatDetected: irregularHeartbeatDetected.present
+        ? irregularHeartbeatDetected.value
+        : this.irregularHeartbeatDetected,
     notes: notes.present ? notes.value : this.notes,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
@@ -6305,6 +6354,9 @@ class MeasurementRecord extends DataClass
           ? data.valueTertiary.value
           : this.valueTertiary,
       unit: data.unit.present ? data.unit.value : this.unit,
+      irregularHeartbeatDetected: data.irregularHeartbeatDetected.present
+          ? data.irregularHeartbeatDetected.value
+          : this.irregularHeartbeatDetected,
       notes: data.notes.present ? data.notes.value : this.notes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -6322,6 +6374,7 @@ class MeasurementRecord extends DataClass
           ..write('valueSecondary: $valueSecondary, ')
           ..write('valueTertiary: $valueTertiary, ')
           ..write('unit: $unit, ')
+          ..write('irregularHeartbeatDetected: $irregularHeartbeatDetected, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -6339,6 +6392,7 @@ class MeasurementRecord extends DataClass
     valueSecondary,
     valueTertiary,
     unit,
+    irregularHeartbeatDetected,
     notes,
     createdAt,
     updatedAt,
@@ -6355,6 +6409,7 @@ class MeasurementRecord extends DataClass
           other.valueSecondary == this.valueSecondary &&
           other.valueTertiary == this.valueTertiary &&
           other.unit == this.unit &&
+          other.irregularHeartbeatDetected == this.irregularHeartbeatDetected &&
           other.notes == this.notes &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -6369,6 +6424,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
   final Value<double?> valueSecondary;
   final Value<double?> valueTertiary;
   final Value<String> unit;
+  final Value<bool?> irregularHeartbeatDetected;
   final Value<String?> notes;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
@@ -6381,6 +6437,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     this.valueSecondary = const Value.absent(),
     this.valueTertiary = const Value.absent(),
     this.unit = const Value.absent(),
+    this.irregularHeartbeatDetected = const Value.absent(),
     this.notes = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -6394,6 +6451,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     this.valueSecondary = const Value.absent(),
     this.valueTertiary = const Value.absent(),
     required String unit,
+    this.irregularHeartbeatDetected = const Value.absent(),
     this.notes = const Value.absent(),
     required DateTime createdAt,
     this.updatedAt = const Value.absent(),
@@ -6412,6 +6470,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     Expression<double>? valueSecondary,
     Expression<double>? valueTertiary,
     Expression<String>? unit,
+    Expression<bool>? irregularHeartbeatDetected,
     Expression<String>? notes,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -6425,6 +6484,8 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
       if (valueSecondary != null) 'value_secondary': valueSecondary,
       if (valueTertiary != null) 'value_tertiary': valueTertiary,
       if (unit != null) 'unit': unit,
+      if (irregularHeartbeatDetected != null)
+        'irregular_heartbeat_detected': irregularHeartbeatDetected,
       if (notes != null) 'notes': notes,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -6440,6 +6501,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     Value<double?>? valueSecondary,
     Value<double?>? valueTertiary,
     Value<String>? unit,
+    Value<bool?>? irregularHeartbeatDetected,
     Value<String?>? notes,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
@@ -6453,6 +6515,8 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
       valueSecondary: valueSecondary ?? this.valueSecondary,
       valueTertiary: valueTertiary ?? this.valueTertiary,
       unit: unit ?? this.unit,
+      irregularHeartbeatDetected:
+          irregularHeartbeatDetected ?? this.irregularHeartbeatDetected,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -6486,6 +6550,11 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
     if (unit.present) {
       map['unit'] = Variable<String>(unit.value);
     }
+    if (irregularHeartbeatDetected.present) {
+      map['irregular_heartbeat_detected'] = Variable<bool>(
+        irregularHeartbeatDetected.value,
+      );
+    }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
@@ -6509,6 +6578,7 @@ class MeasurementRecordsCompanion extends UpdateCompanion<MeasurementRecord> {
           ..write('valueSecondary: $valueSecondary, ')
           ..write('valueTertiary: $valueTertiary, ')
           ..write('unit: $unit, ')
+          ..write('irregularHeartbeatDetected: $irregularHeartbeatDetected, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -17821,6 +17891,7 @@ typedef $$MeasurementRecordsTableCreateCompanionBuilder =
       Value<double?> valueSecondary,
       Value<double?> valueTertiary,
       required String unit,
+      Value<bool?> irregularHeartbeatDetected,
       Value<String?> notes,
       required DateTime createdAt,
       Value<DateTime?> updatedAt,
@@ -17835,6 +17906,7 @@ typedef $$MeasurementRecordsTableUpdateCompanionBuilder =
       Value<double?> valueSecondary,
       Value<double?> valueTertiary,
       Value<String> unit,
+      Value<bool?> irregularHeartbeatDetected,
       Value<String?> notes,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -17956,6 +18028,11 @@ class $$MeasurementRecordsTableFilterComposer
 
   ColumnFilters<String> get unit => $composableBuilder(
     column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get irregularHeartbeatDetected => $composableBuilder(
+    column: $table.irregularHeartbeatDetected,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -18086,6 +18163,11 @@ class $$MeasurementRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get irregularHeartbeatDetected => $composableBuilder(
+    column: $table.irregularHeartbeatDetected,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get notes => $composableBuilder(
     column: $table.notes,
     builder: (column) => ColumnOrderings(column),
@@ -18180,6 +18262,11 @@ class $$MeasurementRecordsTableAnnotationComposer
 
   GeneratedColumn<String> get unit =>
       $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<bool> get irregularHeartbeatDetected => $composableBuilder(
+    column: $table.irregularHeartbeatDetected,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
@@ -18309,6 +18396,7 @@ class $$MeasurementRecordsTableTableManager
                 Value<double?> valueSecondary = const Value.absent(),
                 Value<double?> valueTertiary = const Value.absent(),
                 Value<String> unit = const Value.absent(),
+                Value<bool?> irregularHeartbeatDetected = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -18321,6 +18409,7 @@ class $$MeasurementRecordsTableTableManager
                 valueSecondary: valueSecondary,
                 valueTertiary: valueTertiary,
                 unit: unit,
+                irregularHeartbeatDetected: irregularHeartbeatDetected,
                 notes: notes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -18335,6 +18424,7 @@ class $$MeasurementRecordsTableTableManager
                 Value<double?> valueSecondary = const Value.absent(),
                 Value<double?> valueTertiary = const Value.absent(),
                 required String unit,
+                Value<bool?> irregularHeartbeatDetected = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 required DateTime createdAt,
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -18347,6 +18437,7 @@ class $$MeasurementRecordsTableTableManager
                 valueSecondary: valueSecondary,
                 valueTertiary: valueTertiary,
                 unit: unit,
+                irregularHeartbeatDetected: irregularHeartbeatDetected,
                 notes: notes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

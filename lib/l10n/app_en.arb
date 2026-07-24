@@ -203,6 +203,7 @@
   "bloodGlucose": "Blood Glucose",
   "spo2": "SpO2",
   "temperature": "Temperature",
+  "irregularHeartbeat": "Irregular heartbeat",
   "pulseLabel": "pulse",
   "fieldName": "Field Name",
   "unit": "Unit",

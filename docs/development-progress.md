@@ -689,6 +689,86 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 ---
 
+### Phase 4E Polish — Georgian Pluralization
+
+**Date:** 2026-07-24
+
+**Changes:**
+- `DosageFormLocalizer` made locale-aware — `_shouldPluralize()` returns false for `localeName == 'ka'`
+- `_pluralized()` helper used by both `localizeWithQuantity()` and `localizeSnapshot()`
+- 3 new Georgian tests added to `schedule_test.dart`
+
+**Test Results:** 204/204 passing
+
+---
+
+### Phase 5A — Irregular Heartbeat Indicator
+
+**Date:** 2026-07-24
+
+**Problem:** Many blood-pressure devices display an irregular-heartbeat indicator during a reading. Users need to record whether the device showed this indicator for a specific reading. This is a device indicator, not a medical diagnosis.
+
+**Changes:**
+
+**Schema v7:**
+- Added nullable `bool? irregularHeartbeatDetected` column to `MeasurementRecords` table
+- Migration: `if (from < 7) { addColumn }` — non-destructive
+
+**Domain Entity:**
+- `MeasurementRecord` in `measurement.dart` updated with `bool? irregularHeartbeatDetected` field
+- `copyWith` supports `clearIrregularHeartbeat` flag (Dart cannot distinguish `null` from absent in named params)
+
+**Repository:**
+- `_recordToDomain` maps `irregularHeartbeatDetected` from DB row to domain entity
+- `createRecord` and `updateRecord` pass `Value(record.irregularHeartbeatDetected)`
+
+**Forms:**
+- `measurement_entry_screen.dart`: `SwitchListTile` shown only for `type.key == 'blood_pressure'`; state initialized as `null`
+- `measurement_edit_screen.dart`: `SwitchListTile` shown only for BP; pre-populated from existing record
+
+**History Display:**
+- `measurement_history_screen.dart`: `_RecordTile` shows `Icons.heart_broken` icon + localized label only when `record.irregularHeartbeatDetected == true`; hidden for `false` or `null`
+
+**Localization:**
+- New key `irregularHeartbeat` in EN (`Irregular heartbeat`) and KA (`არარეგულარული გულისცემა`)
+
+**Storage Semantics:**
+- `true` = device showed irregular heartbeat indicator
+- `false` = user explicitly recorded no indicator
+- `null` = not recorded / device doesn't support indicator
+
+**Tests:** 15 new tests in `test/irregular_heartbeat_test.dart`:
+- Domain entity: constructor accepts null/true/false, copyWith preserves/changes/clears the field
+- DB CRUD: default null after migration, create with true/false, update true→false, update false→null, non-BP records unaffected
+
+**Files Created:**
+- `test/irregular_heartbeat_test.dart`
+
+**Files Modified:**
+- `lib/domain/entities/measurement.dart` — added `irregularHeartbeatDetected` field + copyWith
+- `lib/data/database/tables/measurement_tables.dart` — added nullable `BoolColumn`
+- `lib/data/database/app_database.dart` — schema v7, migration
+- `lib/data/repositories/measurement_repository_impl.dart` — domain mapping, CRUD
+- `lib/presentation/screens/health/measurement_entry_screen.dart` — SwitchListTile for BP
+- `lib/presentation/screens/health/measurement_edit_screen.dart` — SwitchListTile for BP
+- `lib/presentation/screens/health/measurement_history_screen.dart` — indicator display
+- `lib/l10n/app_en.arb` — added `irregularHeartbeat`
+- `lib/l10n/app_ka.arb` — added `irregularHeartbeat`
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (1 pre-existing info lint) |
+| `flutter test` | Passed (219/219) |
+
+**Known Limitations:**
+- The field is on `MeasurementRecords` (applies to all types) but UI only shows the toggle for blood pressure
+- No data migration for existing BP records (they default to `null`)
+- Not connected to any conditional dose logic yet
+
+---
+
 ## Development Rules
 
 - Commit after every completed phase

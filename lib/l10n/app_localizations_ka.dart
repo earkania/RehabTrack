@@ -551,6 +551,9 @@ class AppLocalizationsKa extends AppLocalizations {
   String get temperature => 'ტემპერატურა';
 
   @override
+  String get irregularHeartbeat => 'არარეგულარული გულისცემა';
+
+  @override
   String get pulseLabel => 'პულსი';
 
   @override

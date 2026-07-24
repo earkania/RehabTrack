@@ -221,9 +221,38 @@ class _RecordTile extends StatelessWidget {
             formatted,
             style: theme.textTheme.titleMedium,
           ),
-          subtitle: Text(
-            _formatDate(record.timestamp),
-            style: theme.textTheme.bodySmall,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _formatDate(record.timestamp),
+                style: theme.textTheme.bodySmall,
+              ),
+              if (record.irregularHeartbeatDetected == true)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.heart_broken,
+                        size: 14,
+                        color: theme.colorScheme.error,
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          l10n.irregularHeartbeat,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.error,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
           trailing: PopupMenuButton<String>(
             onSelected: (value) {

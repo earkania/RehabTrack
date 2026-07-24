@@ -203,6 +203,7 @@
   "bloodGlucose": "გლუკოზა სისხლში",
   "spo2": "SpO2",
   "temperature": "ტემპერატურა",
+  "irregularHeartbeat": "არარეგულარული გულისცემა",
   "pulseLabel": "პულსი",
   "fieldName": "ველის სახელი",
   "unit": "ერთეული",

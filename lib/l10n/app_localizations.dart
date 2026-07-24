@@ -1142,6 +1142,12 @@ abstract class AppLocalizations {
   /// **'Temperature'**
   String get temperature;
 
+  /// No description provided for @irregularHeartbeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Irregular heartbeat'**
+  String get irregularHeartbeat;
+
   /// No description provided for @pulseLabel.
   ///
   /// In en, this message translates to:

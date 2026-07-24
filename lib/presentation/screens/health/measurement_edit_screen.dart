@@ -33,6 +33,7 @@ class _MeasurementEditScreenState
   bool _isSaving = false;
   bool _initialized = false;
   MeasurementRecord? _record;
+  bool? _irregularHeartbeatDetected;
 
   @override
   void dispose() {
@@ -122,6 +123,7 @@ class _MeasurementEditScreenState
 
     _measuredAt = record.timestamp;
     _notesController.text = record.notes ?? '';
+    _irregularHeartbeatDetected = record.irregularHeartbeatDetected;
 
     final valueMap = <String, MeasurementRecordValue>{};
     for (final v in values) {
@@ -167,6 +169,19 @@ class _MeasurementEditScreenState
           ),
           AppSpacing.lgH,
           ...fields.map((field) => _buildField(field, l10n)),
+          if (type.key == 'blood_pressure') ...[
+            AppSpacing.mdH,
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.irregularHeartbeat),
+              value: _irregularHeartbeatDetected ?? false,
+              onChanged: (value) {
+                setState(() {
+                  _irregularHeartbeatDetected = value;
+                });
+              },
+            ),
+          ],
           AppSpacing.mdH,
           _buildDateTimeField(context, l10n),
           AppSpacing.mdH,
@@ -297,6 +312,7 @@ class _MeasurementEditScreenState
         timestamp: _measuredAt,
         valuePrimary: primaryValue,
         unit: primaryUnit,
+        irregularHeartbeatDetected: _irregularHeartbeatDetected,
         notes: _notesController.text.trim().isEmpty
             ? null
             : _notesController.text.trim(),

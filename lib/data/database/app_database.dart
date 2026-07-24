@@ -80,7 +80,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -151,6 +151,13 @@ class AppDatabase extends _$AppDatabase {
         // Recreate with new columns (intakeQuantity, dosageForm, customDosageForm)
         await m.createTable(medicationSchedules);
         await m.createTable(medicationLogs);
+      }
+      if (from < 7) {
+        // Phase 5A: Irregular heartbeat indicator for blood-pressure readings
+        await m.addColumn(
+          measurementRecords,
+          measurementRecords.irregularHeartbeatDetected,
+        );
       }
     },
   );

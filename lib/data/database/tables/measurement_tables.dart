@@ -43,6 +43,7 @@ class MeasurementRecords extends Table {
   RealColumn get valueSecondary => real().nullable()();
   RealColumn get valueTertiary => real().nullable()();
   TextColumn get unit => text()();
+  BoolColumn get irregularHeartbeatDetected => boolean().nullable()();
   TextColumn get notes => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime().nullable()();

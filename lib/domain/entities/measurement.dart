@@ -127,6 +127,7 @@ class MeasurementRecord {
   final double? valueSecondary;
   final double? valueTertiary;
   final String unit;
+  final bool? irregularHeartbeatDetected;
   final String? notes;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -140,6 +141,7 @@ class MeasurementRecord {
     this.valueSecondary,
     this.valueTertiary,
     required this.unit,
+    this.irregularHeartbeatDetected,
     this.notes,
     required this.createdAt,
     this.updatedAt,
@@ -154,9 +156,11 @@ class MeasurementRecord {
     double? valueSecondary,
     double? valueTertiary,
     String? unit,
+    bool? irregularHeartbeatDetected,
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool clearIrregularHeartbeat = false,
   }) {
     return MeasurementRecord(
       id: id ?? this.id,
@@ -168,6 +172,9 @@ class MeasurementRecord {
       valueSecondary: valueSecondary ?? this.valueSecondary,
       valueTertiary: valueTertiary ?? this.valueTertiary,
       unit: unit ?? this.unit,
+      irregularHeartbeatDetected: clearIrregularHeartbeat
+          ? irregularHeartbeatDetected
+          : (irregularHeartbeatDetected ?? this.irregularHeartbeatDetected),
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

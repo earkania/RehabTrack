@@ -550,6 +550,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get temperature => 'Temperature';
 
   @override
+  String get irregularHeartbeat => 'Irregular heartbeat';
+
+  @override
   String get pulseLabel => 'pulse';
 
   @override
