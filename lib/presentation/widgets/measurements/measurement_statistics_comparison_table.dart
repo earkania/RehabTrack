@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:rehab_track/domain/entities/measurement_statistics.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
+import 'package:rehab_track/presentation/utils/measurement_formatter.dart';
 
 class _SeriesColumn {
   final String label;
   final String compactLabel;
   final String unit;
+  final String? fieldKey;
   final MeasurementStatistics? statistics;
 
   const _SeriesColumn({
     required this.label,
     required this.compactLabel,
     required this.unit,
+    this.fieldKey,
     this.statistics,
   });
 }
@@ -117,9 +120,11 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
                         row.label,
                         col.label,
                         l10n,
+                        fieldKey: col.fieldKey,
                       ),
                       child: Text(
-                        _formatCell(col.statistics, row.extract, l10n),
+                        _formatCell(col.statistics, row.extract, l10n,
+                            fieldKey: col.fieldKey),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
@@ -137,13 +142,13 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
   String _formatCell(
     MeasurementStatistics? stats,
     double? Function(MeasurementStatistics) extract,
-    AppLocalizations l10n,
-  ) {
+    AppLocalizations l10n, {
+    String? fieldKey,
+  }) {
     if (stats == null) return '\u2014';
     final value = extract(stats);
     if (value == null) return '\u2014';
-    if (value == value.roundToDouble()) return value.toInt().toString();
-    return value.toStringAsFixed(1);
+    return MeasurementFormatter.formatStatisticsValue(value, fieldKey: fieldKey);
   }
 
   String _formatCellAccessibility(
@@ -151,13 +156,16 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
     double? Function(MeasurementStatistics) extract,
     String rowLabel,
     String colLabel,
-    AppLocalizations l10n,
-  ) {
+    AppLocalizations l10n, {
+    String? fieldKey,
+  }) {
     if (stats == null) return '$rowLabel $colLabel: ${l10n.unavailable}';
     final value = extract(stats);
     if (value == null) return '$rowLabel $colLabel: ${l10n.unavailable}';
-    final formatted =
-        value == value.roundToDouble() ? value.toInt().toString() : value.toStringAsFixed(1);
+    final formatted = MeasurementFormatter.formatStatisticsValue(
+      value,
+      fieldKey: fieldKey,
+    );
     return '$rowLabel $colLabel: $formatted';
   }
 
@@ -170,18 +178,21 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
         label: l10n.systolicLabel,
         compactLabel: l10n.systolicShort,
         unit: 'mmHg',
+        fieldKey: 'systolic',
         statistics: fieldStatistics['systolic'],
       ),
       _SeriesColumn(
         label: l10n.diastolicLabel,
         compactLabel: l10n.diastolicShort,
         unit: 'mmHg',
+        fieldKey: 'diastolic',
         statistics: fieldStatistics['diastolic'],
       ),
       _SeriesColumn(
         label: l10n.pulseLabelStat,
         compactLabel: l10n.pulseShort,
         unit: 'bpm',
+        fieldKey: 'pulse',
         statistics: fieldStatistics['pulse'],
       ),
     ];

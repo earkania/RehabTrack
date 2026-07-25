@@ -3,6 +3,7 @@ import 'package:rehab_track/domain/entities/measurement_chart.dart';
 import 'package:rehab_track/domain/entities/measurement_statistics.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
+import 'package:rehab_track/presentation/utils/measurement_formatter.dart';
 import 'package:rehab_track/presentation/widgets/measurements/measurement_statistics_comparison_table.dart';
 
 class MeasurementStatisticsCard extends StatelessWidget {
@@ -53,19 +54,19 @@ class MeasurementStatisticsCard extends StatelessWidget {
       children: [
         _StatRow(
           label: l10n.latest,
-          value: _formatDouble(stats.latest),
+          value: _formatValue(stats.latest),
         ),
         _StatRow(
           label: l10n.average,
-          value: _formatDouble(stats.average),
+          value: _formatValue(stats.average),
         ),
         _StatRow(
           label: l10n.minimum,
-          value: _formatDouble(stats.minimum),
+          value: _formatValue(stats.minimum),
         ),
         _StatRow(
           label: l10n.maximum,
-          value: _formatDouble(stats.maximum),
+          value: _formatValue(stats.maximum),
         ),
         _StatRow(
           label: l10n.readingCount,
@@ -82,10 +83,9 @@ class MeasurementStatisticsCard extends StatelessWidget {
     );
   }
 
-  String _formatDouble(double? value) {
+  String _formatValue(double? value) {
     if (value == null) return '--';
-    if (value == value.roundToDouble()) return value.toInt().toString();
-    return value.toStringAsFixed(1);
+    return MeasurementFormatter.formatStatisticsValue(value, typeKey: typeKey);
   }
 }
 

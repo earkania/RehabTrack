@@ -183,6 +183,31 @@ class MeasurementFormatter {
     return value.toStringAsFixed(decimals);
   }
 
+  static int statisticsDecimalPlaces({String? typeKey, String? fieldKey}) {
+    if (fieldKey != null) {
+      return switch (fieldKey) {
+        'systolic' || 'diastolic' || 'pulse' || 'spo2' => 0,
+        'glucose' || 'temperature' || 'weight' => 1,
+        _ => 1,
+      };
+    }
+    return switch (typeKey) {
+      'blood_pressure' || 'pulse' || 'spo2' => 0,
+      'blood_glucose' || 'temperature' || 'weight' => 1,
+      _ => 1,
+    };
+  }
+
+  static String formatStatisticsValue(
+    double value, {
+    String? typeKey,
+    String? fieldKey,
+  }) {
+    final decimals =
+        statisticsDecimalPlaces(typeKey: typeKey, fieldKey: fieldKey);
+    return formatNumber(value, decimals);
+  }
+
   static String _formatNumber(double value, int decimals) =>
       formatNumber(value, decimals);
 }
