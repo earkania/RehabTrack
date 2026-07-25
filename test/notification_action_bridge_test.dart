@@ -114,6 +114,16 @@ class FakeMedicationRepository implements MedicationRepository {
   @override
   Future<List<Medication>> getMedications(int profileId) async =>
       medications.values.where((m) => m.profileId == profileId).toList();
+  @override
+  Future<List<Medication>> getActiveMedications(int profileId) async =>
+      medications.values
+          .where((m) => m.profileId == profileId && m.active)
+          .toList();
+  @override
+  Future<List<MedicationSchedule>> getSchedulesForMedication(
+    int medicationId,
+  ) async =>
+      schedulesByMedicationId[medicationId] ?? [];
 
   @override
   Stream<List<MedicationSchedule>> watchSchedules(int medicationId) async* {

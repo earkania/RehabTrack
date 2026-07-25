@@ -24,6 +24,13 @@ class MedicationDao extends DatabaseAccessor<AppDatabase>
       ..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
   }
 
+  Future<List<Medication>> getActiveMedications(int profileId) {
+    return (select(medications)
+      ..where((t) =>
+          t.profileId.equals(profileId) & t.active.equals(true))
+      ..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
+  }
+
   Future<List<Medication>> getMedications(int profileId) {
     return (select(medications)
       ..where((t) => t.profileId.equals(profileId))
@@ -54,6 +61,16 @@ class MedicationDao extends DatabaseAccessor<AppDatabase>
       ..orderBy([
         (t) => OrderingTerm.asc(t.startDate),
       ])).watch();
+  }
+
+  Future<List<MedicationSchedule>> getSchedulesForMedication(
+    int medicationId,
+  ) {
+    return (select(medicationSchedules)
+      ..where((t) => t.medicationId.equals(medicationId))
+      ..orderBy([
+        (t) => OrderingTerm.asc(t.startDate),
+      ])).get();
   }
 
   Future<int> insertSchedule(MedicationSchedulesCompanion entry) {

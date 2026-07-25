@@ -6,6 +6,7 @@ import 'package:rehab_track/domain/entities/medication_component.dart';
 abstract class MedicationRepository {
   Stream<List<Medication>> watchMedications(int profileId);
   Stream<List<Medication>> watchActiveMedications(int profileId);
+  Future<List<Medication>> getActiveMedications(int profileId);
   Future<List<Medication>> getMedications(int profileId);
   Future<Medication?> getMedication(int id);
   Future<int> createMedication(Medication medication);
@@ -13,6 +14,9 @@ abstract class MedicationRepository {
   Future<void> deleteMedication(int id);
 
   Stream<List<MedicationSchedule>> watchSchedules(int medicationId);
+  Future<List<MedicationSchedule>> getSchedulesForMedication(
+    int medicationId,
+  );
   Future<MedicationSchedule?> getSchedule(int id);
   Future<int> createSchedule(MedicationSchedule schedule);
   Future<void> updateSchedule(MedicationSchedule schedule);

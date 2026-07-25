@@ -1520,9 +1520,162 @@ Note: Diet module has a DAO but no dedicated repository yet.
 **Known Limitations:**
 - No snooze duration configurability (hardcoded 10 minutes)
 - No "Record Now" deep link from notification directly to entry form
-- Today screen remains empty — measurement reminders not yet surfaced there
 - Schedule editor does not show existing notification status
 - No schedule conflict detection (overlapping time slots)
+
+---
+
+## Phase 6 — Today Dashboard
+
+**Status:** Simplified and complete. Single chronological agenda, corrected Next-item logic, past/future background styling, 43 tests (26 unit + 17 widget).
+
+### Design
+
+- One chronological agenda list for the full day
+- Each scheduled occurrence appears exactly once
+- No separate Overdue, Medications, or Measurements sections
+- Status icons distinguish taken, skipped, overdue, pending, due, and snoozed
+- Past/future background styling (subtle muted for past, normal for future, highlighted for due)
+- Next card shows earliest future/due actionable item (excludes overdue)
+
+### What Was Built
+
+**Domain layer:**
+- `TodayAgendaItem` — unified agenda item with `effectiveTime` (snoozedUntil ?? scheduledDateTime), `isPast()`, `isFuture()`, `isDue()` helpers
+- `TodayAgendaItemType` — `medication` / `measurement`
+- `TodayAgendaItemStatus` — `upcoming`, `due`, `overdue`, `completed`, `skipped`, `snoozed`
+- `TodaySummary` — counts of total/completed/skipped/overdue with percentage getters
+- `TodayAgenda` — stores single `items` list (sorted by effectiveTime, then id); `nextItem({now?})` selects earliest future/due item excluding overdue
+- `TodayAgendaService` — generates unified agenda from active schedules + logs; 30-min grace window; `determineMedicationStatus()` / `determineMeasurementStatus()` are now static for testing
+
+**Repository extensions:**
+- `MedicationRepository.getActiveMedications(profileId)` — Future-based
+- `MedicationRepository.getSchedulesForMedication(medicationId)` — Future-based
+- Corresponding DAO methods in `MedicationDao`
+
+**Providers:**
+- `todayAgendaProvider` — `FutureProvider.autoDispose<TodayAgenda>`
+- `todaySummaryProvider` — derives from agenda
+- `nextTodayItemProvider` — derives from agenda, uses corrected future-only logic
+- `todayItemsProvider` — single unified list provider
+
+**UI widgets:**
+- `TodaySummaryCard` — progress bar with completed/skipped/overdue counts
+- `TodayNextItemCard` — highlights next actionable item (primary container style), uses `effectiveTime`
+- `TodayAgendaItemWidget` — row with type icon, time, title, subtitle, status icon, action buttons; past/future background applied via `TodayBackground`
+- `TodayBackground` — determines past/current/future position and provides subtle card color and time color
+
+**Screen:**
+- `TodayScreen` — `CustomScrollView` with summary card, next item, then single `SliverList` of all items chronologically
+- Pull-to-refresh to invalidate agenda
+- Empty state when no schedules
+- Removed: separate Overdue, Medications, Measurements sections; collapsible completed section
+
+**Localization:**
+- Existing keys retained; no new keys required for simplification
+
+### Tests
+
+- `test/today_agenda_test.dart` — 26 unit tests covering `TodayAgendaItem` (effectiveTime, isPast, isFuture, isDue, isActionable, isCompleted), `TodayAgenda` (uniqueness, sorting, nextItem exclusion/selection/snooze), `TodaySummary` (totals, percentages), `TodayBackground` (classification)
+- `test/today_screen_test.dart` — 17 widget tests covering unified list, no separate sections, no duplicates, status icons, past/future background, empty state, narrow screen, Georgian locale, light/dark theme, NextItemCard selection, type icons
+
+### Validation
+
+- `flutter analyze`: 0 new errors (15 pre-existing infos/warnings only)
+- `flutter test`: 488 passed, 8 failed (all 8 pre-existing in `phase5a_correction_test.dart`)
+- Pixel 7 verification: app launches successfully, builds in 8.7s, installs in 3.8s, Impeller Vulkan active, no crashes
+
+### Phase 6 Visual Hierarchy & Action-Menu Improvement
+
+**Status:** Completed
+
+**What was done:**
+
+#### 1. Agenda Section Title
+- Added localized `Agenda` / `დღის განრიგი` section title between Next card and agenda list
+- Uses `titleSmall` typography with `fontWeight.w600` and `onSurfaceVariant` color
+- Left-aligned with consistent 16px horizontal padding
+- Separates summary/next card from the chronological list
+
+#### 2. Background Styling Fix
+- **Root cause:** `surfaceContainerLow` was too close to the Card's default surface color; `primaryContainer.withValues(alpha: 0.3)` was too subtle
+- **Solution:** `TodayBackground` now uses `ElevationOverlay.applySurfaceTint()` for visible but subtle distinction:
+  - **Past:** `surfaceContainerHighest` with `surfaceTint` at elevation 2
+  - **Current/Due:** `primaryContainer` with `primary` at elevation 3
+  - **Future:** `null` (default Card surface)
+- Past items have a visibly muted background; due items have a clear highlight; future items are normal
+- Time text also changes: past → muted, due → primary, future → default
+
+#### 3. Popup Menu Actions
+- **Removed:** `_ActionButtons` with inline `TextButton.icon` (Mark as Taken, Record Now) and snooze `IconButton`
+- **Added:** `_AgendaItemMenu` with `PopupMenuButton<String>` following existing `measurement_history_screen.dart` convention
+- **Menu items per status/type:**
+  - **Medication (actionable):** Mark as taken (Icons.check), Skip (Icons.skip_next), Details (Icons.info_outline), History (Icons.history)
+  - **Measurement (actionable):** Record now (Icons.add), Skip (Icons.skip_next), Details, History, Trends (Icons.show_chart)
+  - **Completed/Skipped (any type):** Details, History only
+- All menu items have icons alongside text labels
+- Menu closes before performing action
+- `ref.invalidate(todayAgendaProvider)` on mark taken / skip (TODO stubs remain for actual repository calls)
+
+#### 4. Agenda Row Layout
+- Row: `Time | TypeIcon | Content | StatusIcon | MoreMenu`
+- Title supports 2 lines (was 1 line before) for better long-name handling
+- Subtitle and instructions preserved with truncation
+- Compact vertical padding (10px vs 12px)
+- No wide inline buttons — all horizontal space available for content
+
+#### 5. Localization
+- Added 7 new keys to EN and KA ARB files: `agenda`, `moreActions`, `skip`, `openDetails`, `viewHistory`, `viewTrends`, `failedToUpdateItem`
+- Existing keys retained: `markTaken`, `recordNow`, `snooze10min`
+
+### Tests (Phase 6 Improvement)
+
+- `test/today_screen_test.dart` — 40 widget tests (13 original + 27 new):
+  - **Agenda section title (3):** title visible, Georgian title, no duplicate headings
+  - **Background styling (5):** past muted, due highlighted, future normal, backgrounds differ visibly, time refresh updates classification
+  - **Action menu (5):** no wide TextButton, PopupMenuButton visible, medication pending shows Mark/Skip, completed hides Mark/Skip, measurement shows Record Now, menu closes after selection
+  - **Agenda row layout (5):** long name readable, Georgian overflow-free, status icon visible, menu icon visible, Pixel 7 narrow screen
+  - **Popup menu actions (4):** overdue medication shows correct items, skipped medication hides actions, measurement shows Trends, medication hides Trends
+- `test/today_agenda_test.dart` — 26 unit tests (unchanged)
+
+### Validation (Phase 6 Improvement)
+
+- `flutter gen-l10n`: completed successfully
+- `flutter analyze`: 15 pre-existing issues, 0 new
+- `flutter test`: 511 passed, 8 failed (all 8 pre-existing in `phase5a_correction_test.dart`)
+- Pixel 7: app builds in 8.7s, installs in 3.6s, Impeller Vulkan, no crashes
+
+### Phase 6 Medication-Information Improvement
+
+**Date:** 2026-07-25
+
+**What changed:**
+- `TodayAgendaItem` model extended with `strength` (String?), `intakeQuantity` (double?), `dosageForm` (DosageForm?), `customDosageForm` (String?) fields
+- `TodayAgendaService._buildMedicationItem` now fetches components via `MedicationRepository.getComponents()` and formats strength using `ComponentFormatter.formatComponents()` (fallback: `DoseFormatter.format()`)
+- Service is async (fetches component data per medication)
+- `TodayAgendaItemWidget` renders medication info as separate lines: strength → intake (via `DosageFormLocalizer.localizeWithQuantity()`) → instructions; legacy `subtitle` fallback for medications without new fields
+- `TodayNextItemCard` shows strength and intake text joined with `•` separator; falls back to `subtitle` when no dosage info
+- No changes to schedule generation, notification logic, repository behavior, agenda sorting, status logic, or popup-menu actions
+
+**Files modified:**
+- `lib/domain/entities/today_agenda.dart`: 4 new fields + `DosageForm` import
+- `lib/domain/services/today_agenda_service.dart`: async `_buildMedicationItem`, `_resolveMedicationStrength()`, 2 new imports
+- `lib/presentation/widgets/today/today_agenda_item.dart`: strength/intake/instructions rendering, `DosageFormLocalizer` import
+- `lib/presentation/widgets/today/today_next_item_card.dart`: strength/intake display, `_formatIntake()`, `DosageFormLocalizer` import
+- `test/today_agenda_test.dart`: 6 new unit tests for model fields
+- `test/today_screen_test.dart`: 9 new widget tests for medication info display
+
+**Tests (Phase 6 Medication Info):**
+- `today_agenda_test.dart`: 6 new unit tests (strength default, strength stored, intake defaults, intake stored, complete dosage info)
+- `today_screen_test.dart`: 9 new widget tests (strength display, intake with form, separate lines, instructions below, null strength, zero intake, subtitle fallback, Georgian locale, full dosage no overflow)
+
+**Validation:**
+- `flutter analyze`: 15 pre-existing issues, 0 new
+- `flutter test`: 525 passed, 8 failed (all 8 pre-existing in `phase5a_correction_test.dart`)
+
+### Remaining
+
+- **Action callbacks:** Mark Taken → `MedicationRepository.logDose()`, Record Now → navigate to measurement entry, Skip → update state, Details → navigate to medication/measurement details, History → navigate to history, Trends → navigate to trends (all TODO stubs in `_AgendaItemMenu._handleAction`)
 
 ---
 

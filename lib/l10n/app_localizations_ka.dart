@@ -619,7 +619,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get addReadingTooltip => 'ჩანაწერის დამატება';
 
   @override
-  String get viewHistory => 'ისტორიის ნახვა';
+  String get viewHistory => 'ისტორია';
 
   @override
   String get valueRequired => 'მნიშვნელობა საჭიროა';
@@ -702,7 +702,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get measurementTrends => 'გაზომვის ტრენდები';
 
   @override
-  String get viewTrends => 'ტრენდების ნახვა';
+  String get viewTrends => 'ტრენდები';
 
   @override
   String get lastSevenDays => 'ბოლო 7 დღე';
@@ -849,7 +849,7 @@ class AppLocalizationsKa extends AppLocalizations {
       'ყოველ N დღეში საჭიროებს დაწყების თარიღს';
 
   @override
-  String get recordNow => 'ჩაწერეთ ახლა';
+  String get recordNow => 'ჩაწერე ახლა';
 
   @override
   String get measurementReminder => 'გაზომვის შეხსენება';
@@ -891,4 +891,73 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get snoozed => 'გადადებული';
+
+  @override
+  String get todaysProgress => 'დღევანდელი პროგრესი';
+
+  @override
+  String get todaysPlan => 'დღევანდელი გეგმა';
+
+  @override
+  String get nothingScheduledToday => 'დღეს არაფერია დაგეგმილი';
+
+  @override
+  String get nextItem => 'შემდეგი';
+
+  @override
+  String get medicationsToday => 'მედიკამენტები';
+
+  @override
+  String get measurementsToday => 'გაზომვები';
+
+  @override
+  String get completedAndSkipped => 'დასრულებული და გამოტოვებული';
+
+  @override
+  String get markTaken => 'მიღებულია';
+
+  @override
+  String get snooze10min => 'გადადე 10 წუთით';
+
+  @override
+  String get due => 'დროა';
+
+  @override
+  String get dueSoon => 'მალე დროა';
+
+  @override
+  String takeMedication(Object name) {
+    return 'მიიღე $name';
+  }
+
+  @override
+  String completedAt(Object time) {
+    return 'დასრულდა $time';
+  }
+
+  @override
+  String overdueSince(Object time) {
+    return 'ვადაგასულია $time-დან';
+  }
+
+  @override
+  String get noMedicationsToday => 'დღეს მედიკამენტების გრაფიკი არ არის';
+
+  @override
+  String get noMeasurementsToday => 'დღეს გაზომვების გრაფიკი არ არის';
+
+  @override
+  String get agenda => 'დღის განრიგი';
+
+  @override
+  String get moreActions => 'დამატებითი მოქმედებები';
+
+  @override
+  String get skip => 'გამოტოვება';
+
+  @override
+  String get openDetails => 'დეტალები';
+
+  @override
+  String get failedToUpdateItem => 'ელემენტის განახლება ვერ მოხერხდა';
 }

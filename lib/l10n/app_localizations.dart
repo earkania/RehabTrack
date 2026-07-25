@@ -1277,7 +1277,7 @@ abstract class AppLocalizations {
   /// No description provided for @viewHistory.
   ///
   /// In en, this message translates to:
-  /// **'View History'**
+  /// **'History'**
   String get viewHistory;
 
   /// No description provided for @valueRequired.
@@ -1433,7 +1433,7 @@ abstract class AppLocalizations {
   /// No description provided for @viewTrends.
   ///
   /// In en, this message translates to:
-  /// **'View Trends'**
+  /// **'Trends'**
   String get viewTrends;
 
   /// No description provided for @lastSevenDays.
@@ -1789,6 +1789,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Snoozed'**
   String get snoozed;
+
+  /// No description provided for @todaysProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Progress'**
+  String get todaysProgress;
+
+  /// No description provided for @todaysPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Plan'**
+  String get todaysPlan;
+
+  /// No description provided for @nothingScheduledToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing scheduled for today'**
+  String get nothingScheduledToday;
+
+  /// No description provided for @nextItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextItem;
+
+  /// No description provided for @medicationsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Medications'**
+  String get medicationsToday;
+
+  /// No description provided for @measurementsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurements'**
+  String get measurementsToday;
+
+  /// No description provided for @completedAndSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed & Skipped'**
+  String get completedAndSkipped;
+
+  /// No description provided for @markTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Taken'**
+  String get markTaken;
+
+  /// No description provided for @snooze10min.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 10 min'**
+  String get snooze10min;
+
+  /// No description provided for @due.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get due;
+
+  /// No description provided for @dueSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Due soon'**
+  String get dueSoon;
+
+  /// No description provided for @takeMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Take {name}'**
+  String takeMedication(Object name);
+
+  /// No description provided for @completedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed at {time}'**
+  String completedAt(Object time);
+
+  /// No description provided for @overdueSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue since {time}'**
+  String overdueSince(Object time);
+
+  /// No description provided for @noMedicationsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No medication schedules for today'**
+  String get noMedicationsToday;
+
+  /// No description provided for @noMeasurementsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No measurement schedules for today'**
+  String get noMeasurementsToday;
+
+  /// No description provided for @agenda.
+  ///
+  /// In en, this message translates to:
+  /// **'Agenda'**
+  String get agenda;
+
+  /// No description provided for @moreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get moreActions;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @openDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get openDetails;
+
+  /// No description provided for @failedToUpdateItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update item'**
+  String get failedToUpdateItem;
 }
 
 class _AppLocalizationsDelegate

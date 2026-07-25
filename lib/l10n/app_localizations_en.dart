@@ -618,7 +618,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addReadingTooltip => 'Add Reading';
 
   @override
-  String get viewHistory => 'View History';
+  String get viewHistory => 'History';
 
   @override
   String get valueRequired => 'Value is required';
@@ -708,7 +708,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get measurementTrends => 'Measurement Trends';
 
   @override
-  String get viewTrends => 'View Trends';
+  String get viewTrends => 'Trends';
 
   @override
   String get lastSevenDays => 'Last 7 Days';
@@ -897,4 +897,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get snoozed => 'Snoozed';
+
+  @override
+  String get todaysProgress => 'Today\'s Progress';
+
+  @override
+  String get todaysPlan => 'Today\'s Plan';
+
+  @override
+  String get nothingScheduledToday => 'Nothing scheduled for today';
+
+  @override
+  String get nextItem => 'Next';
+
+  @override
+  String get medicationsToday => 'Medications';
+
+  @override
+  String get measurementsToday => 'Measurements';
+
+  @override
+  String get completedAndSkipped => 'Completed & Skipped';
+
+  @override
+  String get markTaken => 'Mark as Taken';
+
+  @override
+  String get snooze10min => 'Snooze 10 min';
+
+  @override
+  String get due => 'Due';
+
+  @override
+  String get dueSoon => 'Due soon';
+
+  @override
+  String takeMedication(Object name) {
+    return 'Take $name';
+  }
+
+  @override
+  String completedAt(Object time) {
+    return 'Completed at $time';
+  }
+
+  @override
+  String overdueSince(Object time) {
+    return 'Overdue since $time';
+  }
+
+  @override
+  String get noMedicationsToday => 'No medication schedules for today';
+
+  @override
+  String get noMeasurementsToday => 'No measurement schedules for today';
+
+  @override
+  String get agenda => 'Agenda';
+
+  @override
+  String get moreActions => 'More actions';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get openDetails => 'Details';
+
+  @override
+  String get failedToUpdateItem => 'Failed to update item';
 }

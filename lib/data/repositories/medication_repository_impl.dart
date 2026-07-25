@@ -44,6 +44,12 @@ class MedicationRepositoryImpl implements MedicationRepository {
   }
 
   @override
+  Future<List<Medication>> getActiveMedications(int profileId) async {
+    final rows = await _database.medicationDao.getActiveMedications(profileId);
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
   Future<List<Medication>> getMedications(int profileId) async {
     final rows = await _database.medicationDao.getMedications(profileId);
     return rows.map(_toDomain).toList();
@@ -104,6 +110,16 @@ class MedicationRepositoryImpl implements MedicationRepository {
     return _database.medicationDao
         .watchSchedules(medicationId)
         .map((rows) => rows.map(_scheduleToDomain).toList());
+  }
+
+  @override
+  Future<List<MedicationSchedule>> getSchedulesForMedication(
+    int medicationId,
+  ) async {
+    final rows = await _database.medicationDao.getSchedulesForMedication(
+      medicationId,
+    );
+    return rows.map(_scheduleToDomain).toList();
   }
 
   @override
