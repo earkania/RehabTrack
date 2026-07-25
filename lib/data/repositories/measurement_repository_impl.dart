@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:rehab_track/data/database/app_database.dart' as db;
 import 'package:rehab_track/domain/entities/measurement.dart';
-import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 
 class MeasurementRepositoryImpl implements MeasurementRepository {
@@ -335,8 +334,9 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
       db.MeasurementSchedulesCompanion.insert(
         profileId: schedule.profileId,
         measurementTypeId: schedule.measurementTypeId,
-        scheduleConfig:
-            schedule.scheduleConfig.toJsonString(),
+        scheduleType: schedule.scheduleType,
+        time: schedule.time,
+        intervalDays: Value(schedule.intervalDays),
         startDate: Value(schedule.startDate),
         endDate: Value(schedule.endDate),
         active: Value(schedule.active),
@@ -355,8 +355,9 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         profileId: Value(schedule.profileId),
         measurementTypeId:
             Value(schedule.measurementTypeId),
-        scheduleConfig:
-            Value(schedule.scheduleConfig.toJsonString()),
+        scheduleType: Value(schedule.scheduleType),
+        time: Value(schedule.time),
+        intervalDays: Value(schedule.intervalDays),
         startDate: Value(schedule.startDate),
         endDate: Value(schedule.endDate),
         active: Value(schedule.active),
@@ -514,8 +515,9 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
       id: row.id,
       profileId: row.profileId,
       measurementTypeId: row.measurementTypeId,
-      scheduleConfig:
-          ScheduleConfig.fromJsonString(row.scheduleConfig),
+      scheduleType: row.scheduleType,
+      time: row.time,
+      intervalDays: row.intervalDays,
       startDate: row.startDate,
       endDate: row.endDate,
       active: row.active,

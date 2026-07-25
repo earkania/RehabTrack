@@ -119,6 +119,7 @@
   "deleteScheduleConfirmation": "წაშალოთ ეს გრაფიკი? შეტყობინებები გაუქმდება.",
   "selectTime": "აირჩიეთ დრო",
   "addTime": "დროის დამატება",
+  "scheduledTime": "დაგეგმილი დრო",
   "removeTime": "წაშლა",
   "intervalDays": "ინტერვალი (დღე)",
   "atLeastOneTimeRequired": "სულ მცირე ერთი დრო საჭიროა",

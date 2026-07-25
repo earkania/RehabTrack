@@ -6,7 +6,6 @@ import 'package:rehab_track/domain/entities/blood_pressure_component_status.dart
 import 'package:rehab_track/domain/entities/default_reference_ranges.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
-import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/services/blood_pressure_status_evaluator.dart';
 import 'package:rehab_track/domain/services/reading_status_calculator.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
@@ -822,15 +821,11 @@ class _ScheduleTile extends StatelessWidget {
     final theme = Theme.of(context);
 
     final String scheduleLabel;
-    switch (schedule.scheduleConfig) {
-      case DailySchedule():
-        scheduleLabel = l10n.daily;
-      case IntervalDaysSchedule(:final intervalDays):
-        scheduleLabel = '${l10n.everyNDaysLabel} ($intervalDays)';
+    if (schedule.isDaily) {
+      scheduleLabel = l10n.daily;
+    } else {
+      scheduleLabel = '${l10n.everyNDaysLabel} (${schedule.intervalDays})';
     }
-
-    final times = schedule.scheduleConfig.times;
-    final timesStr = times.join(', ');
 
     return ListTile(
       dense: true,
@@ -846,7 +841,7 @@ class _ScheduleTile extends StatelessWidget {
         style: theme.textTheme.bodyMedium,
       ),
       subtitle: Text(
-        timesStr,
+        schedule.time,
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),

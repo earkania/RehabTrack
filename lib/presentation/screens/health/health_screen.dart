@@ -123,6 +123,11 @@ class _MeasurementTypeCard extends StatelessWidget {
               ),
             ),
             IconButton(
+              onPressed: onSchedules,
+              icon: const Icon(Icons.alarm),
+              tooltip: l10n.measurementSchedules,
+            ),
+            IconButton(
               onPressed: onHistory,
               icon: const Icon(Icons.history),
               tooltip: l10n.viewHistory,
@@ -131,11 +136,6 @@ class _MeasurementTypeCard extends StatelessWidget {
               onPressed: onAdd,
               icon: const Icon(Icons.add_circle_outline),
               tooltip: l10n.addReading,
-            ),
-            IconButton(
-              onPressed: onSchedules,
-              icon: const Icon(Icons.schedule),
-              tooltip: l10n.measurementSchedules,
             ),
           ],
         ),

@@ -65,7 +65,9 @@ class MeasurementSchedules extends Table {
       integer().references(Profiles, #id)();
   IntColumn get measurementTypeId =>
       integer().references(MeasurementTypes, #id)();
-  TextColumn get scheduleConfig => text()();
+  TextColumn get scheduleType => text()();
+  TextColumn get time => text()();
+  IntColumn get intervalDays => integer().nullable()();
   DateTimeColumn get startDate => dateTime().nullable()();
   DateTimeColumn get endDate => dateTime().nullable()();
   BoolColumn get active => boolean().withDefault(const Constant(true))();

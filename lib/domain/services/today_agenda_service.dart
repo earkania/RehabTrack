@@ -110,7 +110,8 @@ class TodayAgendaService {
     final items = <TodayAgendaItem>[];
 
     for (final schedule in schedules) {
-      if (!_scheduleAppliesOnDate(schedule.scheduleConfig, today)) continue;
+      if (!schedule.active || schedule.id == null) continue;
+      if (!_measurementScheduleAppliesOnDate(schedule, today)) continue;
 
       final typeId = schedule.measurementTypeId;
       if (!typeMap.containsKey(typeId)) {
@@ -119,7 +120,8 @@ class TodayAgendaService {
       }
       final type = typeMap[typeId];
 
-      final times = schedule.scheduleConfig.times;
+      final scheduledDateTime = _parseTimeForDate(schedule.time, today);
+
       final logs = await _measurementRepository.getReminderLogsForSchedule(
         schedule.id!,
       );
@@ -130,19 +132,16 @@ class TodayAgendaService {
             logDate.isBefore(dayEnd);
       }).toList();
 
-      for (final timeStr in times) {
-        final scheduledDateTime = _parseTimeForDate(timeStr, today);
-        final log = _findMeasurementLogForTime(todayLogs, scheduledDateTime);
+      final log = _findMeasurementLogForTime(todayLogs, scheduledDateTime);
 
-        items.add(_buildMeasurementItem(
-          schedule: schedule,
-          type: type,
-          scheduledDateTime: scheduledDateTime,
-          log: log,
-          currentTime: currentTime,
-          typeName: type?.name ?? 'Measurement',
-        ));
-      }
+      items.add(_buildMeasurementItem(
+        schedule: schedule,
+        type: type,
+        scheduledDateTime: scheduledDateTime,
+        log: log,
+        currentTime: currentTime,
+        typeName: type?.name ?? 'Measurement',
+      ));
     }
 
     return items;
@@ -158,6 +157,15 @@ class TodayAgendaService {
 
   static bool _scheduleAppliesOnDate(ScheduleConfig config, DateTime date) {
     return scheduleAppliesOnDate(config, date);
+  }
+
+  static bool _measurementScheduleAppliesOnDate(
+    MeasurementSchedule schedule,
+    DateTime date,
+  ) {
+    if (schedule.isDaily) return true;
+    if (schedule.intervalDays == null || schedule.intervalDays! <= 0) return false;
+    return _intervalScheduleAppliesOnDate(schedule.intervalDays!, date);
   }
 
   static bool _intervalScheduleAppliesOnDate(

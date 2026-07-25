@@ -7060,16 +7060,36 @@ class $MeasurementSchedulesTable extends MeasurementSchedules
       'REFERENCES measurement_types (id)',
     ),
   );
-  static const VerificationMeta _scheduleConfigMeta = const VerificationMeta(
-    'scheduleConfig',
+  static const VerificationMeta _scheduleTypeMeta = const VerificationMeta(
+    'scheduleType',
   );
   @override
-  late final GeneratedColumn<String> scheduleConfig = GeneratedColumn<String>(
-    'schedule_config',
+  late final GeneratedColumn<String> scheduleType = GeneratedColumn<String>(
+    'schedule_type',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timeMeta = const VerificationMeta('time');
+  @override
+  late final GeneratedColumn<String> time = GeneratedColumn<String>(
+    'time',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _intervalDaysMeta = const VerificationMeta(
+    'intervalDays',
+  );
+  @override
+  late final GeneratedColumn<int> intervalDays = GeneratedColumn<int>(
+    'interval_days',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _startDateMeta = const VerificationMeta(
     'startDate',
@@ -7144,7 +7164,9 @@ class $MeasurementSchedulesTable extends MeasurementSchedules
     id,
     profileId,
     measurementTypeId,
-    scheduleConfig,
+    scheduleType,
+    time,
+    intervalDays,
     startDate,
     endDate,
     active,
@@ -7186,16 +7208,33 @@ class $MeasurementSchedulesTable extends MeasurementSchedules
     } else if (isInserting) {
       context.missing(_measurementTypeIdMeta);
     }
-    if (data.containsKey('schedule_config')) {
+    if (data.containsKey('schedule_type')) {
       context.handle(
-        _scheduleConfigMeta,
-        scheduleConfig.isAcceptableOrUnknown(
-          data['schedule_config']!,
-          _scheduleConfigMeta,
+        _scheduleTypeMeta,
+        scheduleType.isAcceptableOrUnknown(
+          data['schedule_type']!,
+          _scheduleTypeMeta,
         ),
       );
     } else if (isInserting) {
-      context.missing(_scheduleConfigMeta);
+      context.missing(_scheduleTypeMeta);
+    }
+    if (data.containsKey('time')) {
+      context.handle(
+        _timeMeta,
+        time.isAcceptableOrUnknown(data['time']!, _timeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timeMeta);
+    }
+    if (data.containsKey('interval_days')) {
+      context.handle(
+        _intervalDaysMeta,
+        intervalDays.isAcceptableOrUnknown(
+          data['interval_days']!,
+          _intervalDaysMeta,
+        ),
+      );
     }
     if (data.containsKey('start_date')) {
       context.handle(
@@ -7261,10 +7300,18 @@ class $MeasurementSchedulesTable extends MeasurementSchedules
         DriftSqlType.int,
         data['${effectivePrefix}measurement_type_id'],
       )!,
-      scheduleConfig: attachedDatabase.typeMapping.read(
+      scheduleType: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}schedule_config'],
+        data['${effectivePrefix}schedule_type'],
       )!,
+      time: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}time'],
+      )!,
+      intervalDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}interval_days'],
+      ),
       startDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}start_date'],
@@ -7303,7 +7350,9 @@ class MeasurementSchedule extends DataClass
   final int id;
   final int profileId;
   final int measurementTypeId;
-  final String scheduleConfig;
+  final String scheduleType;
+  final String time;
+  final int? intervalDays;
   final DateTime? startDate;
   final DateTime? endDate;
   final bool active;
@@ -7314,7 +7363,9 @@ class MeasurementSchedule extends DataClass
     required this.id,
     required this.profileId,
     required this.measurementTypeId,
-    required this.scheduleConfig,
+    required this.scheduleType,
+    required this.time,
+    this.intervalDays,
     this.startDate,
     this.endDate,
     required this.active,
@@ -7328,7 +7379,11 @@ class MeasurementSchedule extends DataClass
     map['id'] = Variable<int>(id);
     map['profile_id'] = Variable<int>(profileId);
     map['measurement_type_id'] = Variable<int>(measurementTypeId);
-    map['schedule_config'] = Variable<String>(scheduleConfig);
+    map['schedule_type'] = Variable<String>(scheduleType);
+    map['time'] = Variable<String>(time);
+    if (!nullToAbsent || intervalDays != null) {
+      map['interval_days'] = Variable<int>(intervalDays);
+    }
     if (!nullToAbsent || startDate != null) {
       map['start_date'] = Variable<DateTime>(startDate);
     }
@@ -7349,7 +7404,11 @@ class MeasurementSchedule extends DataClass
       id: Value(id),
       profileId: Value(profileId),
       measurementTypeId: Value(measurementTypeId),
-      scheduleConfig: Value(scheduleConfig),
+      scheduleType: Value(scheduleType),
+      time: Value(time),
+      intervalDays: intervalDays == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intervalDays),
       startDate: startDate == null && nullToAbsent
           ? const Value.absent()
           : Value(startDate),
@@ -7374,7 +7433,9 @@ class MeasurementSchedule extends DataClass
       id: serializer.fromJson<int>(json['id']),
       profileId: serializer.fromJson<int>(json['profileId']),
       measurementTypeId: serializer.fromJson<int>(json['measurementTypeId']),
-      scheduleConfig: serializer.fromJson<String>(json['scheduleConfig']),
+      scheduleType: serializer.fromJson<String>(json['scheduleType']),
+      time: serializer.fromJson<String>(json['time']),
+      intervalDays: serializer.fromJson<int?>(json['intervalDays']),
       startDate: serializer.fromJson<DateTime?>(json['startDate']),
       endDate: serializer.fromJson<DateTime?>(json['endDate']),
       active: serializer.fromJson<bool>(json['active']),
@@ -7390,7 +7451,9 @@ class MeasurementSchedule extends DataClass
       'id': serializer.toJson<int>(id),
       'profileId': serializer.toJson<int>(profileId),
       'measurementTypeId': serializer.toJson<int>(measurementTypeId),
-      'scheduleConfig': serializer.toJson<String>(scheduleConfig),
+      'scheduleType': serializer.toJson<String>(scheduleType),
+      'time': serializer.toJson<String>(time),
+      'intervalDays': serializer.toJson<int?>(intervalDays),
       'startDate': serializer.toJson<DateTime?>(startDate),
       'endDate': serializer.toJson<DateTime?>(endDate),
       'active': serializer.toJson<bool>(active),
@@ -7404,7 +7467,9 @@ class MeasurementSchedule extends DataClass
     int? id,
     int? profileId,
     int? measurementTypeId,
-    String? scheduleConfig,
+    String? scheduleType,
+    String? time,
+    Value<int?> intervalDays = const Value.absent(),
     Value<DateTime?> startDate = const Value.absent(),
     Value<DateTime?> endDate = const Value.absent(),
     bool? active,
@@ -7415,7 +7480,9 @@ class MeasurementSchedule extends DataClass
     id: id ?? this.id,
     profileId: profileId ?? this.profileId,
     measurementTypeId: measurementTypeId ?? this.measurementTypeId,
-    scheduleConfig: scheduleConfig ?? this.scheduleConfig,
+    scheduleType: scheduleType ?? this.scheduleType,
+    time: time ?? this.time,
+    intervalDays: intervalDays.present ? intervalDays.value : this.intervalDays,
     startDate: startDate.present ? startDate.value : this.startDate,
     endDate: endDate.present ? endDate.value : this.endDate,
     active: active ?? this.active,
@@ -7430,9 +7497,13 @@ class MeasurementSchedule extends DataClass
       measurementTypeId: data.measurementTypeId.present
           ? data.measurementTypeId.value
           : this.measurementTypeId,
-      scheduleConfig: data.scheduleConfig.present
-          ? data.scheduleConfig.value
-          : this.scheduleConfig,
+      scheduleType: data.scheduleType.present
+          ? data.scheduleType.value
+          : this.scheduleType,
+      time: data.time.present ? data.time.value : this.time,
+      intervalDays: data.intervalDays.present
+          ? data.intervalDays.value
+          : this.intervalDays,
       startDate: data.startDate.present ? data.startDate.value : this.startDate,
       endDate: data.endDate.present ? data.endDate.value : this.endDate,
       active: data.active.present ? data.active.value : this.active,
@@ -7450,7 +7521,9 @@ class MeasurementSchedule extends DataClass
           ..write('id: $id, ')
           ..write('profileId: $profileId, ')
           ..write('measurementTypeId: $measurementTypeId, ')
-          ..write('scheduleConfig: $scheduleConfig, ')
+          ..write('scheduleType: $scheduleType, ')
+          ..write('time: $time, ')
+          ..write('intervalDays: $intervalDays, ')
           ..write('startDate: $startDate, ')
           ..write('endDate: $endDate, ')
           ..write('active: $active, ')
@@ -7466,7 +7539,9 @@ class MeasurementSchedule extends DataClass
     id,
     profileId,
     measurementTypeId,
-    scheduleConfig,
+    scheduleType,
+    time,
+    intervalDays,
     startDate,
     endDate,
     active,
@@ -7481,7 +7556,9 @@ class MeasurementSchedule extends DataClass
           other.id == this.id &&
           other.profileId == this.profileId &&
           other.measurementTypeId == this.measurementTypeId &&
-          other.scheduleConfig == this.scheduleConfig &&
+          other.scheduleType == this.scheduleType &&
+          other.time == this.time &&
+          other.intervalDays == this.intervalDays &&
           other.startDate == this.startDate &&
           other.endDate == this.endDate &&
           other.active == this.active &&
@@ -7495,7 +7572,9 @@ class MeasurementSchedulesCompanion
   final Value<int> id;
   final Value<int> profileId;
   final Value<int> measurementTypeId;
-  final Value<String> scheduleConfig;
+  final Value<String> scheduleType;
+  final Value<String> time;
+  final Value<int?> intervalDays;
   final Value<DateTime?> startDate;
   final Value<DateTime?> endDate;
   final Value<bool> active;
@@ -7506,7 +7585,9 @@ class MeasurementSchedulesCompanion
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
     this.measurementTypeId = const Value.absent(),
-    this.scheduleConfig = const Value.absent(),
+    this.scheduleType = const Value.absent(),
+    this.time = const Value.absent(),
+    this.intervalDays = const Value.absent(),
     this.startDate = const Value.absent(),
     this.endDate = const Value.absent(),
     this.active = const Value.absent(),
@@ -7518,7 +7599,9 @@ class MeasurementSchedulesCompanion
     this.id = const Value.absent(),
     required int profileId,
     required int measurementTypeId,
-    required String scheduleConfig,
+    required String scheduleType,
+    required String time,
+    this.intervalDays = const Value.absent(),
     this.startDate = const Value.absent(),
     this.endDate = const Value.absent(),
     this.active = const Value.absent(),
@@ -7527,14 +7610,17 @@ class MeasurementSchedulesCompanion
     required DateTime updatedAt,
   }) : profileId = Value(profileId),
        measurementTypeId = Value(measurementTypeId),
-       scheduleConfig = Value(scheduleConfig),
+       scheduleType = Value(scheduleType),
+       time = Value(time),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
   static Insertable<MeasurementSchedule> custom({
     Expression<int>? id,
     Expression<int>? profileId,
     Expression<int>? measurementTypeId,
-    Expression<String>? scheduleConfig,
+    Expression<String>? scheduleType,
+    Expression<String>? time,
+    Expression<int>? intervalDays,
     Expression<DateTime>? startDate,
     Expression<DateTime>? endDate,
     Expression<bool>? active,
@@ -7546,7 +7632,9 @@ class MeasurementSchedulesCompanion
       if (id != null) 'id': id,
       if (profileId != null) 'profile_id': profileId,
       if (measurementTypeId != null) 'measurement_type_id': measurementTypeId,
-      if (scheduleConfig != null) 'schedule_config': scheduleConfig,
+      if (scheduleType != null) 'schedule_type': scheduleType,
+      if (time != null) 'time': time,
+      if (intervalDays != null) 'interval_days': intervalDays,
       if (startDate != null) 'start_date': startDate,
       if (endDate != null) 'end_date': endDate,
       if (active != null) 'active': active,
@@ -7560,7 +7648,9 @@ class MeasurementSchedulesCompanion
     Value<int>? id,
     Value<int>? profileId,
     Value<int>? measurementTypeId,
-    Value<String>? scheduleConfig,
+    Value<String>? scheduleType,
+    Value<String>? time,
+    Value<int?>? intervalDays,
     Value<DateTime?>? startDate,
     Value<DateTime?>? endDate,
     Value<bool>? active,
@@ -7572,7 +7662,9 @@ class MeasurementSchedulesCompanion
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
       measurementTypeId: measurementTypeId ?? this.measurementTypeId,
-      scheduleConfig: scheduleConfig ?? this.scheduleConfig,
+      scheduleType: scheduleType ?? this.scheduleType,
+      time: time ?? this.time,
+      intervalDays: intervalDays ?? this.intervalDays,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       active: active ?? this.active,
@@ -7594,8 +7686,14 @@ class MeasurementSchedulesCompanion
     if (measurementTypeId.present) {
       map['measurement_type_id'] = Variable<int>(measurementTypeId.value);
     }
-    if (scheduleConfig.present) {
-      map['schedule_config'] = Variable<String>(scheduleConfig.value);
+    if (scheduleType.present) {
+      map['schedule_type'] = Variable<String>(scheduleType.value);
+    }
+    if (time.present) {
+      map['time'] = Variable<String>(time.value);
+    }
+    if (intervalDays.present) {
+      map['interval_days'] = Variable<int>(intervalDays.value);
     }
     if (startDate.present) {
       map['start_date'] = Variable<DateTime>(startDate.value);
@@ -7624,7 +7722,9 @@ class MeasurementSchedulesCompanion
           ..write('id: $id, ')
           ..write('profileId: $profileId, ')
           ..write('measurementTypeId: $measurementTypeId, ')
-          ..write('scheduleConfig: $scheduleConfig, ')
+          ..write('scheduleType: $scheduleType, ')
+          ..write('time: $time, ')
+          ..write('intervalDays: $intervalDays, ')
           ..write('startDate: $startDate, ')
           ..write('endDate: $endDate, ')
           ..write('active: $active, ')
@@ -20123,7 +20223,9 @@ typedef $$MeasurementSchedulesTableCreateCompanionBuilder =
       Value<int> id,
       required int profileId,
       required int measurementTypeId,
-      required String scheduleConfig,
+      required String scheduleType,
+      required String time,
+      Value<int?> intervalDays,
       Value<DateTime?> startDate,
       Value<DateTime?> endDate,
       Value<bool> active,
@@ -20136,7 +20238,9 @@ typedef $$MeasurementSchedulesTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> profileId,
       Value<int> measurementTypeId,
-      Value<String> scheduleConfig,
+      Value<String> scheduleType,
+      Value<String> time,
+      Value<int?> intervalDays,
       Value<DateTime?> startDate,
       Value<DateTime?> endDate,
       Value<bool> active,
@@ -20239,8 +20343,18 @@ class $$MeasurementSchedulesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get scheduleConfig => $composableBuilder(
-    column: $table.scheduleConfig,
+  ColumnFilters<String> get scheduleType => $composableBuilder(
+    column: $table.scheduleType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get time => $composableBuilder(
+    column: $table.time,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -20361,8 +20475,18 @@ class $$MeasurementSchedulesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get scheduleConfig => $composableBuilder(
-    column: $table.scheduleConfig,
+  ColumnOrderings<String> get scheduleType => $composableBuilder(
+    column: $table.scheduleType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get time => $composableBuilder(
+    column: $table.time,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -20455,8 +20579,16 @@ class $$MeasurementSchedulesTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get scheduleConfig => $composableBuilder(
-    column: $table.scheduleConfig,
+  GeneratedColumn<String> get scheduleType => $composableBuilder(
+    column: $table.scheduleType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get time =>
+      $composableBuilder(column: $table.time, builder: (column) => column);
+
+  GeneratedColumn<int> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
     builder: (column) => column,
   );
 
@@ -20597,7 +20729,9 @@ class $$MeasurementSchedulesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> profileId = const Value.absent(),
                 Value<int> measurementTypeId = const Value.absent(),
-                Value<String> scheduleConfig = const Value.absent(),
+                Value<String> scheduleType = const Value.absent(),
+                Value<String> time = const Value.absent(),
+                Value<int?> intervalDays = const Value.absent(),
                 Value<DateTime?> startDate = const Value.absent(),
                 Value<DateTime?> endDate = const Value.absent(),
                 Value<bool> active = const Value.absent(),
@@ -20608,7 +20742,9 @@ class $$MeasurementSchedulesTableTableManager
                 id: id,
                 profileId: profileId,
                 measurementTypeId: measurementTypeId,
-                scheduleConfig: scheduleConfig,
+                scheduleType: scheduleType,
+                time: time,
+                intervalDays: intervalDays,
                 startDate: startDate,
                 endDate: endDate,
                 active: active,
@@ -20621,7 +20757,9 @@ class $$MeasurementSchedulesTableTableManager
                 Value<int> id = const Value.absent(),
                 required int profileId,
                 required int measurementTypeId,
-                required String scheduleConfig,
+                required String scheduleType,
+                required String time,
+                Value<int?> intervalDays = const Value.absent(),
                 Value<DateTime?> startDate = const Value.absent(),
                 Value<DateTime?> endDate = const Value.absent(),
                 Value<bool> active = const Value.absent(),
@@ -20632,7 +20770,9 @@ class $$MeasurementSchedulesTableTableManager
                 id: id,
                 profileId: profileId,
                 measurementTypeId: measurementTypeId,
-                scheduleConfig: scheduleConfig,
+                scheduleType: scheduleType,
+                time: time,
+                intervalDays: intervalDays,
                 startDate: startDate,
                 endDate: endDate,
                 active: active,

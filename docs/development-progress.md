@@ -1523,6 +1523,109 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - Schedule editor does not show existing notification status
 - No schedule conflict detection (overlapping time slots)
 
+### Phase 5C Refinement — Measurement Schedule Model & UI Polish
+
+**Date:** 2026-07-26
+
+**Status:** Completed
+
+**What was done:**
+
+#### One Time Per Measurement Schedule
+- Refactored `MeasurementSchedule` to contain exactly one scheduled time per record
+- Removed `ScheduleConfig` dependency from measurement schedules
+- Added `scheduleType` (String: 'daily' / 'interval_days'), `time` (String: 'HH:mm'), `intervalDays` (int?) fields directly on `MeasurementSchedule`
+- Added `isDaily` / `isIntervalDays` computed getters
+- Added static `normalizeTime()` and `isValidTime()` validation methods
+- Added `clearIntervalDays` flag to `copyWith`
+- Each measurement schedule now produces one notification and one Today agenda occurrence
+- Multiple daily times are represented by multiple independent `MeasurementSchedule` records
+- Medication schedules remain unchanged (still use `ScheduleConfig` with `times: List<String>`)
+
+#### Database Schema v10
+- **Destructive migration**: dropped and recreated `MeasurementSchedules` and `MeasurementReminderLogs` tables
+- New `MeasurementSchedules` columns: `scheduleType` (Text), `time` (Text), `intervalDays` (Int nullable)
+- Removed `scheduleConfig` (Text/JSON) column
+- No data migration — measurement schedules reset on upgrade (acceptable for pre-release app)
+
+#### Notification Changes
+- `MeasurementNotificationHelper.computeNotificationId(scheduleId)` — returns single notification ID (`100000 + scheduleId`)
+- Removed `computeNotificationIds(scheduleId, config)` (old multi-time method)
+- `NotificationScheduler` — added `scheduleSingleNotification()` and `scheduleSingleIntervalNotification()` for single-time scheduling
+- Each schedule gets exactly one recurring daily notification or one one-shot interval notification
+- Form screen schedules one notification per schedule (fixed previous bug where N×N notifications were created)
+
+#### Today Agenda
+- `todayMeasurementRemindersProvider` — each active schedule produces one occurrence using `schedule.time`
+- No more inner loop over `scheduleConfig.times`
+- Each independent schedule appears separately in chronological order
+- `TodayAgendaService._generateMeasurementItems` — uses `MeasurementSchedule.time` directly
+
+#### Schedule List UI Redesign
+- New row layout: `[alarm icon] | [type + time] | [status dot] | [⋮ menu]`
+- Schedule type (Daily / Every N Days) and time on first line with secondary text style
+- Date range on second line with smaller secondary text
+- Active/inactive status indicator (`Icons.check_circle_outline` / `Icons.cancel_outlined`) before popup menu
+- Popup menu (`Icons.more_vert`) with Edit and Delete actions
+- Delete confirmation dialog with error feedback
+- Empty state uses `Icons.alarm`
+
+#### Health Screen Icon Correction
+- Replaced `Symbols.share_eta` with `Icons.alarm` for measurement schedule action
+- All three action icons (Schedule, History, Add Reading) use standard `IconButton` with equal sizing
+- Action order preserved: Schedule → History → Add Reading
+
+#### Add/Edit Form Simplified
+- Single time picker field replaces dynamic time list
+- No "Add Time" / "Remove Time" buttons
+- `SegmentedButton` for Daily / Every N Days
+- Interval days field (conditional)
+- Start/end date pickers, active toggle, instructions
+- Validation: valid time required, interval >= 1, interval requires start date
+
+#### Duplicate Schedule Prevention
+- Repository-level validation not yet implemented (deferred to future phase)
+- UI validation prevents invalid schedules (missing time, invalid interval)
+
+**Files Created:**
+- None (all changes to existing files)
+
+**Files Modified:**
+- `lib/domain/entities/measurement.dart` — MeasurementSchedule refactored (ScheduleConfig removed, flat fields added)
+- `lib/data/database/tables/measurement_tables.dart` — new columns (scheduleType, time, intervalDays), removed scheduleConfig
+- `lib/data/database/app_database.dart` — schema v10, destructive migration
+- `lib/data/repositories/measurement_repository_impl.dart` — new field mapping
+- `lib/data/services/notification/measurement_notification_helper.dart` — single notification ID
+- `lib/data/services/notification/notification_scheduler.dart` — single-time scheduling methods
+- `lib/data/services/notification/notification_action_bridge.dart` — recovery uses new model
+- `lib/presentation/screens/health/measurement_schedule_screen.dart` — single time picker, new model
+- `lib/presentation/screens/health/measurement_schedule_list_screen.dart` — new layout, status indicator, popup menu
+- `lib/presentation/screens/health/measurement_history_screen.dart` — updated schedule display
+- `lib/presentation/screens/health/health_screen.dart` — Icons.alarm, equal sizing
+- `lib/presentation/providers/measurement_provider.dart` — one time per schedule in today provider
+- `lib/domain/services/today_agenda_service.dart` — measurement schedule uses new model
+- `lib/l10n/app_en.arb` — added `scheduledTime` key
+- `lib/l10n/app_ka.arb` — added Georgian `scheduledTime` key
+- `test/phase5c_measurement_schedules_test.dart` — rewritten for new model (33 tests)
+
+**Tests:** 33 tests covering:
+- MeasurementSchedule entity: copyWith, clearInstructions, clearEndDate, default active, isDaily, isIntervalDays, normalizeTime, isValidTime, one-time-per-record model
+- MeasurementReminderAction: fromString
+- MeasurementReminderLog: copyWith
+- MeasurementNotificationHelper: computeNotificationId, baseNotificationId, buildPayload, parsePayload
+- MeasurementNotificationPayload: isValid
+- Independence: two schedules at different times, disabling one doesn't affect the other
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `dart run build_runner build` | Completed successfully |
+| `flutter analyze` | 0 errors (pre-existing info/warnings only) |
+| `flutter test` | 524 passed, 8 failed (all pre-existing in phase5a_correction_test.dart) |
+| Medication tests | 26/26 passed (unchanged) |
+| Measurement schedule tests | 33/33 passed |
+
 ---
 
 ## Phase 6 — Today Dashboard

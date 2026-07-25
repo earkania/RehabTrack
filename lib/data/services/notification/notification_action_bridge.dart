@@ -400,9 +400,8 @@ class NotificationActionBridge {
     MeasurementType? type,
     MeasurementSchedule schedule,
   ) {
-    final notificationIds = MeasurementNotificationHelper.computeNotificationIds(
-      scheduleId: schedule.id!,
-      config: schedule.scheduleConfig,
+    final notificationId = MeasurementNotificationHelper.computeNotificationId(
+      schedule.id!,
     );
 
     final typeName = type?.name ?? 'Measurement';
@@ -412,11 +411,18 @@ class NotificationActionBridge {
       profileId: schedule.profileId,
     );
 
+    final scheduleConfig = schedule.isDaily
+        ? DailySchedule(times: [schedule.time])
+        : IntervalDaysSchedule(
+            intervalDays: schedule.intervalDays ?? 1,
+            times: [schedule.time],
+          );
+
     return ScheduleRecoveryEntry(
-      notificationIds: notificationIds,
+      notificationIds: [notificationId],
       title: 'Time to record $typeName',
       body: _buildMeasurementBody(type, schedule),
-      config: schedule.scheduleConfig,
+      config: scheduleConfig,
       channelType: NotificationChannelType.measurement,
       payload: payload,
       includeActions: true,

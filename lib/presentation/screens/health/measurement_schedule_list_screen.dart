@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
-import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
@@ -96,7 +95,7 @@ class _EmptySchedules extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           EmptyState(
-            icon: Icons.schedule,
+            icon: Icons.alarm,
             title: l10n.noMeasurementSchedules,
             subtitle: l10n.noMeasurementSchedulesDescription,
           ),
@@ -175,11 +174,19 @@ class _ScheduleList extends ConsumerWidget {
     );
     if (confirmed == true && context.mounted) {
       final repo = ref.read(measurementRepositoryProvider);
-      await repo.deleteSchedule(schedule.id!);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.scheduleDeleted)),
-        );
+      try {
+        await repo.deleteSchedule(schedule.id!);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.scheduleDeleted)),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.failedToDeleteSchedule)),
+          );
+        }
       }
     }
   }
@@ -204,15 +211,11 @@ class _ScheduleCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     final String scheduleLabel;
-    switch (schedule.scheduleConfig) {
-      case DailySchedule():
-        scheduleLabel = l10n.daily;
-      case IntervalDaysSchedule(:final intervalDays):
-        scheduleLabel = '${l10n.everyNDaysLabel} ($intervalDays)';
+    if (schedule.isDaily) {
+      scheduleLabel = l10n.daily;
+    } else {
+      scheduleLabel = '${l10n.everyNDaysLabel} (${schedule.intervalDays})';
     }
-
-    final times = schedule.scheduleConfig.times;
-    final timesStr = times.join(', ');
 
     final startDateStr = schedule.startDate != null
         ? '${schedule.startDate!.day}.${schedule.startDate!.month}.${schedule.startDate!.year}'
@@ -223,95 +226,115 @@ class _ScheduleCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        child: Row(
           children: [
-            Row(
-              children: [
-                Icon(
-                  schedule.active ? Icons.alarm : Icons.alarm_off,
-                  size: 20,
-                  color: schedule.active
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            Icon(
+              schedule.active ? Icons.alarm : Icons.alarm_off,
+              size: 20,
+              color: schedule.active
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        scheduleLabel,
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
+                      Flexible(
+                        child: Text(
+                          scheduleLabel,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      const SizedBox(width: AppSpacing.sm),
                       Text(
-                        timesStr,
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        schedule.time,
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
+                  if (startDateStr != null || endDateStr != null)
+                    Text(
+                      _buildDateLine(startDateStr, endDateStr),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+            Icon(
+              schedule.active
+                  ? Icons.check_circle_outline
+                  : Icons.cancel_outlined,
+              size: 18,
+              color: schedule.active
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'edit') onEdit();
+                if (value == 'delete') onDelete();
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.edit, size: 18),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(l10n.edit),
+                    ],
+                  ),
                 ),
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'edit') onEdit();
-                    if (value == 'delete') onDelete();
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Text(
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete,
+                        size: 18,
+                        color: theme.colorScheme.error,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
                         l10n.delete,
                         style: TextStyle(color: theme.colorScheme.error),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
-            ),
-            if (startDateStr != null || endDateStr != null) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                [startDateStr, endDateStr].where((s) => s != null).join(' — '),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-            if (schedule.instructions != null &&
-                schedule.instructions!.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                schedule.instructions!,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-            const SizedBox(height: AppSpacing.xs),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Icon(
-                schedule.active
-                    ? Icons.check_circle_outline
-                    : Icons.cancel_outlined,
-                size: 16,
-                color: schedule.active
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
-              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _buildDateLine(String? startDate, String? endDate) {
+    if (startDate != null && endDate != null) {
+      return '$startDate – $endDate';
+    }
+    if (startDate != null) {
+      return 'Starts $startDate';
+    }
+    if (endDate != null) {
+      return 'Until $endDate';
+    }
+    return '';
   }
 }

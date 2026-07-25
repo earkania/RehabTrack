@@ -83,7 +83,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -192,6 +192,14 @@ class AppDatabase extends _$AppDatabase {
           ));
         }
         // Create measurement reminder logs table
+        await m.createTable(measurementReminderLogs);
+      }
+      if (from < 10) {
+        // Phase 5C refinement: one time per measurement schedule
+        // Destructive migration: drop and recreate measurement schedules + reminder logs
+        await m.deleteTable(measurementReminderLogs.actualTableName);
+        await m.deleteTable(measurementSchedules.actualTableName);
+        await m.createTable(measurementSchedules);
         await m.createTable(measurementReminderLogs);
       }
     },

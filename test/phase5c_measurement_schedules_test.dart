@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
-import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/data/services/notification/measurement_notification_helper.dart';
 
 void main() {
@@ -13,7 +12,8 @@ void main() {
         id: 1,
         profileId: 10,
         measurementTypeId: 5,
-        scheduleConfig: const DailySchedule(times: ['08:00']),
+        scheduleType: 'daily',
+        time: '08:00',
         startDate: now,
         endDate: now.add(const Duration(days: 30)),
         active: true,
@@ -26,6 +26,8 @@ void main() {
       expect(copy.id, 1);
       expect(copy.profileId, 10);
       expect(copy.measurementTypeId, 5);
+      expect(copy.scheduleType, 'daily');
+      expect(copy.time, '08:00');
       expect(copy.instructions, 'New instructions');
       expect(copy.startDate, now);
       expect(copy.active, true);
@@ -37,7 +39,8 @@ void main() {
         id: 1,
         profileId: 10,
         measurementTypeId: 5,
-        scheduleConfig: const DailySchedule(times: ['08:00']),
+        scheduleType: 'daily',
+        time: '08:00',
         instructions: 'Old instructions',
         createdAt: now,
         updatedAt: now,
@@ -53,7 +56,8 @@ void main() {
         id: 1,
         profileId: 10,
         measurementTypeId: 5,
-        scheduleConfig: const DailySchedule(times: ['08:00']),
+        scheduleType: 'daily',
+        time: '08:00',
         endDate: now.add(const Duration(days: 30)),
         createdAt: now,
         updatedAt: now,
@@ -68,11 +72,81 @@ void main() {
       final schedule = MeasurementSchedule(
         profileId: 10,
         measurementTypeId: 5,
-        scheduleConfig: const DailySchedule(times: ['08:00']),
+        scheduleType: 'daily',
+        time: '08:00',
         createdAt: now,
         updatedAt: now,
       );
       expect(schedule.active, true);
+    });
+
+    test('isDaily returns true for daily schedule', () {
+      final schedule = MeasurementSchedule(
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '08:00',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      expect(schedule.isDaily, true);
+      expect(schedule.isIntervalDays, false);
+    });
+
+    test('isIntervalDays returns true for interval schedule', () {
+      final schedule = MeasurementSchedule(
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'interval_days',
+        time: '08:00',
+        intervalDays: 3,
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      expect(schedule.isIntervalDays, true);
+      expect(schedule.isDaily, false);
+    });
+
+    test('normalizeTime normalizes HH:mm format', () {
+      expect(MeasurementSchedule.normalizeTime('8:0'), '08:00');
+      expect(MeasurementSchedule.normalizeTime('08:00'), '08:00');
+      expect(MeasurementSchedule.normalizeTime(' 08:00 '), '08:00');
+      expect(MeasurementSchedule.normalizeTime('23:59'), '23:59');
+    });
+
+    test('isValidTime validates time format', () {
+      expect(MeasurementSchedule.isValidTime('08:00'), true);
+      expect(MeasurementSchedule.isValidTime('23:59'), true);
+      expect(MeasurementSchedule.isValidTime('00:00'), true);
+      expect(MeasurementSchedule.isValidTime('24:00'), false);
+      expect(MeasurementSchedule.isValidTime('abc'), false);
+      expect(MeasurementSchedule.isValidTime(''), false);
+    });
+
+    test('one time per schedule - intervalDays is null for daily', () {
+      final schedule = MeasurementSchedule(
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '08:00',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      expect(schedule.intervalDays, isNull);
+    });
+
+    test('clearIntervalDays sets intervalDays to null', () {
+      final schedule = MeasurementSchedule(
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '08:00',
+        intervalDays: 3,
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      final copy = schedule.copyWith(clearIntervalDays: true);
+      expect(copy.intervalDays, isNull);
     });
   });
 
@@ -129,99 +203,15 @@ void main() {
     });
   });
 
-  group('ScheduleConfig', () {
-    test('DailySchedule toJson and fromJson roundtrip', () {
-      const config = DailySchedule(times: ['08:00', '20:00']);
-      final json = config.toJson();
-      final restored = ScheduleConfig.fromJson(json);
-
-      expect(restored, isA<DailySchedule>());
-      expect((restored as DailySchedule).times, ['08:00', '20:00']);
-    });
-
-    test('IntervalDaysSchedule toJson and fromJson roundtrip', () {
-      const config = IntervalDaysSchedule(
-        intervalDays: 3,
-        times: ['09:00'],
-      );
-      final json = config.toJson();
-      final restored = ScheduleConfig.fromJson(json);
-
-      expect(restored, isA<IntervalDaysSchedule>());
-      final interval = restored as IntervalDaysSchedule;
-      expect(interval.intervalDays, 3);
-      expect(interval.times, ['09:00']);
-    });
-
-    test('fromJsonString roundtrip works', () {
-      const config = DailySchedule(times: ['06:30', '18:00']);
-      final jsonStr = config.toJsonString();
-      final restored = ScheduleConfig.fromJsonString(jsonStr);
-
-      expect(restored, isA<DailySchedule>());
-      expect((restored as DailySchedule).times, ['06:30', '18:00']);
-    });
-
-    test('fromJson throws on unknown type', () {
-      expect(
-        () => ScheduleConfig.fromJson({'type': 'unknown'}),
-        throwsArgumentError,
-      );
-    });
-
-    test('normalizeTimes removes duplicates and sorts', () {
-      final result = ScheduleConfig.normalizeTimes(
-        ['20:00', '08:00', '08:00', 'invalid', '20:00'],
-      );
-      expect(result, ['08:00', '20:00']);
-    });
-
-    test('normalizeTimes filters invalid formats', () {
-      final result = ScheduleConfig.normalizeTimes([
-        '08:00',
-        '8:00',
-        'abc',
-      ]);
-      expect(result, ['08:00']);
-    });
-
-    test('validateTimes throws on empty list', () {
-      expect(
-        () => ScheduleConfig.validateTimes([]),
-        throwsArgumentError,
-      );
-    });
-
-    test('validateTimes throws on duplicates', () {
-      expect(
-        () => ScheduleConfig.validateTimes(['08:00', '08:00']),
-        throwsArgumentError,
-      );
-    });
-
-    test('validateTimes accepts valid unique times', () {
-      expect(
-        () => ScheduleConfig.validateTimes(['08:00', '20:00']),
-        returnsNormally,
-      );
-    });
-  });
-
   group('MeasurementNotificationHelper', () {
-    test('computeNotificationIds applies 100000 offset', () {
-      final ids = MeasurementNotificationHelper.computeNotificationIds(
-        scheduleId: 5,
-        config: const DailySchedule(times: ['08:00', '20:00']),
-      );
-      expect(ids, [100005, 100006]);
+    test('computeNotificationId applies 100000 offset', () {
+      final id = MeasurementNotificationHelper.computeNotificationId(5);
+      expect(id, 100005);
     });
 
-    test('computeNotificationIds with single time', () {
-      final ids = MeasurementNotificationHelper.computeNotificationIds(
-        scheduleId: 1,
-        config: const DailySchedule(times: ['08:00']),
-      );
-      expect(ids, [100001]);
+    test('computeNotificationId with schedule id 1', () {
+      final id = MeasurementNotificationHelper.computeNotificationId(1);
+      expect(id, 100001);
     });
 
     test('baseNotificationId applies offset', () {
@@ -352,29 +342,93 @@ void main() {
     });
   });
 
-  group('ScheduleConfig equality', () {
-    test('DailySchedule equality based on times', () {
-      const a = DailySchedule(times: ['08:00', '20:00']);
-      const b = DailySchedule(times: ['08:00', '20:00']);
-      const c = DailySchedule(times: ['08:00']);
-
-      expect(a, equals(b));
-      expect(a == c, false);
+  group('MeasurementSchedule one-time-per-record model', () {
+    test('daily schedule has single time', () {
+      final schedule = MeasurementSchedule(
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '08:00',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      expect(schedule.time, '08:00');
+      expect(schedule.isDaily, true);
+      expect(schedule.intervalDays, isNull);
     });
 
-    test('IntervalDaysSchedule equality based on interval and times', () {
-      const a = IntervalDaysSchedule(intervalDays: 3, times: ['08:00']);
-      const b = IntervalDaysSchedule(intervalDays: 3, times: ['08:00']);
-      const c = IntervalDaysSchedule(intervalDays: 5, times: ['08:00']);
-
-      expect(a, equals(b));
-      expect(a == c, false);
+    test('interval schedule has single time and interval', () {
+      final schedule = MeasurementSchedule(
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'interval_days',
+        time: '14:00',
+        intervalDays: 3,
+        startDate: DateTime(2025),
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      expect(schedule.time, '14:00');
+      expect(schedule.intervalDays, 3);
+      expect(schedule.isIntervalDays, true);
     });
 
-    test('DailySchedule and IntervalDaysSchedule are not equal', () {
-      const a = DailySchedule(times: ['08:00']);
-      const b = IntervalDaysSchedule(intervalDays: 1, times: ['08:00']);
-      expect(a == b, false);
+    test('two schedules at different times are independent', () {
+      final schedule1 = MeasurementSchedule(
+        id: 1,
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '08:00',
+        active: true,
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      final schedule2 = MeasurementSchedule(
+        id: 2,
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '20:00',
+        active: true,
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      expect(schedule1.time, isNot(equals(schedule2.time)));
+      expect(schedule1.id, isNot(equals(schedule2.id)));
+    });
+
+    test('disabling one schedule does not affect another', () {
+      final schedule1 = MeasurementSchedule(
+        id: 1,
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '08:00',
+        active: false,
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      final schedule2 = MeasurementSchedule(
+        id: 2,
+        profileId: 10,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '20:00',
+        active: true,
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      expect(schedule1.active, false);
+      expect(schedule2.active, true);
+    });
+
+    test('each schedule gets its own notification ID', () {
+      final id1 = MeasurementNotificationHelper.computeNotificationId(1);
+      final id2 = MeasurementNotificationHelper.computeNotificationId(2);
+      expect(id1, isNot(equals(id2)));
+      expect(id1, 100001);
+      expect(id2, 100002);
     });
   });
 }

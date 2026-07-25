@@ -332,6 +332,9 @@ class AppLocalizationsKa extends AppLocalizations {
   String get addTime => 'დროის დამატება';
 
   @override
+  String get scheduledTime => 'დაგეგმილი დრო';
+
+  @override
   String get removeTime => 'წაშლა';
 
   @override

@@ -728,6 +728,12 @@ abstract class AppLocalizations {
   /// **'Add Time'**
   String get addTime;
 
+  /// No description provided for @scheduledTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled Time'**
+  String get scheduledTime;
+
   /// No description provided for @removeTime.
   ///
   /// In en, this message translates to:

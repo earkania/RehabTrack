@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
-import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
@@ -36,7 +35,7 @@ class MeasurementScheduleScreen extends ConsumerStatefulWidget {
 class _MeasurementScheduleScreenState
     extends ConsumerState<MeasurementScheduleScreen> {
   ScheduleType _scheduleType = ScheduleType.daily;
-  final List<String> _times = ['08:00'];
+  String _time = '08:00';
   int _intervalDays = 2;
   DateTime? _startDate;
   DateTime? _endDate;
@@ -58,15 +57,11 @@ class _MeasurementScheduleScreenState
     if (schedule == null || !mounted) return;
 
     setState(() {
-      _scheduleType = schedule.scheduleConfig is DailySchedule
+      _scheduleType = schedule.isDaily
           ? ScheduleType.daily
           : ScheduleType.intervalDays;
-      _times.clear();
-      _times.addAll(schedule.scheduleConfig.times);
-      if (schedule.scheduleConfig is IntervalDaysSchedule) {
-        _intervalDays =
-            (schedule.scheduleConfig as IntervalDaysSchedule).intervalDays;
-      }
+      _time = schedule.time;
+      _intervalDays = schedule.intervalDays ?? 2;
       _startDate = schedule.startDate;
       _endDate = schedule.endDate;
       _active = schedule.active;
@@ -80,47 +75,31 @@ class _MeasurementScheduleScreenState
     super.dispose();
   }
 
-  ScheduleConfig _buildConfig() {
-    final normalizedTimes = ScheduleConfig.normalizeTimes(_times);
-    if (_scheduleType == ScheduleType.daily) {
-      return DailySchedule(times: normalizedTimes);
-    }
-    return IntervalDaysSchedule(
-      intervalDays: _intervalDays,
-      times: normalizedTimes,
-    );
-  }
-
   Future<void> _save() async {
     if (_saving) return;
 
-    final normalizedTimes = ScheduleConfig.normalizeTimes(_times);
-    if (normalizedTimes.isEmpty) {
-      _showError(AppLocalizations.of(context)!.atLeastOneTimeRequired);
-      return;
-    }
+    final l10n = AppLocalizations.of(context)!;
 
-    if (normalizedTimes.length != _times.length) {
-      _showError(AppLocalizations.of(context)!.duplicateTimesNotAllowed);
+    final normalizedTime = MeasurementSchedule.normalizeTime(_time);
+    if (!MeasurementSchedule.isValidTime(_time)) {
+      _showError(l10n.atLeastOneTimeRequired);
       return;
     }
 
     if (_scheduleType == ScheduleType.intervalDays && _intervalDays < 1) {
-      _showError(AppLocalizations.of(context)!.invalidInterval);
+      _showError(l10n.invalidInterval);
       return;
     }
 
     if (_scheduleType == ScheduleType.intervalDays && _startDate == null) {
-      _showError(
-        AppLocalizations.of(context)!.everyNDaysRequiresStartDate,
-      );
+      _showError(l10n.everyNDaysRequiresStartDate);
       return;
     }
 
     if (_startDate != null &&
         _endDate != null &&
         _startDate!.isAfter(_endDate!)) {
-      _showError(AppLocalizations.of(context)!.endDateBeforeStartDate);
+      _showError(l10n.endDateBeforeStartDate);
       return;
     }
 
@@ -128,8 +107,10 @@ class _MeasurementScheduleScreenState
 
     try {
       final profileId = ref.read(activeProfileIdProvider) ?? 1;
-      final config = _buildConfig();
       final now = DateTime.now();
+      final scheduleTypeName = _scheduleType == ScheduleType.daily
+          ? 'daily'
+          : 'interval_days';
 
       final repo = ref.read(measurementRepositoryProvider);
       final scheduler = ref.read(notificationSchedulerProvider);
@@ -138,19 +119,20 @@ class _MeasurementScheduleScreenState
         final existing = await repo.getSchedule(widget.scheduleId!);
         if (existing == null) {
           if (!mounted) return;
-          _showError(AppLocalizations.of(context)!.failedToSaveSchedule);
+          _showError(l10n.failedToSaveSchedule);
           return;
         }
 
-        // Cancel previous notifications
-        await scheduler.cancelNotificationsForSchedule(
-          baseNotificationId:
-              MeasurementNotificationHelper.baseNotificationId(existing.id!),
-          config: existing.scheduleConfig,
+        await scheduler.cancelNotification(
+          MeasurementNotificationHelper.baseNotificationId(existing.id!),
         );
 
         final updated = existing.copyWith(
-          scheduleConfig: config,
+          scheduleType: scheduleTypeName,
+          time: normalizedTime,
+          intervalDays:
+              _scheduleType == ScheduleType.intervalDays ? _intervalDays : null,
+          clearIntervalDays: _scheduleType == ScheduleType.daily,
           startDate: _startDate,
           endDate: _endDate,
           active: _active,
@@ -174,7 +156,10 @@ class _MeasurementScheduleScreenState
         final schedule = MeasurementSchedule(
           profileId: profileId,
           measurementTypeId: widget.measurementTypeId,
-          scheduleConfig: config,
+          scheduleType: scheduleTypeName,
+          time: normalizedTime,
+          intervalDays:
+              _scheduleType == ScheduleType.intervalDays ? _intervalDays : null,
           startDate: _startDate,
           endDate: _endDate,
           active: _active,
@@ -238,18 +223,28 @@ class _MeasurementScheduleScreenState
     }
     final body = bodyParts.join(' — ');
 
-    final notificationIds =
-        MeasurementNotificationHelper.computeNotificationIds(
-      scheduleId: schedule.id!,
-      config: schedule.scheduleConfig,
+    final notificationId =
+        MeasurementNotificationHelper.computeNotificationId(
+      schedule.id!,
     );
 
-    for (var i = 0; i < notificationIds.length; i++) {
-      await scheduler.scheduleFromConfig(
-        notificationId: notificationIds[i],
+    if (schedule.isIntervalDays && schedule.intervalDays != null) {
+      await scheduler.scheduleSingleIntervalNotification(
+        notificationId: notificationId,
         title: 'Time to record $typeName',
         body: body,
-        config: schedule.scheduleConfig,
+        time: schedule.time,
+        intervalDays: schedule.intervalDays!,
+        channelType: NotificationChannelType.measurement,
+        payload: notifPayload,
+        includeActions: true,
+      );
+    } else {
+      await scheduler.scheduleSingleNotification(
+        notificationId: notificationId,
+        title: 'Time to record $typeName',
+        body: body,
+        time: schedule.time,
         channelType: NotificationChannelType.measurement,
         payload: notifPayload,
         includeActions: true,
@@ -297,7 +292,7 @@ class _MeasurementScheduleScreenState
               _buildIntervalDaysField(l10n),
               const SizedBox(height: AppSpacing.md),
             ],
-            _buildTimesSection(l10n),
+            _buildTimeField(l10n),
             const SizedBox(height: AppSpacing.md),
             _buildDateRow(l10n),
             const SizedBox(height: AppSpacing.md),
@@ -360,62 +355,40 @@ class _MeasurementScheduleScreenState
     );
   }
 
-  Widget _buildTimesSection(AppLocalizations l10n) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.schedules,
-          style: Theme.of(context).textTheme.titleSmall,
+  Widget _buildTimeField(AppLocalizations l10n) {
+    return InkWell(
+      onTap: () async {
+        final parts = _time.split(':');
+        final initial = TimeOfDay(
+          hour: int.tryParse(parts[0]) ?? 8,
+          minute: int.tryParse(parts[1]) ?? 0,
+        );
+        final picked = await showTimePicker(
+          context: context,
+          initialTime: initial,
+        );
+        if (picked != null) {
+          setState(() {
+            _time =
+                '${picked.hour.toString().padLeft(2, '0')}:'
+                '${picked.minute.toString().padLeft(2, '0')}';
+          });
+        }
+      },
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: l10n.scheduledTime,
+          border: const OutlineInputBorder(),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        for (var i = 0; i < _times.length; i++)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _TimePickerField(
-                    initialTime: _times[i],
-                    onTimeSelected: (time) {
-                      setState(() => _times[i] = time);
-                    },
-                  ),
-                ),
-                if (_times.length > 1)
-                  IconButton(
-                    icon: const Icon(Icons.remove_circle_outline),
-                    onPressed: () {
-                      setState(() => _times.removeAt(i));
-                    },
-                    tooltip: l10n.removeTime,
-                  ),
-              ],
-            ),
-          ),
-        TextButton.icon(
-          onPressed: () async {
-            final time = await _pickTime();
-            if (time != null) {
-              setState(() => _times.add(time));
-            }
-          },
-          icon: const Icon(Icons.add),
-          label: Text(l10n.addTime),
+        child: Row(
+          children: [
+            const Icon(Icons.access_time, size: 20),
+            const SizedBox(width: AppSpacing.sm),
+            Text(_time),
+          ],
         ),
-      ],
+      ),
     );
-  }
-
-  Future<String?> _pickTime() async {
-    final now = TimeOfDay.now();
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: now,
-    );
-    if (picked == null) return null;
-    return '${picked.hour.toString().padLeft(2, '0')}:'
-        '${picked.minute.toString().padLeft(2, '0')}';
   }
 
   Widget _buildDateRow(AppLocalizations l10n) {
@@ -457,51 +430,6 @@ class _MeasurementScheduleScreenState
         border: const OutlineInputBorder(),
       ),
       maxLines: 2,
-    );
-  }
-}
-
-class _TimePickerField extends StatelessWidget {
-  final String initialTime;
-  final ValueChanged<String> onTimeSelected;
-
-  const _TimePickerField({
-    required this.initialTime,
-    required this.onTimeSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        final parts = initialTime.split(':');
-        final initial = TimeOfDay(
-          hour: int.tryParse(parts[0]) ?? 8,
-          minute: int.tryParse(parts[1]) ?? 0,
-        );
-        final picked = await showTimePicker(
-          context: context,
-          initialTime: initial,
-        );
-        if (picked != null) {
-          onTimeSelected(
-            '${picked.hour.toString().padLeft(2, '0')}:'
-            '${picked.minute.toString().padLeft(2, '0')}',
-          );
-        }
-      },
-      child: InputDecorator(
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.access_time, size: 20),
-            const SizedBox(width: AppSpacing.sm),
-            Text(initialTime),
-          ],
-        ),
-      ),
     );
   }
 }

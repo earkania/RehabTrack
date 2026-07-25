@@ -184,6 +184,31 @@ Examples:
 
 ---
 
+# Measurement Schedules — Design Rule
+
+**Approved:** 2026-07-26
+
+Each `MeasurementSchedule` represents exactly **one scheduled time**.
+
+Multiple daily measurement times (e.g., morning and evening blood pressure) are represented by **multiple independent `MeasurementSchedule` records**, each with its own:
+
+- Notification
+- Today agenda occurrence
+- Active/inactive toggle
+- Start/end date range
+- Instructions
+
+This design ensures:
+
+- Disabling one schedule does not affect others
+- Each schedule has independent notification lifecycle
+- Today agenda shows each occurrence separately
+- Users can configure different instructions per time slot
+
+**Medication schedules remain unchanged.** `MedicationSchedule` continues to use `ScheduleConfig` with `times: List<String>` to support multiple times per schedule record, because medication timing semantics differ (multiple times per day is the common case for medications).
+
+---
+
 # Future Features
 
 Keep an expandable checklist for ideas that may be implemented later.

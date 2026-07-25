@@ -1,20 +1,12 @@
 import 'dart:convert';
 
-import 'package:rehab_track/domain/entities/schedule_config.dart';
-
 class MeasurementNotificationHelper {
   MeasurementNotificationHelper._();
 
   static const int _namespaceOffset = 100000;
 
-  static List<int> computeNotificationIds({
-    required int scheduleId,
-    required ScheduleConfig config,
-  }) {
-    return List.generate(
-      config.times.length,
-      (i) => _namespaceOffset + scheduleId + i,
-    );
+  static int computeNotificationId(int scheduleId) {
+    return _namespaceOffset + scheduleId;
   }
 
   static int baseNotificationId(int scheduleId) {

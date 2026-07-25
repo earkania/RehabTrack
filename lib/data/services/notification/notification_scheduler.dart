@@ -152,4 +152,60 @@ class NotificationScheduler {
       await _notificationService.cancelNotification(baseNotificationId + i);
     }
   }
+
+  Future<void> scheduleSingleNotification({
+    required int notificationId,
+    required String title,
+    required String body,
+    required String time,
+    required NotificationChannelType channelType,
+    String? payload,
+    bool includeActions = false,
+    tz.Location? location,
+  }) async {
+    final tzLocation = location ?? tz.local;
+    final scheduledDate = _nextOccurrence(time, location: tzLocation);
+    if (scheduledDate == null) return;
+
+    await _notificationService.scheduleRecurringNotification(
+      id: notificationId,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      matchComponents: DateTimeComponents.time,
+      channelType: channelType,
+      payload: payload,
+      includeActions: includeActions,
+    );
+  }
+
+  Future<void> scheduleSingleIntervalNotification({
+    required int notificationId,
+    required String title,
+    required String body,
+    required String time,
+    required int intervalDays,
+    required NotificationChannelType channelType,
+    String? payload,
+    bool includeActions = false,
+    tz.Location? location,
+  }) async {
+    final tzLocation = location ?? tz.local;
+    final scheduledDate = _nextOccurrence(
+      time,
+      interval: intervalDays,
+      location: tzLocation,
+    );
+    if (scheduledDate == null) return;
+
+    await _notificationService.scheduleNotification(
+      id: notificationId,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      channelType: channelType,
+      payload: payload,
+      includeActions: includeActions,
+    );
+  }
 }

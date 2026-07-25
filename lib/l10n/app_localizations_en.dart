@@ -331,6 +331,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addTime => 'Add Time';
 
   @override
+  String get scheduledTime => 'Scheduled Time';
+
+  @override
   String get removeTime => 'Remove';
 
   @override

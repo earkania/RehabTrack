@@ -1,5 +1,3 @@
-import 'package:rehab_track/domain/entities/schedule_config.dart';
-
 class MeasurementType {
   final int? id;
   final int? profileId;
@@ -223,7 +221,9 @@ class MeasurementSchedule {
   final int? id;
   final int profileId;
   final int measurementTypeId;
-  final ScheduleConfig scheduleConfig;
+  final String scheduleType;
+  final String time;
+  final int? intervalDays;
   final DateTime? startDate;
   final DateTime? endDate;
   final bool active;
@@ -235,7 +235,9 @@ class MeasurementSchedule {
     this.id,
     required this.profileId,
     required this.measurementTypeId,
-    required this.scheduleConfig,
+    required this.scheduleType,
+    required this.time,
+    this.intervalDays,
     this.startDate,
     this.endDate,
     this.active = true,
@@ -244,17 +246,23 @@ class MeasurementSchedule {
     required this.updatedAt,
   });
 
+  bool get isDaily => scheduleType == 'daily';
+  bool get isIntervalDays => scheduleType == 'interval_days';
+
   MeasurementSchedule copyWith({
     int? id,
     int? profileId,
     int? measurementTypeId,
-    ScheduleConfig? scheduleConfig,
+    String? scheduleType,
+    String? time,
+    int? intervalDays,
     DateTime? startDate,
     DateTime? endDate,
     bool? active,
     String? instructions,
     bool clearInstructions = false,
     bool clearEndDate = false,
+    bool clearIntervalDays = false,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -263,7 +271,11 @@ class MeasurementSchedule {
       profileId: profileId ?? this.profileId,
       measurementTypeId:
           measurementTypeId ?? this.measurementTypeId,
-      scheduleConfig: scheduleConfig ?? this.scheduleConfig,
+      scheduleType: scheduleType ?? this.scheduleType,
+      time: time ?? this.time,
+      intervalDays: clearIntervalDays
+          ? null
+          : (intervalDays ?? this.intervalDays),
       startDate: startDate ?? this.startDate,
       endDate: clearEndDate ? null : (endDate ?? this.endDate),
       active: active ?? this.active,
@@ -272,6 +284,28 @@ class MeasurementSchedule {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
+  }
+
+  static String normalizeTime(String time) {
+    final trimmed = time.trim();
+    final parts = trimmed.split(':');
+    if (parts.length != 2) return trimmed;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return trimmed;
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return trimmed;
+    return '${hour.toString().padLeft(2, '0')}:'
+        '${minute.toString().padLeft(2, '0')}';
+  }
+
+  static bool isValidTime(String time) {
+    final normalized = normalizeTime(time);
+    final parts = normalized.split(':');
+    if (parts.length != 2) return false;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return false;
+    return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
   }
 }
 

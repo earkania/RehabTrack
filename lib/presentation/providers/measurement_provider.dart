@@ -249,42 +249,40 @@ final todayMeasurementRemindersProvider =
 
         for (final schedule in activeSchedules) {
           if (schedule.id == null) continue;
-          final times = schedule.scheduleConfig.times;
+          final timeStr = schedule.time;
           final type = types[schedule.measurementTypeId];
 
-          for (final timeStr in times) {
-            final parts = timeStr.split(':');
-            if (parts.length != 2) continue;
-            final hour = int.tryParse(parts[0]);
-            final minute = int.tryParse(parts[1]);
-            if (hour == null || minute == null) continue;
+          final parts = timeStr.split(':');
+          if (parts.length != 2) continue;
+          final hour = int.tryParse(parts[0]);
+          final minute = int.tryParse(parts[1]);
+          if (hour == null || minute == null) continue;
 
-            final scheduledTime = DateTime(
-              today.year,
-              today.month,
-              today.day,
-              hour,
-              minute,
-            );
+          final scheduledTime = DateTime(
+            today.year,
+            today.month,
+            today.day,
+            hour,
+            minute,
+          );
 
-            if (scheduledTime.isBefore(tomorrow) == false) continue;
+          if (scheduledTime.isBefore(tomorrow) == false) continue;
 
-            final logEntry = logs.where((l) =>
-                l.measurementScheduleId == schedule.id &&
-                l.scheduledTime.year == scheduledTime.year &&
-                l.scheduledTime.month == scheduledTime.month &&
-                l.scheduledTime.day == scheduledTime.day &&
-                l.scheduledTime.hour == scheduledTime.hour &&
-                l.scheduledTime.minute == scheduledTime.minute).firstOrNull;
+          final logEntry = logs.where((l) =>
+              l.measurementScheduleId == schedule.id &&
+              l.scheduledTime.year == scheduledTime.year &&
+              l.scheduledTime.month == scheduledTime.month &&
+              l.scheduledTime.day == scheduledTime.day &&
+              l.scheduledTime.hour == scheduledTime.hour &&
+              l.scheduledTime.minute == scheduledTime.minute).firstOrNull;
 
-            reminders.add(_TodayMeasurementReminder(
-              schedule: schedule,
-              typeName: type?.name ?? 'Measurement',
-              typeKey: type?.key ?? '',
-              scheduledTime: scheduledTime,
-              logEntry: logEntry,
-            ));
-          }
+          reminders.add(_TodayMeasurementReminder(
+            schedule: schedule,
+            typeName: type?.name ?? 'Measurement',
+            typeKey: type?.key ?? '',
+            scheduledTime: scheduledTime,
+            logEntry: logEntry,
+          ));
         }
 
         reminders.sort((a, b) => a.scheduledTime.compareTo(b.scheduledTime));

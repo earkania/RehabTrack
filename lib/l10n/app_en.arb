@@ -119,6 +119,7 @@
   "deleteScheduleConfirmation": "Remove this schedule? Notifications will be cancelled.",
   "selectTime": "Select Time",
   "addTime": "Add Time",
+  "scheduledTime": "Scheduled Time",
   "removeTime": "Remove",
   "intervalDays": "Interval (days)",
   "atLeastOneTimeRequired": "At least one time is required",
