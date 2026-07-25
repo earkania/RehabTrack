@@ -10,9 +10,11 @@ class AppRoutes {
   // Measurements
   static String measurementAdd(int typeId) => '/measurements/measurement/$typeId/add';
   static String measurementHistory(int typeId) => '/measurements/measurement/$typeId/history';
-  static String measurementEdit(int recordId) => '/measurements/measurement/record/$recordId/edit';
+  static String measurementEdit(int recordId) =>
+      '/measurements/measurement/record/$recordId/edit';
+  static String measurementTrends(int typeId) =>
+      '/measurements/measurement/$typeId/trends';
   static const measurementRanges = '/measurements/ranges';
-
   // Medications
   static const medicationAdd = '/medications/medication/add';
   static String medicationDetail(int id) => '/medications/medication/$id';

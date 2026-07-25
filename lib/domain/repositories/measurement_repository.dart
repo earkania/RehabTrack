@@ -31,12 +31,14 @@ abstract class MeasurementRepository {
     int? typeId,
     DateTime? from,
     DateTime? to,
+    bool ascending = false,
   });
   Future<List<MeasurementRecord>> getRecords(
     int profileId, {
     int? typeId,
     DateTime? from,
     DateTime? to,
+    bool ascending = false,
   });
   Future<MeasurementRecord?> getRecord(int id);
   Future<int> createRecord(
@@ -52,6 +54,9 @@ abstract class MeasurementRepository {
   // --- MeasurementRecordValues ---
   Future<List<MeasurementRecordValue>> getValuesForRecord(
     int measurementRecordId,
+  );
+  Future<Map<int, List<MeasurementRecordValue>>> getValuesForRecords(
+    List<int> recordIds,
   );
 
   // --- MeasurementSchedules ---

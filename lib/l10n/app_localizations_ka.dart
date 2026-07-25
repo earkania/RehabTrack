@@ -407,7 +407,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get last30Days => 'ბოლო 30 დღე';
 
   @override
-  String get allTime => 'მთელი დრო';
+  String get allTime => 'ყველა დრო';
 
   @override
   String adherencePercentage(double percentage) {
@@ -694,4 +694,92 @@ class AppLocalizationsKa extends AppLocalizations {
   String referenceRangeCount(int count) {
     return '$count ცნობილი დიაპაზონი';
   }
+
+  @override
+  String get trends => 'ტრენდები';
+
+  @override
+  String get measurementTrends => 'გაზომვის ტრენდები';
+
+  @override
+  String get viewTrends => 'ტრენდების ნახვა';
+
+  @override
+  String get lastSevenDays => 'ბოლო 7 დღე';
+
+  @override
+  String get lastThirtyDays => 'ბოლო 30 დღე';
+
+  @override
+  String get lastNinetyDays => 'ბოლო 90 დღე';
+
+  @override
+  String get latest => 'უახლესი';
+
+  @override
+  String get average => 'საშუალო';
+
+  @override
+  String get minimum => 'მინიმუმი';
+
+  @override
+  String get maximum => 'მაქსიმუმი';
+
+  @override
+  String get readingCount => 'გაზომვები';
+
+  @override
+  String get firstReading => 'პირველი';
+
+  @override
+  String get change => 'ცვლილება';
+
+  @override
+  String get percentageChange => 'ცვლილება %';
+
+  @override
+  String get belowCount => 'დაბალი';
+
+  @override
+  String get withinCount => 'ნორმაში';
+
+  @override
+  String get aboveCount => 'მაღალი';
+
+  @override
+  String get unknownCount => 'უცნობი';
+
+  @override
+  String get irregularHeartbeatCount => 'არარეგულარული გულისცემა';
+
+  @override
+  String get noTrendData => 'ტრენდის მონაცემები არ არის';
+
+  @override
+  String get moreReadingsNeeded =>
+      'ტრენდის ჩვენებისთვის საჭიროა მინიმუმ 2 გაზომვა';
+
+  @override
+  String get selectPeriod => 'პერიოდის არჩევა';
+
+  @override
+  String get failedToLoadTrends => 'ტრენდების ჩატვირთვა ვერ მოხერხდა';
+
+  @override
+  String get statusSummary => 'სტატუსის შეჯამება';
+
+  @override
+  String get statistics => 'სტატისტიკა';
+
+  @override
+  String get chart => 'გრაფიკი';
+
+  @override
+  String get systolicLabel => 'სისტოლური';
+
+  @override
+  String get diastolicLabel => 'დიასტოლური';
+
+  @override
+  String get pulseLabelStat => 'პულსი';
 }

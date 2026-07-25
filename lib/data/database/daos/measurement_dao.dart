@@ -155,6 +155,7 @@ class MeasurementDao extends DatabaseAccessor<AppDatabase>
     int? typeId,
     DateTime? from,
     DateTime? to,
+    bool ascending = false,
   }) {
     final query = select(measurementRecords)
       ..where((t) => t.profileId.equals(profileId));
@@ -168,7 +169,8 @@ class MeasurementDao extends DatabaseAccessor<AppDatabase>
       query.where((t) => t.timestamp.isSmallerOrEqualValue(to));
     }
     query.orderBy([
-      (t) => OrderingTerm.desc(t.timestamp),
+      (t) =>
+          ascending ? OrderingTerm.asc(t.timestamp) : OrderingTerm.desc(t.timestamp),
     ]);
     return query.watch();
   }
@@ -178,6 +180,7 @@ class MeasurementDao extends DatabaseAccessor<AppDatabase>
     int? typeId,
     DateTime? from,
     DateTime? to,
+    bool ascending = false,
   }) {
     final query = select(measurementRecords)
       ..where((t) => t.profileId.equals(profileId));
@@ -191,7 +194,8 @@ class MeasurementDao extends DatabaseAccessor<AppDatabase>
       query.where((t) => t.timestamp.isSmallerOrEqualValue(to));
     }
     query.orderBy([
-      (t) => OrderingTerm.desc(t.timestamp),
+      (t) =>
+          ascending ? OrderingTerm.asc(t.timestamp) : OrderingTerm.desc(t.timestamp),
     ]);
     return query.get();
   }
@@ -248,6 +252,17 @@ class MeasurementDao extends DatabaseAccessor<AppDatabase>
     for (final value in values) {
       await into(measurementRecordValues).insert(value);
     }
+  }
+
+  Future<List<MeasurementRecordValue>> getValuesForRecords(
+    List<int> recordIds,
+  ) async {
+    if (recordIds.isEmpty) return [];
+    return (select(measurementRecordValues)
+      ..where((t) => t.measurementRecordId.isIn(recordIds))
+      ..orderBy([
+        (t) => OrderingTerm.asc(t.displayOrder),
+      ])).get();
   }
 
   // --- MeasurementSchedules ---

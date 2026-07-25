@@ -254,5 +254,35 @@
     "placeholders": {
       "count": {"type": "int"}
     }
-  }
+  },
+  "trends": "Trends",
+  "measurementTrends": "Measurement Trends",
+  "viewTrends": "View Trends",
+  "lastSevenDays": "Last 7 Days",
+  "lastThirtyDays": "Last 30 Days",
+  "lastNinetyDays": "Last 90 Days",
+  "allTime": "All Time",
+  "latest": "Latest",
+  "average": "Average",
+  "minimum": "Minimum",
+  "maximum": "Maximum",
+  "readingCount": "Readings",
+  "firstReading": "First",
+  "change": "Change",
+  "percentageChange": "Change %",
+  "belowCount": "Below",
+  "withinCount": "Within",
+  "aboveCount": "Above",
+  "unknownCount": "Unknown",
+  "irregularHeartbeatCount": "Irregular Heartbeat",
+  "noTrendData": "No trend data",
+  "moreReadingsNeeded": "At least 2 readings are needed to show a trend",
+  "selectPeriod": "Select Period",
+  "failedToLoadTrends": "Failed to load trends",
+  "statusSummary": "Status Summary",
+  "statistics": "Statistics",
+  "chart": "Chart",
+  "systolicLabel": "Systolic",
+  "diastolicLabel": "Diastolic",
+  "pulseLabelStat": "Pulse"
 }

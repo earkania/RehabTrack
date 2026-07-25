@@ -1417,6 +1417,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count,plural, =0{0 reference ranges} =1{1 reference range} other{{count} reference ranges}}'**
   String referenceRangeCount(int count);
+
+  /// No description provided for @trends.
+  ///
+  /// In en, this message translates to:
+  /// **'Trends'**
+  String get trends;
+
+  /// No description provided for @measurementTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement Trends'**
+  String get measurementTrends;
+
+  /// No description provided for @viewTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'View Trends'**
+  String get viewTrends;
+
+  /// No description provided for @lastSevenDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 Days'**
+  String get lastSevenDays;
+
+  /// No description provided for @lastThirtyDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get lastThirtyDays;
+
+  /// No description provided for @lastNinetyDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 90 Days'**
+  String get lastNinetyDays;
+
+  /// No description provided for @latest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get latest;
+
+  /// No description provided for @average.
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get average;
+
+  /// No description provided for @minimum.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum'**
+  String get minimum;
+
+  /// No description provided for @maximum.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum'**
+  String get maximum;
+
+  /// No description provided for @readingCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Readings'**
+  String get readingCount;
+
+  /// No description provided for @firstReading.
+  ///
+  /// In en, this message translates to:
+  /// **'First'**
+  String get firstReading;
+
+  /// No description provided for @change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// No description provided for @percentageChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change %'**
+  String get percentageChange;
+
+  /// No description provided for @belowCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Below'**
+  String get belowCount;
+
+  /// No description provided for @withinCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Within'**
+  String get withinCount;
+
+  /// No description provided for @aboveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Above'**
+  String get aboveCount;
+
+  /// No description provided for @unknownCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknownCount;
+
+  /// No description provided for @irregularHeartbeatCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Irregular Heartbeat'**
+  String get irregularHeartbeatCount;
+
+  /// No description provided for @noTrendData.
+  ///
+  /// In en, this message translates to:
+  /// **'No trend data'**
+  String get noTrendData;
+
+  /// No description provided for @moreReadingsNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 2 readings are needed to show a trend'**
+  String get moreReadingsNeeded;
+
+  /// No description provided for @selectPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Period'**
+  String get selectPeriod;
+
+  /// No description provided for @failedToLoadTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load trends'**
+  String get failedToLoadTrends;
+
+  /// No description provided for @statusSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Status Summary'**
+  String get statusSummary;
+
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
+  /// No description provided for @chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart'**
+  String get chart;
+
+  /// No description provided for @systolicLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Systolic'**
+  String get systolicLabel;
+
+  /// No description provided for @diastolicLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Diastolic'**
+  String get diastolicLabel;
+
+  /// No description provided for @pulseLabelStat.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulse'**
+  String get pulseLabelStat;
 }
 
 class _AppLocalizationsDelegate

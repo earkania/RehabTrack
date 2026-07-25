@@ -254,5 +254,35 @@
     "placeholders": {
       "count": {"type": "int"}
     }
-  }
+  },
+  "trends": "ტრენდები",
+  "measurementTrends": "გაზომვის ტრენდები",
+  "viewTrends": "ტრენდების ნახვა",
+  "lastSevenDays": "ბოლო 7 დღე",
+  "lastThirtyDays": "ბოლო 30 დღე",
+  "lastNinetyDays": "ბოლო 90 დღე",
+  "allTime": "ყველა დრო",
+  "latest": "უახლესი",
+  "average": "საშუალო",
+  "minimum": "მინიმუმი",
+  "maximum": "მაქსიმუმი",
+  "readingCount": "გაზომვები",
+  "firstReading": "პირველი",
+  "change": "ცვლილება",
+  "percentageChange": "ცვლილება %",
+  "belowCount": "დაბალი",
+  "withinCount": "ნორმაში",
+  "aboveCount": "მაღალი",
+  "unknownCount": "უცნობი",
+  "irregularHeartbeatCount": "არარეგულარული გულისცემა",
+  "noTrendData": "ტრენდის მონაცემები არ არის",
+  "moreReadingsNeeded": "ტრენდის ჩვენებისთვის საჭიროა მინიმუმ 2 გაზომვა",
+  "selectPeriod": "პერიოდის არჩევა",
+  "failedToLoadTrends": "ტრენდების ჩატვირთვა ვერ მოხერხდა",
+  "statusSummary": "სტატუსის შეჯამება",
+  "statistics": "სტატისტიკა",
+  "chart": "გრაფიკი",
+  "systolicLabel": "სისტოლური",
+  "diastolicLabel": "დიასტოლური",
+  "pulseLabelStat": "პულსი"
 }

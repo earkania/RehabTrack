@@ -36,6 +36,7 @@ dependencies:
   timezone: ^0.10.1
 
   # UI
+  fl_chart: ^0.70.0
   cupertino_icons: ^1.0.8
   material_symbols_icons: ^4.2951.0
 

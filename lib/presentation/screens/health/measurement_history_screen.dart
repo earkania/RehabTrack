@@ -41,6 +41,13 @@ class MeasurementHistoryScreen extends ConsumerWidget {
             tooltip: l10n.referenceRanges,
           ),
           IconButton(
+            onPressed: () => context.push(
+              AppRoutes.measurementTrends(measurementTypeId),
+            ),
+            icon: const Icon(Icons.show_chart),
+            tooltip: l10n.viewTrends,
+          ),
+          IconButton(
             onPressed: () => _showLegend(context, l10n),
             icon: const Icon(Icons.info_outline),
             tooltip: l10n.readingStatusLegend,

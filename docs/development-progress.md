@@ -1019,6 +1019,148 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 ---
 
+### Phase 5B — Measurement Charts, Trends, and Statistics
+
+**Date:** 2026-07-25
+
+**Status:** Completed
+
+**What was done:**
+
+#### Chart Library
+- Added `fl_chart: ^0.70.0` to `pubspec.yaml`
+- Single chart library used throughout (no duplicate chart packages)
+
+#### Domain Models (no Flutter imports)
+- **`MeasurementPeriod`** enum — `last7Days`, `last30Days`, `last90Days`, `allTime` with `from` date calculation
+- **`MeasurementDataPoint`** — combines `MeasurementRecord` + `List<MeasurementRecordValue>` with `valueForKey`/`unitForKey` accessors
+- **`MeasurementChartPoint`** — recordId, measuredAt, numericValue, unit, readingStatus, irregularHeartbeatDetected
+- **`MeasurementChartSeries`** — fieldKey, label, unit, ordered points
+- **`MeasurementStatistics`** — count, latest, minimum, maximum, average, first, change, percentageChange (with `compute` factory)
+- **`ReadingStatusSummary`** — belowCount, withinCount, aboveCount, unknownCount, irregularHeartbeatCount
+
+#### Domain Service
+- **`MeasurementChartBuilder`** — pure static methods:
+  - `buildSeries()` — converts data points + fields + ranges into chart series (oldest-first ordering)
+  - `_buildBloodPressureSeries()` — special BP handling: systolic/diastolic/pulse as separate series
+  - `_buildGenericSeries()` — one series per field for single-value and custom types
+  - `computeFieldStatistics()` — statistics per chart series
+  - `computeStatusSummary()` — status counts with deduplication across series (same record counted once)
+
+#### Data Layer Changes
+- **DAO:** Added `getValuesForRecords(List<int> recordIds)` — bulk fetch avoids N+1 queries
+- **DAO:** Added `ascending` parameter to `watchRecords` and `getRecords` (default false = newest first)
+- **Repository interface:** Added `getValuesForRecords` + `ascending` param
+- **Repository implementation:** Bulk values grouped by recordId; ascending ordering passed through
+
+#### Providers
+- **`TrendParams`** typedef — `({int measurementTypeId, MeasurementPeriod period})`
+- **`TrendData`** class — combined data container (dataPoints, chartSeries, fieldStatistics, statusSummary)
+- **`trendDataProvider`** — `FutureProvider.autoDispose.family<TrendData, TrendParams>` — loads records, bulk values, type, fields, ranges; builds chart series + stats + summary in single provider
+- **`trendTypeProvider`** — lookup for type metadata
+
+#### Routes
+- **Route constant:** `AppRoutes.measurementTrends(int typeId)` → `/measurements/measurement/$typeId/trends`
+- **Router entry:** Outside ShellRoute (full-screen), with `int.tryParse` + `_InvalidRouteScreen` fallback
+
+#### Chart Widget
+- **`MeasurementLineChart`** — single widget handles all measurement types:
+  - One `LineChartBarData` per series with status-colored dots
+  - Blood Pressure: systolic (primary), diastolic (secondary), pulse (dashed, lighter)
+  - Custom `FlDotCirclePainter` maps `ReadingStatus` to colors (matching `ReadingStatusIndicator`)
+  - Irregular heartbeat: larger ring in `colorScheme.error` around status-colored dot
+  - Reference range: dashed horizontal lines in `colorScheme.outlineVariant`
+  - Touch tooltip: date/time, field label, value, unit, status, irregular heartbeat
+  - Auto Y-axis scaling with 15% padding
+  - Date labels on X-axis with locale-aware formatting via `intl.DateFormat`
+
+#### Supporting Widgets
+- **`MeasurementPeriodSelector`** — `SegmentedButton<MaterialPeriod>` with 4 options
+- **`MeasurementStatisticsCard`** — compact Card with stat rows; BP shows separate systolic/diastolic/pulse sections
+- **`MeasurementStatusSummaryCard`** — status counts with `ReadingStatusIndicator` dots + irregular heartbeat row
+- **`MeasurementChartLegend`** — inline legend with status dots, series color indicators, irregular heartbeat note
+
+#### Trends Screen
+- **`MeasurementTrendsScreen`** — ConsumerStatefulWidget with:
+  - AppBar with history action button
+  - Period selector
+  - Chart (250px height)
+  - Statistics card
+  - Status summary card
+  - Legend card
+  - Empty state with Add Reading action
+  - One-reading state with latest value + "more readings needed" message
+  - Loading/error states with retry
+
+#### History Screen Integration
+- Added `Icons.show_chart` IconButton in AppBar between tune and legend buttons
+- Navigates to `/measurements/measurement/:typeId/trends`
+- Localized tooltip `l10n.viewTrends`
+
+#### Localization
+- **30 new keys** in English and Georgian ARB files
+- English uses full sentences; Georgian uses natural translations
+- Key categories: periods (4), statistics (5), status counts (5), UI labels (10), error states (3), BP labels (3)
+
+**Files Created:**
+- `lib/domain/entities/measurement_period.dart`
+- `lib/domain/entities/measurement_data_point.dart`
+- `lib/domain/entities/measurement_chart.dart`
+- `lib/domain/entities/measurement_statistics.dart`
+- `lib/domain/entities/reading_status_summary.dart`
+- `lib/domain/services/measurement_chart_builder.dart`
+- `lib/presentation/screens/health/measurement_trends_screen.dart`
+- `lib/presentation/widgets/charts/measurement_line_chart.dart`
+- `lib/presentation/widgets/charts/chart_legend.dart`
+- `lib/presentation/widgets/measurements/measurement_period_selector.dart`
+- `lib/presentation/widgets/measurements/measurement_statistics_card.dart`
+- `lib/presentation/widgets/measurements/measurement_status_summary_card.dart`
+- `test/measurement_period_test.dart`
+- `test/measurement_chart_builder_test.dart`
+- `test/measurement_chart_model_test.dart`
+
+**Files Modified:**
+- `pubspec.yaml` — added `fl_chart: ^0.70.0`
+- `lib/data/database/daos/measurement_dao.dart` — added `getValuesForRecords`, `ascending` param
+- `lib/domain/repositories/measurement_repository.dart` — added `getValuesForRecords`, `ascending` param
+- `lib/data/repositories/measurement_repository_impl.dart` — implemented bulk values + ascending
+- `lib/core/router/app_routes.dart` — added `measurementTrends`
+- `lib/core/router/app_router.dart` — added trends route + import
+- `lib/presentation/providers/measurement_provider.dart` — added TrendParams, TrendData, trend providers
+- `lib/presentation/screens/health/measurement_history_screen.dart` — added trends button
+- `lib/l10n/app_en.arb` — 30 new keys
+- `lib/l10n/app_ka.arb` — 30 new Georgian translations
+
+**Tests Added:** 44 new tests:
+- 7 measurement period tests (date calculations, ordering)
+- 24 chart builder tests (series building, statistics, status summary, BP, custom types)
+- 13 chart model tests (point, series, statistics, summary entities)
+
+**Performance Decisions:**
+- Bulk `getValuesForRecords` avoids N+1 queries (3 queries total regardless of record count)
+- Single `FutureProvider.family` for trend data avoids duplicate database queries
+- Chart statistics and status summary computed in-memory from loaded data
+- `ascending` ordering at database level (not in Dart)
+
+**Known Limitations:**
+- No zoom/pan on charts
+- No custom date range picker (only 4 preset periods)
+- Data refreshes on navigation (FutureProvider, not StreamProvider)
+- Weight has no reference range (always unknown status) — by design
+- No PDF/CSV export of trend data
+- No real-time streaming for chart updates
+- Pixel 7 not tested (not connected during this session)
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter pub get` | Completed successfully |
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (1 pre-existing info lint, 10 pre-existing test warnings) |
+| `flutter test` | Passed (359/359) |
+
+---
+
 ## Development Rules
 
 - Commit after every completed phase

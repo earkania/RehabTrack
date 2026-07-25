@@ -700,4 +700,92 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trends => 'Trends';
+
+  @override
+  String get measurementTrends => 'Measurement Trends';
+
+  @override
+  String get viewTrends => 'View Trends';
+
+  @override
+  String get lastSevenDays => 'Last 7 Days';
+
+  @override
+  String get lastThirtyDays => 'Last 30 Days';
+
+  @override
+  String get lastNinetyDays => 'Last 90 Days';
+
+  @override
+  String get latest => 'Latest';
+
+  @override
+  String get average => 'Average';
+
+  @override
+  String get minimum => 'Minimum';
+
+  @override
+  String get maximum => 'Maximum';
+
+  @override
+  String get readingCount => 'Readings';
+
+  @override
+  String get firstReading => 'First';
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String get percentageChange => 'Change %';
+
+  @override
+  String get belowCount => 'Below';
+
+  @override
+  String get withinCount => 'Within';
+
+  @override
+  String get aboveCount => 'Above';
+
+  @override
+  String get unknownCount => 'Unknown';
+
+  @override
+  String get irregularHeartbeatCount => 'Irregular Heartbeat';
+
+  @override
+  String get noTrendData => 'No trend data';
+
+  @override
+  String get moreReadingsNeeded =>
+      'At least 2 readings are needed to show a trend';
+
+  @override
+  String get selectPeriod => 'Select Period';
+
+  @override
+  String get failedToLoadTrends => 'Failed to load trends';
+
+  @override
+  String get statusSummary => 'Status Summary';
+
+  @override
+  String get statistics => 'Statistics';
+
+  @override
+  String get chart => 'Chart';
+
+  @override
+  String get systolicLabel => 'Systolic';
+
+  @override
+  String get diastolicLabel => 'Diastolic';
+
+  @override
+  String get pulseLabelStat => 'Pulse';
 }

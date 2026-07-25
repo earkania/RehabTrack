@@ -131,6 +131,7 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
     int? typeId,
     DateTime? from,
     DateTime? to,
+    bool ascending = false,
   }) {
     return _database.measurementDao
         .watchRecords(
@@ -138,6 +139,7 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
           typeId: typeId,
           from: from,
           to: to,
+          ascending: ascending,
         )
         .map((rows) => rows.map(_recordToDomain).toList());
   }
@@ -148,12 +150,14 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
     int? typeId,
     DateTime? from,
     DateTime? to,
+    bool ascending = false,
   }) async {
     final rows = await _database.measurementDao.getRecords(
       profileId,
       typeId: typeId,
       from: from,
       to: to,
+      ascending: ascending,
     );
     return rows.map(_recordToDomain).toList();
   }
@@ -262,6 +266,22 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
     final rows = await _database.measurementDao
         .getValuesForRecord(measurementRecordId);
     return rows.map(_recordValueToDomain).toList();
+  }
+
+  @override
+  Future<Map<int, List<MeasurementRecordValue>>> getValuesForRecords(
+    List<int> recordIds,
+  ) async {
+    if (recordIds.isEmpty) return {};
+    final rows = await _database.measurementDao
+        .getValuesForRecords(recordIds);
+    final grouped = <int, List<MeasurementRecordValue>>{};
+    for (final row in rows) {
+      grouped
+          .putIfAbsent(row.measurementRecordId, () => [])
+          .add(_recordValueToDomain(row));
+    }
+    return grouped;
   }
 
   // --- Schedules ---

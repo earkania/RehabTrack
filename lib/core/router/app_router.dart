@@ -18,6 +18,7 @@ import 'package:rehab_track/presentation/screens/activities/medication_history_s
 import 'package:rehab_track/presentation/screens/health/measurement_entry_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurement_edit_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurement_history_screen.dart';
+import 'package:rehab_track/presentation/screens/health/measurement_trends_screen.dart';
 import 'package:rehab_track/presentation/screens/health/reference_range_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
@@ -175,6 +176,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             return const _InvalidRouteScreen();
           }
           return MeasurementHistoryScreen(measurementTypeId: typeId);
+        },
+      ),
+      GoRoute(
+        path: '/measurements/measurement/:typeId/trends',
+        builder: (context, state) {
+          final typeId =
+              int.tryParse(state.pathParameters['typeId'] ?? '');
+          if (typeId == null) {
+            return const _InvalidRouteScreen();
+          }
+          return MeasurementTrendsScreen(measurementTypeId: typeId);
         },
       ),
       GoRoute(
