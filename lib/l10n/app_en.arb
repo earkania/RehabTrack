@@ -310,5 +310,40 @@
     "placeholders": {
       "status": {"type": "String"}
     }
-  }
+  },
+  "measurementSchedules": "Measurement Schedules",
+  "addMeasurementSchedule": "Add Measurement Schedule",
+  "editMeasurementSchedule": "Edit Measurement Schedule",
+  "noMeasurementSchedules": "No measurement schedules",
+  "noMeasurementSchedulesDescription": "Add a schedule to get reminders for this measurement",
+  "schedulesSection": "Schedules",
+  "addScheduleSubtitle": "Add a schedule to get reminders",
+  "daily": "Daily",
+  "everyNDaysLabel": "Every N Days",
+  "intervalDays": "Interval (days)",
+  "everyNDaysRequiresStartDate": "Every N Days requires a start date",
+  "recordNow": "Record Now",
+  "measurementReminder": "Measurement Reminder",
+  "measurementReminders": "Measurement Reminders",
+  "timeToRecordMeasurement": "Time to record {name}",
+  "@timeToRecordMeasurement": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "reminderScheduled": "Reminder scheduled",
+  "reminderUpdated": "Reminder updated",
+  "reminderDeleted": "Reminder deleted",
+  "failedToSaveSchedule": "Failed to save schedule",
+  "scheduleRecovered": "Schedule recovered",
+  "measurementsDueToday": "Measurements Due Today",
+  "noRemindersToday": "No reminders scheduled for today",
+  "upcoming": "Upcoming",
+  "overdue": "Overdue",
+  "completed": "Completed",
+  "skipped": "Skipped",
+  "snoozed": "Snoozed",
+  "schedules": "Schedules",
+  "deleteSchedule": "Delete Schedule",
+  "deleteScheduleConfirmation": "Are you sure you want to delete this schedule?"
 }

@@ -69,4 +69,17 @@ class MeasurementSchedules extends Table {
   DateTimeColumn get startDate => dateTime().nullable()();
   DateTimeColumn get endDate => dateTime().nullable()();
   BoolColumn get active => boolean().withDefault(const Constant(true))();
+  TextColumn get instructions => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+}
+
+class MeasurementReminderLogs extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get measurementScheduleId =>
+      integer().references(MeasurementSchedules, #id)();
+  DateTimeColumn get scheduledTime => dateTime()();
+  DateTimeColumn get actionTime => dateTime().nullable()();
+  TextColumn get status => text()();
+  DateTimeColumn get createdAt => dateTime()();
 }

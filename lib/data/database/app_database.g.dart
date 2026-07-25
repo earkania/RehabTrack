@@ -7106,6 +7106,39 @@ class $MeasurementSchedulesTable extends MeasurementSchedules
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _instructionsMeta = const VerificationMeta(
+    'instructions',
+  );
+  @override
+  late final GeneratedColumn<String> instructions = GeneratedColumn<String>(
+    'instructions',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -7115,6 +7148,9 @@ class $MeasurementSchedulesTable extends MeasurementSchedules
     startDate,
     endDate,
     active,
+    instructions,
+    createdAt,
+    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -7179,6 +7215,31 @@ class $MeasurementSchedulesTable extends MeasurementSchedules
         active.isAcceptableOrUnknown(data['active']!, _activeMeta),
       );
     }
+    if (data.containsKey('instructions')) {
+      context.handle(
+        _instructionsMeta,
+        instructions.isAcceptableOrUnknown(
+          data['instructions']!,
+          _instructionsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
     return context;
   }
 
@@ -7216,6 +7277,18 @@ class $MeasurementSchedulesTable extends MeasurementSchedules
         DriftSqlType.bool,
         data['${effectivePrefix}active'],
       )!,
+      instructions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}instructions'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -7234,6 +7307,9 @@ class MeasurementSchedule extends DataClass
   final DateTime? startDate;
   final DateTime? endDate;
   final bool active;
+  final String? instructions;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   const MeasurementSchedule({
     required this.id,
     required this.profileId,
@@ -7242,6 +7318,9 @@ class MeasurementSchedule extends DataClass
     this.startDate,
     this.endDate,
     required this.active,
+    this.instructions,
+    required this.createdAt,
+    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -7257,6 +7336,11 @@ class MeasurementSchedule extends DataClass
       map['end_date'] = Variable<DateTime>(endDate);
     }
     map['active'] = Variable<bool>(active);
+    if (!nullToAbsent || instructions != null) {
+      map['instructions'] = Variable<String>(instructions);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
@@ -7273,6 +7357,11 @@ class MeasurementSchedule extends DataClass
           ? const Value.absent()
           : Value(endDate),
       active: Value(active),
+      instructions: instructions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(instructions),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -7289,6 +7378,9 @@ class MeasurementSchedule extends DataClass
       startDate: serializer.fromJson<DateTime?>(json['startDate']),
       endDate: serializer.fromJson<DateTime?>(json['endDate']),
       active: serializer.fromJson<bool>(json['active']),
+      instructions: serializer.fromJson<String?>(json['instructions']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -7302,6 +7394,9 @@ class MeasurementSchedule extends DataClass
       'startDate': serializer.toJson<DateTime?>(startDate),
       'endDate': serializer.toJson<DateTime?>(endDate),
       'active': serializer.toJson<bool>(active),
+      'instructions': serializer.toJson<String?>(instructions),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
@@ -7313,6 +7408,9 @@ class MeasurementSchedule extends DataClass
     Value<DateTime?> startDate = const Value.absent(),
     Value<DateTime?> endDate = const Value.absent(),
     bool? active,
+    Value<String?> instructions = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) => MeasurementSchedule(
     id: id ?? this.id,
     profileId: profileId ?? this.profileId,
@@ -7321,6 +7419,9 @@ class MeasurementSchedule extends DataClass
     startDate: startDate.present ? startDate.value : this.startDate,
     endDate: endDate.present ? endDate.value : this.endDate,
     active: active ?? this.active,
+    instructions: instructions.present ? instructions.value : this.instructions,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
   MeasurementSchedule copyWithCompanion(MeasurementSchedulesCompanion data) {
     return MeasurementSchedule(
@@ -7335,6 +7436,11 @@ class MeasurementSchedule extends DataClass
       startDate: data.startDate.present ? data.startDate.value : this.startDate,
       endDate: data.endDate.present ? data.endDate.value : this.endDate,
       active: data.active.present ? data.active.value : this.active,
+      instructions: data.instructions.present
+          ? data.instructions.value
+          : this.instructions,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -7347,7 +7453,10 @@ class MeasurementSchedule extends DataClass
           ..write('scheduleConfig: $scheduleConfig, ')
           ..write('startDate: $startDate, ')
           ..write('endDate: $endDate, ')
-          ..write('active: $active')
+          ..write('active: $active, ')
+          ..write('instructions: $instructions, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -7361,6 +7470,9 @@ class MeasurementSchedule extends DataClass
     startDate,
     endDate,
     active,
+    instructions,
+    createdAt,
+    updatedAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -7372,7 +7484,10 @@ class MeasurementSchedule extends DataClass
           other.scheduleConfig == this.scheduleConfig &&
           other.startDate == this.startDate &&
           other.endDate == this.endDate &&
-          other.active == this.active);
+          other.active == this.active &&
+          other.instructions == this.instructions &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
 class MeasurementSchedulesCompanion
@@ -7384,6 +7499,9 @@ class MeasurementSchedulesCompanion
   final Value<DateTime?> startDate;
   final Value<DateTime?> endDate;
   final Value<bool> active;
+  final Value<String?> instructions;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   const MeasurementSchedulesCompanion({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
@@ -7392,6 +7510,9 @@ class MeasurementSchedulesCompanion
     this.startDate = const Value.absent(),
     this.endDate = const Value.absent(),
     this.active = const Value.absent(),
+    this.instructions = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
   MeasurementSchedulesCompanion.insert({
     this.id = const Value.absent(),
@@ -7401,9 +7522,14 @@ class MeasurementSchedulesCompanion
     this.startDate = const Value.absent(),
     this.endDate = const Value.absent(),
     this.active = const Value.absent(),
+    this.instructions = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
   }) : profileId = Value(profileId),
        measurementTypeId = Value(measurementTypeId),
-       scheduleConfig = Value(scheduleConfig);
+       scheduleConfig = Value(scheduleConfig),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
   static Insertable<MeasurementSchedule> custom({
     Expression<int>? id,
     Expression<int>? profileId,
@@ -7412,6 +7538,9 @@ class MeasurementSchedulesCompanion
     Expression<DateTime>? startDate,
     Expression<DateTime>? endDate,
     Expression<bool>? active,
+    Expression<String>? instructions,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -7421,6 +7550,9 @@ class MeasurementSchedulesCompanion
       if (startDate != null) 'start_date': startDate,
       if (endDate != null) 'end_date': endDate,
       if (active != null) 'active': active,
+      if (instructions != null) 'instructions': instructions,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
@@ -7432,6 +7564,9 @@ class MeasurementSchedulesCompanion
     Value<DateTime?>? startDate,
     Value<DateTime?>? endDate,
     Value<bool>? active,
+    Value<String?>? instructions,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
   }) {
     return MeasurementSchedulesCompanion(
       id: id ?? this.id,
@@ -7441,6 +7576,9 @@ class MeasurementSchedulesCompanion
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       active: active ?? this.active,
+      instructions: instructions ?? this.instructions,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -7468,6 +7606,15 @@ class MeasurementSchedulesCompanion
     if (active.present) {
       map['active'] = Variable<bool>(active.value);
     }
+    if (instructions.present) {
+      map['instructions'] = Variable<String>(instructions.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
     return map;
   }
 
@@ -7480,7 +7627,440 @@ class MeasurementSchedulesCompanion
           ..write('scheduleConfig: $scheduleConfig, ')
           ..write('startDate: $startDate, ')
           ..write('endDate: $endDate, ')
-          ..write('active: $active')
+          ..write('active: $active, ')
+          ..write('instructions: $instructions, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MeasurementReminderLogsTable extends MeasurementReminderLogs
+    with TableInfo<$MeasurementReminderLogsTable, MeasurementReminderLog> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MeasurementReminderLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _measurementScheduleIdMeta =
+      const VerificationMeta('measurementScheduleId');
+  @override
+  late final GeneratedColumn<int> measurementScheduleId = GeneratedColumn<int>(
+    'measurement_schedule_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES measurement_schedules (id)',
+    ),
+  );
+  static const VerificationMeta _scheduledTimeMeta = const VerificationMeta(
+    'scheduledTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> scheduledTime =
+      GeneratedColumn<DateTime>(
+        'scheduled_time',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _actionTimeMeta = const VerificationMeta(
+    'actionTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> actionTime = GeneratedColumn<DateTime>(
+    'action_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    measurementScheduleId,
+    scheduledTime,
+    actionTime,
+    status,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'measurement_reminder_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MeasurementReminderLog> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('measurement_schedule_id')) {
+      context.handle(
+        _measurementScheduleIdMeta,
+        measurementScheduleId.isAcceptableOrUnknown(
+          data['measurement_schedule_id']!,
+          _measurementScheduleIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_measurementScheduleIdMeta);
+    }
+    if (data.containsKey('scheduled_time')) {
+      context.handle(
+        _scheduledTimeMeta,
+        scheduledTime.isAcceptableOrUnknown(
+          data['scheduled_time']!,
+          _scheduledTimeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_scheduledTimeMeta);
+    }
+    if (data.containsKey('action_time')) {
+      context.handle(
+        _actionTimeMeta,
+        actionTime.isAcceptableOrUnknown(data['action_time']!, _actionTimeMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MeasurementReminderLog map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MeasurementReminderLog(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      measurementScheduleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}measurement_schedule_id'],
+      )!,
+      scheduledTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}scheduled_time'],
+      )!,
+      actionTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}action_time'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MeasurementReminderLogsTable createAlias(String alias) {
+    return $MeasurementReminderLogsTable(attachedDatabase, alias);
+  }
+}
+
+class MeasurementReminderLog extends DataClass
+    implements Insertable<MeasurementReminderLog> {
+  final int id;
+  final int measurementScheduleId;
+  final DateTime scheduledTime;
+  final DateTime? actionTime;
+  final String status;
+  final DateTime createdAt;
+  const MeasurementReminderLog({
+    required this.id,
+    required this.measurementScheduleId,
+    required this.scheduledTime,
+    this.actionTime,
+    required this.status,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['measurement_schedule_id'] = Variable<int>(measurementScheduleId);
+    map['scheduled_time'] = Variable<DateTime>(scheduledTime);
+    if (!nullToAbsent || actionTime != null) {
+      map['action_time'] = Variable<DateTime>(actionTime);
+    }
+    map['status'] = Variable<String>(status);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  MeasurementReminderLogsCompanion toCompanion(bool nullToAbsent) {
+    return MeasurementReminderLogsCompanion(
+      id: Value(id),
+      measurementScheduleId: Value(measurementScheduleId),
+      scheduledTime: Value(scheduledTime),
+      actionTime: actionTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actionTime),
+      status: Value(status),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory MeasurementReminderLog.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MeasurementReminderLog(
+      id: serializer.fromJson<int>(json['id']),
+      measurementScheduleId: serializer.fromJson<int>(
+        json['measurementScheduleId'],
+      ),
+      scheduledTime: serializer.fromJson<DateTime>(json['scheduledTime']),
+      actionTime: serializer.fromJson<DateTime?>(json['actionTime']),
+      status: serializer.fromJson<String>(json['status']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'measurementScheduleId': serializer.toJson<int>(measurementScheduleId),
+      'scheduledTime': serializer.toJson<DateTime>(scheduledTime),
+      'actionTime': serializer.toJson<DateTime?>(actionTime),
+      'status': serializer.toJson<String>(status),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  MeasurementReminderLog copyWith({
+    int? id,
+    int? measurementScheduleId,
+    DateTime? scheduledTime,
+    Value<DateTime?> actionTime = const Value.absent(),
+    String? status,
+    DateTime? createdAt,
+  }) => MeasurementReminderLog(
+    id: id ?? this.id,
+    measurementScheduleId: measurementScheduleId ?? this.measurementScheduleId,
+    scheduledTime: scheduledTime ?? this.scheduledTime,
+    actionTime: actionTime.present ? actionTime.value : this.actionTime,
+    status: status ?? this.status,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  MeasurementReminderLog copyWithCompanion(
+    MeasurementReminderLogsCompanion data,
+  ) {
+    return MeasurementReminderLog(
+      id: data.id.present ? data.id.value : this.id,
+      measurementScheduleId: data.measurementScheduleId.present
+          ? data.measurementScheduleId.value
+          : this.measurementScheduleId,
+      scheduledTime: data.scheduledTime.present
+          ? data.scheduledTime.value
+          : this.scheduledTime,
+      actionTime: data.actionTime.present
+          ? data.actionTime.value
+          : this.actionTime,
+      status: data.status.present ? data.status.value : this.status,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeasurementReminderLog(')
+          ..write('id: $id, ')
+          ..write('measurementScheduleId: $measurementScheduleId, ')
+          ..write('scheduledTime: $scheduledTime, ')
+          ..write('actionTime: $actionTime, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    measurementScheduleId,
+    scheduledTime,
+    actionTime,
+    status,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MeasurementReminderLog &&
+          other.id == this.id &&
+          other.measurementScheduleId == this.measurementScheduleId &&
+          other.scheduledTime == this.scheduledTime &&
+          other.actionTime == this.actionTime &&
+          other.status == this.status &&
+          other.createdAt == this.createdAt);
+}
+
+class MeasurementReminderLogsCompanion
+    extends UpdateCompanion<MeasurementReminderLog> {
+  final Value<int> id;
+  final Value<int> measurementScheduleId;
+  final Value<DateTime> scheduledTime;
+  final Value<DateTime?> actionTime;
+  final Value<String> status;
+  final Value<DateTime> createdAt;
+  const MeasurementReminderLogsCompanion({
+    this.id = const Value.absent(),
+    this.measurementScheduleId = const Value.absent(),
+    this.scheduledTime = const Value.absent(),
+    this.actionTime = const Value.absent(),
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  MeasurementReminderLogsCompanion.insert({
+    this.id = const Value.absent(),
+    required int measurementScheduleId,
+    required DateTime scheduledTime,
+    this.actionTime = const Value.absent(),
+    required String status,
+    required DateTime createdAt,
+  }) : measurementScheduleId = Value(measurementScheduleId),
+       scheduledTime = Value(scheduledTime),
+       status = Value(status),
+       createdAt = Value(createdAt);
+  static Insertable<MeasurementReminderLog> custom({
+    Expression<int>? id,
+    Expression<int>? measurementScheduleId,
+    Expression<DateTime>? scheduledTime,
+    Expression<DateTime>? actionTime,
+    Expression<String>? status,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (measurementScheduleId != null)
+        'measurement_schedule_id': measurementScheduleId,
+      if (scheduledTime != null) 'scheduled_time': scheduledTime,
+      if (actionTime != null) 'action_time': actionTime,
+      if (status != null) 'status': status,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  MeasurementReminderLogsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? measurementScheduleId,
+    Value<DateTime>? scheduledTime,
+    Value<DateTime?>? actionTime,
+    Value<String>? status,
+    Value<DateTime>? createdAt,
+  }) {
+    return MeasurementReminderLogsCompanion(
+      id: id ?? this.id,
+      measurementScheduleId:
+          measurementScheduleId ?? this.measurementScheduleId,
+      scheduledTime: scheduledTime ?? this.scheduledTime,
+      actionTime: actionTime ?? this.actionTime,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (measurementScheduleId.present) {
+      map['measurement_schedule_id'] = Variable<int>(
+        measurementScheduleId.value,
+      );
+    }
+    if (scheduledTime.present) {
+      map['scheduled_time'] = Variable<DateTime>(scheduledTime.value);
+    }
+    if (actionTime.present) {
+      map['action_time'] = Variable<DateTime>(actionTime.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeasurementReminderLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('measurementScheduleId: $measurementScheduleId, ')
+          ..write('scheduledTime: $scheduledTime, ')
+          ..write('actionTime: $actionTime, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -12617,6 +13197,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $MeasurementRecordValuesTable(this);
   late final $MeasurementSchedulesTable measurementSchedules =
       $MeasurementSchedulesTable(this);
+  late final $MeasurementReminderLogsTable measurementReminderLogs =
+      $MeasurementReminderLogsTable(this);
   late final $ExerciseTypesTable exerciseTypes = $ExerciseTypesTable(this);
   late final $ExerciseGoalsTable exerciseGoals = $ExerciseGoalsTable(this);
   late final $ExerciseLogsTable exerciseLogs = $ExerciseLogsTable(this);
@@ -12649,6 +13231,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     measurementRecords,
     measurementRecordValues,
     measurementSchedules,
+    measurementReminderLogs,
     exerciseTypes,
     exerciseGoals,
     exerciseLogs,
@@ -19544,6 +20127,9 @@ typedef $$MeasurementSchedulesTableCreateCompanionBuilder =
       Value<DateTime?> startDate,
       Value<DateTime?> endDate,
       Value<bool> active,
+      Value<String?> instructions,
+      required DateTime createdAt,
+      required DateTime updatedAt,
     });
 typedef $$MeasurementSchedulesTableUpdateCompanionBuilder =
     MeasurementSchedulesCompanion Function({
@@ -19554,6 +20140,9 @@ typedef $$MeasurementSchedulesTableUpdateCompanionBuilder =
       Value<DateTime?> startDate,
       Value<DateTime?> endDate,
       Value<bool> active,
+      Value<String?> instructions,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
     });
 
 final class $$MeasurementSchedulesTableReferences
@@ -19604,6 +20193,36 @@ final class $$MeasurementSchedulesTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<
+    $MeasurementReminderLogsTable,
+    List<MeasurementReminderLog>
+  >
+  _measurementReminderLogsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.measurementReminderLogs,
+    aliasName:
+        'measurement_schedules__id__measurement_reminder_logs__measurement_schedule_id',
+  );
+
+  $$MeasurementReminderLogsTableProcessedTableManager
+  get measurementReminderLogsRefs {
+    final manager =
+        $$MeasurementReminderLogsTableTableManager(
+          $_db,
+          $_db.measurementReminderLogs,
+        ).filter(
+          (f) => f.measurementScheduleId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _measurementReminderLogsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MeasurementSchedulesTableFilterComposer
@@ -19637,6 +20256,21 @@ class $$MeasurementSchedulesTableFilterComposer
 
   ColumnFilters<bool> get active => $composableBuilder(
     column: $table.active,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get instructions => $composableBuilder(
+    column: $table.instructions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -19685,6 +20319,32 @@ class $$MeasurementSchedulesTableFilterComposer
     );
     return composer;
   }
+
+  Expression<bool> measurementReminderLogsRefs(
+    Expression<bool> Function($$MeasurementReminderLogsTableFilterComposer f) f,
+  ) {
+    final $$MeasurementReminderLogsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.measurementReminderLogs,
+          getReferencedColumn: (t) => t.measurementScheduleId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementReminderLogsTableFilterComposer(
+                $db: $db,
+                $table: $db.measurementReminderLogs,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MeasurementSchedulesTableOrderingComposer
@@ -19718,6 +20378,21 @@ class $$MeasurementSchedulesTableOrderingComposer
 
   ColumnOrderings<bool> get active => $composableBuilder(
     column: $table.active,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get instructions => $composableBuilder(
+    column: $table.instructions,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -19794,6 +20469,17 @@ class $$MeasurementSchedulesTableAnnotationComposer
   GeneratedColumn<bool> get active =>
       $composableBuilder(column: $table.active, builder: (column) => column);
 
+  GeneratedColumn<String> get instructions => $composableBuilder(
+    column: $table.instructions,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
   $$ProfilesTableAnnotationComposer get profileId {
     final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -19839,6 +20525,33 @@ class $$MeasurementSchedulesTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> measurementReminderLogsRefs<T extends Object>(
+    Expression<T> Function($$MeasurementReminderLogsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$MeasurementReminderLogsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.measurementReminderLogs,
+          getReferencedColumn: (t) => t.measurementScheduleId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementReminderLogsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.measurementReminderLogs,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MeasurementSchedulesTableTableManager
@@ -19854,7 +20567,11 @@ class $$MeasurementSchedulesTableTableManager
           $$MeasurementSchedulesTableUpdateCompanionBuilder,
           (MeasurementSchedule, $$MeasurementSchedulesTableReferences),
           MeasurementSchedule,
-          PrefetchHooks Function({bool profileId, bool measurementTypeId})
+          PrefetchHooks Function({
+            bool profileId,
+            bool measurementTypeId,
+            bool measurementReminderLogsRefs,
+          })
         > {
   $$MeasurementSchedulesTableTableManager(
     _$AppDatabase db,
@@ -19884,6 +20601,9 @@ class $$MeasurementSchedulesTableTableManager
                 Value<DateTime?> startDate = const Value.absent(),
                 Value<DateTime?> endDate = const Value.absent(),
                 Value<bool> active = const Value.absent(),
+                Value<String?> instructions = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
               }) => MeasurementSchedulesCompanion(
                 id: id,
                 profileId: profileId,
@@ -19892,6 +20612,9 @@ class $$MeasurementSchedulesTableTableManager
                 startDate: startDate,
                 endDate: endDate,
                 active: active,
+                instructions: instructions,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
               ),
           createCompanionCallback:
               ({
@@ -19902,6 +20625,9 @@ class $$MeasurementSchedulesTableTableManager
                 Value<DateTime?> startDate = const Value.absent(),
                 Value<DateTime?> endDate = const Value.absent(),
                 Value<bool> active = const Value.absent(),
+                Value<String?> instructions = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
               }) => MeasurementSchedulesCompanion.insert(
                 id: id,
                 profileId: profileId,
@@ -19910,6 +20636,9 @@ class $$MeasurementSchedulesTableTableManager
                 startDate: startDate,
                 endDate: endDate,
                 active: active,
+                instructions: instructions,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -19920,10 +20649,16 @@ class $$MeasurementSchedulesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({profileId = false, measurementTypeId = false}) {
+              ({
+                profileId = false,
+                measurementTypeId = false,
+                measurementReminderLogsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [],
+                  explicitlyWatchedTables: [
+                    if (measurementReminderLogsRefs) db.measurementReminderLogs,
+                  ],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -19974,7 +20709,29 @@ class $$MeasurementSchedulesTableTableManager
                         return state;
                       },
                   getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return [
+                      if (measurementReminderLogsRefs)
+                        await $_getPrefetchedData<
+                          MeasurementSchedule,
+                          $MeasurementSchedulesTable,
+                          MeasurementReminderLog
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MeasurementSchedulesTableReferences
+                              ._measurementReminderLogsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MeasurementSchedulesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).measurementReminderLogsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.measurementScheduleId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
                 );
               },
@@ -19994,7 +20751,374 @@ typedef $$MeasurementSchedulesTableProcessedTableManager =
       $$MeasurementSchedulesTableUpdateCompanionBuilder,
       (MeasurementSchedule, $$MeasurementSchedulesTableReferences),
       MeasurementSchedule,
-      PrefetchHooks Function({bool profileId, bool measurementTypeId})
+      PrefetchHooks Function({
+        bool profileId,
+        bool measurementTypeId,
+        bool measurementReminderLogsRefs,
+      })
+    >;
+typedef $$MeasurementReminderLogsTableCreateCompanionBuilder =
+    MeasurementReminderLogsCompanion Function({
+      Value<int> id,
+      required int measurementScheduleId,
+      required DateTime scheduledTime,
+      Value<DateTime?> actionTime,
+      required String status,
+      required DateTime createdAt,
+    });
+typedef $$MeasurementReminderLogsTableUpdateCompanionBuilder =
+    MeasurementReminderLogsCompanion Function({
+      Value<int> id,
+      Value<int> measurementScheduleId,
+      Value<DateTime> scheduledTime,
+      Value<DateTime?> actionTime,
+      Value<String> status,
+      Value<DateTime> createdAt,
+    });
+
+final class $$MeasurementReminderLogsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MeasurementReminderLogsTable,
+          MeasurementReminderLog
+        > {
+  $$MeasurementReminderLogsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MeasurementSchedulesTable _measurementScheduleIdTable(
+    _$AppDatabase db,
+  ) => db.measurementSchedules.createAlias(
+    'measurement_reminder_logs__measurement_schedule_id__measurement_schedules__id',
+  );
+
+  $$MeasurementSchedulesTableProcessedTableManager get measurementScheduleId {
+    final $_column = $_itemColumn<int>('measurement_schedule_id')!;
+
+    final manager = $$MeasurementSchedulesTableTableManager(
+      $_db,
+      $_db.measurementSchedules,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _measurementScheduleIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MeasurementReminderLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $MeasurementReminderLogsTable> {
+  $$MeasurementReminderLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get actionTime => $composableBuilder(
+    column: $table.actionTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MeasurementSchedulesTableFilterComposer get measurementScheduleId {
+    final $$MeasurementSchedulesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.measurementScheduleId,
+      referencedTable: $db.measurementSchedules,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeasurementSchedulesTableFilterComposer(
+            $db: $db,
+            $table: $db.measurementSchedules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeasurementReminderLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MeasurementReminderLogsTable> {
+  $$MeasurementReminderLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get actionTime => $composableBuilder(
+    column: $table.actionTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MeasurementSchedulesTableOrderingComposer get measurementScheduleId {
+    final $$MeasurementSchedulesTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.measurementScheduleId,
+          referencedTable: $db.measurementSchedules,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementSchedulesTableOrderingComposer(
+                $db: $db,
+                $table: $db.measurementSchedules,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$MeasurementReminderLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MeasurementReminderLogsTable> {
+  $$MeasurementReminderLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get actionTime => $composableBuilder(
+    column: $table.actionTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$MeasurementSchedulesTableAnnotationComposer get measurementScheduleId {
+    final $$MeasurementSchedulesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.measurementScheduleId,
+          referencedTable: $db.measurementSchedules,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MeasurementSchedulesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.measurementSchedules,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$MeasurementReminderLogsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MeasurementReminderLogsTable,
+          MeasurementReminderLog,
+          $$MeasurementReminderLogsTableFilterComposer,
+          $$MeasurementReminderLogsTableOrderingComposer,
+          $$MeasurementReminderLogsTableAnnotationComposer,
+          $$MeasurementReminderLogsTableCreateCompanionBuilder,
+          $$MeasurementReminderLogsTableUpdateCompanionBuilder,
+          (MeasurementReminderLog, $$MeasurementReminderLogsTableReferences),
+          MeasurementReminderLog,
+          PrefetchHooks Function({bool measurementScheduleId})
+        > {
+  $$MeasurementReminderLogsTableTableManager(
+    _$AppDatabase db,
+    $MeasurementReminderLogsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MeasurementReminderLogsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$MeasurementReminderLogsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MeasurementReminderLogsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> measurementScheduleId = const Value.absent(),
+                Value<DateTime> scheduledTime = const Value.absent(),
+                Value<DateTime?> actionTime = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MeasurementReminderLogsCompanion(
+                id: id,
+                measurementScheduleId: measurementScheduleId,
+                scheduledTime: scheduledTime,
+                actionTime: actionTime,
+                status: status,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int measurementScheduleId,
+                required DateTime scheduledTime,
+                Value<DateTime?> actionTime = const Value.absent(),
+                required String status,
+                required DateTime createdAt,
+              }) => MeasurementReminderLogsCompanion.insert(
+                id: id,
+                measurementScheduleId: measurementScheduleId,
+                scheduledTime: scheduledTime,
+                actionTime: actionTime,
+                status: status,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MeasurementReminderLogsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({measurementScheduleId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (measurementScheduleId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.measurementScheduleId,
+                                referencedTable:
+                                    $$MeasurementReminderLogsTableReferences
+                                        ._measurementScheduleIdTable(db),
+                                referencedColumn:
+                                    $$MeasurementReminderLogsTableReferences
+                                        ._measurementScheduleIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MeasurementReminderLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MeasurementReminderLogsTable,
+      MeasurementReminderLog,
+      $$MeasurementReminderLogsTableFilterComposer,
+      $$MeasurementReminderLogsTableOrderingComposer,
+      $$MeasurementReminderLogsTableAnnotationComposer,
+      $$MeasurementReminderLogsTableCreateCompanionBuilder,
+      $$MeasurementReminderLogsTableUpdateCompanionBuilder,
+      (MeasurementReminderLog, $$MeasurementReminderLogsTableReferences),
+      MeasurementReminderLog,
+      PrefetchHooks Function({bool measurementScheduleId})
     >;
 typedef $$ExerciseTypesTableCreateCompanionBuilder =
     ExerciseTypesCompanion Function({
@@ -24371,6 +25495,11 @@ class $AppDatabaseManager {
       );
   $$MeasurementSchedulesTableTableManager get measurementSchedules =>
       $$MeasurementSchedulesTableTableManager(_db, _db.measurementSchedules);
+  $$MeasurementReminderLogsTableTableManager get measurementReminderLogs =>
+      $$MeasurementReminderLogsTableTableManager(
+        _db,
+        _db.measurementReminderLogs,
+      );
   $$ExerciseTypesTableTableManager get exerciseTypes =>
       $$ExerciseTypesTableTableManager(_db, _db.exerciseTypes);
   $$ExerciseGoalsTableTableManager get exerciseGoals =>

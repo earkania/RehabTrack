@@ -6,6 +6,7 @@ import 'package:rehab_track/domain/entities/blood_pressure_component_status.dart
 import 'package:rehab_track/domain/entities/default_reference_ranges.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
+import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/services/blood_pressure_status_evaluator.dart';
 import 'package:rehab_track/domain/services/reading_status_calculator.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
@@ -110,64 +111,12 @@ class MeasurementHistoryScreen extends ConsumerWidget {
                 ),
                 error: (e, _) => Center(child: Text(l10n.error)),
                 data: (fields) {
-                  if (records.isEmpty) {
-                    return EmptyState(
-                      icon: Icons.history,
-                      title: l10n.noReadingsYet,
-                      subtitle: l10n.addFirstReading,
-                    );
-                  }
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                          vertical: AppSpacing.sm,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                MeasurementLocalizer.typeName(l10n, type.key),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.separated(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                          ),
-                          itemCount: records.length,
-                          separatorBuilder: (_, _) =>
-                              const Divider(height: 1),
-                          itemBuilder: (context, index) {
-                            final record = records[index];
-                            final effectiveRanges =
-                                effectiveRangesAsync.valueOrNull;
-                            return _RecordTile(
-                              record: record,
-                              fields: fields,
-                              type: type,
-                              effectiveRanges: effectiveRanges,
-                              onEdit: () => context.push(
-                                AppRoutes.measurementEdit(record.id!),
-                              ),
-                              onDelete: () => _confirmDelete(
-                                context,
-                                ref,
-                                l10n,
-                                record,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                  return _HistoryBody(
+                    measurementTypeId: measurementTypeId,
+                    type: type,
+                    fields: fields,
+                    records: records,
+                    effectiveRangesAsync: effectiveRangesAsync,
                   );
                 },
               );
@@ -247,46 +196,6 @@ class MeasurementHistoryScreen extends ConsumerWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _confirmDelete(
-    BuildContext context,
-    WidgetRef ref,
-    AppLocalizations l10n,
-    MeasurementRecord record,
-  ) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.delete),
-        content: Text(l10n.confirmDeleteMeasurement),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              final repo = ref.read(measurementRepositoryProvider);
-              await repo.deleteRecord(record.id!);
-              ref.invalidate(measurementRecordsProvider);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.measurementDeleted)),
-                );
-              }
-            },
-            child: Text(
-              l10n.delete,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -632,5 +541,332 @@ class _RecordTile extends StatelessWidget {
         '${dt.year} '
         '${dt.hour.toString().padLeft(2, '0')}:'
         '${dt.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+class _HistoryBody extends ConsumerWidget {
+  final int measurementTypeId;
+  final MeasurementType type;
+  final List<MeasurementTypeField> fields;
+  final List<MeasurementRecord> records;
+  final AsyncValue<MeasurementRanges?> effectiveRangesAsync;
+
+  const _HistoryBody({
+    required this.measurementTypeId,
+    required this.type,
+    required this.fields,
+    required this.records,
+    required this.effectiveRangesAsync,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final schedulesAsync = ref.watch(
+      measurementSchedulesForTypeProvider(measurementTypeId),
+    );
+
+    return Column(
+      children: [
+        schedulesAsync.when(
+          loading: () => const SizedBox.shrink(),
+          error: (Object e, StackTrace st) => const SizedBox.shrink(),
+          data: (schedules) {
+            if (schedules.isEmpty) return const SizedBox.shrink();
+            return _SchedulesSection(
+              schedules: schedules,
+              measurementTypeId: measurementTypeId,
+              onDelete: (scheduleId) => _confirmDeleteSchedule(
+                context,
+                ref,
+                l10n,
+                scheduleId,
+              ),
+            );
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  MeasurementLocalizer.typeName(l10n, type.key),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (records.isEmpty)
+          Expanded(
+            child: EmptyState(
+              icon: Icons.history,
+              title: l10n.noReadingsYet,
+              subtitle: l10n.addFirstReading,
+            ),
+          )
+        else
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+              ),
+              itemCount: records.length,
+              separatorBuilder: (_, _) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final record = records[index];
+                final effectiveRanges =
+                    effectiveRangesAsync.valueOrNull;
+                return _RecordTile(
+                  record: record,
+                  fields: fields,
+                  type: type,
+                  effectiveRanges: effectiveRanges,
+                  onEdit: () => context.push(
+                    AppRoutes.measurementEdit(record.id!),
+                  ),
+                  onDelete: () => _confirmDeleteRecord(
+                    context,
+                    ref,
+                    l10n,
+                    record,
+                  ),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _confirmDeleteRecord(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    MeasurementRecord record,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.delete),
+        content: Text(l10n.confirmDeleteMeasurement),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final repo = ref.read(measurementRepositoryProvider);
+              await repo.deleteRecord(record.id!);
+              ref.invalidate(measurementRecordsProvider);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.measurementDeleted)),
+                );
+              }
+            },
+            child: Text(
+              l10n.delete,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteSchedule(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    int scheduleId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.deleteSchedule),
+        content: Text(l10n.deleteScheduleConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final repo = ref.read(measurementRepositoryProvider);
+              await repo.deleteSchedule(scheduleId);
+              ref.invalidate(
+                measurementSchedulesForTypeProvider(measurementTypeId),
+              );
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.scheduleDeleted)),
+                );
+              }
+            },
+            child: Text(
+              l10n.delete,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SchedulesSection extends StatelessWidget {
+  final List<MeasurementSchedule> schedules;
+  final int measurementTypeId;
+  final ValueChanged<int> onDelete;
+
+  const _SchedulesSection({
+    required this.schedules,
+    required this.measurementTypeId,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.sm,
+        AppSpacing.md,
+        0,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.sm,
+              AppSpacing.sm,
+              0,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.schedule,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Text(
+                    l10n.schedulesSection,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add, size: 20),
+                  tooltip: l10n.addMeasurementSchedule,
+                  onPressed: () => context.push(
+                    AppRoutes.measurementScheduleAdd(measurementTypeId),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ...schedules.map(
+            (schedule) => _ScheduleTile(
+              schedule: schedule,
+              onDelete: () => onDelete(schedule.id!),
+              onTap: () => context.push(
+                AppRoutes.measurementScheduleEdit(
+                  measurementTypeId,
+                  schedule.id!,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScheduleTile extends StatelessWidget {
+  final MeasurementSchedule schedule;
+  final VoidCallback onDelete;
+  final VoidCallback onTap;
+
+  const _ScheduleTile({
+    required this.schedule,
+    required this.onDelete,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    final String scheduleLabel;
+    switch (schedule.scheduleConfig) {
+      case DailySchedule():
+        scheduleLabel = l10n.daily;
+      case IntervalDaysSchedule(:final intervalDays):
+        scheduleLabel = '${l10n.everyNDaysLabel} ($intervalDays)';
+    }
+
+    final times = schedule.scheduleConfig.times;
+    final timesStr = times.join(', ');
+
+    return ListTile(
+      dense: true,
+      leading: Icon(
+        schedule.active ? Icons.alarm : Icons.alarm_off,
+        size: 20,
+        color: schedule.active
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onSurfaceVariant,
+      ),
+      title: Text(
+        scheduleLabel,
+        style: theme.textTheme.bodyMedium,
+      ),
+      subtitle: Text(
+        timesStr,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+      trailing: PopupMenuButton<String>(
+        onSelected: (value) {
+          if (value == 'edit') onTap();
+          if (value == 'delete') onDelete();
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
+          PopupMenuItem(
+            value: 'delete',
+            child: Text(
+              l10n.delete,
+              style: TextStyle(color: theme.colorScheme.error),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

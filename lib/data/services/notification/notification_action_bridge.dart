@@ -3,11 +3,14 @@ import 'dart:developer';
 
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:rehab_track/data/services/notification/measurement_notification_helper.dart';
 import 'package:rehab_track/data/services/notification/notification_action_handler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/data/services/notification/schedule_recovery_service.dart';
+import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/presentation/utils/dose_formatter.dart';
 
@@ -16,22 +19,32 @@ class NotificationActionBridge {
     required this._notificationService,
     required ScheduleRecoveryService scheduleRecoveryService,
     required this._medicationRepository,
+    required this._measurementRepository,
   }) : _scheduleRecoveryService = scheduleRecoveryService;
 
   final NotificationService _notificationService;
   final ScheduleRecoveryService _scheduleRecoveryService;
   final MedicationRepository _medicationRepository;
+  final MeasurementRepository _measurementRepository;
 
   Future<void> initialize({required int profileId}) async {
     _notificationService.setActionCallback(_handleAction);
     log('NotificationActionBridge: action callback registered');
 
     await _recoverSchedules(profileId);
+    await _recoverMeasurementSchedules(profileId);
   }
 
   void _handleAction(NotificationActionResponse response) {
     log('NotificationActionBridge: action=${response.actionType.name}, '
         'notificationId=${response.notificationId}');
+
+    final measurementPayload =
+        MeasurementNotificationHelper.parsePayload(response.payload);
+    if (measurementPayload != null && measurementPayload.isValid) {
+      _handleMeasurementAction(response, measurementPayload);
+      return;
+    }
 
     final payload = _parsePayload(response.payload);
     if (payload == null) {
@@ -176,6 +189,251 @@ class NotificationActionBridge {
     } catch (e) {
       log('NotificationActionBridge: failed to snooze: $e');
     }
+  }
+
+  // --- Measurement notification actions ---
+
+  void _handleMeasurementAction(
+    NotificationActionResponse response,
+    MeasurementNotificationPayload payload,
+  ) {
+    switch (response.actionType) {
+      case NotificationActionType.taken:
+        _handleMeasurementCompleted(response, payload);
+      case NotificationActionType.skipped:
+        _handleMeasurementSkipped(response, payload);
+      case NotificationActionType.snoozed:
+        _handleMeasurementSnooze(response, payload);
+    }
+  }
+
+  Future<void> _handleMeasurementCompleted(
+    NotificationActionResponse response,
+    MeasurementNotificationPayload payload,
+  ) async {
+    final scheduledTime = payload.scheduledTime != null
+        ? DateTime.tryParse(payload.scheduledTime!)
+        : DateTime.now();
+
+    if (scheduledTime == null) return;
+
+    final existing = await _measurementRepository.getReminderLog(
+      payload.scheduleId,
+      scheduledTime,
+    );
+
+    if (existing != null && existing.id != null) {
+      await _measurementRepository.updateReminderLog(
+        existing.copyWith(
+          status: MeasurementReminderAction.completed,
+          actionTime: DateTime.now(),
+        ),
+      );
+    } else {
+      await _measurementRepository.logReminder(
+        MeasurementReminderLog(
+          measurementScheduleId: payload.scheduleId,
+          scheduledTime: scheduledTime,
+          actionTime: DateTime.now(),
+          status: MeasurementReminderAction.completed,
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
+    log('NotificationActionBridge: measurement reminder completed '
+        'for schedule ${payload.scheduleId}');
+  }
+
+  Future<void> _handleMeasurementSkipped(
+    NotificationActionResponse response,
+    MeasurementNotificationPayload payload,
+  ) async {
+    final scheduledTime = payload.scheduledTime != null
+        ? DateTime.tryParse(payload.scheduledTime!)
+        : DateTime.now();
+
+    if (scheduledTime == null) return;
+
+    final existing = await _measurementRepository.getReminderLog(
+      payload.scheduleId,
+      scheduledTime,
+    );
+
+    if (existing != null && existing.id != null) {
+      await _measurementRepository.updateReminderLog(
+        existing.copyWith(
+          status: MeasurementReminderAction.skipped,
+          actionTime: DateTime.now(),
+        ),
+      );
+    } else {
+      await _measurementRepository.logReminder(
+        MeasurementReminderLog(
+          measurementScheduleId: payload.scheduleId,
+          scheduledTime: scheduledTime,
+          actionTime: DateTime.now(),
+          status: MeasurementReminderAction.skipped,
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
+    log('NotificationActionBridge: measurement reminder skipped '
+        'for schedule ${payload.scheduleId}');
+  }
+
+  Future<void> _handleMeasurementSnooze(
+    NotificationActionResponse response,
+    MeasurementNotificationPayload payload,
+  ) async {
+    try {
+      final schedule = await _measurementRepository.getSchedule(
+        payload.scheduleId,
+      );
+      if (schedule == null) {
+        log('NotificationActionBridge: measurement schedule '
+            '${payload.scheduleId} not found for snooze');
+        return;
+      }
+
+      final type = await _measurementRepository.getMeasurementType(
+        payload.measurementTypeId,
+      );
+      final typeName = type?.name ?? 'Measurement';
+
+      final title = 'Time to record $typeName';
+      final body = _buildMeasurementBody(type, schedule);
+      final snoozePayload = MeasurementNotificationHelper.buildPayload(
+        scheduleId: payload.scheduleId,
+        measurementTypeId: payload.measurementTypeId,
+        profileId: payload.profileId,
+        scheduledTime: payload.scheduledTime,
+      );
+
+      final now = DateTime.now();
+      final snoozeTime = now.add(const Duration(minutes: 10));
+      final tzLocation = tz.local;
+      final scheduledDate = tz.TZDateTime(
+        tzLocation,
+        snoozeTime.year,
+        snoozeTime.month,
+        snoozeTime.day,
+        snoozeTime.hour,
+        snoozeTime.minute,
+      );
+
+      final notifId = MeasurementNotificationHelper.baseNotificationId(
+        payload.scheduleId,
+      );
+
+      await _notificationService.scheduleNotification(
+        id: notifId,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        channelType: NotificationChannelType.measurement,
+        payload: snoozePayload,
+        includeActions: true,
+      );
+
+      // Log snooze
+      final scheduledTime = payload.scheduledTime != null
+          ? DateTime.tryParse(payload.scheduledTime!)
+          : DateTime.now();
+      if (scheduledTime != null) {
+        final existing = await _measurementRepository.getReminderLog(
+          payload.scheduleId,
+          scheduledTime,
+        );
+        if (existing != null && existing.id != null) {
+          await _measurementRepository.updateReminderLog(
+            existing.copyWith(
+              status: MeasurementReminderAction.snoozed,
+              actionTime: DateTime.now(),
+            ),
+          );
+        }
+      }
+
+      log('NotificationActionBridge: snoozed measurement notification '
+          '$notifId for $snoozeTime');
+    } catch (e) {
+      log('NotificationActionBridge: failed to snooze measurement: $e');
+    }
+  }
+
+  // --- Measurement schedule recovery ---
+
+  Future<void> _recoverMeasurementSchedules(int profileId) async {
+    try {
+      final schedules =
+          await _measurementRepository.getActiveSchedules(profileId);
+
+      final entries = <ScheduleRecoveryEntry>[];
+
+      for (final schedule in schedules) {
+        if (!schedule.active || schedule.id == null) continue;
+
+        final type = await _measurementRepository.getMeasurementType(
+          schedule.measurementTypeId,
+        );
+
+        entries.add(_buildMeasurementRecoveryEntry(type, schedule));
+      }
+
+      if (entries.isEmpty) {
+        log('NotificationActionBridge: no active measurement schedules '
+            'to recover');
+        return;
+      }
+
+      await _scheduleRecoveryService.recoverAllSchedules(
+        activeSchedules: entries,
+      );
+      log('NotificationActionBridge: measurement recovery complete, '
+          '${entries.length} schedule entries processed');
+    } catch (e) {
+      log('NotificationActionBridge: measurement recovery failed: $e');
+    }
+  }
+
+  ScheduleRecoveryEntry _buildMeasurementRecoveryEntry(
+    MeasurementType? type,
+    MeasurementSchedule schedule,
+  ) {
+    final notificationIds = MeasurementNotificationHelper.computeNotificationIds(
+      scheduleId: schedule.id!,
+      config: schedule.scheduleConfig,
+    );
+
+    final typeName = type?.name ?? 'Measurement';
+    final payload = MeasurementNotificationHelper.buildPayload(
+      scheduleId: schedule.id!,
+      measurementTypeId: schedule.measurementTypeId,
+      profileId: schedule.profileId,
+    );
+
+    return ScheduleRecoveryEntry(
+      notificationIds: notificationIds,
+      title: 'Time to record $typeName',
+      body: _buildMeasurementBody(type, schedule),
+      config: schedule.scheduleConfig,
+      channelType: NotificationChannelType.measurement,
+      payload: payload,
+      includeActions: true,
+    );
+  }
+
+  static String _buildMeasurementBody(
+    MeasurementType? type,
+    MeasurementSchedule schedule,
+  ) {
+    final parts = <String>[];
+    parts.add('Please record your ${type?.name.toLowerCase() ?? 'measurement'}');
+    if (schedule.instructions != null &&
+        schedule.instructions!.isNotEmpty) {
+      parts.add(schedule.instructions!);
+    }
+    return parts.join(' — ');
   }
 
   Future<void> _recoverSchedules(int profileId) async {

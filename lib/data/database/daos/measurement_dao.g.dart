@@ -15,6 +15,8 @@ mixin _$MeasurementDaoMixin on DatabaseAccessor<AppDatabase> {
       attachedDatabase.measurementRecordValues;
   $MeasurementSchedulesTable get measurementSchedules =>
       attachedDatabase.measurementSchedules;
+  $MeasurementReminderLogsTable get measurementReminderLogs =>
+      attachedDatabase.measurementReminderLogs;
   MeasurementDaoManager get managers => MeasurementDaoManager(this);
 }
 
@@ -47,5 +49,10 @@ class MeasurementDaoManager {
       $$MeasurementSchedulesTableTableManager(
         _db.attachedDatabase,
         _db.measurementSchedules,
+      );
+  $$MeasurementReminderLogsTableTableManager get measurementReminderLogs =>
+      $$MeasurementReminderLogsTableTableManager(
+        _db.attachedDatabase,
+        _db.measurementReminderLogs,
       );
 }

@@ -172,7 +172,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get missed => 'გამოტოვილი';
 
   @override
-  String get skipped => 'გაცდენილი';
+  String get skipped => 'გამოტოვებული';
 
   @override
   String get pending => 'მოლოდინში';
@@ -319,11 +319,11 @@ class AppLocalizationsKa extends AppLocalizations {
   String get schedules => 'გრაფიკები';
 
   @override
-  String get deleteSchedule => 'გრაფიკის წაშლა';
+  String get deleteSchedule => 'წაშალეთ გრაფიკი';
 
   @override
   String get deleteScheduleConfirmation =>
-      'წაშალოთ ეს გრაფიკი? შეტყობინებები გაუქმდება.';
+      'დარწმუნებული ხართ რომ გსურთ ამ გრაფიკის წაშლა?';
 
   @override
   String get selectTime => 'აირჩიეთ დრო';
@@ -335,7 +335,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get removeTime => 'წაშლა';
 
   @override
-  String get intervalDays => 'ინტერვალი (დღე)';
+  String get intervalDays => 'ინტერვალი (დღეები)';
 
   @override
   String get atLeastOneTimeRequired => 'სულ მცირე ერთი დრო საჭიროა';
@@ -356,7 +356,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get schedulesSection => 'გრაფიკები';
 
   @override
-  String get addScheduleSubtitle => 'დააყენეთ შეხსენებები ამ მედიკამენტისთვის';
+  String get addScheduleSubtitle => 'დაამატეთ გრაფიკი შეხსენებებისთვის';
 
   @override
   String get editAlternative => 'ალტერნატივის რედაქტირება';
@@ -821,4 +821,74 @@ class AppLocalizationsKa extends AppLocalizations {
   String componentStatusPulse(String status) {
     return 'პულსი $status';
   }
+
+  @override
+  String get measurementSchedules => 'გაზომვების გრაფიკი';
+
+  @override
+  String get addMeasurementSchedule => 'დაამატეთ გაზომვის გრაფიკი';
+
+  @override
+  String get editMeasurementSchedule => 'შეცვალეთ გაზომვის გრაფიკი';
+
+  @override
+  String get noMeasurementSchedules => 'გაზომვების გრაფიკი არ არსებობს';
+
+  @override
+  String get noMeasurementSchedulesDescription =>
+      'დაამატეთ გრაფიკი შეხსენებებისთვის';
+
+  @override
+  String get daily => 'ყოველდღიური';
+
+  @override
+  String get everyNDaysLabel => 'ყოველ N დღეში';
+
+  @override
+  String get everyNDaysRequiresStartDate =>
+      'ყოველ N დღეში საჭიროებს დაწყების თარიღს';
+
+  @override
+  String get recordNow => 'ჩაწერეთ ახლა';
+
+  @override
+  String get measurementReminder => 'გაზომვის შეხსენება';
+
+  @override
+  String get measurementReminders => 'გაზომვების შეხსენებები';
+
+  @override
+  String timeToRecordMeasurement(String name) {
+    return 'დროა ჩაწეროთ $name';
+  }
+
+  @override
+  String get reminderScheduled => 'შეხსენება დაგეგმილია';
+
+  @override
+  String get reminderUpdated => 'შეხსენება განახლდა';
+
+  @override
+  String get reminderDeleted => 'შეხსენება წაიშალა';
+
+  @override
+  String get scheduleRecovered => 'გრაფიკი აღდგენილია';
+
+  @override
+  String get measurementsDueToday => 'დღეს გასაკეთებელი გაზომვები';
+
+  @override
+  String get noRemindersToday => 'დღეს შეხსენებები არ არის დაგეგმილი';
+
+  @override
+  String get upcoming => 'მომდევნო';
+
+  @override
+  String get overdue => 'ვადაგასული';
+
+  @override
+  String get completed => 'დასრულებული';
+
+  @override
+  String get snoozed => 'გადადებული';
 }

@@ -61,7 +61,30 @@ abstract class MeasurementRepository {
 
   // --- MeasurementSchedules ---
   Stream<List<MeasurementSchedule>> watchSchedules(int profileId);
+  Stream<List<MeasurementSchedule>> watchSchedulesForType(
+    int measurementTypeId,
+  );
+  Future<MeasurementSchedule?> getSchedule(int id);
+  Future<List<MeasurementSchedule>> getActiveSchedules(int profileId);
+  Stream<List<MeasurementSchedule>> watchActiveSchedules(int profileId);
   Future<int> createSchedule(MeasurementSchedule schedule);
   Future<void> updateSchedule(MeasurementSchedule schedule);
   Future<void> deleteSchedule(int id);
+
+  // --- MeasurementReminderLogs ---
+  Future<int> logReminder(MeasurementReminderLog log);
+  Future<void> updateReminderLog(MeasurementReminderLog log);
+  Future<MeasurementReminderLog?> getReminderLog(
+    int scheduleId,
+    DateTime scheduledTime,
+  );
+  Future<List<MeasurementReminderLog>> getReminderLogsForSchedule(
+    int scheduleId,
+  );
+  Stream<List<MeasurementReminderLog>> watchReminderLogsForSchedule(
+    int scheduleId,
+  );
+  Future<List<MeasurementReminderLog>> getTodayReminderLogs(
+    int profileId,
+  );
 }

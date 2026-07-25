@@ -177,3 +177,145 @@ final trendTypeProvider =
         return repo.getMeasurementType(typeId);
       },
     );
+
+// --- Measurement Schedule providers ---
+
+final measurementSchedulesForTypeProvider =
+    StreamProvider.autoDispose.family<List<MeasurementSchedule>, int>(
+      (ref, typeId) {
+        final repo = ref.watch(measurementRepositoryProvider);
+        return repo.watchSchedulesForType(typeId);
+      },
+    );
+
+final measurementScheduleProvider =
+    FutureProvider.autoDispose.family<MeasurementSchedule?, int>(
+      (ref, scheduleId) async {
+        final repo = ref.watch(measurementRepositoryProvider);
+        return repo.getSchedule(scheduleId);
+      },
+    );
+
+final activeMeasurementSchedulesProvider =
+    StreamProvider.autoDispose<List<MeasurementSchedule>>((ref) {
+      final profileId = ref.watch(activeProfileIdProvider);
+      if (profileId == null) return const Stream.empty();
+      final repo = ref.watch(measurementRepositoryProvider);
+      return repo.watchActiveSchedules(profileId);
+    });
+
+// --- Measurement Reminder Log providers ---
+
+final measurementReminderLogsProvider =
+    StreamProvider.autoDispose.family<List<MeasurementReminderLog>, int>(
+      (ref, scheduleId) {
+        final repo = ref.watch(measurementRepositoryProvider);
+        return repo.watchReminderLogsForSchedule(scheduleId);
+      },
+    );
+
+final todayMeasurementRemindersProvider =
+    FutureProvider.autoDispose<List<_TodayMeasurementReminder>>(
+      (ref) async {
+        final profileId = ref.watch(activeProfileIdProvider);
+        if (profileId == null) return [];
+
+        final repo = ref.watch(measurementRepositoryProvider);
+        final logs = await repo.getTodayReminderLogs(profileId);
+        final activeSchedules = await repo.getActiveSchedules(profileId);
+
+        if (activeSchedules.isEmpty) return [];
+
+        final scheduleMap = <int, MeasurementSchedule>{};
+        for (final s in activeSchedules) {
+          if (s.id != null) scheduleMap[s.id!] = s;
+        }
+
+        final typeIds = activeSchedules
+            .map((s) => s.measurementTypeId)
+            .toSet()
+            .toList();
+        final types = <int, MeasurementType>{};
+        for (final tid in typeIds) {
+          final type = await repo.getMeasurementType(tid);
+          if (type != null) types[tid] = type;
+        }
+
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final tomorrow = today.add(const Duration(days: 1));
+
+        final reminders = <_TodayMeasurementReminder>[];
+
+        for (final schedule in activeSchedules) {
+          if (schedule.id == null) continue;
+          final times = schedule.scheduleConfig.times;
+          final type = types[schedule.measurementTypeId];
+
+          for (final timeStr in times) {
+            final parts = timeStr.split(':');
+            if (parts.length != 2) continue;
+            final hour = int.tryParse(parts[0]);
+            final minute = int.tryParse(parts[1]);
+            if (hour == null || minute == null) continue;
+
+            final scheduledTime = DateTime(
+              today.year,
+              today.month,
+              today.day,
+              hour,
+              minute,
+            );
+
+            if (scheduledTime.isBefore(tomorrow) == false) continue;
+
+            final logEntry = logs.where((l) =>
+                l.measurementScheduleId == schedule.id &&
+                l.scheduledTime.year == scheduledTime.year &&
+                l.scheduledTime.month == scheduledTime.month &&
+                l.scheduledTime.day == scheduledTime.day &&
+                l.scheduledTime.hour == scheduledTime.hour &&
+                l.scheduledTime.minute == scheduledTime.minute).firstOrNull;
+
+            reminders.add(_TodayMeasurementReminder(
+              schedule: schedule,
+              typeName: type?.name ?? 'Measurement',
+              typeKey: type?.key ?? '',
+              scheduledTime: scheduledTime,
+              logEntry: logEntry,
+            ));
+          }
+        }
+
+        reminders.sort((a, b) => a.scheduledTime.compareTo(b.scheduledTime));
+        return reminders;
+      },
+    );
+
+class _TodayMeasurementReminder {
+  final MeasurementSchedule schedule;
+  final String typeName;
+  final String typeKey;
+  final DateTime scheduledTime;
+  final MeasurementReminderLog? logEntry;
+
+  const _TodayMeasurementReminder({
+    required this.schedule,
+    required this.typeName,
+    required this.typeKey,
+    required this.scheduledTime,
+    this.logEntry,
+  });
+
+  bool get isCompleted =>
+      logEntry?.status == MeasurementReminderAction.completed;
+  bool get isSkipped =>
+      logEntry?.status == MeasurementReminderAction.skipped;
+  bool get isSnoozed =>
+      logEntry?.status == MeasurementReminderAction.snoozed;
+  bool get isPending => logEntry == null;
+  bool get isOverdue =>
+      !isCompleted &&
+      !isSkipped &&
+      DateTime.now().isAfter(scheduledTime);
+}

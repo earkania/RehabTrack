@@ -1419,6 +1419,113 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 ---
 
+### Phase 5C — Measurement Schedules and Reminders
+
+**Date:** 2026-07-25
+
+**Status:** Completed
+
+**What was done:**
+
+#### Domain Entities Extended
+- **`MeasurementSchedule`** — added `instructions` (String?), `createdAt`, `updatedAt` fields; updated `copyWith` with `clearInstructions` and `clearEndDate` support
+- **`MeasurementReminderLog`** — new entity: `id`, `measurementScheduleId`, `scheduledTime`, `actionTime`, `status` (MeasurementReminderAction), `createdAt`
+- **`MeasurementReminderAction`** enum — `completed`, `skipped`, `snoozed`, `expired` with `fromString()` factory
+
+#### Database Schema v9
+- **`MeasurementSchedules`** table extended — added `instructions` (TextColumn nullable), `createdAt` (DateTimeColumn), `updatedAt` (DateTimeColumn)
+- **`MeasurementReminderLogs`** table created — `id` (auto-increment), `measurementScheduleId` (FK → MeasurementSchedules), `scheduledTime`, `actionTime` (nullable), `status` (text), `createdAt`
+- Migration: adds columns to existing schedules, backfills timestamps from `startDate`/`updatedAt`, creates reminder logs table
+
+#### Notification System
+- **`MeasurementNotificationHelper`** — namespace offset (100000) avoids ID collisions with medication notifications; `computeNotificationIds()`, `baseNotificationId()`, `parsePayload()`, `buildPayload()`
+- **`NotificationActionBridge`** extended — handles Record Now (completed), Skip, Snooze actions for measurement payloads; `_recoverMeasurementSchedules()` called at startup; passes measurement reminder log updates through repository
+- **Measurement notification channel** (`rehabtrack_measurements`) already existed from Phase 3
+
+#### DAO Methods Added
+- `watchSchedulesForType`, `getSchedule`, `getActiveSchedules`, `watchActiveSchedules`, `getScheduleForType`
+- `insertReminderLog`, `updateReminderLog`, `getReminderLog`, `getReminderLogsForSchedule`, `watchReminderLogsForSchedule`, `getTodayReminderLogs`
+
+#### Repository Interface Extended
+- Added all schedule query methods + reminder log CRUD methods
+- `MeasurementRepositoryImpl` — all methods implemented with mappers
+
+#### Providers Added
+- `measurementSchedulesForTypeProvider(typeId)` — StreamProvider for schedule list
+- `measurementScheduleProvider(scheduleId)` — FutureProvider for single schedule
+- `activeMeasurementSchedulesProvider` — StreamProvider for active schedules
+- `measurementReminderLogsProvider(scheduleId)` — StreamProvider for reminder logs
+- `todayMeasurementRemindersProvider` — FutureProvider for today's reminders
+
+#### Routes Added
+- `/measurements/measurement/:typeId/schedule/add` — add schedule
+- `/measurements/measurement/:typeId/schedule/:scheduleId/edit` — edit schedule
+- `AppRoutes.measurementScheduleAdd(typeId)` and `AppRoutes.measurementScheduleEdit(typeId, scheduleId)` helpers
+
+#### Measurement Schedule Screen
+- **`MeasurementScheduleScreen`** — shared add/edit screen (ConsumerStatefulWidget)
+- `SegmentedButton<ScheduleType>` for Daily / Every N Days selection
+- Dynamic time list with add/remove/time picker
+- Date range picker (start/end), active toggle, instructions text field
+- Notification scheduling via `NotificationScheduler`
+- Form validation: required times, interval days must be > 0, end date must be after start date
+
+#### Measurement History Screen Integration
+- Schedules section added above records list via `_HistoryBody` widget
+- Shows active schedules for current type with schedule type label and times
+- Add schedule button (+) in schedules section header
+- Popup menu on each schedule with Edit / Delete actions
+- Delete confirmation dialog with schedule-specific messaging
+
+#### Localization
+- 30+ new keys in EN and KA: schedule UI labels, reminder action labels, schedule management dialogs, measurement reminder notifications
+
+**Files Created:**
+- `lib/data/services/notification/measurement_notification_helper.dart`
+- `lib/presentation/screens/health/measurement_schedule_screen.dart`
+- `test/phase5c_measurement_schedules_test.dart`
+
+**Files Modified:**
+- `lib/domain/entities/measurement.dart` — MeasurementSchedule extended + MeasurementReminderLog + MeasurementReminderAction
+- `lib/domain/repositories/measurement_repository.dart` — schedule query + reminder log methods
+- `lib/data/database/tables/measurement_tables.dart` — MeasurementSchedules extended + MeasurementReminderLogs table
+- `lib/data/database/app_database.dart` — schema v9, migration
+- `lib/data/database/daos/measurement_dao.dart` — 11 new methods + MeasurementReminderLogs accessor
+- `lib/data/repositories/measurement_repository_impl.dart` — new methods + mappers
+- `lib/data/services/notification/notification_action_bridge.dart` — measurement action handling + recovery
+- `lib/presentation/providers/measurement_provider.dart` — 5 new providers
+- `lib/presentation/providers/notification_provider.dart` — bridge gets measurementRepository
+- `lib/presentation/screens/health/measurement_history_screen.dart` — schedules section integration
+- `lib/core/router/app_routes.dart` — 2 new helper methods
+- `lib/core/router/app_router.dart` — 2 new routes
+- `lib/l10n/app_en.arb` — 30+ new keys
+- `lib/l10n/app_ka.arb` — 30+ new Georgian keys
+
+**Tests Added:** 34 new tests in `test/phase5c_measurement_schedules_test.dart`:
+- MeasurementSchedule entity: copyWith, clearInstructions, clearEndDate, default active
+- MeasurementReminderAction: fromString for valid/invalid values
+- MeasurementReminderLog: copyWith
+- ScheduleConfig: DailySchedule/IntervalDaysSchedule JSON roundtrip, fromJsonString, unknown type error, normalizeTimes, validateTimes
+- MeasurementNotificationHelper: computeNotificationIds offset, baseNotificationId, buildPayload, parsePayload (valid, null, empty, invalid JSON, wrong type, missing fields)
+- MeasurementNotificationPayload: isValid
+- ScheduleConfig equality: DailySchedule, IntervalDaysSchedule, cross-type
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (0 errors, 1 pre-existing info lint, 10 pre-existing test warnings) |
+| `flutter test` | Passed (453/453) |
+
+**Known Limitations:**
+- No snooze duration configurability (hardcoded 10 minutes)
+- No "Record Now" deep link from notification directly to entry form
+- Today screen remains empty — measurement reminders not yet surfaced there
+- Schedule editor does not show existing notification status
+- No schedule conflict detection (overlapping time slots)
+
+---
+
 ## Development Rules
 
 - Commit after every completed phase

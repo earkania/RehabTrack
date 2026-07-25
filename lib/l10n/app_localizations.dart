@@ -713,7 +713,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteScheduleConfirmation.
   ///
   /// In en, this message translates to:
-  /// **'Remove this schedule? Notifications will be cancelled.'**
+  /// **'Are you sure you want to delete this schedule?'**
   String get deleteScheduleConfirmation;
 
   /// No description provided for @selectTime.
@@ -779,7 +779,7 @@ abstract class AppLocalizations {
   /// No description provided for @addScheduleSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Set up reminders for this medication'**
+  /// **'Add a schedule to get reminders'**
   String get addScheduleSubtitle;
 
   /// No description provided for @editAlternative.
@@ -1657,6 +1657,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pulse {status}'**
   String componentStatusPulse(String status);
+
+  /// No description provided for @measurementSchedules.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement Schedules'**
+  String get measurementSchedules;
+
+  /// No description provided for @addMeasurementSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Measurement Schedule'**
+  String get addMeasurementSchedule;
+
+  /// No description provided for @editMeasurementSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Measurement Schedule'**
+  String get editMeasurementSchedule;
+
+  /// No description provided for @noMeasurementSchedules.
+  ///
+  /// In en, this message translates to:
+  /// **'No measurement schedules'**
+  String get noMeasurementSchedules;
+
+  /// No description provided for @noMeasurementSchedulesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a schedule to get reminders for this measurement'**
+  String get noMeasurementSchedulesDescription;
+
+  /// No description provided for @daily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get daily;
+
+  /// No description provided for @everyNDaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Every N Days'**
+  String get everyNDaysLabel;
+
+  /// No description provided for @everyNDaysRequiresStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Every N Days requires a start date'**
+  String get everyNDaysRequiresStartDate;
+
+  /// No description provided for @recordNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Record Now'**
+  String get recordNow;
+
+  /// No description provided for @measurementReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement Reminder'**
+  String get measurementReminder;
+
+  /// No description provided for @measurementReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement Reminders'**
+  String get measurementReminders;
+
+  /// No description provided for @timeToRecordMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to record {name}'**
+  String timeToRecordMeasurement(String name);
+
+  /// No description provided for @reminderScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder scheduled'**
+  String get reminderScheduled;
+
+  /// No description provided for @reminderUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder updated'**
+  String get reminderUpdated;
+
+  /// No description provided for @reminderDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder deleted'**
+  String get reminderDeleted;
+
+  /// No description provided for @scheduleRecovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule recovered'**
+  String get scheduleRecovered;
+
+  /// No description provided for @measurementsDueToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurements Due Today'**
+  String get measurementsDueToday;
+
+  /// No description provided for @noRemindersToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders scheduled for today'**
+  String get noRemindersToday;
+
+  /// No description provided for @upcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcoming;
+
+  /// No description provided for @overdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdue;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @snoozed.
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed'**
+  String get snoozed;
 }
 
 class _AppLocalizationsDelegate

@@ -322,7 +322,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteScheduleConfirmation =>
-      'Remove this schedule? Notifications will be cancelled.';
+      'Are you sure you want to delete this schedule?';
 
   @override
   String get selectTime => 'Select Time';
@@ -355,7 +355,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get schedulesSection => 'Schedules';
 
   @override
-  String get addScheduleSubtitle => 'Set up reminders for this medication';
+  String get addScheduleSubtitle => 'Add a schedule to get reminders';
 
   @override
   String get editAlternative => 'Edit Alternative';
@@ -827,4 +827,74 @@ class AppLocalizationsEn extends AppLocalizations {
   String componentStatusPulse(String status) {
     return 'Pulse $status';
   }
+
+  @override
+  String get measurementSchedules => 'Measurement Schedules';
+
+  @override
+  String get addMeasurementSchedule => 'Add Measurement Schedule';
+
+  @override
+  String get editMeasurementSchedule => 'Edit Measurement Schedule';
+
+  @override
+  String get noMeasurementSchedules => 'No measurement schedules';
+
+  @override
+  String get noMeasurementSchedulesDescription =>
+      'Add a schedule to get reminders for this measurement';
+
+  @override
+  String get daily => 'Daily';
+
+  @override
+  String get everyNDaysLabel => 'Every N Days';
+
+  @override
+  String get everyNDaysRequiresStartDate =>
+      'Every N Days requires a start date';
+
+  @override
+  String get recordNow => 'Record Now';
+
+  @override
+  String get measurementReminder => 'Measurement Reminder';
+
+  @override
+  String get measurementReminders => 'Measurement Reminders';
+
+  @override
+  String timeToRecordMeasurement(String name) {
+    return 'Time to record $name';
+  }
+
+  @override
+  String get reminderScheduled => 'Reminder scheduled';
+
+  @override
+  String get reminderUpdated => 'Reminder updated';
+
+  @override
+  String get reminderDeleted => 'Reminder deleted';
+
+  @override
+  String get scheduleRecovered => 'Schedule recovered';
+
+  @override
+  String get measurementsDueToday => 'Measurements Due Today';
+
+  @override
+  String get noRemindersToday => 'No reminders scheduled for today';
+
+  @override
+  String get upcoming => 'Upcoming';
+
+  @override
+  String get overdue => 'Overdue';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get snoozed => 'Snoozed';
 }

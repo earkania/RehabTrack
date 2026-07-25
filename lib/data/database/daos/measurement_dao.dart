@@ -11,6 +11,7 @@ part 'measurement_dao.g.dart';
     MeasurementRecords,
     MeasurementRecordValues,
     MeasurementSchedules,
+    MeasurementReminderLogs,
   ],
 )
 class MeasurementDao extends DatabaseAccessor<AppDatabase>
@@ -290,5 +291,115 @@ class MeasurementDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteSchedule(int id) {
     return (delete(measurementSchedules)
       ..where((t) => t.id.equals(id))).go();
+  }
+
+  Stream<List<MeasurementSchedule>> watchSchedulesForType(
+    int measurementTypeId,
+  ) {
+    return (select(measurementSchedules)
+      ..where((t) => t.measurementTypeId.equals(measurementTypeId))
+      ..orderBy([
+        (t) => OrderingTerm.asc(t.createdAt),
+      ])).watch();
+  }
+
+  Future<MeasurementSchedule?> getSchedule(int id) {
+    return (select(measurementSchedules)
+      ..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<List<MeasurementSchedule>> getActiveSchedules(int profileId) {
+    return (select(measurementSchedules)
+      ..where((t) =>
+          t.profileId.equals(profileId) & t.active.equals(true)))
+        .get();
+  }
+
+  Stream<List<MeasurementSchedule>> watchActiveSchedules(int profileId) {
+    return (select(measurementSchedules)
+      ..where((t) =>
+          t.profileId.equals(profileId) & t.active.equals(true))
+      ..orderBy([
+        (t) => OrderingTerm.asc(t.measurementTypeId),
+      ])).watch();
+  }
+
+  Future<MeasurementSchedule?> getScheduleForType(
+    int measurementTypeId,
+  ) {
+    return (select(measurementSchedules)
+      ..where((t) =>
+          t.measurementTypeId.equals(measurementTypeId) &
+          t.active.equals(true))
+      ..limit(1)).getSingleOrNull();
+  }
+
+  // --- MeasurementReminderLogs ---
+
+  Future<int> insertReminderLog(
+    MeasurementReminderLogsCompanion entry,
+  ) {
+    return into(measurementReminderLogs).insert(entry);
+  }
+
+  Future<bool> updateReminderLog(
+    MeasurementReminderLogsCompanion entry,
+  ) {
+    return update(measurementReminderLogs).replace(entry);
+  }
+
+  Future<MeasurementReminderLog?> getReminderLog(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) {
+    return (select(measurementReminderLogs)
+      ..where((t) =>
+          t.measurementScheduleId.equals(scheduleId) &
+          t.scheduledTime.equals(scheduledTime))
+      ..limit(1)).getSingleOrNull();
+  }
+
+  Future<List<MeasurementReminderLog>> getReminderLogsForSchedule(
+    int scheduleId,
+  ) {
+    return (select(measurementReminderLogs)
+      ..where((t) => t.measurementScheduleId.equals(scheduleId))
+      ..orderBy([
+        (t) => OrderingTerm.desc(t.scheduledTime),
+      ])).get();
+  }
+
+  Stream<List<MeasurementReminderLog>> watchReminderLogsForSchedule(
+    int scheduleId,
+  ) {
+    return (select(measurementReminderLogs)
+      ..where((t) => t.measurementScheduleId.equals(scheduleId))
+      ..orderBy([
+        (t) => OrderingTerm.desc(t.scheduledTime),
+      ])).watch();
+  }
+
+  Future<List<MeasurementReminderLog>> getTodayReminderLogs(
+    int profileId,
+  ) {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
+    final scheduleIdsQuery = select(measurementSchedules)
+      ..where((t) => t.profileId.equals(profileId));
+
+    return scheduleIdsQuery.get().then((schedules) async {
+      if (schedules.isEmpty) return [];
+      final ids = schedules.map((s) => s.id).toList();
+      return (select(measurementReminderLogs)
+        ..where((t) =>
+            t.measurementScheduleId.isIn(ids) &
+            t.scheduledTime.isBiggerOrEqualValue(startOfDay) &
+            t.scheduledTime.isSmallerThanValue(endOfDay))
+        ..orderBy([
+          (t) => OrderingTerm.asc(t.scheduledTime),
+        ])).get();
+    });
   }
 }

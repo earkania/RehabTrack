@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:rehab_track/presentation/screens/health/health_screen.dart';
 import 'package:rehab_track/presentation/utils/measurement_formatter.dart';
 import 'package:rehab_track/presentation/utils/measurement_validator.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
@@ -101,6 +104,24 @@ void main() {
       );
 
       expect(errors, isNotEmpty);
+    });
+  });
+
+  group('measurementIconForType', () {
+    test('weight key maps to Symbols.weight', () {
+      final icon = measurementIconForType('weight');
+      expect(icon.codePoint, Symbols.weight.codePoint);
+      expect(icon.fontFamily, Symbols.weight.fontFamily);
+    });
+
+    test('weight key does not map to Symbols.monitor_weight', () {
+      final icon = measurementIconForType('weight');
+      expect(icon.codePoint, isNot(equals(Symbols.monitor_weight.codePoint)));
+    });
+
+    test('weight key does not map to Icons.monitor_weight', () {
+      final icon = measurementIconForType('weight');
+      expect(icon.codePoint, isNot(equals(Icons.monitor_weight.codePoint)));
     });
   });
 }

@@ -15,6 +15,10 @@ class AppRoutes {
   static String measurementTrends(int typeId) =>
       '/measurements/measurement/$typeId/trends';
   static const measurementRanges = '/measurements/ranges';
+  static String measurementScheduleAdd(int typeId) =>
+      '/measurements/measurement/$typeId/schedule/add';
+  static String measurementScheduleEdit(int typeId, int scheduleId) =>
+      '/measurements/measurement/$typeId/schedule/$scheduleId/edit';
   // Medications
   static const medicationAdd = '/medications/medication/add';
   static String medicationDetail(int id) => '/medications/medication/$id';

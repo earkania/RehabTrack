@@ -93,9 +93,10 @@ class _MeasurementTypeCard extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              _iconForType(type.key),
+              measurementIconForType(type.key),
               size: 32,
               color: theme.colorScheme.primary,
+              fill: type.key == 'weight' ? 1.0 : null,
             ),
             AppSpacing.mdW,
             Expanded(
@@ -131,16 +132,16 @@ class _MeasurementTypeCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  IconData _iconForType(String? key) {
-    return switch (key) {
-      'blood_pressure' => Icons.monitor_heart,
-      'pulse' => Icons.favorite,
-      'weight' => Symbols.weight,
-      'blood_glucose' => Icons.bloodtype,
-      'spo2' => Icons.air,
-      'temperature' => Icons.thermostat,
-      _ => Icons.straighten,
-    };
-  }
+IconData measurementIconForType(String? key) {
+  return switch (key) {
+    'blood_pressure' => Icons.monitor_heart,
+    'pulse' => Icons.favorite,
+    'weight' => Symbols.weight,
+    'blood_glucose' => Icons.bloodtype,
+    'spo2' => Icons.air,
+    'temperature' => Icons.thermostat,
+    _ => Icons.straighten,
+  };
 }

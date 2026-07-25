@@ -310,5 +310,40 @@
     "placeholders": {
       "status": {"type": "String"}
     }
-  }
+  },
+  "measurementSchedules": "გაზომვების გრაფიკი",
+  "addMeasurementSchedule": "დაამატეთ გაზომვის გრაფიკი",
+  "editMeasurementSchedule": "შეცვალეთ გაზომვის გრაფიკი",
+  "noMeasurementSchedules": "გაზომვების გრაფიკი არ არსებობს",
+  "noMeasurementSchedulesDescription": "დაამატეთ გრაფიკი შეხსენებებისთვის",
+  "schedulesSection": "გრაფიკები",
+  "addScheduleSubtitle": "დაამატეთ გრაფიკი შეხსენებებისთვის",
+  "daily": "ყოველდღიური",
+  "everyNDaysLabel": "ყოველ N დღეში",
+  "intervalDays": "ინტერვალი (დღეები)",
+  "everyNDaysRequiresStartDate": "ყოველ N დღეში საჭიროებს დაწყების თარიღს",
+  "recordNow": "ჩაწერეთ ახლა",
+  "measurementReminder": "გაზომვის შეხსენება",
+  "measurementReminders": "გაზომვების შეხსენებები",
+  "timeToRecordMeasurement": "დროა ჩაწეროთ {name}",
+  "@timeToRecordMeasurement": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "reminderScheduled": "შეხსენება დაგეგმილია",
+  "reminderUpdated": "შეხსენება განახლდა",
+  "reminderDeleted": "შეხსენება წაიშალა",
+  "failedToSaveSchedule": "გრაფიკის შენახვა ვერ მოხერხდა",
+  "scheduleRecovered": "გრაფიკი აღდგენილია",
+  "measurementsDueToday": "დღეს გასაკეთებელი გაზომვები",
+  "noRemindersToday": "დღეს შეხსენებები არ არის დაგეგმილი",
+  "upcoming": "მომდევნო",
+  "overdue": "ვადაგასული",
+  "completed": "დასრულებული",
+  "skipped": "გამოტოვებული",
+  "snoozed": "გადადებული",
+  "schedules": "გრაფიკები",
+  "deleteSchedule": "წაშალეთ გრაფიკი",
+  "deleteScheduleConfirmation": "დარწმუნებული ხართ რომ გსურთ ამ გრაფიკის წაშლა?"
 }

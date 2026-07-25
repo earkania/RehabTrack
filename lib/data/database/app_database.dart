@@ -45,6 +45,7 @@ part 'app_database.g.dart';
     MeasurementRecords,
     MeasurementRecordValues,
     MeasurementSchedules,
+    MeasurementReminderLogs,
     ExerciseTypes,
     ExerciseGoals,
     ExerciseLogs,
@@ -82,7 +83,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -164,6 +165,34 @@ class AppDatabase extends _$AppDatabase {
       if (from < 8) {
         // Phase 5A.1: Profile-specific reference ranges
         await m.createTable(profileReferenceRanges);
+      }
+      if (from < 9) {
+        // Phase 5C: Measurement schedules - add instructions, createdAt, updatedAt
+        await m.addColumn(
+          measurementSchedules,
+          measurementSchedules.instructions,
+        );
+        await m.addColumn(
+          measurementSchedules,
+          measurementSchedules.createdAt,
+        );
+        await m.addColumn(
+          measurementSchedules,
+          measurementSchedules.updatedAt,
+        );
+        // Backfill existing rows with default timestamps
+        final now = DateTime.now();
+        final existingSchedules = await select(measurementSchedules).get();
+        for (final s in existingSchedules) {
+          await (update(measurementSchedules)
+                ..where((t) => t.id.equals(s.id)))
+              .write(MeasurementSchedulesCompanion(
+            createdAt: Value(now),
+            updatedAt: Value(now),
+          ));
+        }
+        // Create measurement reminder logs table
+        await m.createTable(measurementReminderLogs);
       }
     },
   );

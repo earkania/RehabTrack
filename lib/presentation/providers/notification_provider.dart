@@ -42,6 +42,7 @@ final notificationInitializerProvider = Provider<void>((ref) {
     notificationService: ref.watch(notificationServiceProvider),
     scheduleRecoveryService: ref.watch(scheduleRecoveryServiceProvider),
     medicationRepository: ref.watch(medicationRepositoryProvider),
+    measurementRepository: ref.watch(measurementRepositoryProvider),
   );
 
   final profileId = ref.watch(activeProfileIdProvider) ?? 1;

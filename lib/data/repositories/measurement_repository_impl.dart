@@ -296,7 +296,41 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
   }
 
   @override
+  Stream<List<MeasurementSchedule>> watchSchedulesForType(
+    int measurementTypeId,
+  ) {
+    return _database.measurementDao
+        .watchSchedulesForType(measurementTypeId)
+        .map((rows) => rows.map(_scheduleToDomain).toList());
+  }
+
+  @override
+  Future<MeasurementSchedule?> getSchedule(int id) async {
+    final row = await _database.measurementDao.getSchedule(id);
+    return row != null ? _scheduleToDomain(row) : null;
+  }
+
+  @override
+  Future<List<MeasurementSchedule>> getActiveSchedules(
+    int profileId,
+  ) async {
+    final rows =
+        await _database.measurementDao.getActiveSchedules(profileId);
+    return rows.map(_scheduleToDomain).toList();
+  }
+
+  @override
+  Stream<List<MeasurementSchedule>> watchActiveSchedules(
+    int profileId,
+  ) {
+    return _database.measurementDao
+        .watchActiveSchedules(profileId)
+        .map((rows) => rows.map(_scheduleToDomain).toList());
+  }
+
+  @override
   Future<int> createSchedule(MeasurementSchedule schedule) async {
+    final now = DateTime.now();
     return _database.measurementDao.insertSchedule(
       db.MeasurementSchedulesCompanion.insert(
         profileId: schedule.profileId,
@@ -306,6 +340,9 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         startDate: Value(schedule.startDate),
         endDate: Value(schedule.endDate),
         active: Value(schedule.active),
+        instructions: Value(schedule.instructions),
+        createdAt: now,
+        updatedAt: now,
       ),
     );
   }
@@ -323,6 +360,9 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         startDate: Value(schedule.startDate),
         endDate: Value(schedule.endDate),
         active: Value(schedule.active),
+        instructions: Value(schedule.instructions),
+        createdAt: Value(schedule.createdAt),
+        updatedAt: Value(DateTime.now()),
       ),
     );
   }
@@ -330,6 +370,74 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
   @override
   Future<void> deleteSchedule(int id) async {
     await _database.measurementDao.deleteSchedule(id);
+  }
+
+  // --- Reminder Logs ---
+
+  @override
+  Future<int> logReminder(MeasurementReminderLog log) async {
+    return _database.measurementDao.insertReminderLog(
+      db.MeasurementReminderLogsCompanion.insert(
+        measurementScheduleId: log.measurementScheduleId,
+        scheduledTime: log.scheduledTime,
+        actionTime: Value(log.actionTime),
+        status: log.status.name,
+        createdAt: log.createdAt,
+      ),
+    );
+  }
+
+  @override
+  Future<void> updateReminderLog(MeasurementReminderLog log) async {
+    await _database.measurementDao.updateReminderLog(
+      db.MeasurementReminderLogsCompanion(
+        id: Value(log.id!),
+        measurementScheduleId: Value(log.measurementScheduleId),
+        scheduledTime: Value(log.scheduledTime),
+        actionTime: Value(log.actionTime),
+        status: Value(log.status.name),
+        createdAt: Value(log.createdAt),
+      ),
+    );
+  }
+
+  @override
+  Future<MeasurementReminderLog?> getReminderLog(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) async {
+    final row = await _database.measurementDao.getReminderLog(
+      scheduleId,
+      scheduledTime,
+    );
+    return row != null ? _reminderLogToDomain(row) : null;
+  }
+
+  @override
+  Future<List<MeasurementReminderLog>> getReminderLogsForSchedule(
+    int scheduleId,
+  ) async {
+    final rows = await _database.measurementDao
+        .getReminderLogsForSchedule(scheduleId);
+    return rows.map(_reminderLogToDomain).toList();
+  }
+
+  @override
+  Stream<List<MeasurementReminderLog>> watchReminderLogsForSchedule(
+    int scheduleId,
+  ) {
+    return _database.measurementDao
+        .watchReminderLogsForSchedule(scheduleId)
+        .map((rows) => rows.map(_reminderLogToDomain).toList());
+  }
+
+  @override
+  Future<List<MeasurementReminderLog>> getTodayReminderLogs(
+    int profileId,
+  ) async {
+    final rows = await _database.measurementDao
+        .getTodayReminderLogs(profileId);
+    return rows.map(_reminderLogToDomain).toList();
   }
 
   // --- Mappers ---
@@ -411,6 +519,22 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
       startDate: row.startDate,
       endDate: row.endDate,
       active: row.active,
+      instructions: row.instructions,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    );
+  }
+
+  MeasurementReminderLog _reminderLogToDomain(
+    db.MeasurementReminderLog row,
+  ) {
+    return MeasurementReminderLog(
+      id: row.id,
+      measurementScheduleId: row.measurementScheduleId,
+      scheduledTime: row.scheduledTime,
+      actionTime: row.actionTime,
+      status: MeasurementReminderAction.fromString(row.status),
+      createdAt: row.createdAt,
     );
   }
 }

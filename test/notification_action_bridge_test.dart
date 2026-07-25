@@ -10,12 +10,86 @@ import 'package:rehab_track/data/services/notification/notification_scheduler.da
 import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/data/services/notification/schedule_recovery_service.dart';
 import 'package:rehab_track/domain/entities/dosage_form.dart';
+import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
 import 'package:rehab_track/domain/entities/medication_component.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
+
+class FakeMeasurementRepository implements MeasurementRepository {
+  final List<MeasurementReminderLog> logs = [];
+  final Map<int, MeasurementSchedule> schedules = {};
+  final Map<int, List<MeasurementSchedule>> schedulesByType = {};
+  final Map<int, MeasurementType> types = {};
+
+  @override
+  Stream<List<MeasurementType>> watchActiveMeasurementTypes(int? profileId) => const Stream.empty();
+  @override
+  Stream<List<MeasurementType>> watchMeasurementTypes(int? profileId) => const Stream.empty();
+  @override
+  Future<List<MeasurementType>> getMeasurementTypes(int? profileId) async => [];
+  @override
+  Future<MeasurementType?> getMeasurementType(int id) async => types[id];
+  @override
+  Future<MeasurementType?> getMeasurementTypeByKey(String key) async => null;
+  @override
+  Future<int> createMeasurementType(MeasurementType type) async => 0;
+  @override
+  Future<void> updateMeasurementType(MeasurementType type) async {}
+  @override
+  Future<void> deactivateMeasurementType(int id) async {}
+  @override
+  Stream<List<MeasurementTypeField>> watchFieldsForType(int measurementTypeId) => const Stream.empty();
+  @override
+  Future<List<MeasurementTypeField>> getFieldsForType(int measurementTypeId) async => [];
+  @override
+  Stream<List<MeasurementRecord>> watchRecords(int profileId, {int? typeId, DateTime? from, DateTime? to, bool ascending = false}) => const Stream.empty();
+  @override
+  Future<List<MeasurementRecord>> getRecords(int profileId, {int? typeId, DateTime? from, DateTime? to, bool ascending = false}) async => [];
+  @override
+  Future<MeasurementRecord?> getRecord(int id) async => null;
+  @override
+  Future<int> createRecord(MeasurementRecord record, List<MeasurementRecordValue> values) async => 0;
+  @override
+  Future<void> updateRecord(MeasurementRecord record, List<MeasurementRecordValue> values) async {}
+  @override
+  Future<void> deleteRecord(int id) async {}
+  @override
+  Future<List<MeasurementRecordValue>> getValuesForRecord(int measurementRecordId) async => [];
+  @override
+  Future<Map<int, List<MeasurementRecordValue>>> getValuesForRecords(List<int> recordIds) async => {};
+  @override
+  Stream<List<MeasurementSchedule>> watchSchedules(int profileId) => const Stream.empty();
+  @override
+  Stream<List<MeasurementSchedule>> watchSchedulesForType(int measurementTypeId) => const Stream.empty();
+  @override
+  Future<MeasurementSchedule?> getSchedule(int id) async => schedules[id];
+  @override
+  Future<List<MeasurementSchedule>> getActiveSchedules(int profileId) async => schedules.values.where((s) => s.active).toList();
+  @override
+  Stream<List<MeasurementSchedule>> watchActiveSchedules(int profileId) => const Stream.empty();
+  @override
+  Future<int> createSchedule(MeasurementSchedule schedule) async => schedule.id ?? 1;
+  @override
+  Future<void> updateSchedule(MeasurementSchedule schedule) async {}
+  @override
+  Future<void> deleteSchedule(int id) async {}
+  @override
+  Future<int> logReminder(MeasurementReminderLog log) async { logs.add(log); return log.id ?? logs.length; }
+  @override
+  Future<void> updateReminderLog(MeasurementReminderLog log) async {}
+  @override
+  Future<MeasurementReminderLog?> getReminderLog(int scheduleId, DateTime scheduledTime) async => null;
+  @override
+  Future<List<MeasurementReminderLog>> getReminderLogsForSchedule(int scheduleId) async => [];
+  @override
+  Stream<List<MeasurementReminderLog>> watchReminderLogsForSchedule(int scheduleId) => const Stream.empty();
+  @override
+  Future<List<MeasurementReminderLog>> getTodayReminderLogs(int profileId) async => [];
+}
 
 class FakeMedicationRepository implements MedicationRepository {
   final List<MedicationLog> loggedDoses = [];
@@ -384,6 +458,7 @@ void main() {
         notificationService: notificationService,
         scheduleRecoveryService: recoveryService,
         medicationRepository: repo,
+        measurementRepository: FakeMeasurementRepository(),
       );
     });
 
@@ -519,6 +594,7 @@ void main() {
         notificationService: notificationService,
         scheduleRecoveryService: recoveryService,
         medicationRepository: repo,
+        measurementRepository: FakeMeasurementRepository(),
       );
     });
 

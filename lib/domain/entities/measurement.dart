@@ -227,6 +227,9 @@ class MeasurementSchedule {
   final DateTime? startDate;
   final DateTime? endDate;
   final bool active;
+  final String? instructions;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   const MeasurementSchedule({
     this.id,
@@ -236,6 +239,9 @@ class MeasurementSchedule {
     this.startDate,
     this.endDate,
     this.active = true,
+    this.instructions,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   MeasurementSchedule copyWith({
@@ -246,6 +252,11 @@ class MeasurementSchedule {
     DateTime? startDate,
     DateTime? endDate,
     bool? active,
+    String? instructions,
+    bool clearInstructions = false,
+    bool clearEndDate = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return MeasurementSchedule(
       id: id ?? this.id,
@@ -254,8 +265,63 @@ class MeasurementSchedule {
           measurementTypeId ?? this.measurementTypeId,
       scheduleConfig: scheduleConfig ?? this.scheduleConfig,
       startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
+      endDate: clearEndDate ? null : (endDate ?? this.endDate),
       active: active ?? this.active,
+      instructions:
+          clearInstructions ? null : (instructions ?? this.instructions),
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+}
+
+enum MeasurementReminderAction {
+  completed,
+  skipped,
+  snoozed,
+  expired;
+
+  static MeasurementReminderAction fromString(String value) {
+    return MeasurementReminderAction.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => MeasurementReminderAction.expired,
+    );
+  }
+}
+
+class MeasurementReminderLog {
+  final int? id;
+  final int measurementScheduleId;
+  final DateTime scheduledTime;
+  final DateTime? actionTime;
+  final MeasurementReminderAction status;
+  final DateTime createdAt;
+
+  const MeasurementReminderLog({
+    this.id,
+    required this.measurementScheduleId,
+    required this.scheduledTime,
+    this.actionTime,
+    required this.status,
+    required this.createdAt,
+  });
+
+  MeasurementReminderLog copyWith({
+    int? id,
+    int? measurementScheduleId,
+    DateTime? scheduledTime,
+    DateTime? actionTime,
+    MeasurementReminderAction? status,
+    DateTime? createdAt,
+  }) {
+    return MeasurementReminderLog(
+      id: id ?? this.id,
+      measurementScheduleId:
+          measurementScheduleId ?? this.measurementScheduleId,
+      scheduledTime: scheduledTime ?? this.scheduledTime,
+      actionTime: actionTime ?? this.actionTime,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }
