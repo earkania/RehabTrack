@@ -17,6 +17,8 @@ class AppRoutes {
   static const measurementRanges = '/measurements/ranges';
   static String measurementScheduleAdd(int typeId) =>
       '/measurements/measurement/$typeId/schedule/add';
+  static String measurementScheduleList(int typeId) =>
+      '/measurements/measurement/$typeId/schedules';
   static String measurementScheduleEdit(int typeId, int scheduleId) =>
       '/measurements/measurement/$typeId/schedule/$scheduleId/edit';
   // Medications

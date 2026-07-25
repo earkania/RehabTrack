@@ -61,6 +61,9 @@ class HealthScreen extends ConsumerWidget {
                 onHistory: () => context.push(
                   AppRoutes.measurementHistory(type.id!),
                 ),
+                onSchedules: () => context.push(
+                  AppRoutes.measurementScheduleList(type.id!),
+                ),
               );
             },
           );
@@ -74,11 +77,13 @@ class _MeasurementTypeCard extends StatelessWidget {
   final dynamic type;
   final VoidCallback onAdd;
   final VoidCallback onHistory;
+  final VoidCallback onSchedules;
 
   const _MeasurementTypeCard({
     required this.type,
     required this.onAdd,
     required this.onHistory,
+    required this.onSchedules,
   });
 
   @override
@@ -126,6 +131,11 @@ class _MeasurementTypeCard extends StatelessWidget {
               onPressed: onAdd,
               icon: const Icon(Icons.add_circle_outline),
               tooltip: l10n.addReading,
+            ),
+            IconButton(
+              onPressed: onSchedules,
+              icon: const Icon(Icons.schedule),
+              tooltip: l10n.measurementSchedules,
             ),
           ],
         ),

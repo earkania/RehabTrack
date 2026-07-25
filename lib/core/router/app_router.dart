@@ -20,6 +20,7 @@ import 'package:rehab_track/presentation/screens/health/measurement_edit_screen.
 import 'package:rehab_track/presentation/screens/health/measurement_history_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurement_trends_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurement_schedule_screen.dart';
+import 'package:rehab_track/presentation/screens/health/measurement_schedule_list_screen.dart';
 import 'package:rehab_track/presentation/screens/health/reference_range_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
@@ -213,6 +214,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             return const _InvalidRouteScreen();
           }
           return TypeRangeDetailScreen(typeKey: typeKey);
+        },
+      ),
+      GoRoute(
+        path: '/measurements/measurement/:typeId/schedules',
+        builder: (context, state) {
+          final typeId =
+              int.tryParse(state.pathParameters['typeId'] ?? '');
+          if (typeId == null) {
+            return const _InvalidRouteScreen();
+          }
+          return MeasurementScheduleListScreen(measurementTypeId: typeId);
         },
       ),
       GoRoute(
