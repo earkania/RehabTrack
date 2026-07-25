@@ -35,11 +35,26 @@ class MeasurementScheduleListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(typeName.isNotEmpty
-            ? '${l10n.measurementSchedules} — $typeName'
-            : l10n.measurementSchedules),
+        title: Text(l10n.measurementSchedules),
       ),
-      body: schedulesAsync.when(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (typeName.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.sm,
+              ),
+              child: Text(
+                typeName,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          Expanded(
+            child: schedulesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Column(
@@ -69,6 +84,9 @@ class MeasurementScheduleListScreen extends ConsumerWidget {
             measurementTypeId: measurementTypeId,
           );
         },
+      ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.small(
         onPressed: () => context.push(
