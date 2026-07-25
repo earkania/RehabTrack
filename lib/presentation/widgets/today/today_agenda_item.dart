@@ -40,9 +40,8 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                     children: [
                       Text(
                         timeStr,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: background.timeColor(theme),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -58,30 +57,11 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  if (item.strength != null && item.strength!.isNotEmpty)
+                  if (_hasDosageInfo(item))
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(
-                        item.strength!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  if (item.intakeQuantity != null &&
-                      item.intakeQuantity! > 0 &&
-                      item.dosageForm != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        DosageFormLocalizer.localizeWithQuantity(
-                          item.intakeQuantity!,
-                          item.dosageForm!,
-                          l10n,
-                          customForm: item.customDosageForm,
-                        ),
+                        _formatDosageLine(item, l10n),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -106,7 +86,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                     ),
                   if (item.subtitle != null &&
                       item.subtitle != item.title &&
-                      item.strength == null)
+                      !_hasDosageInfo(item))
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(
@@ -127,6 +107,32 @@ class TodayAgendaItemWidget extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  static bool _hasDosageInfo(TodayAgendaItem item) {
+    final hasStrength = item.strength != null && item.strength!.isNotEmpty;
+    final hasIntake = item.intakeQuantity != null &&
+        item.intakeQuantity! > 0 &&
+        item.dosageForm != null;
+    return hasStrength || hasIntake;
+  }
+
+  static String _formatDosageLine(TodayAgendaItem item, AppLocalizations l10n) {
+    final strength = item.strength;
+    final hasIntake = item.intakeQuantity != null &&
+        item.intakeQuantity! > 0 &&
+        item.dosageForm != null;
+    final intake = hasIntake
+        ? DosageFormLocalizer.localizeWithQuantity(
+            item.intakeQuantity!,
+            item.dosageForm!,
+            l10n,
+            customForm: item.customDosageForm,
+          )
+        : '';
+    return [strength, intake]
+        .where((s) => s != null && s.isNotEmpty)
+        .join('  •  ');
   }
 }
 

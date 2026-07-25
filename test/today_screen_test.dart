@@ -916,7 +916,7 @@ void main() {
       expect(find.text('0.5 tablets'), findsOneWidget);
     });
 
-    testWidgets('shows strength and intake as separate lines', (tester) async {
+    testWidgets('shows strength and intake combined with bullet', (tester) async {
       final item = TodayAgendaItem(
         id: '1',
         type: TodayAgendaItemType.medication,
@@ -931,8 +931,7 @@ void main() {
 
       await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
 
-      expect(find.text('5 mg'), findsOneWidget);
-      expect(find.text('1 capsule'), findsOneWidget);
+      expect(find.text('5 mg  •  1 capsule'), findsOneWidget);
     });
 
     testWidgets('shows instructions below dosage info', (tester) async {
@@ -951,8 +950,7 @@ void main() {
 
       await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
 
-      expect(find.text('5 mg'), findsOneWidget);
-      expect(find.text('0.5 tablets'), findsOneWidget);
+      expect(find.text('5 mg  •  0.5 tablets'), findsOneWidget);
       expect(find.text('Take with food'), findsOneWidget);
     });
 
