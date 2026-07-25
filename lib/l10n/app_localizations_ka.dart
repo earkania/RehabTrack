@@ -782,4 +782,43 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get pulseLabelStat => 'პულსი';
+
+  @override
+  String get systolicShort => 'სისტ.';
+
+  @override
+  String get diastolicShort => 'დიასტ.';
+
+  @override
+  String get pulseShort => 'პულსი';
+
+  @override
+  String get unavailable => 'მიუწვდომელი';
+
+  @override
+  String get withinConfiguredRange => 'კონფიგურირებულ დიაპაზონში';
+
+  @override
+  String get belowConfiguredRange => 'კონფიგურირებულ დიაპაზონზე დაბალი';
+
+  @override
+  String get aboveConfiguredRange => 'კონფიგურირებულ დიაპაზონზე მაღალი';
+
+  @override
+  String get noReferenceRangeConfigured => 'დიაპაზონი არ არის კონფიგურირებული';
+
+  @override
+  String componentStatusSystolic(String status) {
+    return 'სისტოლური $status';
+  }
+
+  @override
+  String componentStatusDiastolic(String status) {
+    return 'დიასტოლური $status';
+  }
+
+  @override
+  String componentStatusPulse(String status) {
+    return 'პულსი $status';
+  }
 }

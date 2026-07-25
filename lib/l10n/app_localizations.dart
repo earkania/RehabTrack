@@ -1591,6 +1591,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pulse'**
   String get pulseLabelStat;
+
+  /// No description provided for @systolicShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Systolic'**
+  String get systolicShort;
+
+  /// No description provided for @diastolicShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Diastolic'**
+  String get diastolicShort;
+
+  /// No description provided for @pulseShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulse'**
+  String get pulseShort;
+
+  /// No description provided for @unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get unavailable;
+
+  /// No description provided for @withinConfiguredRange.
+  ///
+  /// In en, this message translates to:
+  /// **'within configured range'**
+  String get withinConfiguredRange;
+
+  /// No description provided for @belowConfiguredRange.
+  ///
+  /// In en, this message translates to:
+  /// **'below configured range'**
+  String get belowConfiguredRange;
+
+  /// No description provided for @aboveConfiguredRange.
+  ///
+  /// In en, this message translates to:
+  /// **'above configured range'**
+  String get aboveConfiguredRange;
+
+  /// No description provided for @noReferenceRangeConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'no reference range configured'**
+  String get noReferenceRangeConfigured;
+
+  /// No description provided for @componentStatusSystolic.
+  ///
+  /// In en, this message translates to:
+  /// **'Systolic {status}'**
+  String componentStatusSystolic(String status);
+
+  /// No description provided for @componentStatusDiastolic.
+  ///
+  /// In en, this message translates to:
+  /// **'Diastolic {status}'**
+  String componentStatusDiastolic(String status);
+
+  /// No description provided for @componentStatusPulse.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulse {status}'**
+  String componentStatusPulse(String status);
 }
 
 class _AppLocalizationsDelegate

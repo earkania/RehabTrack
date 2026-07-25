@@ -7,6 +7,7 @@ class DefaultReferenceRanges {
     'blood_pressure': const MeasurementRanges(fieldRanges: {
       'systolic': ReferenceRange(minValue: 90, maxValue: 120),
       'diastolic': ReferenceRange(minValue: 60, maxValue: 80),
+      'pulse': ReferenceRange(minValue: 60, maxValue: 100),
     }),
     'pulse': const MeasurementRanges(fieldRanges: {
       'pulse': ReferenceRange(minValue: 60, maxValue: 100),
@@ -17,6 +18,7 @@ class DefaultReferenceRanges {
     }),
     'spo2': const MeasurementRanges(fieldRanges: {
       'spo2': ReferenceRange(minValue: 95, maxValue: 100),
+      'pulse': ReferenceRange(minValue: 60, maxValue: 100),
     }),
     'temperature': const MeasurementRanges(fieldRanges: {
       'temperature': ReferenceRange(minValue: 36.1, maxValue: 37.2),

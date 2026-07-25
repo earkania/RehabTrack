@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
+import 'package:rehab_track/presentation/utils/reading_status_color.dart';
 
 class ReadingStatusIndicator extends StatelessWidget {
   final ReadingStatus status;
@@ -13,12 +14,8 @@ class ReadingStatusIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = switch (status) {
-      ReadingStatus.inRange => Colors.green,
-      ReadingStatus.belowRange => Colors.blue,
-      ReadingStatus.aboveRange => Theme.of(context).colorScheme.error,
-      ReadingStatus.unknown => Theme.of(context).colorScheme.outline,
-    };
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = ReadingStatusColor.forStatus(status, colorScheme);
 
     return Icon(
       Icons.circle,

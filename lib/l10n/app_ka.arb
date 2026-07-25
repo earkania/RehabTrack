@@ -284,5 +284,31 @@
   "chart": "გრაფიკი",
   "systolicLabel": "სისტოლური",
   "diastolicLabel": "დიასტოლური",
-  "pulseLabelStat": "პულსი"
+  "pulseLabelStat": "პულსი",
+  "systolicShort": "სისტ.",
+  "diastolicShort": "დიასტ.",
+  "pulseShort": "პულსი",
+  "unavailable": "მიუწვდომელი",
+  "withinConfiguredRange": "კონფიგურირებულ დიაპაზონში",
+  "belowConfiguredRange": "კონფიგურირებულ დიაპაზონზე დაბალი",
+  "aboveConfiguredRange": "კონფიგურირებულ დიაპაზონზე მაღალი",
+  "noReferenceRangeConfigured": "დიაპაზონი არ არის კონფიგურირებული",
+  "componentStatusSystolic": "სისტოლური {status}",
+  "@componentStatusSystolic": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "componentStatusDiastolic": "დიასტოლური {status}",
+  "@componentStatusDiastolic": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "componentStatusPulse": "პულსი {status}",
+  "@componentStatusPulse": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  }
 }

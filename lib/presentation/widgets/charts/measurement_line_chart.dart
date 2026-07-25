@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:rehab_track/domain/entities/measurement_chart.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/utils/reading_status_color.dart';
 
 class MeasurementLineChart extends StatelessWidget {
   final List<MeasurementChartSeries> series;
@@ -241,12 +242,7 @@ class MeasurementLineChart extends StatelessWidget {
   }
 
   Color _statusColor(ReadingStatus status, ColorScheme colorScheme) {
-    return switch (status) {
-      ReadingStatus.inRange => Colors.green,
-      ReadingStatus.belowRange => Colors.blue,
-      ReadingStatus.aboveRange => colorScheme.error,
-      ReadingStatus.unknown => colorScheme.outline,
-    };
+    return ReadingStatusColor.forStatus(status, colorScheme);
   }
 
   String _statusText(ReadingStatus status, AppLocalizations l10n) {

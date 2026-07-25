@@ -788,4 +788,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pulseLabelStat => 'Pulse';
+
+  @override
+  String get systolicShort => 'Systolic';
+
+  @override
+  String get diastolicShort => 'Diastolic';
+
+  @override
+  String get pulseShort => 'Pulse';
+
+  @override
+  String get unavailable => 'Unavailable';
+
+  @override
+  String get withinConfiguredRange => 'within configured range';
+
+  @override
+  String get belowConfiguredRange => 'below configured range';
+
+  @override
+  String get aboveConfiguredRange => 'above configured range';
+
+  @override
+  String get noReferenceRangeConfigured => 'no reference range configured';
+
+  @override
+  String componentStatusSystolic(String status) {
+    return 'Systolic $status';
+  }
+
+  @override
+  String componentStatusDiastolic(String status) {
+    return 'Diastolic $status';
+  }
+
+  @override
+  String componentStatusPulse(String status) {
+    return 'Pulse $status';
+  }
 }

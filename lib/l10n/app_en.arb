@@ -284,5 +284,31 @@
   "chart": "Chart",
   "systolicLabel": "Systolic",
   "diastolicLabel": "Diastolic",
-  "pulseLabelStat": "Pulse"
+  "pulseLabelStat": "Pulse",
+  "systolicShort": "Systolic",
+  "diastolicShort": "Diastolic",
+  "pulseShort": "Pulse",
+  "unavailable": "Unavailable",
+  "withinConfiguredRange": "within configured range",
+  "belowConfiguredRange": "below configured range",
+  "aboveConfiguredRange": "above configured range",
+  "noReferenceRangeConfigured": "no reference range configured",
+  "componentStatusSystolic": "Systolic {status}",
+  "@componentStatusSystolic": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "componentStatusDiastolic": "Diastolic {status}",
+  "@componentStatusDiastolic": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "componentStatusPulse": "Pulse {status}",
+  "@componentStatusPulse": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  }
 }

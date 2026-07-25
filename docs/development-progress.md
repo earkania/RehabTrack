@@ -1076,7 +1076,7 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 #### Supporting Widgets
 - **`MeasurementPeriodSelector`** — `SegmentedButton<MaterialPeriod>` with 4 options
-- **`MeasurementStatisticsCard`** — compact Card with stat rows; BP shows separate systolic/diastolic/pulse sections
+- **`MeasurementStatisticsCard`** — compact Card with stat rows; BP uses comparison table layout
 - **`MeasurementStatusSummaryCard`** — status counts with `ReadingStatusIndicator` dots + irregular heartbeat row
 - **`MeasurementChartLegend`** — inline legend with status dots, series color indicators, irregular heartbeat note
 
@@ -1157,7 +1157,265 @@ Note: Diet module has a DAO but no dedicated repository yet.
 | `flutter pub get` | Completed successfully |
 | `flutter gen-l10n` | Completed successfully |
 | `flutter analyze` | Passed (1 pre-existing info lint, 10 pre-existing test warnings) |
-| `flutter test` | Passed (359/359) |
+| `flutter test` | Passed (359/359, pre-extension) |
+
+### Phase 5B Extension — Blood Pressure Statistics Comparison Table
+
+**Date:** 2026-07-25
+
+**Status:** Completed
+
+**What was done:**
+
+#### Comparison Table Widget
+- **`MeasurementStatisticsComparisonTable`** — new reusable widget for multi-series comparison:
+  - Column headers with series label + unit (e.g. "Systolic mmHg", "Pulse bpm")
+  - Row labels: Latest, Average, Minimum, Maximum
+  - Missing series values show em dash (`—`) — no fabricated zeros
+  - Accessibility: Semantics labels with row + column context (e.g. "Latest Systolic: 125")
+  - Horizontal scroll on narrow screens (no overflow)
+  - Static factory `fromBloodPressure()` for BP-specific layout
+
+#### Blood Pressure Statistics Card Update
+- Replaced `_buildBloodPressureStats()` vertical sections with `MeasurementStatisticsComparisonTable.fromBloodPressure()`
+- Single widget call instead of 3 separate `_SectionHeader` + row blocks
+- Removed unused `_SectionHeader` private class from `measurement_statistics_card.dart`
+
+#### Localization
+- Added `unavailable` key to EN (`"Unavailable"`) and KA (`"მიუწვდომელი"`) ARB files
+- Used in accessibility labels for missing values
+
+**Files Created:**
+- `lib/presentation/widgets/measurements/measurement_statistics_comparison_table.dart`
+- `test/bp_statistics_table_test.dart`
+
+**Files Modified:**
+- `lib/presentation/widgets/measurements/measurement_statistics_card.dart` — replaced BP stats with comparison table
+- `lib/l10n/app_en.arb` — added `unavailable` key
+- `lib/l10n/app_ka.arb` — added `unavailable` key
+
+**Tests Added:** 12 new tests:
+- 9 comparison table tests (headers, labels, values, units, missing pulse, Georgian, narrow screen, accessibility)
+- 3 statistics card integration tests (BP type, single-value type, empty)
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (only pre-existing issues) |
+| `flutter test` | Passed (371/371, pre-extension) |
+
+### Phase 5B Extension — BP Presentation: Compact Headers & Component-Level Status
+
+**Date:** 2026-07-25
+
+**Status:** Completed
+
+**What was done:**
+
+#### Compact Georgian Statistics Headers
+- Added `systolicShort`, `diastolicShort`, `pulseShort` localization keys
+- Georgian compact headers: სისტ., დიასტ., პულსი (single line, no wrapping)
+- English compact headers match full labels (Systolic, Diastolic, Pulse)
+- Full labels preserved in Semantics + Tooltip for accessibility
+- Updated `MeasurementStatisticsComparisonTable` to accept `compactLabel` per column
+
+#### Centralized Status-to-Color Utility
+- **`ReadingStatusColor.forStatus()`** — single source of truth for `ReadingStatus` → `Color` mapping
+- Updated `ReadingStatusIndicator`, `MeasurementLineChart._statusColor()` to use centralized utility
+- Eliminates color duplication between indicator widget and chart
+
+#### BloodPressureComponentStatus Model
+- Domain entity at `lib/domain/entities/blood_pressure_component_status.dart`
+- Fields: `overallStatus`, `systolicStatus`, `diastolicStatus`, `pulseStatus` (nullable)
+- No Flutter imports — pure domain layer
+
+#### BloodPressureStatusEvaluator Service
+- Domain service at `lib/domain/services/blood_pressure_status_evaluator.dart`
+- Evaluates per-component statuses using effective reference ranges
+- Overall status computed via existing `ReadingStatusCalculator` (consistent rules)
+- Pulse status returns `null` when pulse is absent
+
+#### Component-Level Colored History Row
+- **`BloodPressureSummaryText`** widget — `RichText` with status-colored numeric values
+- Systolic value uses systolic status color
+- Diastolic value uses diastolic status color
+- Pulse value uses pulse status color (when present)
+- Separators (`/`, `,`), labels, and units keep normal theme text color
+- Pulse section omitted when pulse is absent
+- Updated `_RecordTile` to use `BloodPressureSummaryText` for BP records
+- Non-BP records continue using plain `Text` from `MeasurementFormatter`
+
+#### Accessibility
+- Compact table headers wrapped in `Semantics(label: fullLabel)` + `Tooltip(message: fullLabel)`
+- `BloodPressureSummaryText` provides `Semantics` label: "Systolic above configured range, Diastolic within configured range"
+- Added localization keys: `withinConfiguredRange`, `belowConfiguredRange`, `aboveConfiguredRange`, `noReferenceRangeConfigured`
+- Added parameterized keys: `componentStatusSystolic`, `componentStatusDiastolic`, `componentStatusPulse`
+
+#### Localization (10 new keys)
+- `systolicShort` / `diastolicShort` / `pulseShort` — compact headers
+- `withinConfiguredRange` / `belowConfiguredRange` / `aboveConfiguredRange` / `noReferenceRangeConfigured` — component status descriptions
+- `componentStatusSystolic` / `componentStatusDiastolic` / `componentStatusPulse` — parameterized accessibility labels
+
+**Files Created:**
+- `lib/domain/entities/blood_pressure_component_status.dart`
+- `lib/domain/services/blood_pressure_status_evaluator.dart`
+- `lib/presentation/utils/reading_status_color.dart`
+- `lib/presentation/widgets/measurements/blood_pressure_summary_text.dart`
+- `test/blood_pressure_status_evaluator_test.dart`
+- `test/bp_component_status_widget_test.dart`
+
+**Files Modified:**
+- `lib/l10n/app_en.arb` — 10 new keys
+- `lib/l10n/app_ka.arb` — 10 new Georgian translations
+- `lib/presentation/widgets/measurements/measurement_statistics_comparison_table.dart` — compact headers + Semantics/Tooltip
+- `lib/presentation/screens/health/measurement_history_screen.dart` — BP-specific RichText rendering
+- `lib/presentation/widgets/common/reading_status_indicator.dart` — uses centralized `ReadingStatusColor`
+- `lib/presentation/widgets/charts/measurement_line_chart.dart` — uses centralized `ReadingStatusColor`
+- `test/bp_statistics_table_test.dart` — updated Georgian compact header assertions
+
+**Tests Added:** 26 new tests:
+- 14 unit tests for `BloodPressureStatusEvaluator` (all component combinations, missing values, unknown ranges, profile override, overall consistency)
+- 12 widget tests: 4 compact header tests (Georgian short labels, narrow screen, Semantics full labels, English) + 8 `BloodPressureSummaryText` tests (systolic/diastolic/pulse colors, separator color, pulse omission, accessibility semantics, English/Georgian summaries, narrow screen)
+
+**Overall Status Behavior:**
+- Overall status dot (`ReadingStatusIndicator`) remains unchanged — shows combined reading status
+- Component-level colors explain which values contributed to that status
+- Irregular heartbeat icon remains completely independent
+
+**Pixel 7 Verification:** Not performed (device not connected during this session)
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (only pre-existing issues) |
+| `flutter test` | Passed (397/397) |
+
+---
+
+### Phase 5B Extension — Measurement-History Status Colouring + BP Pulse Range
+
+**Status:** Completed
+
+**What was done:**
+
+1. **`StatusAwareMeasurementValue` reusable widget** — new presentation widget that renders `RichText` with per-part status colours and `Semantics` label
+   - `MeasurementValuePart` model: `(text, ReadingStatus)`
+   - Multi-part support: SpO2 + optional Pulse rendered with independent colours
+   - Consistent with `BloodPressureSummaryText` widget pattern
+
+2. **Blood Pressure Pulse default reference range** — added `'pulse': ReferenceRange(minValue: 60, maxValue: 100)` to `DefaultReferenceRanges.ranges['blood_pressure']`
+   - Standalone Pulse type range unchanged
+   - Effective-range lookup for BP Pulse now returns known range instead of unknown
+
+3. **Blood Pressure reference-range editor** — updated `_fieldKeysForType('blood_pressure')` from `['systolic', 'diastolic']` to `['systolic', 'diastolic', 'pulse']`
+   - Pulse row now appears in BP range editor with lower/upper bound fields
+   - Save/reset logic unchanged — iterates all field keys
+
+4. **Single-value history status colouring** — updated `_RecordTile` in `measurement_history_screen.dart`
+   - Pulse, Weight, Blood Glucose, Temperature: values now rendered via `StatusAwareMeasurementValue` with status-coloured text
+   - SpO2: both SpO2 value and optional Pulse value rendered with independent status colours
+   - Added `_calculateFieldStatus(fieldKey, value)` helper for per-field status evaluation
+   - Added `_buildSpO2Title()` for SpO2-specific two-component rendering
+   - Added `_statusLabel()` helper for semantics labels
+
+**Files Created:**
+- `lib/presentation/widgets/measurements/status_aware_measurement_value.dart`
+- `test/status_aware_measurement_value_test.dart`
+
+**Files Modified:**
+- `lib/domain/entities/default_reference_ranges.dart` — added pulse range to blood_pressure entry
+- `lib/presentation/screens/health/reference_range_screen.dart` — added pulse to `_fieldKeysForType` for blood_pressure
+- `lib/presentation/screens/health/measurement_history_screen.dart` — single-value + SpO2 status colouring via `StatusAwareMeasurementValue`
+
+**Tests Added:** 14 new tests:
+- 9 `StatusAwareMeasurementValue` widget tests (single-part colour, multi-part colours, aboveRange error colour, unknown outline colour, custom style, semantics label, plain text, SpO2 with pulse, narrow screen)
+- 5 `DefaultReferenceRanges` unit tests (BP includes pulse range, systolic unchanged, diastolic unchanged, standalone pulse unchanged, three field ranges)
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (only pre-existing issues) |
+| `flutter test` | Passed (411/411) |
+
+---
+
+### Phase 5B Extension — Numeric-Only Status Colouring + SpO2 Pulse Range
+
+**Status:** Completed
+
+**What was done:**
+
+1. **Numeric-only status colouring** — restructured `MeasurementValuePart` to separate `label`, `value`, and `unit` fields
+   - Only the `value` span receives status colour
+   - `label` and `unit` spans remain in normal text colour
+   - Applied to all measurement types: Pulse, Weight, Blood Glucose, Temperature, SpO2, Standalone Pulse
+
+2. **`StatusAwareMeasurementValue` widget update** — renders three spans per part: label (normal) → value (status colour) → unit (normal)
+   - Separator `, ` between parts remains normal colour
+   - Consistent with `BloodPressureSummaryText` pattern
+
+3. **`BloodPressureSummaryText` pulse unit fix** — split `'$pulseStr ${pulse.unit}'` into separate value and unit spans
+   - Pulse number (`pulseStr`) receives status colour
+   - Pulse unit (` bpm` or ` წთ`) remains normal colour
+   - Systolic/diastolic `/` separator and ` mmHg` unit were already normal
+
+4. **`MeasurementFormatter.formatNumber` made public** — existing private `_formatNumber` now delegates to public `formatNumber`
+   - Enables `_RecordTile` to build value parts with correct decimal formatting per type
+   - No breaking changes to existing callers
+
+5. **`_RecordTile` single-value builder** — new `_buildSingleValueTitle()` constructs `MeasurementValuePart` from raw values
+   - Type-specific decimal places: Pulse/SpO2 → 0, Weight/Glucose/Temperature → 1
+   - Falls back to first available field for unknown types
+   - Null value renders `--` with unavailable semantics
+
+6. **`_RecordTile` SpO2 builder update** — `_buildSpO2Title()` uses new label/value/unit structure
+   - SpO2 value: `value='97', unit='%'`
+   - Optional Pulse: `label='pulse ', value='70', unit=' bpm'`
+   - Enhanced semantics include numeric values and units
+
+7. **SpO2 Pulse default reference range** — added `'pulse': ReferenceRange(minValue: 60, maxValue: 100)` to `DefaultReferenceRanges.ranges['spo2']`
+   - Standalone Pulse and Blood Pressure Pulse ranges unchanged
+   - SpO2 type now has two field ranges: `spo2` and `pulse`
+
+8. **SpO2 reference-range editor** — updated `_fieldKeysForType('spo2')` from `['spo2']` to `['spo2', 'pulse']`
+   - Pulse row now appears in SpO2 range editor with lower/upper bound fields
+   - Save/reset/clear logic unchanged — iterates all field keys
+
+9. **Effective-range lookup for SpO2 Pulse** — `effectiveRangesForCurrentProfileProvider('spo2')` now returns both `spo2` and `pulse` ranges
+   - Profile override → application default → unknown precedence unchanged
+   - SpO2 Pulse values outside 60–100 show below/above range colours instead of grey
+
+**Files Created:** None
+
+**Files Modified:**
+- `lib/presentation/widgets/measurements/status_aware_measurement_value.dart` — restructured `MeasurementValuePart` with label/value/unit, updated widget rendering
+- `lib/presentation/widgets/measurements/blood_pressure_summary_text.dart` — split pulse value from unit span
+- `lib/presentation/utils/measurement_formatter.dart` — made `formatNumber` public
+- `lib/presentation/screens/health/measurement_history_screen.dart` — added `_buildSingleValueTitle()`, updated `_buildSpO2Title()` with new part structure
+- `lib/domain/entities/default_reference_ranges.dart` — added pulse range to spo2 entry
+- `lib/presentation/screens/health/reference_range_screen.dart` — added pulse to `_fieldKeysForType` for spo2
+- `test/status_aware_measurement_value_test.dart` — rewrote tests for new label/value/unit API, added type-specific colour tests, added SpO2 Pulse range tests
+
+**Tests Updated:** 19 tests:
+- 14 `StatusAwareMeasurementValue` widget tests: value-coloured-unit-normal, label-normal-value-coloured, multi-part independent colours, aboveRange error colour, unknown outline colour, custom style, semantics label, plain text, SpO2 with pulse, narrow screen, temperature, weight, blood glucose, standalone pulse
+- 5 `DefaultReferenceRanges` unit tests: spo2 includes pulse range, spo2 range unchanged, spo2 has two fields, BP pulse unchanged, standalone pulse unchanged
+
+**Accessibility:**
+- Semantics labels include numeric values and units: "SpO2 97%, within configured range. Pulse 70 bpm, within configured range"
+- Units and labels remain in normal text colour for visual display
+- Status legend remains available via info button
+
+**Pixel 7 Verification:** Not performed (device not connected during this session)
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (only pre-existing issues) |
+| `flutter test` | Passed (416/416) |
 
 ---
 

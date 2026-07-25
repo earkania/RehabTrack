@@ -3,6 +3,7 @@ import 'package:rehab_track/domain/entities/measurement_chart.dart';
 import 'package:rehab_track/domain/entities/measurement_statistics.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
+import 'package:rehab_track/presentation/widgets/measurements/measurement_statistics_comparison_table.dart';
 
 class MeasurementStatisticsCard extends StatelessWidget {
   final Map<String, MeasurementStatistics> fieldStatistics;
@@ -75,62 +76,9 @@ class MeasurementStatisticsCard extends StatelessWidget {
   }
 
   Widget _buildBloodPressureStats(AppLocalizations l10n, ThemeData theme) {
-    final sysStats = fieldStatistics['systolic'];
-    final diaStats = fieldStatistics['diastolic'];
-    final pulseStats = fieldStatistics['pulse'];
-
-    return Column(
-      children: [
-        if (sysStats != null) ...[
-          _SectionHeader(label: l10n.systolicLabel),
-          _StatRow(
-            label: l10n.latest,
-            value: _formatDouble(sysStats.latest),
-          ),
-          _StatRow(
-            label: l10n.average,
-            value: _formatDouble(sysStats.average),
-          ),
-          _StatRow(
-            label: l10n.minimum,
-            value: _formatDouble(sysStats.minimum),
-          ),
-          _StatRow(
-            label: l10n.maximum,
-            value: _formatDouble(sysStats.maximum),
-          ),
-        ],
-        if (diaStats != null) ...[
-          _SectionHeader(label: l10n.diastolicLabel),
-          _StatRow(
-            label: l10n.latest,
-            value: _formatDouble(diaStats.latest),
-          ),
-          _StatRow(
-            label: l10n.average,
-            value: _formatDouble(diaStats.average),
-          ),
-          _StatRow(
-            label: l10n.minimum,
-            value: _formatDouble(diaStats.minimum),
-          ),
-          _StatRow(
-            label: l10n.maximum,
-            value: _formatDouble(diaStats.maximum),
-          ),
-        ],
-        if (pulseStats != null) ...[
-          _SectionHeader(label: l10n.pulseLabelStat),
-          _StatRow(
-            label: l10n.latest,
-            value: _formatDouble(pulseStats.latest),
-          ),
-          _StatRow(
-            label: l10n.average,
-            value: _formatDouble(pulseStats.average),
-          ),
-        ],
-      ],
+    return MeasurementStatisticsComparisonTable.fromBloodPressure(
+      fieldStatistics: fieldStatistics,
+      l10n: l10n,
     );
   }
 
@@ -138,25 +86,6 @@ class MeasurementStatisticsCard extends StatelessWidget {
     if (value == null) return '--';
     if (value == value.roundToDouble()) return value.toInt().toString();
     return value.toStringAsFixed(1);
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String label;
-
-  const _SectionHeader({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.sm),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-      ),
-    );
   }
 }
 

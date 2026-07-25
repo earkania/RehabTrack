@@ -176,10 +176,13 @@ class MeasurementFormatter {
     return 'unknown';
   }
 
-  static String _formatNumber(double value, int decimals) {
+  static String formatNumber(double value, int decimals) {
     if (decimals == 0) {
       return value.toInt().toString();
     }
     return value.toStringAsFixed(decimals);
   }
+
+  static String _formatNumber(double value, int decimals) =>
+      formatNumber(value, decimals);
 }

@@ -321,11 +321,11 @@ class _TypeRangeDetailScreenState extends ConsumerState<TypeRangeDetailScreen> {
 
   List<String> _fieldKeysForType(String typeKey) {
     return switch (typeKey) {
-      'blood_pressure' => ['systolic', 'diastolic'],
+      'blood_pressure' => ['systolic', 'diastolic', 'pulse'],
       'pulse' => ['pulse'],
       'weight' => ['weight'],
       'blood_glucose' => ['glucose'],
-      'spo2' => ['spo2'],
+      'spo2' => ['spo2', 'pulse'],
       'temperature' => ['temperature'],
       _ => [],
     };
