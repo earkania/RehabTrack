@@ -284,6 +284,49 @@ Keep an expandable checklist for ideas that may be implemented later.
 
 ---
 
+## Phase 6E — Daily Agenda History and Date Navigation
+
+### Status rules for different date contexts
+
+| Date context | No log with schedule | With log |
+|---|---|---|
+| **Past** | `missed` | stored action (completed/skipped) |
+| **Today** | `due`/`overdue`/`upcoming` (existing logic) | stored action |
+| **Future** | `upcoming` | stored action |
+
+### Past date behavior
+- Inactive schedules do not generate planned future occurrences
+- Historical logs must still be considered even if a schedule is now inactive
+- Items use the `missed` status for no-log occurrences (not `overdue`)
+- Progress bar and completion percentage hidden for past dates
+- "History" summary title shown instead of "Today's Progress"
+- Missed count chip displayed (event_busy icon)
+
+### Future date behavior
+- Planning view only — no action buttons (Taken/Skip/Snooze/Record Now)
+- "First planned item" card shown at the top
+- "Today's Plan" summary title shown
+- No progress bar — total count only
+
+### Date navigation
+- Chevron left/right for day-by-day navigation
+- Tappable date label returns to today
+- "Today" button appears when viewing non-today dates
+- AppBar title: "Today" for today, "Daily Plan · formatted date" otherwise
+- Selected date stored in `selectedAgendaDateProvider` (reset on app launch)
+
+### Data precedence for past dates
+1. Stored action logs (ground truth)
+2. Schedule reconstruction (when no logs exist)
+3. Known limitation: inactive schedules may not appear in historical views (documented)
+
+### Known limitations
+- Inactive schedules are not queried for past dates (only active schedules processed)
+- Historical view limited to schedules that were active when generated
+- The `_intervalScheduleAppliesOnDate` anchor is now configurable (defaults to `DateTime.now()`)
+
+---
+
 # Notes From Real Usage
 
 Create a section specifically intended for recording observations that arise while actually using the application.

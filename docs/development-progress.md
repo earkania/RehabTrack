@@ -2088,6 +2088,56 @@ void _onItemTapped(BuildContext context, int index) {
 
 ---
 
+### Phase 6E — Daily Agenda History and Date Navigation
+
+**Goal:** Extend the Today screen into a date-based Daily Agenda screen with date navigation, past/today/future status rules, and historical data display.
+
+**Domain model changes:**
+- `TodayAgendaItemStatus` — added `missed` status (for past unresolved items)
+- `TodayAgendaItem.isActionable` — includes `missed` status
+- `TodaySummary` — added `medicationMissed`/`measurementMissed` fields (defaults to 0)
+- `TodaySummary.missed` — computed getter for total missed
+- `TodayAgenda` — added `isToday`, `isPast`, `isFuture` date-only getters (fixed DateTime comparison bug)
+
+**Service changes:**
+- `TodayAgendaService.generateAgenda` — accepts optional `selectedDate` parameter (default: today)
+- `_intervalScheduleAppliesOnDate` — fixed anchor bug (now uses schedule's `startDate` via parameter, falls back to `DateTime.now()`)
+- Status determination: past dates → `missed` for no-log items; today → unchanged; future → `upcoming` for no-log items
+- `TodaySummary` now includes `medicationMissed`/`measurementMissed` counts
+
+**Provider changes:**
+- `selectedAgendaDateProvider` — `StateProvider<DateTime>`, default: today, reset on app launch
+- `dailyAgendaProvider` — renamed from `todayAgendaProvider`, watches `selectedAgendaDateProvider`
+- `todayAgendaProvider` — alias for backwards compatibility
+- Derived providers (`dailySummaryProvider`, `nextDailyItemProvider`, `dailyItemsProvider`) with backwards-compatible aliases
+
+**UI changes:**
+- `DateNavigationBar` — new widget with chevron left/right, tappable date label, "Today" button
+- `TodayScreen` — dynamic AppBar title ("Today" vs "Daily Plan · date"), date navigation header, conditional next-item card (hidden for past, "First planned item" for future)
+- `TodaySummaryCard` — now receives `TodayAgenda` as parameter; shows "History" for past, "Today's Plan" for future, "Today's Progress" for today; progress bar hidden for future dates; missed count chip shown for past dates
+- `_FirstPlannedItemCard` — new widget for future dates showing first scheduled item
+
+**Popup menu behavior:**
+- Past dates: `missed` items are actionable (can mark as taken/skipped)
+- Future dates: read-only (no Taken/Skip/Snooze/Record Now) — controlled by existing `isActionable` logic
+
+**Localization keys added (EN + KA):**
+- `dailyPlan`, `previousDay`, `nextDay`, `returnToToday`, `nothingScheduledForThisDay`, `firstPlannedItem`, `scheduledAt`, `history`, `medicationsMissed`, `measurementsMissed`
+
+**Tests (25 new, all pass):**
+- DateNavigationBar: Today label, formatted date, left/right chevron navigation, tap-to-today
+- TodayAgenda date getters: isToday, isPast, isFuture (date-only comparison)
+- Past date: AppBar title, History summary, missed items, missed count chip, no next card
+- Future date: AppBar title, Today's Plan summary, first planned item card, no progress bar, total count
+- Today date: AppBar title, Today's Progress, next item card
+- Missed status: actionable, summary computation
+- Empty state: past vs today messages
+
+**Validation:**
+- `dart analyze lib/` — 0 errors, only pre-existing infos
+- `flutter test` — 150 passed, 1 pre-existing failure (measurement icon)
+- APK builds and installs successfully
+
 ## Development Rules
 
 - Commit after every completed phase

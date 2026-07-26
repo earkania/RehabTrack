@@ -978,4 +978,33 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get editReading => 'ჩანაწერის რედაქტირება';
+
+  @override
+  String get dailyPlan => 'დღის გეგმა';
+
+  @override
+  String get previousDay => 'წინა დღე';
+
+  @override
+  String get nextDay => 'მომდევნო დღე';
+
+  @override
+  String get returnToToday => 'დღეს';
+
+  @override
+  String get nothingScheduledForThisDay => 'ამ დღისთვის არაფერია დაგეგმილი';
+
+  @override
+  String get firstPlannedItem => 'პირველი დაგეგმილი ელემენტი';
+
+  @override
+  String scheduledAt(Object time) {
+    return 'დაგეგმილია $time';
+  }
+
+  @override
+  String get medicationsMissed => 'გამოტოვებული მედიკამენტები';
+
+  @override
+  String get measurementsMissed => 'გამოტოვებული გაზომვები';
 }

@@ -217,7 +217,7 @@ void main() {
     });
 
     testWidgets('summary is visible', (tester) async {
-      final now = DateTime(2025, 7, 25, 12, 0);
+      final now = DateTime.now();
       final agenda = _mockAgenda(now: now);
 
       await tester.pumpWidget(_buildScreen(agenda: agenda));

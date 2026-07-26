@@ -984,4 +984,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editReading => 'Edit Reading';
+
+  @override
+  String get dailyPlan => 'Daily Plan';
+
+  @override
+  String get previousDay => 'Previous day';
+
+  @override
+  String get nextDay => 'Next day';
+
+  @override
+  String get returnToToday => 'Today';
+
+  @override
+  String get nothingScheduledForThisDay => 'Nothing scheduled for this day';
+
+  @override
+  String get firstPlannedItem => 'First planned item';
+
+  @override
+  String scheduledAt(Object time) {
+    return 'Scheduled at $time';
+  }
+
+  @override
+  String get medicationsMissed => 'Missed medications';
+
+  @override
+  String get measurementsMissed => 'Missed measurements';
 }

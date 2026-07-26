@@ -375,5 +375,15 @@
   "changeToSkipped": "Change to Skipped",
   "changeToTaken": "Change to Taken",
   "resetToPending": "Reset to Pending",
-  "editReading": "Edit Reading"
+  "editReading": "Edit Reading",
+  "dailyPlan": "Daily Plan",
+  "previousDay": "Previous day",
+  "nextDay": "Next day",
+  "returnToToday": "Today",
+  "nothingScheduledForThisDay": "Nothing scheduled for this day",
+  "firstPlannedItem": "First planned item",
+  "scheduledAt": "Scheduled at {time}",
+  "history": "History",
+  "medicationsMissed": "Missed medications",
+  "measurementsMissed": "Missed measurements"
 }

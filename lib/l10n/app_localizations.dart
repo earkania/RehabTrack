@@ -1951,6 +1951,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit Reading'**
   String get editReading;
+
+  /// No description provided for @dailyPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Plan'**
+  String get dailyPlan;
+
+  /// No description provided for @previousDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous day'**
+  String get previousDay;
+
+  /// No description provided for @nextDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Next day'**
+  String get nextDay;
+
+  /// No description provided for @returnToToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get returnToToday;
+
+  /// No description provided for @nothingScheduledForThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing scheduled for this day'**
+  String get nothingScheduledForThisDay;
+
+  /// No description provided for @firstPlannedItem.
+  ///
+  /// In en, this message translates to:
+  /// **'First planned item'**
+  String get firstPlannedItem;
+
+  /// No description provided for @scheduledAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled at {time}'**
+  String scheduledAt(Object time);
+
+  /// No description provided for @medicationsMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed medications'**
+  String get medicationsMissed;
+
+  /// No description provided for @measurementsMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed measurements'**
+  String get measurementsMissed;
 }
 
 class _AppLocalizationsDelegate

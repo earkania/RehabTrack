@@ -218,6 +218,10 @@ class _StatusIcon extends StatelessWidget {
         Icons.snooze,
         theme.colorScheme.tertiary,
       ),
+      TodayAgendaItemStatus.missed => (
+        Icons.event_busy,
+        theme.colorScheme.onSurfaceVariant,
+      ),
     };
 
     return Icon(icon, color: color, size: 22);
