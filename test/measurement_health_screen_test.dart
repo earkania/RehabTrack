@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:rehab_track/presentation/screens/health/health_screen.dart';
+import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_formatter.dart';
 import 'package:rehab_track/presentation/utils/measurement_validator.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';

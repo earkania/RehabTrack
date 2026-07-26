@@ -261,6 +261,7 @@ class TodayAgendaService {
           : null,
       measurementTypeId: type?.id,
       measurementTypeKey: type?.key,
+      measurementRecordId: log?.measurementRecordId,
     );
   }
 

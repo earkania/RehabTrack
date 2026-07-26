@@ -32,8 +32,16 @@ abstract class MedicationRepository {
     DateTime? from,
     DateTime? to,
   });
+  Future<MedicationLog?> getLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  );
   Future<int> logDose(MedicationLog log);
   Future<void> updateLog(MedicationLog log);
+  Future<void> deleteLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  );
 
   Stream<List<MedicationAlternative>> watchAlternatives(
     int medicationId,

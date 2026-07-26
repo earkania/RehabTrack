@@ -640,6 +640,8 @@ void main() {
 
       expect(find.text('Mark as Taken'), findsNothing);
       expect(find.text('Skip'), findsNothing);
+      expect(find.text('Change to Skipped'), findsOneWidget);
+      expect(find.text('Reset to Pending'), findsOneWidget);
       expect(find.text('Details'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
     });
@@ -660,7 +662,7 @@ void main() {
 
       expect(find.text('Record Now'), findsOneWidget);
       expect(find.text('Skip'), findsOneWidget);
-      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
       expect(find.text('Trends'), findsOneWidget);
     });
@@ -898,6 +900,8 @@ void main() {
 
       expect(find.text('Mark as Taken'), findsNothing);
       expect(find.text('Skip'), findsNothing);
+      expect(find.text('Change to Taken'), findsOneWidget);
+      expect(find.text('Reset to Pending'), findsOneWidget);
       expect(find.text('Details'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
     });
@@ -1300,7 +1304,7 @@ void main() {
       expect(find.text('Record Now'), findsOneWidget);
       expect(find.text('Skip'), findsOneWidget);
       expect(find.text('Mark as Taken'), findsNothing);
-      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
       expect(find.text('Trends'), findsOneWidget);
     });
@@ -1442,7 +1446,7 @@ void main() {
 
       expect(find.text('Record Now'), findsOneWidget);
       expect(find.text('Skip'), findsOneWidget);
-      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
       expect(find.text('Trends'), findsOneWidget);
     });
@@ -1465,6 +1469,102 @@ void main() {
 
       // Verify the menu is open
       expect(find.text('Mark as Taken'), findsOneWidget);
+    });
+
+    testWidgets('completed measurement shows Reset to Pending and Schedules',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.completed,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reset to Pending'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
+      expect(find.text('Record Now'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(find.text('History'), findsOneWidget);
+      expect(find.text('Trends'), findsOneWidget);
+    });
+
+    testWidgets('skipped measurement shows Reset to Pending and Schedules',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.skipped,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reset to Pending'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
+      expect(find.text('Record Now'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(find.text('History'), findsOneWidget);
+      expect(find.text('Trends'), findsOneWidget);
+    });
+
+    testWidgets('completed medication shows Change to Skipped and Reset to Pending',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'Completed Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.completed,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Change to Skipped'), findsOneWidget);
+      expect(find.text('Reset to Pending'), findsOneWidget);
+      expect(find.text('Mark as Taken'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('History'), findsOneWidget);
+    });
+
+    testWidgets('skipped medication shows Change to Taken and Reset to Pending',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'Skipped Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.skipped,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Change to Taken'), findsOneWidget);
+      expect(find.text('Reset to Pending'), findsOneWidget);
+      expect(find.text('Mark as Taken'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('History'), findsOneWidget);
     });
   });
 }

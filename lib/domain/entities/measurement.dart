@@ -329,6 +329,7 @@ class MeasurementReminderLog {
   final DateTime scheduledTime;
   final DateTime? actionTime;
   final MeasurementReminderAction status;
+  final int? measurementRecordId;
   final DateTime createdAt;
 
   const MeasurementReminderLog({
@@ -337,6 +338,7 @@ class MeasurementReminderLog {
     required this.scheduledTime,
     this.actionTime,
     required this.status,
+    this.measurementRecordId,
     required this.createdAt,
   });
 
@@ -346,7 +348,9 @@ class MeasurementReminderLog {
     DateTime? scheduledTime,
     DateTime? actionTime,
     MeasurementReminderAction? status,
+    int? measurementRecordId,
     DateTime? createdAt,
+    bool clearMeasurementRecordId = false,
   }) {
     return MeasurementReminderLog(
       id: id ?? this.id,
@@ -355,6 +359,9 @@ class MeasurementReminderLog {
       scheduledTime: scheduledTime ?? this.scheduledTime,
       actionTime: actionTime ?? this.actionTime,
       status: status ?? this.status,
+      measurementRecordId: clearMeasurementRecordId
+          ? null
+          : (measurementRecordId ?? this.measurementRecordId),
       createdAt: createdAt ?? this.createdAt,
     );
   }

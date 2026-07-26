@@ -166,7 +166,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           if (typeId == null) {
             return const _InvalidRouteScreen();
           }
-          return MeasurementEntryScreen(measurementTypeId: typeId);
+          final extra = state.extra as RecordNowExtra?;
+          return MeasurementEntryScreen(
+            measurementTypeId: typeId,
+            recordNowExtra: extra,
+          );
         },
       ),
       GoRoute(

@@ -383,6 +383,7 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         scheduledTime: log.scheduledTime,
         actionTime: Value(log.actionTime),
         status: log.status.name,
+        measurementRecordId: Value(log.measurementRecordId),
         createdAt: log.createdAt,
       ),
     );
@@ -397,8 +398,20 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         scheduledTime: Value(log.scheduledTime),
         actionTime: Value(log.actionTime),
         status: Value(log.status.name),
+        measurementRecordId: Value(log.measurementRecordId),
         createdAt: Value(log.createdAt),
       ),
+    );
+  }
+
+  @override
+  Future<void> deleteReminderLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) async {
+    await _database.measurementDao.deleteReminderLogForOccurrence(
+      scheduleId,
+      scheduledTime,
     );
   }
 
@@ -536,6 +549,7 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
       scheduledTime: row.scheduledTime,
       actionTime: row.actionTime,
       status: MeasurementReminderAction.fromString(row.status),
+      measurementRecordId: row.measurementRecordId,
       createdAt: row.createdAt,
     );
   }

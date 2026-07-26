@@ -972,4 +972,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToUpdateItem => 'Failed to update item';
+
+  @override
+  String get changeToSkipped => 'Change to Skipped';
+
+  @override
+  String get changeToTaken => 'Change to Taken';
+
+  @override
+  String get resetToPending => 'Reset to Pending';
+
+  @override
+  String get editReading => 'Edit Reading';
 }

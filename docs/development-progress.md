@@ -1919,6 +1919,80 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 ---
 
+### Phase 6D — Scheduled Action Refinement
+
+**Status:** Completed
+
+**What was done:**
+
+**Repository layer — occurrence-based methods:**
+- `MedicationDao.getLogForOccurrence(scheduleId, scheduledTime)` — find existing log by schedule+time
+- `MedicationDao.deleteLogForOccurrence(scheduleId, scheduledTime)` — delete log by schedule+time (for Reset to Pending)
+- `MeasurementDao.deleteReminderLogForOccurrence(scheduleId, scheduledTime)` — delete reminder log by schedule+time
+- `MedicationRepository.getLogForOccurrence()`, `deleteLogForOccurrence()` — domain interface
+- `MeasurementRepository.deleteReminderLogForOccurrence()` — domain interface
+- `MedicationRepositoryImpl` and `MeasurementRepositoryImpl` — implementations
+
+**Popup menu restructure — measurement:**
+- Actionable (upcoming/due/overdue/snoozed): Record Now, Skip, Schedules, History, Trends
+- Completed/skipped: Reset to Pending, Schedules, History, Trends
+- "Details" replaced by "Schedules" — navigates to `MeasurementScheduleListScreen`
+- `RecordNowExtra` class created to carry occurrence context through GoRouter extra
+
+**Popup menu restructure — medication:**
+- Actionable (upcoming/due/overdue/snoozed): Mark as Taken, Skip, Details, History
+- Completed: Change to Skipped, Reset to Pending, Details, History
+- Skipped: Change to Taken, Reset to Pending, Details, History
+
+**Status correction — medication:**
+- `_changeStatus()` — updates existing log status or creates new log with new status
+- `_resetToPending()` — deletes log for occurrence, reverting item to pending state
+
+**Reset to Pending — measurement:**
+- `_resetToPending()` — deletes `MeasurementReminderLog` for the occurrence via `deleteReminderLogForOccurrence()`
+
+**Record Now context — measurement:**
+- `RecordNowExtra` class carries `scheduledOccurrenceTime` and `reminderScheduleId`
+- `_recordNow()` passes `RecordNowExtra` via `context.push(..., extra: extra)`
+- Router extracts `state.extra as RecordNowExtra?` and passes to `MeasurementEntryScreen`
+- `MeasurementEntryScreen` accepts optional `recordNowExtra` parameter
+- `_completeReminder()` — on save, marks `MeasurementReminderLog` as `completed` (updates existing or creates new)
+
+**All popup menu Rows use `mainAxisSize: MainAxisSize.min`** to prevent overflow on narrow screens, with `Flexible` + `TextOverflow.ellipsis` on longer labels.
+
+**Localization:**
+- `changeToSkipped` / `changeToTaken` / `resetToPending` — added to both `app_en.arb` and `app_ka.arb`
+
+**Tests updated/added (4 new, 5 updated):**
+- Updated: completed medication, skipped medication, measurement item, measurement due, overdue measurement — all now check for new menu items (Schedules, Reset to Pending, Change to Skipped/Taken)
+- New: `completed measurement shows Reset to Pending and Schedules`
+- New: `skipped measurement shows Reset to Pending and Schedules`
+- New: `completed medication shows Change to Skipped and Reset to Pending`
+- New: `skipped medication shows Change to Taken and Reset to Pending`
+
+**Files modified:**
+- `lib/data/database/daos/medication_dao.dart` — added `getLogForOccurrence`, `deleteLogForOccurrence`
+- `lib/data/database/daos/measurement_dao.dart` — added `deleteReminderLogForOccurrence`
+- `lib/domain/repositories/medication_repository.dart` — added interface methods
+- `lib/domain/repositories/measurement_repository.dart` — added `deleteReminderLogForOccurrence`
+- `lib/data/repositories/medication_repository_impl.dart` — implemented new methods
+- `lib/data/repositories/measurement_repository_impl.dart` — implemented new method
+- `lib/presentation/widgets/today/today_agenda_item.dart` — restructured popup menus, added status correction and reset actions
+- `lib/core/router/app_routes.dart` — added `RecordNowExtra` class
+- `lib/core/router/app_router.dart` — passes `RecordNowExtra` to `MeasurementEntryScreen`
+- `lib/presentation/screens/health/measurement_entry_screen.dart` — accepts `recordNowExtra`, calls `_completeReminder()` on save
+- `lib/l10n/app_en.arb` — added 3 keys
+- `lib/l10n/app_ka.arb` — added 3 keys
+- `test/today_screen_test.dart` — 4 new tests, 5 updated tests
+- `test/notification_action_bridge_test.dart` — added missing mock methods
+
+**Validation:**
+- `flutter analyze`: 0 errors, 17 pre-existing infos/warnings only
+- `flutter test`: 543 passed, 8 failed (all pre-existing in `phase5a_correction_test.dart` — pumpAndSettle timeouts)
+- APK built successfully (Pixel 7 not connected for device verification)
+
+---
+
 ## Development Rules
 
 - Commit after every completed phase

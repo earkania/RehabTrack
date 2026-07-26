@@ -34,6 +34,16 @@ class AppRoutes {
       '/medications/medication/$medicationId/alternative/$alternativeId/edit';
 }
 
+class RecordNowExtra {
+  final DateTime scheduledOccurrenceTime;
+  final int reminderScheduleId;
+
+  const RecordNowExtra({
+    required this.scheduledOccurrenceTime,
+    required this.reminderScheduleId,
+  });
+}
+
 class _OldRoutes {
   static const health = '/health';
   static const activities = '/activities';

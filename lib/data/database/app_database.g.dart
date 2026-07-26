@@ -7800,6 +7800,16 @@ class $MeasurementReminderLogsTable extends MeasurementReminderLogs
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _measurementRecordIdMeta =
+      const VerificationMeta('measurementRecordId');
+  @override
+  late final GeneratedColumn<int> measurementRecordId = GeneratedColumn<int>(
+    'measurement_record_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -7818,6 +7828,7 @@ class $MeasurementReminderLogsTable extends MeasurementReminderLogs
     scheduledTime,
     actionTime,
     status,
+    measurementRecordId,
     createdAt,
   ];
   @override
@@ -7871,6 +7882,15 @@ class $MeasurementReminderLogsTable extends MeasurementReminderLogs
     } else if (isInserting) {
       context.missing(_statusMeta);
     }
+    if (data.containsKey('measurement_record_id')) {
+      context.handle(
+        _measurementRecordIdMeta,
+        measurementRecordId.isAcceptableOrUnknown(
+          data['measurement_record_id']!,
+          _measurementRecordIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -7908,6 +7928,10 @@ class $MeasurementReminderLogsTable extends MeasurementReminderLogs
         DriftSqlType.string,
         data['${effectivePrefix}status'],
       )!,
+      measurementRecordId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}measurement_record_id'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -7928,6 +7952,7 @@ class MeasurementReminderLog extends DataClass
   final DateTime scheduledTime;
   final DateTime? actionTime;
   final String status;
+  final int? measurementRecordId;
   final DateTime createdAt;
   const MeasurementReminderLog({
     required this.id,
@@ -7935,6 +7960,7 @@ class MeasurementReminderLog extends DataClass
     required this.scheduledTime,
     this.actionTime,
     required this.status,
+    this.measurementRecordId,
     required this.createdAt,
   });
   @override
@@ -7947,6 +7973,9 @@ class MeasurementReminderLog extends DataClass
       map['action_time'] = Variable<DateTime>(actionTime);
     }
     map['status'] = Variable<String>(status);
+    if (!nullToAbsent || measurementRecordId != null) {
+      map['measurement_record_id'] = Variable<int>(measurementRecordId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -7960,6 +7989,9 @@ class MeasurementReminderLog extends DataClass
           ? const Value.absent()
           : Value(actionTime),
       status: Value(status),
+      measurementRecordId: measurementRecordId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(measurementRecordId),
       createdAt: Value(createdAt),
     );
   }
@@ -7977,6 +8009,9 @@ class MeasurementReminderLog extends DataClass
       scheduledTime: serializer.fromJson<DateTime>(json['scheduledTime']),
       actionTime: serializer.fromJson<DateTime?>(json['actionTime']),
       status: serializer.fromJson<String>(json['status']),
+      measurementRecordId: serializer.fromJson<int?>(
+        json['measurementRecordId'],
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -7989,6 +8024,7 @@ class MeasurementReminderLog extends DataClass
       'scheduledTime': serializer.toJson<DateTime>(scheduledTime),
       'actionTime': serializer.toJson<DateTime?>(actionTime),
       'status': serializer.toJson<String>(status),
+      'measurementRecordId': serializer.toJson<int?>(measurementRecordId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -7999,6 +8035,7 @@ class MeasurementReminderLog extends DataClass
     DateTime? scheduledTime,
     Value<DateTime?> actionTime = const Value.absent(),
     String? status,
+    Value<int?> measurementRecordId = const Value.absent(),
     DateTime? createdAt,
   }) => MeasurementReminderLog(
     id: id ?? this.id,
@@ -8006,6 +8043,9 @@ class MeasurementReminderLog extends DataClass
     scheduledTime: scheduledTime ?? this.scheduledTime,
     actionTime: actionTime.present ? actionTime.value : this.actionTime,
     status: status ?? this.status,
+    measurementRecordId: measurementRecordId.present
+        ? measurementRecordId.value
+        : this.measurementRecordId,
     createdAt: createdAt ?? this.createdAt,
   );
   MeasurementReminderLog copyWithCompanion(
@@ -8023,6 +8063,9 @@ class MeasurementReminderLog extends DataClass
           ? data.actionTime.value
           : this.actionTime,
       status: data.status.present ? data.status.value : this.status,
+      measurementRecordId: data.measurementRecordId.present
+          ? data.measurementRecordId.value
+          : this.measurementRecordId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -8035,6 +8078,7 @@ class MeasurementReminderLog extends DataClass
           ..write('scheduledTime: $scheduledTime, ')
           ..write('actionTime: $actionTime, ')
           ..write('status: $status, ')
+          ..write('measurementRecordId: $measurementRecordId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -8047,6 +8091,7 @@ class MeasurementReminderLog extends DataClass
     scheduledTime,
     actionTime,
     status,
+    measurementRecordId,
     createdAt,
   );
   @override
@@ -8058,6 +8103,7 @@ class MeasurementReminderLog extends DataClass
           other.scheduledTime == this.scheduledTime &&
           other.actionTime == this.actionTime &&
           other.status == this.status &&
+          other.measurementRecordId == this.measurementRecordId &&
           other.createdAt == this.createdAt);
 }
 
@@ -8068,6 +8114,7 @@ class MeasurementReminderLogsCompanion
   final Value<DateTime> scheduledTime;
   final Value<DateTime?> actionTime;
   final Value<String> status;
+  final Value<int?> measurementRecordId;
   final Value<DateTime> createdAt;
   const MeasurementReminderLogsCompanion({
     this.id = const Value.absent(),
@@ -8075,6 +8122,7 @@ class MeasurementReminderLogsCompanion
     this.scheduledTime = const Value.absent(),
     this.actionTime = const Value.absent(),
     this.status = const Value.absent(),
+    this.measurementRecordId = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   MeasurementReminderLogsCompanion.insert({
@@ -8083,6 +8131,7 @@ class MeasurementReminderLogsCompanion
     required DateTime scheduledTime,
     this.actionTime = const Value.absent(),
     required String status,
+    this.measurementRecordId = const Value.absent(),
     required DateTime createdAt,
   }) : measurementScheduleId = Value(measurementScheduleId),
        scheduledTime = Value(scheduledTime),
@@ -8094,6 +8143,7 @@ class MeasurementReminderLogsCompanion
     Expression<DateTime>? scheduledTime,
     Expression<DateTime>? actionTime,
     Expression<String>? status,
+    Expression<int>? measurementRecordId,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -8103,6 +8153,8 @@ class MeasurementReminderLogsCompanion
       if (scheduledTime != null) 'scheduled_time': scheduledTime,
       if (actionTime != null) 'action_time': actionTime,
       if (status != null) 'status': status,
+      if (measurementRecordId != null)
+        'measurement_record_id': measurementRecordId,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -8113,6 +8165,7 @@ class MeasurementReminderLogsCompanion
     Value<DateTime>? scheduledTime,
     Value<DateTime?>? actionTime,
     Value<String>? status,
+    Value<int?>? measurementRecordId,
     Value<DateTime>? createdAt,
   }) {
     return MeasurementReminderLogsCompanion(
@@ -8122,6 +8175,7 @@ class MeasurementReminderLogsCompanion
       scheduledTime: scheduledTime ?? this.scheduledTime,
       actionTime: actionTime ?? this.actionTime,
       status: status ?? this.status,
+      measurementRecordId: measurementRecordId ?? this.measurementRecordId,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -8146,6 +8200,9 @@ class MeasurementReminderLogsCompanion
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
+    if (measurementRecordId.present) {
+      map['measurement_record_id'] = Variable<int>(measurementRecordId.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -8160,6 +8217,7 @@ class MeasurementReminderLogsCompanion
           ..write('scheduledTime: $scheduledTime, ')
           ..write('actionTime: $actionTime, ')
           ..write('status: $status, ')
+          ..write('measurementRecordId: $measurementRecordId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -20904,6 +20962,7 @@ typedef $$MeasurementReminderLogsTableCreateCompanionBuilder =
       required DateTime scheduledTime,
       Value<DateTime?> actionTime,
       required String status,
+      Value<int?> measurementRecordId,
       required DateTime createdAt,
     });
 typedef $$MeasurementReminderLogsTableUpdateCompanionBuilder =
@@ -20913,6 +20972,7 @@ typedef $$MeasurementReminderLogsTableUpdateCompanionBuilder =
       Value<DateTime> scheduledTime,
       Value<DateTime?> actionTime,
       Value<String> status,
+      Value<int?> measurementRecordId,
       Value<DateTime> createdAt,
     });
 
@@ -20981,6 +21041,11 @@ class $$MeasurementReminderLogsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get measurementRecordId => $composableBuilder(
+    column: $table.measurementRecordId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
@@ -21039,6 +21104,11 @@ class $$MeasurementReminderLogsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get measurementRecordId => $composableBuilder(
+    column: $table.measurementRecordId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -21093,6 +21163,11 @@ class $$MeasurementReminderLogsTableAnnotationComposer
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get measurementRecordId => $composableBuilder(
+    column: $table.measurementRecordId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -21166,6 +21241,7 @@ class $$MeasurementReminderLogsTableTableManager
                 Value<DateTime> scheduledTime = const Value.absent(),
                 Value<DateTime?> actionTime = const Value.absent(),
                 Value<String> status = const Value.absent(),
+                Value<int?> measurementRecordId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => MeasurementReminderLogsCompanion(
                 id: id,
@@ -21173,6 +21249,7 @@ class $$MeasurementReminderLogsTableTableManager
                 scheduledTime: scheduledTime,
                 actionTime: actionTime,
                 status: status,
+                measurementRecordId: measurementRecordId,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -21182,6 +21259,7 @@ class $$MeasurementReminderLogsTableTableManager
                 required DateTime scheduledTime,
                 Value<DateTime?> actionTime = const Value.absent(),
                 required String status,
+                Value<int?> measurementRecordId = const Value.absent(),
                 required DateTime createdAt,
               }) => MeasurementReminderLogsCompanion.insert(
                 id: id,
@@ -21189,6 +21267,7 @@ class $$MeasurementReminderLogsTableTableManager
                 scheduledTime: scheduledTime,
                 actionTime: actionTime,
                 status: status,
+                measurementRecordId: measurementRecordId,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

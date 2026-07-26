@@ -4,6 +4,7 @@ import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
+import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:intl/intl.dart';
 
@@ -34,7 +35,7 @@ class TodayNextItemCard extends ConsumerWidget {
         child: Row(
           children: [
             Icon(
-              isMedication ? Icons.medication : Icons.monitor_heart_outlined,
+              isMedication ? Icons.medication : measurementIconForType(nextItem.measurementTypeKey),
               color: theme.colorScheme.onPrimaryContainer,
               size: 32,
             ),

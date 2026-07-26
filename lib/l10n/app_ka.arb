@@ -371,5 +371,9 @@
   "openDetails": "დეტალები",
   "viewHistory": "ისტორია",
   "viewTrends": "ტრენდები",
-  "failedToUpdateItem": "ელემენტის განახლება ვერ მოხერხდა"
+  "failedToUpdateItem": "ელემენტის განახლება ვერ მოხერხდა",
+  "changeToSkipped": "შეცვალეთ გამოტოვებულზე",
+  "changeToTaken": "შეცვალეთ მიღებულზე",
+  "resetToPending": "დააბრუნეთ მოლოდინში",
+  "editReading": "ჩანაწერის რედაქტირება"
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
+import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 
@@ -142,16 +142,4 @@ class _MeasurementTypeCard extends StatelessWidget {
       ),
     );
   }
-}
-
-IconData measurementIconForType(String? key) {
-  return switch (key) {
-    'blood_pressure' => Icons.monitor_heart,
-    'pulse' => Icons.favorite,
-    'weight' => Symbols.weight,
-    'blood_glucose' => Icons.bloodtype,
-    'spo2' => Icons.air,
-    'temperature' => Icons.thermostat,
-    _ => Icons.straighten,
-  };
 }
