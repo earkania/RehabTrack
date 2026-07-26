@@ -84,6 +84,9 @@ class AppLocalizationsKa extends AppLocalizations {
   String get error => 'შეცდომა';
 
   @override
+  String get actionFailed => 'მოქმედების შესრულება ვერ მოხერხდა';
+
+  @override
   String get retry => 'ხელახლა';
 
   @override

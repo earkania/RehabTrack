@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'Error'**
   String get error;
 
+  /// No description provided for @actionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not complete action'**
+  String get actionFailed;
+
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:

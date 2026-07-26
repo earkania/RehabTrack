@@ -25,6 +25,7 @@
   "back": "Back",
   "loading": "Loading...",
   "error": "Error",
+  "actionFailed": "Could not complete action",
   "retry": "Retry",
   "ok": "OK",
   "yes": "Yes",

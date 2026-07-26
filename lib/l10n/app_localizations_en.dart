@@ -84,6 +84,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get error => 'Error';
 
   @override
+  String get actionFailed => 'Could not complete action';
+
+  @override
   String get retry => 'Retry';
 
   @override

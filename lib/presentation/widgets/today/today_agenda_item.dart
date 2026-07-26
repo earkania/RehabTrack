@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
+import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
@@ -208,17 +209,26 @@ class _StatusIcon extends StatelessWidget {
   }
 }
 
-class _AgendaItemMenu extends ConsumerWidget {
+class _AgendaItemMenu extends ConsumerStatefulWidget {
   final TodayAgendaItem item;
 
   const _AgendaItemMenu({required this.item});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_AgendaItemMenu> createState() => _AgendaItemMenuState();
+}
+
+class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
+  bool _isProcessing = false;
+
+  TodayAgendaItem get item => widget.item;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return PopupMenuButton<String>(
-      onSelected: (value) => _handleAction(context, ref, value, l10n),
+      onSelected: _isProcessing ? null : (value) => _handleAction(context, value, l10n),
       tooltip: l10n.moreActions,
       itemBuilder: (context) => _buildMenuItems(l10n),
     );
@@ -315,19 +325,16 @@ class _AgendaItemMenu extends ConsumerWidget {
 
   void _handleAction(
     BuildContext context,
-    WidgetRef ref,
     String value,
     AppLocalizations l10n,
   ) {
-    Navigator.of(context).pop();
-
     switch (value) {
       case 'mark_taken':
-        _markTaken(ref);
+        _markTaken(context, l10n);
       case 'record_now':
         _recordNow(context);
       case 'skip':
-        _skip(ref);
+        _skip(context, l10n);
       case 'details':
         _openDetails(context);
       case 'history':
@@ -337,43 +344,83 @@ class _AgendaItemMenu extends ConsumerWidget {
     }
   }
 
-  void _markTaken(WidgetRef ref) async {
+  Future<void> _markTaken(BuildContext context, AppLocalizations l10n) async {
     if (item.medicationId == null || item.sourceScheduleId <= 0) return;
-    final repo = ref.read(medicationRepositoryProvider);
-    final log = MedicationLog(
-      medicationScheduleId: item.sourceScheduleId,
-      scheduledTime: item.scheduledDateTime,
-      takenTime: DateTime.now(),
-      status: 'taken',
-      createdAt: DateTime.now(),
-      snapshotIntakeQuantity: item.intakeQuantity,
-      snapshotDosageForm: item.dosageForm,
-      snapshotCustomDosageForm: item.customDosageForm,
-    );
-    await repo.logDose(log);
-    ref.invalidate(todayAgendaProvider);
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
+
+    try {
+      final repo = ref.read(medicationRepositoryProvider);
+      final log = MedicationLog(
+        medicationScheduleId: item.sourceScheduleId,
+        scheduledTime: item.scheduledDateTime,
+        takenTime: DateTime.now(),
+        status: 'taken',
+        createdAt: DateTime.now(),
+        snapshotIntakeQuantity: item.intakeQuantity,
+        snapshotDosageForm: item.dosageForm,
+        snapshotCustomDosageForm: item.customDosageForm,
+      );
+      await repo.logDose(log);
+      if (!mounted) return;
+      ref.invalidate(todayAgendaProvider);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.actionFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
   }
 
   void _recordNow(BuildContext context) {
-    if (item.measurementTypeId == null) return;
-    context.push(AppRoutes.measurementAdd(item.measurementTypeId!));
+    final typeId = item.measurementTypeId;
+    if (typeId == null) return;
+    context.push(AppRoutes.measurementAdd(typeId));
   }
 
-  void _skip(WidgetRef ref) async {
-    if (item.medicationId == null || item.sourceScheduleId <= 0) return;
-    final repo = ref.read(medicationRepositoryProvider);
-    final log = MedicationLog(
-      medicationScheduleId: item.sourceScheduleId,
-      scheduledTime: item.scheduledDateTime,
-      takenTime: DateTime.now(),
-      status: 'skipped',
-      createdAt: DateTime.now(),
-      snapshotIntakeQuantity: item.intakeQuantity,
-      snapshotDosageForm: item.dosageForm,
-      snapshotCustomDosageForm: item.customDosageForm,
-    );
-    await repo.logDose(log);
-    ref.invalidate(todayAgendaProvider);
+  Future<void> _skip(BuildContext context, AppLocalizations l10n) async {
+    if (_isProcessing) return;
+    if (item.sourceScheduleId <= 0) return;
+    setState(() => _isProcessing = true);
+
+    try {
+      if (item.type == TodayAgendaItemType.medication &&
+          item.medicationId != null) {
+        final repo = ref.read(medicationRepositoryProvider);
+        final log = MedicationLog(
+          medicationScheduleId: item.sourceScheduleId,
+          scheduledTime: item.scheduledDateTime,
+          takenTime: DateTime.now(),
+          status: 'skipped',
+          createdAt: DateTime.now(),
+          snapshotIntakeQuantity: item.intakeQuantity,
+          snapshotDosageForm: item.dosageForm,
+          snapshotCustomDosageForm: item.customDosageForm,
+        );
+        await repo.logDose(log);
+      } else if (item.type == TodayAgendaItemType.measurement) {
+        final repo = ref.read(measurementRepositoryProvider);
+        final log = MeasurementReminderLog(
+          measurementScheduleId: item.sourceScheduleId,
+          scheduledTime: item.scheduledDateTime,
+          actionTime: DateTime.now(),
+          status: MeasurementReminderAction.skipped,
+          createdAt: DateTime.now(),
+        );
+        await repo.logReminder(log);
+      }
+      if (!mounted) return;
+      ref.invalidate(todayAgendaProvider);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.actionFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
   }
 
   void _openDetails(BuildContext context) {
