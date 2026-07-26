@@ -1993,6 +1993,45 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 ---
 
+### Phase 6D Fix Pass — Popup Menu Dismissal on Tab Switch
+
+**Status:** Completed
+
+**Root cause:** `PopupMenuButton` pushes a `PopupRoute` onto the shell navigator (`shellNavigatorKey`). GoRouter's `context.go()` only updates matched routes — it does not pop modal routes like `PopupRoute`. So when `_onItemTapped` called `context.go(...)`, the popup stayed visible even though the shell content changed.
+
+**Fix in `lib/core/router/app_router.dart`:**
+
+```dart
+void _onItemTapped(BuildContext context, int index) {
+  // Dismiss any open popup menu before switching tabs.
+  final navigator = shellNavigatorKey.currentState;
+  if (navigator != null) {
+    navigator.popUntil((route) => route is! PopupRoute);
+  }
+  switch (index) { ... }
+}
+```
+
+**Also:** Made `rootNavigatorKey` and `shellNavigatorKey` public (removed underscore prefix) to enable testing. No behavior change — only accessibility from test code.
+
+**Tests added (`test/popup_dismissal_test.dart` — 9 tests):**
+1. Popup closes when switching to Measurements
+2. Popup closes when switching to Medications
+3. Popup closes when switching to Records
+4. Popup closes when switching to Settings
+5. Switching tabs does not pop the destination page
+6. Returning to Today does not reopen popup
+7. Tapping outside closes popup
+8. Selecting popup action closes popup
+9. Widget disposal with open popup does not throw
+
+**Validation:**
+- `dart analyze lib/`: 0 errors (9 pre-existing infos only)
+- `flutter test`: 551 passed, 9 failed (all pre-existing in `phase5a_correction_test.dart`)
+- APK built and installed on Pixel 7
+
+---
+
 ## Development Rules
 
 - Commit after every completed phase

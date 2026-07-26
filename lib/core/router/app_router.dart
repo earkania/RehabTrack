@@ -25,19 +25,19 @@ import 'package:rehab_track/presentation/screens/health/reference_range_screen.d
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     redirect: (context, state) {
       return RouteRedirector.redirect(state.uri.toString());
     },
     routes: [
       ShellRoute(
-        navigatorKey: _shellNavigatorKey,
+        navigatorKey: shellNavigatorKey,
         builder: (context, state, child) {
           return ScaffoldWithNavBar(child: child);
         },
@@ -311,6 +311,14 @@ class ScaffoldWithNavBar extends StatelessWidget {
   }
 
   void _onItemTapped(BuildContext context, int index) {
+    // Dismiss any open popup menu before switching tabs.
+    // PopupMenuButton pushes a PopupRoute onto the shell navigator;
+    // GoRouter.context.go does not pop modal routes, so we must do it explicitly.
+    final navigator = shellNavigatorKey.currentState;
+    if (navigator != null) {
+      navigator.popUntil((route) => route is! PopupRoute);
+    }
+
     switch (index) {
       case 0:
         context.go(AppRoutes.home);
