@@ -6,6 +6,7 @@ import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
@@ -194,6 +195,7 @@ class _ScheduleList extends ConsumerWidget {
       final repo = ref.read(measurementRepositoryProvider);
       try {
         await repo.deleteSchedule(schedule.id!);
+        ref.invalidate(todayAgendaProvider);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.scheduleDeleted)),

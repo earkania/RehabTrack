@@ -1804,10 +1804,54 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - `flutter test`: 524 passed, 8 failed (all 8 pre-existing in `phase5a_correction_test.dart`)
 - Pixel 7: Installed, launched, no crashes — Georgian measurement names verified in Today Agenda and Next card
 
-### Remaining
+### Integration & Regression Fix Pass (6 Issues)
 
-- **Action callbacks:** Mark Taken → `MedicationRepository.logDose()`, Record Now → navigate to measurement entry, Skip → update state, Details → navigate to medication/measurement details, History → navigate to history, Trends → navigate to trends (all TODO stubs in `_AgendaItemMenu._handleAction`)
-- **Pixel 7 verification:** ✅ Installed, launched, no crashes — Georgian measurement names display correctly in Today Agenda and Next card
+**Date:** 2026-07-26
+
+**What changed:**
+
+1. **Schedules removed from Measurement History** — The schedules section (add/view/edit/delete schedules) has been removed from the Measurement History screen. Schedules are managed through the dedicated Schedule List screen accessible from the Health screen. Removed `_SchedulesSection`, `_ScheduleTile` classes and `_confirmDeleteSchedule` method from `measurement_history_screen.dart`.
+
+2. **Today past/future background colors swapped** — Previously, past items had the `surfaceContainerHighest` background and future items had no background (surface default). Now: future items have `surfaceContainerHighest` background to indicate upcoming, past items have no background (surface) to indicate they're completed. In `today_background.dart`.
+
+3. **Current item uses Next card background** — The current/due item card background changed from `ElevationOverlay.applySurfaceTint(primaryContainer, primary, 3)` to plain `primaryContainer`, matching the Next item card style. Reduces visual inconsistency. In `today_background.dart`.
+
+4. **Today auto-refreshes after schedule changes** — All schedule mutation screens now call `ref.invalidate(todayAgendaProvider)` after saving/deleting schedules, so the Today Dashboard immediately reflects schedule changes without requiring app restart. Files: `measurement_schedule_screen.dart`, `add_schedule_screen.dart`, `edit_schedule_screen.dart`, `medication_detail_screen.dart`, `measurement_schedule_list_screen.dart`.
+
+5. **Scheduled reminders fixed** — Three fixes:
+   - Changed `AndroidScheduleMode.inexactAllowWhileIdle` → `exactAllowWhileIdle` for both `scheduleNotification` and `scheduleRecurringNotification` in `notification_service.dart`
+   - Added `requestNotificationsPermission()` and `requestExactAlarmsPermission()` calls in `NotificationService.initialize()` (runtime permission request for POST_NOTIFICATIONS on Android 13+)
+   - Added `ScheduledNotificationBootReceiver` and `ScheduledNotificationReceiver` entries to `AndroidManifest.xml` so notifications survive device restart
+   - Fixed `NotificationService` initialization race condition: added `Completer`-based `waitForInitialization()` method, deduplication guard against concurrent `initialize()` calls
+   - Fixed broken `scheduleNotification` method (had wrong variable references `notificationId`, `notificationDetails`, `matchComponents` and missing required `uiLocalNotificationDateInterpretation` parameter)
+   - Added `waitForInitialization()` to `FakeNotificationService` test mock
+
+6. **Popup menu actions implemented** — All "more actions" menu items now perform real operations:
+   - **Mark Taken:** Calls `MedicationRepository.logDose()` with `MedicationLog(status: 'taken', ...)` and invalidates `todayAgendaProvider`
+   - **Skip:** Calls `MedicationRepository.logDose()` with `MedicationLog(status: 'skipped', ...)` and invalidates `todayAgendaProvider`
+   - **Record Now:** Navigates to `AppRoutes.measurementAdd(measurementTypeId)`
+   - **Details:** Navigates to `AppRoutes.medicationDetail(medicationId)` or `AppRoutes.measurementHistory(measurementTypeId)`
+   - **History:** Navigates to `AppRoutes.medicationHistory(medicationId)` or `AppRoutes.measurementHistory(measurementTypeId)`
+   - **Trends:** Navigates to `AppRoutes.measurementTrends(measurementTypeId)`
+
+**Files modified:**
+- `lib/presentation/screens/health/measurement_history_screen.dart`: removed schedule UI section
+- `lib/presentation/widgets/today/today_background.dart`: swapped past/future colors, simplified current cardColor
+- `lib/presentation/widgets/today/today_agenda_item.dart`: implemented popup menu actions with real navigation and dose logging
+- `lib/data/services/notification/notification_service.dart`: exact alarms, runtime permissions, boot receiver, initialization race fix
+- `android/app/src/main/AndroidManifest.xml`: added flutter_local_notifications boot receiver entries
+- `lib/presentation/providers/notification_provider.dart`: unchanged (no provider-level fix needed)
+- `lib/presentation/screens/health/measurement_schedule_screen.dart`: added todayAgendaProvider invalidation
+- `lib/presentation/screens/activities/add_schedule_screen.dart`: added todayAgendaProvider invalidation
+- `lib/presentation/screens/activities/edit_schedule_screen.dart`: added todayAgendaProvider invalidation
+- `lib/presentation/screens/activities/medication_detail_screen.dart`: added todayAgendaProvider invalidation
+- `lib/presentation/screens/health/measurement_schedule_list_screen.dart`: added todayAgendaProvider invalidation
+- `test/notification_action_bridge_test.dart`: added `waitForInitialization()` stub
+
+**Validation:**
+- `flutter analyze`: 0 errors, 15 pre-existing infos/warnings only
+- `flutter test`: 519 passed, 13 failed (all pre-existing in `phase5a_correction_test.dart` — pumpAndSettle timeouts)
+- Pixel 7: APK built and installed successfully
 
 ---
 

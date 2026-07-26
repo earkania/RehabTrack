@@ -5,6 +5,7 @@ import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_schedule_form.dart';
 
 class AddScheduleScreen extends ConsumerStatefulWidget {
@@ -56,6 +57,7 @@ class _AddScheduleScreenState extends ConsumerState<AddScheduleScreen> {
 
       if (mounted) {
         ref.invalidate(medicationSchedulesProvider(widget.medicationId));
+        ref.invalidate(todayAgendaProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.scheduleAdded)),
         );

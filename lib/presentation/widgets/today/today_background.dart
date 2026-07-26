@@ -23,26 +23,22 @@ class TodayBackground {
 
   Color? cardColor(ThemeData theme) {
     return switch (position) {
-      TodayItemTimePosition.past => ElevationOverlay.applySurfaceTint(
+      TodayItemTimePosition.past => null,
+      TodayItemTimePosition.current => theme.colorScheme.primaryContainer,
+      TodayItemTimePosition.future => ElevationOverlay.applySurfaceTint(
           theme.colorScheme.surfaceContainerHighest,
           theme.colorScheme.surfaceTint,
           2,
         ),
-      TodayItemTimePosition.current => ElevationOverlay.applySurfaceTint(
-          theme.colorScheme.primaryContainer,
-          theme.colorScheme.primary,
-          3,
-        ),
-      TodayItemTimePosition.future => null,
     };
   }
 
   Color? timeColor(ThemeData theme) {
     return switch (position) {
-      TodayItemTimePosition.past => theme.colorScheme.onSurface
-          .withValues(alpha: 0.5),
+      TodayItemTimePosition.past => null,
       TodayItemTimePosition.current => theme.colorScheme.primary,
-      TodayItemTimePosition.future => null,
+      TodayItemTimePosition.future => theme.colorScheme.onSurface
+          .withValues(alpha: 0.5),
     };
   }
 }

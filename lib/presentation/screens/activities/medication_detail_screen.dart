@@ -9,6 +9,7 @@ import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/component_formatter.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
@@ -533,6 +534,7 @@ class MedicationDetailScreen extends ConsumerWidget {
       if (context.mounted) {
         ref.invalidate(medicationProvider(medicationId));
         ref.invalidate(medicationListProvider);
+        ref.invalidate(todayAgendaProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.medicationUpdated)),
         );

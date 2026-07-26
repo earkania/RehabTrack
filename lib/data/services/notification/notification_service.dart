@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -11,6 +13,7 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _plugin;
   NotificationActionCallback? _actionCallback;
   bool _initialized = false;
+  Completer<void>? _initCompleter;
 
   static const _medicationChannelId = 'rehabtrack_medications';
   static const _medicationChannelName = 'Medication Reminders';
@@ -37,12 +40,25 @@ class NotificationService {
 
   bool get isInitialized => _initialized;
 
+  /// Returns a Future that completes when initialization is done.
+  /// Subsequent calls return the same Future until initialization completes.
+  Future<void> waitForInitialization() {
+    if (_initialized) return Future.value();
+    _initCompleter ??= Completer<void>();
+    return _initCompleter!.future;
+  }
+
   void setActionCallback(NotificationActionCallback callback) {
     _actionCallback = callback;
   }
 
   Future<bool> initialize() async {
     if (_initialized) return true;
+    if (_initCompleter != null && !_initCompleter!.isCompleted) {
+      await _initCompleter!.future;
+      return _initialized;
+    }
+    _initCompleter = Completer<void>();
 
     tz.initializeTimeZones();
 
@@ -57,6 +73,16 @@ class NotificationService {
     );
 
     _initialized = result ?? false;
+
+    final androidPlugin =
+        _plugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin != null) {
+      await androidPlugin.requestNotificationsPermission();
+      await androidPlugin.requestExactAlarmsPermission();
+    }
+
+    _initCompleter!.complete();
     return _initialized;
   }
 
@@ -183,7 +209,7 @@ class NotificationService {
       body,
       scheduledDate,
       details,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
@@ -215,7 +241,7 @@ class NotificationService {
       body,
       scheduledDate,
       details,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
