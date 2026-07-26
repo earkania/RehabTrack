@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_schedule_form.dart';
 
 class EditScheduleScreen extends ConsumerStatefulWidget {
@@ -63,6 +64,7 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
       if (mounted) {
         ref.invalidate(medicationSchedulesProvider(widget.medicationId));
         ref.invalidate(medicationScheduleProvider(widget.scheduleId));
+        ref.invalidate(todayAgendaProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.scheduleUpdated)),
         );
@@ -110,6 +112,7 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
 
       if (mounted) {
         ref.invalidate(medicationSchedulesProvider(widget.medicationId));
+        ref.invalidate(todayAgendaProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.scheduleDeleted)),
         );

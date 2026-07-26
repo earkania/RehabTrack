@@ -234,6 +234,9 @@ class FakeNotificationService implements NotificationService {
   Future<bool> initialize() async => true;
 
   @override
+  Future<void> waitForInitialization() async {}
+
+  @override
   Future<void> scheduleNotification({
     required int id,
     required String title,

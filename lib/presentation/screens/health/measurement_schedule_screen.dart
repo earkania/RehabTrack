@@ -8,6 +8,7 @@ import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/data/services/notification/measurement_notification_helper.dart';
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
@@ -187,6 +188,7 @@ class _MeasurementScheduleScreenState
         ref.invalidate(
           measurementSchedulesForTypeProvider(widget.measurementTypeId),
         );
+        ref.invalidate(todayAgendaProvider);
         context.pop();
       }
     } catch (e) {

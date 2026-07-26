@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:rehab_track/core/router/app_routes.dart';
+import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
@@ -333,27 +337,64 @@ class _AgendaItemMenu extends ConsumerWidget {
     }
   }
 
-  void _markTaken(WidgetRef ref) {
+  void _markTaken(WidgetRef ref) async {
+    if (item.medicationId == null || item.sourceScheduleId <= 0) return;
+    final repo = ref.read(medicationRepositoryProvider);
+    final log = MedicationLog(
+      medicationScheduleId: item.sourceScheduleId,
+      scheduledTime: item.scheduledDateTime,
+      takenTime: DateTime.now(),
+      status: 'taken',
+      createdAt: DateTime.now(),
+      snapshotIntakeQuantity: item.intakeQuantity,
+      snapshotDosageForm: item.dosageForm,
+      snapshotCustomDosageForm: item.customDosageForm,
+    );
+    await repo.logDose(log);
     ref.invalidate(todayAgendaProvider);
   }
 
   void _recordNow(BuildContext context) {
-    // TODO: Navigate to measurement recording screen
+    if (item.measurementTypeId == null) return;
+    context.push(AppRoutes.measurementAdd(item.measurementTypeId!));
   }
 
-  void _skip(WidgetRef ref) {
+  void _skip(WidgetRef ref) async {
+    if (item.medicationId == null || item.sourceScheduleId <= 0) return;
+    final repo = ref.read(medicationRepositoryProvider);
+    final log = MedicationLog(
+      medicationScheduleId: item.sourceScheduleId,
+      scheduledTime: item.scheduledDateTime,
+      takenTime: DateTime.now(),
+      status: 'skipped',
+      createdAt: DateTime.now(),
+      snapshotIntakeQuantity: item.intakeQuantity,
+      snapshotDosageForm: item.dosageForm,
+      snapshotCustomDosageForm: item.customDosageForm,
+    );
+    await repo.logDose(log);
     ref.invalidate(todayAgendaProvider);
   }
 
   void _openDetails(BuildContext context) {
-    // TODO: Navigate to medication/measurement details
+    if (item.type == TodayAgendaItemType.medication && item.medicationId != null) {
+      context.push(AppRoutes.medicationDetail(item.medicationId!));
+    } else if (item.type == TodayAgendaItemType.measurement && item.measurementTypeId != null) {
+      context.push(AppRoutes.measurementHistory(item.measurementTypeId!));
+    }
   }
 
   void _openHistory(BuildContext context) {
-    // TODO: Navigate to medication/measurement history
+    if (item.type == TodayAgendaItemType.medication && item.medicationId != null) {
+      context.push(AppRoutes.medicationHistory(item.medicationId!));
+    } else if (item.type == TodayAgendaItemType.measurement && item.measurementTypeId != null) {
+      context.push(AppRoutes.measurementHistory(item.measurementTypeId!));
+    }
   }
 
   void _openTrends(BuildContext context) {
-    // TODO: Navigate to measurement trends
+    if (item.measurementTypeId != null) {
+      context.push(AppRoutes.measurementTrends(item.measurementTypeId!));
+    }
   }
 }
