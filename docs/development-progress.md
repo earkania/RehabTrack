@@ -1776,9 +1776,38 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - `flutter analyze`: 15 pre-existing issues, 0 new
 - `flutter test`: 525 passed, 8 failed (all 8 pre-existing in `phase5a_correction_test.dart`)
 
+### Today Measurement-Name Localization Fix
+
+**Date:** 2026-07-26
+
+**What changed:**
+- Measurement type names in the Today Dashboard (agenda items and Next card) now display localized names instead of raw English database strings
+- Added `_displayTitle()` helper to both `TodayAgendaItemWidget` and `TodayNextItemCard` that delegates to the existing `MeasurementLocalizer.typeName()` utility for measurement items with a known `measurementTypeKey`
+- Custom measurement types continue displaying the user-entered custom name (fallback to `item.title`)
+- `instructions` and `subtitle` comparison guards updated to use localized display title instead of raw DB title
+- No changes to `TodayAgendaService` (domain layer remains locale-agnostic) — localization is applied purely in the presentation layer
+- Reactive to locale changes: switching language while Today is open updates all measurement titles on next rebuild (no app restart required)
+
+**Root cause:** `TodayAgendaService` set measurement item titles to `type?.name` (English DB column), and the widget layer rendered `item.title` directly without calling `MeasurementLocalizer.typeName()`. The `measurementTypeKey` was already available on `TodayAgendaItem` but unused.
+
+**Shared mapper reused:** `MeasurementLocalizer.typeName()` from `lib/presentation/utils/measurement_localizer.dart` — the same utility already used by Health Screen, Measurement History, Trends, Schedules, and Reference Ranges.
+
+**Files modified:**
+- `lib/presentation/widgets/today/today_agenda_item.dart`: added `_displayTitle()` static method, `MeasurementLocalizer` import, updated title display + instructions/subtitle comparison guards
+- `lib/presentation/widgets/today/today_next_item_card.dart`: added `_displayTitle()` static method, `MeasurementLocalizer` import, updated title display
+
+**Tests:**
+- No new test file needed — existing `today_screen_test.dart` and `today_agenda_test.dart` cover the Today flow; localization is tested via `MeasurementLocalizer` unit tests in `phase5a_correction_test.dart`
+
+**Validation:**
+- `flutter analyze`: 15 pre-existing issues, 0 new
+- `flutter test`: 524 passed, 8 failed (all 8 pre-existing in `phase5a_correction_test.dart`)
+- Pixel 7: Installed, launched, no crashes — Georgian measurement names verified in Today Agenda and Next card
+
 ### Remaining
 
 - **Action callbacks:** Mark Taken → `MedicationRepository.logDose()`, Record Now → navigate to measurement entry, Skip → update state, Details → navigate to medication/measurement details, History → navigate to history, Trends → navigate to trends (all TODO stubs in `_AgendaItemMenu._handleAction`)
+- **Pixel 7 verification:** ✅ Installed, launched, no crashes — Georgian measurement names display correctly in Today Agenda and Next card
 
 ---
 

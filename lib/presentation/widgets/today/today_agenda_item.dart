@@ -4,6 +4,7 @@ import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
+import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/today/today_background.dart';
 import 'package:intl/intl.dart';
 
@@ -47,7 +48,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          item.title,
+                          _displayTitle(item, l10n),
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w500,
                           ),
@@ -70,7 +71,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                       ),
                     ),
                   if (item.instructions != null &&
-                      item.instructions != item.title)
+                      item.instructions != _displayTitle(item, l10n))
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(
@@ -85,7 +86,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                       ),
                     ),
                   if (item.subtitle != null &&
-                      item.subtitle != item.title &&
+                      item.subtitle != _displayTitle(item, l10n) &&
                       !_hasDosageInfo(item))
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
@@ -107,6 +108,14 @@ class TodayAgendaItemWidget extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  static String _displayTitle(TodayAgendaItem item, AppLocalizations l10n) {
+    if (item.type == TodayAgendaItemType.measurement &&
+        item.measurementTypeKey != null) {
+      return MeasurementLocalizer.typeName(l10n, item.measurementTypeKey);
+    }
+    return item.title;
   }
 
   static bool _hasDosageInfo(TodayAgendaItem item) {

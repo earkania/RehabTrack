@@ -4,6 +4,7 @@ import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
+import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:intl/intl.dart';
 
 class TodayNextItemCard extends ConsumerWidget {
@@ -51,7 +52,7 @@ class TodayNextItemCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${nextItem.title}  •  $timeStr',
+                    '${_displayTitle(nextItem, l10n)}  •  $timeStr',
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.onPrimaryContainer,
@@ -95,6 +96,14 @@ class TodayNextItemCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  static String _displayTitle(TodayAgendaItem item, AppLocalizations l10n) {
+    if (item.type == TodayAgendaItemType.measurement &&
+        item.measurementTypeKey != null) {
+      return MeasurementLocalizer.typeName(l10n, item.measurementTypeKey);
+    }
+    return item.title;
   }
 
   String _formatIntake(TodayAgendaItem item, AppLocalizations l10n) {
