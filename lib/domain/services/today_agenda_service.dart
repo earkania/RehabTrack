@@ -144,7 +144,44 @@ class TodayAgendaService {
       ));
     }
 
-    return items;
+    return _attachLinkedReadings(items);
+  }
+
+  Future<List<TodayAgendaItem>> _attachLinkedReadings(
+    List<TodayAgendaItem> items,
+  ) async {
+    final recordIds = <int>[];
+    for (final item in items) {
+      if (item.type == TodayAgendaItemType.measurement &&
+          item.measurementRecordId != null &&
+          (item.status == TodayAgendaItemStatus.completed ||
+           item.status == TodayAgendaItemStatus.skipped)) {
+        recordIds.add(item.measurementRecordId!);
+      }
+    }
+
+    if (recordIds.isEmpty) return items;
+
+    final valuesMap =
+        await _measurementRepository.getValuesForRecords(recordIds);
+
+    final recordCache = <int, MeasurementRecord>{};
+    for (final id in recordIds) {
+      final record = await _measurementRepository.getRecord(id);
+      if (record != null) recordCache[id] = record;
+    }
+
+    return items.map((item) {
+      if (item.measurementRecordId == null) return item;
+      final recordId = item.measurementRecordId!;
+      final values = valuesMap[recordId];
+      final record = recordCache[recordId];
+      if (values == null || values.isEmpty) return item;
+      return item.copyWith(
+        readingValues: values,
+        irregularHeartbeatDetected: record?.irregularHeartbeatDetected,
+      );
+    }).toList();
   }
 
   static bool scheduleAppliesOnDate(ScheduleConfig config, DateTime date) {

@@ -12,6 +12,7 @@ import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/today/today_background.dart';
+import 'package:rehab_track/presentation/widgets/today/today_measurement_reading.dart';
 import 'package:intl/intl.dart';
 
 class TodayAgendaItemWidget extends ConsumerWidget {
@@ -64,6 +65,11 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  if (_shouldShowReading(item))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: TodayMeasurementReading(item: item),
+                    ),
                   if (_hasDosageInfo(item))
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
@@ -93,6 +99,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                     ),
                   if (item.subtitle != null &&
                       item.subtitle != _displayTitle(item, l10n) &&
+                      item.subtitle != item.instructions &&
                       !_hasDosageInfo(item))
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
@@ -114,6 +121,12 @@ class TodayAgendaItemWidget extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  static bool _shouldShowReading(TodayAgendaItem item) {
+    return item.type == TodayAgendaItemType.measurement &&
+        item.status == TodayAgendaItemStatus.completed &&
+        item.readingValues.isNotEmpty;
   }
 
   static String _displayTitle(TodayAgendaItem item, AppLocalizations l10n) {

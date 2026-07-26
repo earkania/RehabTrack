@@ -245,6 +245,28 @@ The "Add Reading" button on the Measurements screen remains independent — it d
 
 ---
 
+## Linked measurement readings on completed Today agenda items
+
+When a completed measurement agenda item has a linked `MeasurementRecord` (via `measurementRecordId`), the formatted reading is shown directly below the measurement name on the Today card.
+
+**Display rules:**
+- Reading only appears when: `type == measurement && status == completed && readingValues.isNotEmpty`
+- Reading is hidden for pending/due/overdue/skipped/snoozed items and for all medication items
+- Reading values are batch-loaded in `TodayAgendaService._attachLinkedReadings()`
+- Status computation uses `effectiveRangesForCurrentProfileProvider` (reactive to range changes)
+- Falls back to `DefaultReferenceRanges` when no profile ranges configured
+
+**Type-specific formatting (reuses existing presentation layer):**
+- Blood Pressure: `BloodPressureSummaryText` → `120/80 mmHg, Pulse 66 bpm`
+- Weight: `StatusAwareMeasurementValue` → `72.5 kg`
+- Blood Glucose: `StatusAwareMeasurementValue` → `5.4 mmol/L`
+- Pulse: `StatusAwareMeasurementValue` → `72 bpm`
+- SpO2: `StatusAwareMeasurementValue` → `97%` (pulse shown separately)
+- Temperature: `StatusAwareMeasurementValue` → `36.6 °C`
+- Irregular heartbeat: `Icons.heart_broken` indicator in error color
+
+---
+
 # Future Features
 
 Keep an expandable checklist for ideas that may be implemented later.

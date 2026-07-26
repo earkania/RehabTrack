@@ -1,4 +1,5 @@
 import 'package:rehab_track/domain/entities/dosage_form.dart';
+import 'package:rehab_track/domain/entities/measurement.dart';
 
 enum TodayAgendaItemType {
   medication,
@@ -39,6 +40,8 @@ class TodayAgendaItem {
   final DosageForm? dosageForm;
   final String? customDosageForm;
 
+  final List<MeasurementRecordValue> readingValues;
+
   const TodayAgendaItem({
     required this.id,
     required this.type,
@@ -60,7 +63,82 @@ class TodayAgendaItem {
     this.intakeQuantity,
     this.dosageForm,
     this.customDosageForm,
+    this.readingValues = const [],
   });
+
+  TodayAgendaItem copyWith({
+    String? id,
+    TodayAgendaItemType? type,
+    int? sourceScheduleId,
+    DateTime? scheduledDateTime,
+    String? title,
+    String? subtitle,
+    String? instructions,
+    TodayAgendaItemStatus? status,
+    DateTime? completedAt,
+    DateTime? snoozedUntil,
+    int? medicationId,
+    String? medicationName,
+    bool? irregularHeartbeatDetected,
+    int? measurementTypeId,
+    String? measurementTypeKey,
+    int? measurementRecordId,
+    String? strength,
+    double? intakeQuantity,
+    DosageForm? dosageForm,
+    String? customDosageForm,
+    List<MeasurementRecordValue>? readingValues,
+    bool clearSubtitle = false,
+    bool clearInstructions = false,
+    bool clearCompletedAt = false,
+    bool clearSnoozedUntil = false,
+    bool clearMedicationId = false,
+    bool clearMedicationName = false,
+    bool clearIrregularHeartbeatDetected = false,
+    bool clearMeasurementTypeId = false,
+    bool clearMeasurementTypeKey = false,
+    bool clearMeasurementRecordId = false,
+    bool clearStrength = false,
+    bool clearIntakeQuantity = false,
+    bool clearDosageForm = false,
+    bool clearCustomDosageForm = false,
+  }) {
+    return TodayAgendaItem(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      sourceScheduleId: sourceScheduleId ?? this.sourceScheduleId,
+      scheduledDateTime: scheduledDateTime ?? this.scheduledDateTime,
+      title: title ?? this.title,
+      subtitle: clearSubtitle ? null : (subtitle ?? this.subtitle),
+      instructions: clearInstructions ? null : (instructions ?? this.instructions),
+      status: status ?? this.status,
+      completedAt: clearCompletedAt ? null : (completedAt ?? this.completedAt),
+      snoozedUntil: clearSnoozedUntil ? null : (snoozedUntil ?? this.snoozedUntil),
+      medicationId: clearMedicationId ? null : (medicationId ?? this.medicationId),
+      medicationName: clearMedicationName ? null : (medicationName ?? this.medicationName),
+      irregularHeartbeatDetected: clearIrregularHeartbeatDetected
+          ? null
+          : (irregularHeartbeatDetected ?? this.irregularHeartbeatDetected),
+      measurementTypeId: clearMeasurementTypeId
+          ? null
+          : (measurementTypeId ?? this.measurementTypeId),
+      measurementTypeKey: clearMeasurementTypeKey
+          ? null
+          : (measurementTypeKey ?? this.measurementTypeKey),
+      measurementRecordId: clearMeasurementRecordId
+          ? null
+          : (measurementRecordId ?? this.measurementRecordId),
+      strength: clearStrength ? null : (strength ?? this.strength),
+      intakeQuantity: clearIntakeQuantity
+          ? null
+          : (intakeQuantity ?? this.intakeQuantity),
+      dosageForm: clearDosageForm ? null : (dosageForm ?? this.dosageForm),
+      customDosageForm: clearCustomDosageForm
+          ? null
+          : (customDosageForm ?? this.customDosageForm),
+      readingValues: readingValues ?? this.readingValues,
+    );
+  }
 
   DateTime get effectiveTime => snoozedUntil ?? scheduledDateTime;
 

@@ -2032,6 +2032,62 @@ void _onItemTapped(BuildContext context, int index) {
 
 ---
 
+### Phase 6D — Linked Measurement Readings on Completed Agenda Items
+
+**Status:** Completed
+
+**What was done:**
+
+**Model (`lib/domain/entities/today_agenda.dart`):**
+- Added `readingValues` field (`List<MeasurementRecordValue>`, default `const []`) to `TodayAgendaItem`
+- Added `copyWith` support with full list replacement
+- Non-breaking: existing code ignores the field (empty list default)
+
+**Service (`lib/domain/services/today_agenda_service.dart`):**
+- New private method `_attachLinkedReadings()` batch-loads `MeasurementRecord` and `MeasurementRecordValue` for completed measurement items with `measurementRecordId` set
+- Uses batch query `getValuesForRecords(recordIds)` for efficiency, then `getRecord(id)` per unique record
+- Stores raw `readingValues` on `TodayAgendaItem` — status computation left to presentation layer
+
+**New Widget (`lib/presentation/widgets/today/today_measurement_reading.dart`):**
+- `TodayMeasurementReading` — `ConsumerWidget` that watches `effectiveRangesForCurrentProfileProvider` for reactive range updates
+- Reuses existing presentation components:
+  - `BloodPressureSummaryText` for BP (systolic/diastolic/pulse)
+  - `StatusAwareMeasurementValue` for single-value types (weight, glucose, SpO2, temperature, pulse)
+  - `BloodPressureStatusEvaluator` for BP component status
+  - `ReadingStatusCalculator` for single-value status
+  - `MeasurementFormatter.formatNumber()` for number formatting
+  - `ReadingStatusColor.forStatus()` for status-based coloring
+- Falls back to `DefaultReferenceRanges` when no profile ranges configured
+- Shows irregular heartbeat indicator (`Icons.heart_broken` + error color) when detected
+- Provides accessibility semantics via `Semantics` and `RichText.semanticsLabel`
+
+**Integration (`lib/presentation/widgets/today/today_agenda_item.dart`):**
+- `TodayAgendaItemWidget` shows `TodayMeasurementReading` between title and instructions
+- Shown only when: `type == measurement && status == completed && readingValues.isNotEmpty`
+- Fixed duplicate subtitle display for measurements (subtitle now suppressed when same as instructions)
+
+**Reading display rules:**
+| Type | Display |
+|---|---|
+| Blood Pressure | `120/80 mmHg, Pulse 66 bpm` with per-component status colors |
+| Weight | `72.5 kg` with status color |
+| Blood Glucose | `5.4 mmol/L` with status color |
+| Pulse | `72 bpm` with status color |
+| SpO2 | `97%` with status color, pulse on separate line |
+| Temperature | `36.6 °C` with status color |
+
+**Tests (`test/today_measurement_reading_test.dart` — 18 tests):**
+- Model: default empty list, copyWith replaces values
+- Widget: BP, weight, glucose, pulse, SpO2, temperature rendering; irregular heartbeat on/off; empty values
+- Integration: completed shows reading; non-completed hides; no values hides; medication hides; skipped hides; reading between title and instructions; BP on completed item
+
+**Validation:**
+- `dart analyze lib/`: 0 errors (9 pre-existing infos only)
+- `flutter test`: 569 passed, 9 failed (all pre-existing in `phase5a_correction_test.dart`)
+- APK built successfully (Pixel 7 not connected for live verification)
+
+---
+
 ## Development Rules
 
 - Commit after every completed phase
