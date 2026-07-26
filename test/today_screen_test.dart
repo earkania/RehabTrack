@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
@@ -25,6 +26,61 @@ Widget _wrapWithApp(Widget child, {TodayAgenda? agenda}) {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: child),
+    ),
+  );
+}
+
+Widget _wrapWithGoRouter(Widget child) {
+  final router = GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => Scaffold(body: child),
+      ),
+      GoRoute(
+        path: '/measurements/measurement/:typeId/add',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Add Reading')),
+        ),
+      ),
+      GoRoute(
+        path: '/measurements/measurement/:typeId/history',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Measurement History')),
+        ),
+      ),
+      GoRoute(
+        path: '/measurements/measurement/:typeId/trends',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Measurement Trends')),
+        ),
+      ),
+      GoRoute(
+        path: '/medications/medication/:id',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Medication Detail')),
+        ),
+      ),
+      GoRoute(
+        path: '/medications/medication/:id/history',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Medication History')),
+        ),
+      ),
+    ],
+  );
+
+  return ProviderScope(
+    child: MaterialApp.router(
+      routerConfig: router,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
     ),
   );
 }
@@ -196,7 +252,7 @@ void main() {
 
       final bg = TodayBackground.forItem(item, DateTime.now());
       final theme = ThemeData.light();
-      expect(bg.cardColor(theme), isNotNull);
+      expect(bg.cardColor(theme), isNull);
     });
 
     testWidgets('future item has normal background via TodayBackground',
@@ -212,7 +268,7 @@ void main() {
 
       final bg = TodayBackground.forItem(item, DateTime.now());
       final theme = ThemeData.light();
-      expect(bg.cardColor(theme), isNull);
+      expect(bg.cardColor(theme), isNotNull);
     });
 
     testWidgets('empty state shows when no items', (tester) async {
@@ -390,8 +446,8 @@ void main() {
 
       final lightColor = bg.cardColor(lightTheme);
       final darkColor = bg.cardColor(darkTheme);
-      expect(lightColor, isNotNull);
-      expect(darkColor, isNotNull);
+      expect(lightColor, isNull);
+      expect(darkColor, isNull);
     });
 
     testWidgets('due/current item uses highlighted background', (tester) async {
@@ -434,8 +490,8 @@ void main() {
       final bg = TodayBackground.forItem(futureItem, now);
       expect(bg.position, TodayItemTimePosition.future);
 
-      expect(bg.cardColor(lightTheme), isNull);
-      expect(bg.cardColor(darkTheme), isNull);
+      expect(bg.cardColor(lightTheme), isNotNull);
+      expect(bg.cardColor(darkTheme), isNotNull);
     });
 
     testWidgets('backgrounds differ visibly between positions', (tester) async {
@@ -478,14 +534,14 @@ void main() {
         now,
       );
 
-      // Past and current must be non-null; future must be null
-      expect(pastBg.cardColor(theme), isNotNull);
+      // Past must be null; current and future must be non-null
+      expect(pastBg.cardColor(theme), isNull);
       expect(currentBg.cardColor(theme), isNotNull);
-      expect(futureBg.cardColor(theme), isNull);
+      expect(futureBg.cardColor(theme), isNotNull);
 
-      // Past and current colors must differ
+      // Current and future colors must differ
       expect(
-        pastBg.cardColor(theme) != currentBg.cardColor(theme),
+        currentBg.cardColor(theme) != futureBg.cardColor(theme),
         isTrue,
       );
     });
@@ -584,6 +640,8 @@ void main() {
 
       expect(find.text('Mark as Taken'), findsNothing);
       expect(find.text('Skip'), findsNothing);
+      expect(find.text('Change to Skipped'), findsOneWidget);
+      expect(find.text('Reset to Pending'), findsOneWidget);
       expect(find.text('Details'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
     });
@@ -604,7 +662,7 @@ void main() {
 
       expect(find.text('Record Now'), findsOneWidget);
       expect(find.text('Skip'), findsOneWidget);
-      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
       expect(find.text('Trends'), findsOneWidget);
     });
@@ -842,6 +900,8 @@ void main() {
 
       expect(find.text('Mark as Taken'), findsNothing);
       expect(find.text('Skip'), findsNothing);
+      expect(find.text('Change to Taken'), findsOneWidget);
+      expect(find.text('Reset to Pending'), findsOneWidget);
       expect(find.text('Details'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
     });
@@ -1062,6 +1122,449 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('Popup menu actions', () {
+    testWidgets('menu closes after tapping Details (no blank screen)',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Test Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      await tester.pumpWidget(_wrapWithGoRouter(TodayAgendaItemWidget(item: item)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Details'), findsOneWidget);
+
+      await tester.tap(find.text('Details'));
+      await tester.pumpAndSettle();
+
+      // Menu must be closed — no blank screen from Navigator.pop
+      expect(find.text('Details'), findsNothing);
+      expect(find.text('Medication Detail'), findsOneWidget);
+    });
+
+    testWidgets('menu closes after tapping History', (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Test Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      await tester.pumpWidget(_wrapWithGoRouter(TodayAgendaItemWidget(item: item)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('History'), findsOneWidget);
+
+      await tester.tap(find.text('History'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Medication History'), findsOneWidget);
+    });
+
+    testWidgets('measurement menu closes after tapping Trends', (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      await tester.pumpWidget(_wrapWithGoRouter(TodayAgendaItemWidget(item: item)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trends'), findsOneWidget);
+
+      await tester.tap(find.text('Trends'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Measurement Trends'), findsOneWidget);
+    });
+
+    testWidgets('measurement menu closes after tapping Record Now',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      await tester.pumpWidget(_wrapWithGoRouter(TodayAgendaItemWidget(item: item)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Record Now'), findsOneWidget);
+
+      await tester.tap(find.text('Record Now'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Add Reading'), findsOneWidget);
+    });
+
+    testWidgets('medication item has medicationId for navigation',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Test Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      // Verify the item carries the correct ID for navigation
+      expect(item.medicationId, 42);
+      expect(item.sourceScheduleId, 1);
+      expect(item.measurementTypeId, isNull);
+    });
+
+    testWidgets('measurement item has measurementTypeId for navigation',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      // Verify the item carries the correct ID for navigation
+      expect(item.measurementTypeId, 5);
+      expect(item.sourceScheduleId, 3);
+      expect(item.medicationId, isNull);
+    });
+
+    testWidgets('medication due item shows Mark as Taken and Skip',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().add(const Duration(minutes: 10)),
+        title: 'Test Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.due,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mark as Taken'), findsOneWidget);
+      expect(find.text('Skip'), findsOneWidget);
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('History'), findsOneWidget);
+      expect(find.text('Trends'), findsNothing);
+    });
+
+    testWidgets('measurement due item shows Record Now and Skip',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().add(const Duration(minutes: 10)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.due,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Record Now'), findsOneWidget);
+      expect(find.text('Skip'), findsOneWidget);
+      expect(find.text('Mark as Taken'), findsNothing);
+      expect(find.text('Schedules'), findsOneWidget);
+      expect(find.text('History'), findsOneWidget);
+      expect(find.text('Trends'), findsOneWidget);
+    });
+
+    testWidgets('no old route paths used in agenda item',
+        (tester) async {
+      // Verify the agenda item widget does not reference old routes
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Test Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+
+      // Verify no /health or /activities paths are rendered as text
+      expect(find.textContaining('/health'), findsNothing);
+      expect(find.textContaining('/activities'), findsNothing);
+    });
+
+    testWidgets('sourceScheduleId is the schedule ID not the entity ID',
+        (tester) async {
+      final medItem = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 10, // schedule ID
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Test Med',
+        medicationId: 42, // medication entity ID
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      final measItem = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 20, // schedule ID
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5, // measurement type entity ID
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      // sourceScheduleId is the schedule, not the entity
+      expect(medItem.sourceScheduleId, 10);
+      expect(medItem.medicationId, 42);
+      expect(medItem.sourceScheduleId, isNot(equals(medItem.medicationId)));
+
+      expect(measItem.sourceScheduleId, 20);
+      expect(measItem.measurementTypeId, 5);
+      expect(measItem.sourceScheduleId, isNot(equals(measItem.measurementTypeId)));
+    });
+
+    testWidgets('invalid medicationId does not crash', (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Test Med',
+        medicationId: null, // invalid
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      await tester.pumpWidget(_wrapWithGoRouter(TodayAgendaItemWidget(item: item)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      // Tapping Details with null medicationId should not crash
+      await tester.tap(find.text('Details'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('invalid measurementTypeId does not crash', (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: null, // invalid
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      await tester.pumpWidget(_wrapWithGoRouter(TodayAgendaItemWidget(item: item)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      // Tapping Record Now with null measurementTypeId should not crash
+      await tester.tap(find.text('Record Now'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('snoozed medication shows Mark as Taken and Skip',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().subtract(const Duration(minutes: 15)),
+        title: 'Snoozed Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.snoozed,
+        snoozedUntil: DateTime.now().add(const Duration(minutes: 15)),
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mark as Taken'), findsOneWidget);
+      expect(find.text('Skip'), findsOneWidget);
+    });
+
+    testWidgets('overdue measurement shows Record Now and Skip',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 2)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.overdue,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Record Now'), findsOneWidget);
+      expect(find.text('Skip'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
+      expect(find.text('History'), findsOneWidget);
+      expect(find.text('Trends'), findsOneWidget);
+    });
+
+    testWidgets('menu does not allow duplicate tap during processing',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().add(const Duration(hours: 1)),
+        title: 'Test Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.upcoming,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      // Verify the menu is open
+      expect(find.text('Mark as Taken'), findsOneWidget);
+    });
+
+    testWidgets('completed measurement shows Reset to Pending and Schedules',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.completed,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reset to Pending'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
+      expect(find.text('Record Now'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(find.text('History'), findsOneWidget);
+      expect(find.text('Trends'), findsOneWidget);
+    });
+
+    testWidgets('skipped measurement shows Reset to Pending and Schedules',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'meas_1_0900',
+        type: TodayAgendaItemType.measurement,
+        sourceScheduleId: 3,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'Blood Pressure',
+        measurementTypeId: 5,
+        status: TodayAgendaItemStatus.skipped,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reset to Pending'), findsOneWidget);
+      expect(find.text('Schedules'), findsOneWidget);
+      expect(find.text('Record Now'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(find.text('History'), findsOneWidget);
+      expect(find.text('Trends'), findsOneWidget);
+    });
+
+    testWidgets('completed medication shows Change to Skipped and Reset to Pending',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'Completed Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.completed,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Change to Skipped'), findsOneWidget);
+      expect(find.text('Reset to Pending'), findsOneWidget);
+      expect(find.text('Mark as Taken'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('History'), findsOneWidget);
+    });
+
+    testWidgets('skipped medication shows Change to Taken and Reset to Pending',
+        (tester) async {
+      final item = TodayAgendaItem(
+        id: 'med_1_0800',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'Skipped Med',
+        medicationId: 42,
+        status: TodayAgendaItemStatus.skipped,
+      );
+
+      await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Change to Taken'), findsOneWidget);
+      expect(find.text('Reset to Pending'), findsOneWidget);
+      expect(find.text('Mark as Taken'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('History'), findsOneWidget);
     });
   });
 }

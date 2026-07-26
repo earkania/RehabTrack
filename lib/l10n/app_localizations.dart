@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'Error'**
   String get error;
 
+  /// No description provided for @actionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not complete action'**
+  String get actionFailed;
+
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:
@@ -1921,6 +1927,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to update item'**
   String get failedToUpdateItem;
+
+  /// No description provided for @changeToSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Change to Skipped'**
+  String get changeToSkipped;
+
+  /// No description provided for @changeToTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Change to Taken'**
+  String get changeToTaken;
+
+  /// No description provided for @resetToPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Pending'**
+  String get resetToPending;
+
+  /// No description provided for @editReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Reading'**
+  String get editReading;
 }
 
 class _AppLocalizationsDelegate

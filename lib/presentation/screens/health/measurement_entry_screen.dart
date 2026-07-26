@@ -3,20 +3,25 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
+import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/utils/measurement_validator.dart';
+import 'package:rehab_track/core/router/app_routes.dart';
 
 class MeasurementEntryScreen extends ConsumerStatefulWidget {
   final int measurementTypeId;
+  final RecordNowExtra? recordNowExtra;
 
   const MeasurementEntryScreen({
     super.key,
     required this.measurementTypeId,
+    this.recordNowExtra,
   });
 
   @override
@@ -272,7 +277,14 @@ class _MeasurementEntryScreenState
       );
 
       final repo = ref.read(measurementRepositoryProvider);
-      await repo.createRecord(record, values);
+      final recordId = await repo.createRecord(record, values);
+
+      final extra = widget.recordNowExtra;
+      if (extra != null) {
+        await _completeReminder(repo, extra, recordId);
+      }
+
+      ref.invalidate(todayAgendaProvider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -288,6 +300,42 @@ class _MeasurementEntryScreenState
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _completeReminder(
+    MeasurementRepository repo,
+    RecordNowExtra extra,
+    int measurementRecordId,
+  ) async {
+    try {
+      final existing = await repo.getReminderLog(
+        extra.reminderScheduleId,
+        extra.scheduledOccurrenceTime,
+      );
+
+      if (existing != null && existing.id != null) {
+        await repo.updateReminderLog(
+          existing.copyWith(
+            status: MeasurementReminderAction.completed,
+            actionTime: DateTime.now(),
+            measurementRecordId: measurementRecordId,
+          ),
+        );
+      } else {
+        await repo.logReminder(
+          MeasurementReminderLog(
+            measurementScheduleId: extra.reminderScheduleId,
+            scheduledTime: extra.scheduledOccurrenceTime,
+            actionTime: DateTime.now(),
+            status: MeasurementReminderAction.completed,
+            measurementRecordId: measurementRecordId,
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
+    } catch (_) {
+      // Best-effort: measurement record was already saved.
     }
   }
 }

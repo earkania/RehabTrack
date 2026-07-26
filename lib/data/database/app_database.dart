@@ -83,7 +83,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -201,6 +201,13 @@ class AppDatabase extends _$AppDatabase {
         await m.deleteTable(measurementSchedules.actualTableName);
         await m.createTable(measurementSchedules);
         await m.createTable(measurementReminderLogs);
+      }
+      if (from < 11) {
+        // Phase 6D: Link reminder logs to measurement records
+        await m.addColumn(
+          measurementReminderLogs,
+          measurementReminderLogs.measurementRecordId,
+        );
       }
     },
   );

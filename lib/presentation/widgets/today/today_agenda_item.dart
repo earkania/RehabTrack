@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
+import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
+import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/today/today_background.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +37,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Row(
           children: [
-            _TypeIcon(type: item.type),
+            _TypeIcon(type: item.type, measurementTypeKey: item.measurementTypeKey),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -151,8 +153,9 @@ class TodayAgendaItemWidget extends ConsumerWidget {
 
 class _TypeIcon extends StatelessWidget {
   final TodayAgendaItemType type;
+  final String? measurementTypeKey;
 
-  const _TypeIcon({required this.type});
+  const _TypeIcon({required this.type, this.measurementTypeKey});
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +164,7 @@ class _TypeIcon extends StatelessWidget {
     return Icon(
       type == TodayAgendaItemType.medication
           ? Icons.medication
-          : Icons.monitor_heart_outlined,
+          : measurementIconForType(measurementTypeKey),
       size: 20,
       color: theme.colorScheme.onSurfaceVariant,
     );
@@ -208,17 +211,26 @@ class _StatusIcon extends StatelessWidget {
   }
 }
 
-class _AgendaItemMenu extends ConsumerWidget {
+class _AgendaItemMenu extends ConsumerStatefulWidget {
   final TodayAgendaItem item;
 
   const _AgendaItemMenu({required this.item});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_AgendaItemMenu> createState() => _AgendaItemMenuState();
+}
+
+class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
+  bool _isProcessing = false;
+
+  TodayAgendaItem get item => widget.item;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return PopupMenuButton<String>(
-      onSelected: (value) => _handleAction(context, ref, value, l10n),
+      onSelected: _isProcessing ? null : (value) => _handleAction(context, value, l10n),
       tooltip: l10n.moreActions,
       itemBuilder: (context) => _buildMenuItems(l10n),
     );
@@ -228,56 +240,90 @@ class _AgendaItemMenu extends ConsumerWidget {
     final items = <PopupMenuItem<String>>[];
 
     if (item.type == TodayAgendaItemType.medication) {
-      if (item.isActionable) {
-        items.add(PopupMenuItem(
-          value: 'mark_taken',
-          child: Row(
-            children: [
-              const Icon(Icons.check, size: 20),
-              const SizedBox(width: 8),
-              Text(l10n.markTaken),
-            ],
-          ),
-        ));
-        items.add(PopupMenuItem(
-          value: 'skip',
-          child: Row(
-            children: [
-              const Icon(Icons.skip_next, size: 20),
-              const SizedBox(width: 8),
-              Text(l10n.skip),
-            ],
-          ),
-        ));
-      }
+      _buildMedicationMenu(items, l10n);
     } else {
-      if (item.isActionable) {
-        items.add(PopupMenuItem(
-          value: 'record_now',
-          child: Row(
-            children: [
-              const Icon(Icons.add, size: 20),
-              const SizedBox(width: 8),
-              Text(l10n.recordNow),
-            ],
-          ),
-        ));
-        items.add(PopupMenuItem(
-          value: 'skip',
-          child: Row(
-            children: [
-              const Icon(Icons.skip_next, size: 20),
-              const SizedBox(width: 8),
-              Text(l10n.skip),
-            ],
-          ),
-        ));
-      }
+      _buildMeasurementMenu(items, l10n);
+    }
+
+    return items;
+  }
+
+  void _buildMedicationMenu(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    if (item.isActionable) {
+      items.add(PopupMenuItem(
+        value: 'mark_taken',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check, size: 20),
+            const SizedBox(width: 8),
+            Text(l10n.markTaken),
+          ],
+        ),
+      ));
+      items.add(PopupMenuItem(
+        value: 'skip',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.skip_next, size: 20),
+            const SizedBox(width: 8),
+            Text(l10n.skip),
+          ],
+        ),
+      ));
+    } else if (item.status == TodayAgendaItemStatus.completed) {
+      items.add(PopupMenuItem(
+        value: 'change_to_skipped',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.remove_circle_outline, size: 20),
+            const SizedBox(width: 8),
+            Flexible(child: Text(l10n.changeToSkipped, overflow: TextOverflow.ellipsis)),
+          ],
+        ),
+      ));
+      items.add(PopupMenuItem(
+        value: 'reset_to_pending',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.replay, size: 20),
+            const SizedBox(width: 8),
+            Flexible(child: Text(l10n.resetToPending, overflow: TextOverflow.ellipsis)),
+          ],
+        ),
+      ));
+    } else if (item.status == TodayAgendaItemStatus.skipped) {
+      items.add(PopupMenuItem(
+        value: 'change_to_taken',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle_outline, size: 20),
+            const SizedBox(width: 8),
+            Flexible(child: Text(l10n.changeToTaken, overflow: TextOverflow.ellipsis)),
+          ],
+        ),
+      ));
+      items.add(PopupMenuItem(
+        value: 'reset_to_pending',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.replay, size: 20),
+            const SizedBox(width: 8),
+            Flexible(child: Text(l10n.resetToPending, overflow: TextOverflow.ellipsis)),
+          ],
+        ),
+      ));
     }
 
     items.add(PopupMenuItem(
       value: 'details',
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.info_outline, size: 20),
           const SizedBox(width: 8),
@@ -289,6 +335,84 @@ class _AgendaItemMenu extends ConsumerWidget {
     items.add(PopupMenuItem(
       value: 'history',
       child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.history, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.viewHistory),
+        ],
+      ),
+    ));
+  }
+
+  void _buildMeasurementMenu(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    if (item.isActionable) {
+      items.add(PopupMenuItem(
+        value: 'record_now',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.add, size: 20),
+            const SizedBox(width: 8),
+            Text(l10n.recordNow),
+          ],
+        ),
+      ));
+      items.add(PopupMenuItem(
+        value: 'skip',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.skip_next, size: 20),
+            const SizedBox(width: 8),
+            Text(l10n.skip),
+          ],
+        ),
+      ));
+    } else if (item.status == TodayAgendaItemStatus.completed ||
+        item.status == TodayAgendaItemStatus.skipped) {
+      if (item.measurementRecordId != null) {
+        items.add(PopupMenuItem(
+          value: 'edit_reading',
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.edit, size: 20),
+              const SizedBox(width: 8),
+              Text(l10n.editReading),
+            ],
+          ),
+        ));
+      }
+      items.add(PopupMenuItem(
+        value: 'reset_to_pending',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.replay, size: 20),
+            const SizedBox(width: 8),
+            Flexible(child: Text(l10n.resetToPending, overflow: TextOverflow.ellipsis)),
+          ],
+        ),
+      ));
+    }
+
+    items.add(PopupMenuItem(
+      value: 'schedules',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.schedule, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.schedules),
+        ],
+      ),
+    ));
+
+    items.add(PopupMenuItem(
+      value: 'history',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.history, size: 20),
           const SizedBox(width: 8),
@@ -297,83 +421,211 @@ class _AgendaItemMenu extends ConsumerWidget {
       ),
     ));
 
-    if (item.type == TodayAgendaItemType.measurement) {
-      items.add(PopupMenuItem(
-        value: 'trends',
-        child: Row(
-          children: [
-            const Icon(Icons.show_chart, size: 20),
-            const SizedBox(width: 8),
-            Text(l10n.viewTrends),
-          ],
-        ),
-      ));
-    }
-
-    return items;
+    items.add(PopupMenuItem(
+      value: 'trends',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.show_chart, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.viewTrends),
+        ],
+      ),
+    ));
   }
 
   void _handleAction(
     BuildContext context,
-    WidgetRef ref,
     String value,
     AppLocalizations l10n,
   ) {
-    Navigator.of(context).pop();
-
     switch (value) {
       case 'mark_taken':
-        _markTaken(ref);
+        _markTaken(context, l10n);
       case 'record_now':
         _recordNow(context);
+      case 'edit_reading':
+        _editReading(context);
       case 'skip':
-        _skip(ref);
+        _skip(context, l10n);
       case 'details':
         _openDetails(context);
       case 'history':
         _openHistory(context);
       case 'trends':
         _openTrends(context);
+      case 'schedules':
+        _openSchedules(context);
+      case 'reset_to_pending':
+        _resetToPending(context, l10n);
+      case 'change_to_skipped':
+        _changeStatus(context, l10n, 'skipped');
+      case 'change_to_taken':
+        _changeStatus(context, l10n, 'taken');
     }
   }
 
-  void _markTaken(WidgetRef ref) async {
+  Future<void> _markTaken(BuildContext context, AppLocalizations l10n) async {
     if (item.medicationId == null || item.sourceScheduleId <= 0) return;
-    final repo = ref.read(medicationRepositoryProvider);
-    final log = MedicationLog(
-      medicationScheduleId: item.sourceScheduleId,
-      scheduledTime: item.scheduledDateTime,
-      takenTime: DateTime.now(),
-      status: 'taken',
-      createdAt: DateTime.now(),
-      snapshotIntakeQuantity: item.intakeQuantity,
-      snapshotDosageForm: item.dosageForm,
-      snapshotCustomDosageForm: item.customDosageForm,
-    );
-    await repo.logDose(log);
-    ref.invalidate(todayAgendaProvider);
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
+
+    try {
+      final repo = ref.read(medicationRepositoryProvider);
+      final log = MedicationLog(
+        medicationScheduleId: item.sourceScheduleId,
+        scheduledTime: item.scheduledDateTime,
+        takenTime: DateTime.now(),
+        status: 'taken',
+        createdAt: DateTime.now(),
+        snapshotIntakeQuantity: item.intakeQuantity,
+        snapshotDosageForm: item.dosageForm,
+        snapshotCustomDosageForm: item.customDosageForm,
+      );
+      await repo.logDose(log);
+      if (!mounted) return;
+      ref.invalidate(todayAgendaProvider);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.actionFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
   }
 
   void _recordNow(BuildContext context) {
-    if (item.measurementTypeId == null) return;
-    context.push(AppRoutes.measurementAdd(item.measurementTypeId!));
+    final typeId = item.measurementTypeId;
+    if (typeId == null) return;
+    final extra = RecordNowExtra(
+      scheduledOccurrenceTime: item.scheduledDateTime,
+      reminderScheduleId: item.sourceScheduleId,
+    );
+    context.push(AppRoutes.measurementAdd(typeId), extra: extra);
   }
 
-  void _skip(WidgetRef ref) async {
-    if (item.medicationId == null || item.sourceScheduleId <= 0) return;
-    final repo = ref.read(medicationRepositoryProvider);
-    final log = MedicationLog(
-      medicationScheduleId: item.sourceScheduleId,
-      scheduledTime: item.scheduledDateTime,
-      takenTime: DateTime.now(),
-      status: 'skipped',
-      createdAt: DateTime.now(),
-      snapshotIntakeQuantity: item.intakeQuantity,
-      snapshotDosageForm: item.dosageForm,
-      snapshotCustomDosageForm: item.customDosageForm,
-    );
-    await repo.logDose(log);
-    ref.invalidate(todayAgendaProvider);
+  void _editReading(BuildContext context) {
+    final recordId = item.measurementRecordId;
+    if (recordId == null) return;
+    context.push(AppRoutes.measurementEdit(recordId));
+  }
+
+  Future<void> _skip(BuildContext context, AppLocalizations l10n) async {
+    if (_isProcessing) return;
+    if (item.sourceScheduleId <= 0) return;
+    setState(() => _isProcessing = true);
+
+    try {
+      if (item.type == TodayAgendaItemType.medication &&
+          item.medicationId != null) {
+        final repo = ref.read(medicationRepositoryProvider);
+        final log = MedicationLog(
+          medicationScheduleId: item.sourceScheduleId,
+          scheduledTime: item.scheduledDateTime,
+          takenTime: DateTime.now(),
+          status: 'skipped',
+          createdAt: DateTime.now(),
+          snapshotIntakeQuantity: item.intakeQuantity,
+          snapshotDosageForm: item.dosageForm,
+          snapshotCustomDosageForm: item.customDosageForm,
+        );
+        await repo.logDose(log);
+      } else if (item.type == TodayAgendaItemType.measurement) {
+        final repo = ref.read(measurementRepositoryProvider);
+        final log = MeasurementReminderLog(
+          measurementScheduleId: item.sourceScheduleId,
+          scheduledTime: item.scheduledDateTime,
+          actionTime: DateTime.now(),
+          status: MeasurementReminderAction.skipped,
+          createdAt: DateTime.now(),
+        );
+        await repo.logReminder(log);
+      }
+      if (!mounted) return;
+      ref.invalidate(todayAgendaProvider);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.actionFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  Future<void> _resetToPending(BuildContext context, AppLocalizations l10n) async {
+    if (_isProcessing) return;
+    if (item.sourceScheduleId <= 0) return;
+    setState(() => _isProcessing = true);
+
+    try {
+      if (item.type == TodayAgendaItemType.medication) {
+        final repo = ref.read(medicationRepositoryProvider);
+        await repo.deleteLogForOccurrence(
+          item.sourceScheduleId,
+          item.scheduledDateTime,
+        );
+      } else {
+        final repo = ref.read(measurementRepositoryProvider);
+        await repo.deleteReminderLogForOccurrence(
+          item.sourceScheduleId,
+          item.scheduledDateTime,
+        );
+      }
+      if (!mounted) return;
+      ref.invalidate(todayAgendaProvider);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.actionFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  Future<void> _changeStatus(
+    BuildContext context,
+    AppLocalizations l10n,
+    String newStatus,
+  ) async {
+    if (_isProcessing) return;
+    if (item.sourceScheduleId <= 0) return;
+    setState(() => _isProcessing = true);
+
+    try {
+      final repo = ref.read(medicationRepositoryProvider);
+      final existing = await repo.getLogForOccurrence(
+        item.sourceScheduleId,
+        item.scheduledDateTime,
+      );
+
+      if (existing != null && existing.id != null) {
+        await repo.updateLog(existing.copyWith(status: newStatus));
+      } else {
+        final log = MedicationLog(
+          medicationScheduleId: item.sourceScheduleId,
+          scheduledTime: item.scheduledDateTime,
+          takenTime: newStatus == 'taken' ? DateTime.now() : null,
+          status: newStatus,
+          createdAt: DateTime.now(),
+          snapshotIntakeQuantity: item.intakeQuantity,
+          snapshotDosageForm: item.dosageForm,
+          snapshotCustomDosageForm: item.customDosageForm,
+        );
+        await repo.logDose(log);
+      }
+      if (!mounted) return;
+      ref.invalidate(todayAgendaProvider);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.actionFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
   }
 
   void _openDetails(BuildContext context) {
@@ -395,6 +647,12 @@ class _AgendaItemMenu extends ConsumerWidget {
   void _openTrends(BuildContext context) {
     if (item.measurementTypeId != null) {
       context.push(AppRoutes.measurementTrends(item.measurementTypeId!));
+    }
+  }
+
+  void _openSchedules(BuildContext context) {
+    if (item.measurementTypeId != null) {
+      context.push(AppRoutes.measurementScheduleList(item.measurementTypeId!));
     }
   }
 }

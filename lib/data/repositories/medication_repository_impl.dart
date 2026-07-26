@@ -244,6 +244,29 @@ class MedicationRepositoryImpl implements MedicationRepository {
     );
   }
 
+  @override
+  Future<MedicationLog?> getLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) async {
+    final row = await _database.medicationDao.getLogForOccurrence(
+      scheduleId,
+      scheduledTime,
+    );
+    return row != null ? _logToDomain(row) : null;
+  }
+
+  @override
+  Future<void> deleteLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) async {
+    await _database.medicationDao.deleteLogForOccurrence(
+      scheduleId,
+      scheduledTime,
+    );
+  }
+
   Medication _toDomain(db.Medication row) {
     return Medication(
       id: row.id,

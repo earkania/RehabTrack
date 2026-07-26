@@ -379,6 +379,17 @@ class MeasurementDao extends DatabaseAccessor<AppDatabase>
       ])).watch();
   }
 
+  Future<int> deleteReminderLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) {
+    return (delete(measurementReminderLogs)
+          ..where((t) =>
+              t.measurementScheduleId.equals(scheduleId) &
+              t.scheduledTime.equals(scheduledTime)))
+        .go();
+  }
+
   Future<List<MeasurementReminderLog>> getTodayReminderLogs(
     int profileId,
   ) {

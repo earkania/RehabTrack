@@ -83,5 +83,6 @@ class MeasurementReminderLogs extends Table {
   DateTimeColumn get scheduledTime => dateTime()();
   DateTimeColumn get actionTime => dateTime().nullable()();
   TextColumn get status => text()();
+  IntColumn get measurementRecordId => integer().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 }

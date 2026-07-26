@@ -1853,6 +1853,183 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - `flutter test`: 519 passed, 13 failed (all pre-existing in `phase5a_correction_test.dart` — pumpAndSettle timeouts)
 - Pixel 7: APK built and installed successfully
 
+### Today Popup-Menu Actions Regression Fix
+
+**Date:** 2026-07-26
+
+**Root cause of blank-screen issue:** `_AgendaItemMenu._handleAction()` called `Navigator.of(context).pop()` on line 322, but `PopupMenuButton.onSelected` is invoked **after** the popup overlay has already been dismissed by the framework. The `.pop()` was actually popping the shell navigator's current route (Today screen), removing it from the stack and leaving a blank Scaffold with only the bottom nav bar.
+
+**Additional root causes found:**
+1. **Measurement skip silently broken** — `_skip()` checked `item.medicationId != null`, which is always `null` for measurement items, so measurement skip silently returned without doing anything.
+2. **No error feedback** when actions failed.
+3. **No duplicate-tap prevention** while an async action was in flight.
+4. **No `mounted` check** after async operations before using `BuildContext`.
+
+**Fixes applied:**
+
+1. **Removed `Navigator.of(context).pop()`** — PopupMenuButton already handles dismissing its own overlay before calling `onSelected`. No manual pop needed.
+2. **Converted `_AgendaItemMenu` from `ConsumerWidget` to `ConsumerStatefulWidget`** — Added `_isProcessing` state to prevent duplicate taps while an async action is running. `onSelected` is set to `null` while processing.
+3. **Fixed `_skip` to handle both medication and measurement items** — Medication skip uses `MedicationRepository.logDose()` with `status: 'skipped'`. Measurement skip uses `MeasurementRepository.logReminder()` with `MeasurementReminderAction.skipped`.
+4. **Added `mounted` checks** after every `await` before accessing `BuildContext` or `ref`.
+5. **Added error feedback** via `ScaffoldMessenger.showSnackBar()` with localized `actionFailed` message on exceptions.
+6. **Added `measurement.dart` import** for `MeasurementReminderLog` and `MeasurementReminderAction`.
+7. **Added `actionFailed` localization key** to `app_en.arb` ("Could not complete action") and `app_ka.arb` ("მოქმედების შესრულება ვერ მოხერხდა").
+8. **Fixed stale background styling tests** — Updated 5 tests that expected old past/future color assignments to match the current (swapped) behavior.
+
+**Identifier analysis:**
+- `TodayAgendaItem.sourceScheduleId` is the correct schedule ID for both medication and measurement items (set from `MedicationSchedule.id` and `MeasurementSchedule.id` respectively). This is used correctly as `MedicationLog.medicationScheduleId` and `MeasurementReminderLog.measurementScheduleId`.
+- `TodayAgendaItem.medicationId` is the `Medication.id` entity key, used for navigation to `AppRoutes.medicationDetail(medicationId)` and `AppRoutes.medicationHistory(medicationId)`.
+- `TodayAgendaItem.measurementTypeId` is the `MeasurementType.id` entity key, used for navigation to `AppRoutes.measurementAdd(typeId)`, `AppRoutes.measurementHistory(typeId)`, and `AppRoutes.measurementTrends(typeId)`.
+- No route receives a schedule ID where it expects an entity ID.
+
+**Navigation approach:**
+- Popup menu closes automatically via PopupMenuButton's built-in behavior (no manual `Navigator.pop`)
+- `context.push()` used for all navigation (preserves Today in the stack)
+- `context.go()` never used from popup actions
+- Invalid/missing IDs silently return without navigating (safe no-op)
+- All routes use canonical paths defined in `AppRoutes`, no old `/activities` or `/health` paths
+
+**Files modified:**
+- `lib/presentation/widgets/today/today_agenda_item.dart`: rewrote `_AgendaItemMenu` — removed `Navigator.pop`, added `ConsumerStatefulWidget`, fixed measurement skip, added mounted checks, error feedback, duplicate-tap prevention
+- `lib/l10n/app_en.arb`: added `actionFailed` key
+- `lib/l10n/app_ka.arb`: added `actionFailed` key
+- `test/today_screen_test.dart`: added 13 new popup action tests, fixed 5 stale background styling tests, added GoRouter-aware test wrapper `_wrapWithGoRouter()`
+
+**Tests added (13 new):**
+1. `menu closes after tapping Details (no blank screen)` — verifies Details navigates to Medication Detail screen
+2. `menu closes after tapping History` — verifies History navigates to Medication History screen
+3. `measurement menu closes after tapping Trends` — verifies Trends navigates to Measurement Trends screen
+4. `measurement menu closes after tapping Record Now` — verifies Record Now navigates to Add Reading screen
+5. `medication item has medicationId for navigation` — verifies correct ID fields
+6. `measurement item has measurementTypeId for navigation` — verifies correct ID fields
+7. `medication due item shows Mark as Taken and Skip` — verifies correct menu items for due medication
+8. `measurement due item shows Record Now and Skip` — verifies correct menu items for due measurement
+9. `no old route paths used in agenda item` — verifies no `/health` or `/activities` text
+10. `sourceScheduleId is the schedule ID not the entity ID` — verifies schedule vs entity ID separation
+11. `invalid medicationId does not crash` — verifies null medicationId is handled safely
+12. `invalid measurementTypeId does not crash` — verifies null measurementTypeId is handled safely
+13. `snoozed medication shows Mark as Taken and Skip` — verifies snoozed status is actionable
+14. `overdue measurement shows Record Now and Skip` — verifies overdue measurement is actionable
+15. `menu does not allow duplicate tap during processing` — verifies _isProcessing guard
+
+**Validation:**
+- `flutter analyze`: 0 errors, 17 pre-existing infos/warnings only
+- `flutter test`: 539 passed, 8 failed (all pre-existing in `phase5a_correction_test.dart` — pumpAndSettle timeouts)
+- Pixel 7: APK built, installed, launched — no crashes in logcat
+
+---
+
+### Phase 6D — Scheduled Action Refinement
+
+**Status:** Completed
+
+**What was done:**
+
+**Repository layer — occurrence-based methods:**
+- `MedicationDao.getLogForOccurrence(scheduleId, scheduledTime)` — find existing log by schedule+time
+- `MedicationDao.deleteLogForOccurrence(scheduleId, scheduledTime)` — delete log by schedule+time (for Reset to Pending)
+- `MeasurementDao.deleteReminderLogForOccurrence(scheduleId, scheduledTime)` — delete reminder log by schedule+time
+- `MedicationRepository.getLogForOccurrence()`, `deleteLogForOccurrence()` — domain interface
+- `MeasurementRepository.deleteReminderLogForOccurrence()` — domain interface
+- `MedicationRepositoryImpl` and `MeasurementRepositoryImpl` — implementations
+
+**Popup menu restructure — measurement:**
+- Actionable (upcoming/due/overdue/snoozed): Record Now, Skip, Schedules, History, Trends
+- Completed/skipped: Reset to Pending, Schedules, History, Trends
+- "Details" replaced by "Schedules" — navigates to `MeasurementScheduleListScreen`
+- `RecordNowExtra` class created to carry occurrence context through GoRouter extra
+
+**Popup menu restructure — medication:**
+- Actionable (upcoming/due/overdue/snoozed): Mark as Taken, Skip, Details, History
+- Completed: Change to Skipped, Reset to Pending, Details, History
+- Skipped: Change to Taken, Reset to Pending, Details, History
+
+**Status correction — medication:**
+- `_changeStatus()` — updates existing log status or creates new log with new status
+- `_resetToPending()` — deletes log for occurrence, reverting item to pending state
+
+**Reset to Pending — measurement:**
+- `_resetToPending()` — deletes `MeasurementReminderLog` for the occurrence via `deleteReminderLogForOccurrence()`
+
+**Record Now context — measurement:**
+- `RecordNowExtra` class carries `scheduledOccurrenceTime` and `reminderScheduleId`
+- `_recordNow()` passes `RecordNowExtra` via `context.push(..., extra: extra)`
+- Router extracts `state.extra as RecordNowExtra?` and passes to `MeasurementEntryScreen`
+- `MeasurementEntryScreen` accepts optional `recordNowExtra` parameter
+- `_completeReminder()` — on save, marks `MeasurementReminderLog` as `completed` (updates existing or creates new)
+
+**All popup menu Rows use `mainAxisSize: MainAxisSize.min`** to prevent overflow on narrow screens, with `Flexible` + `TextOverflow.ellipsis` on longer labels.
+
+**Localization:**
+- `changeToSkipped` / `changeToTaken` / `resetToPending` — added to both `app_en.arb` and `app_ka.arb`
+
+**Tests updated/added (4 new, 5 updated):**
+- Updated: completed medication, skipped medication, measurement item, measurement due, overdue measurement — all now check for new menu items (Schedules, Reset to Pending, Change to Skipped/Taken)
+- New: `completed measurement shows Reset to Pending and Schedules`
+- New: `skipped measurement shows Reset to Pending and Schedules`
+- New: `completed medication shows Change to Skipped and Reset to Pending`
+- New: `skipped medication shows Change to Taken and Reset to Pending`
+
+**Files modified:**
+- `lib/data/database/daos/medication_dao.dart` — added `getLogForOccurrence`, `deleteLogForOccurrence`
+- `lib/data/database/daos/measurement_dao.dart` — added `deleteReminderLogForOccurrence`
+- `lib/domain/repositories/medication_repository.dart` — added interface methods
+- `lib/domain/repositories/measurement_repository.dart` — added `deleteReminderLogForOccurrence`
+- `lib/data/repositories/medication_repository_impl.dart` — implemented new methods
+- `lib/data/repositories/measurement_repository_impl.dart` — implemented new method
+- `lib/presentation/widgets/today/today_agenda_item.dart` — restructured popup menus, added status correction and reset actions
+- `lib/core/router/app_routes.dart` — added `RecordNowExtra` class
+- `lib/core/router/app_router.dart` — passes `RecordNowExtra` to `MeasurementEntryScreen`
+- `lib/presentation/screens/health/measurement_entry_screen.dart` — accepts `recordNowExtra`, calls `_completeReminder()` on save
+- `lib/l10n/app_en.arb` — added 3 keys
+- `lib/l10n/app_ka.arb` — added 3 keys
+- `test/today_screen_test.dart` — 4 new tests, 5 updated tests
+- `test/notification_action_bridge_test.dart` — added missing mock methods
+
+**Validation:**
+- `flutter analyze`: 0 errors, 17 pre-existing infos/warnings only
+- `flutter test`: 543 passed, 8 failed (all pre-existing in `phase5a_correction_test.dart` — pumpAndSettle timeouts)
+- APK built successfully (Pixel 7 not connected for device verification)
+
+---
+
+### Phase 6D Fix Pass — Popup Menu Dismissal on Tab Switch
+
+**Status:** Completed
+
+**Root cause:** `PopupMenuButton` pushes a `PopupRoute` onto the shell navigator (`shellNavigatorKey`). GoRouter's `context.go()` only updates matched routes — it does not pop modal routes like `PopupRoute`. So when `_onItemTapped` called `context.go(...)`, the popup stayed visible even though the shell content changed.
+
+**Fix in `lib/core/router/app_router.dart`:**
+
+```dart
+void _onItemTapped(BuildContext context, int index) {
+  // Dismiss any open popup menu before switching tabs.
+  final navigator = shellNavigatorKey.currentState;
+  if (navigator != null) {
+    navigator.popUntil((route) => route is! PopupRoute);
+  }
+  switch (index) { ... }
+}
+```
+
+**Also:** Made `rootNavigatorKey` and `shellNavigatorKey` public (removed underscore prefix) to enable testing. No behavior change — only accessibility from test code.
+
+**Tests added (`test/popup_dismissal_test.dart` — 9 tests):**
+1. Popup closes when switching to Measurements
+2. Popup closes when switching to Medications
+3. Popup closes when switching to Records
+4. Popup closes when switching to Settings
+5. Switching tabs does not pop the destination page
+6. Returning to Today does not reopen popup
+7. Tapping outside closes popup
+8. Selecting popup action closes popup
+9. Widget disposal with open popup does not throw
+
+**Validation:**
+- `dart analyze lib/`: 0 errors (9 pre-existing infos only)
+- `flutter test`: 551 passed, 9 failed (all pre-existing in `phase5a_correction_test.dart`)
+- APK built and installed on Pixel 7
+
 ---
 
 ## Development Rules

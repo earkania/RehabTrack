@@ -32,6 +32,7 @@ class TodayAgendaItem {
 
   final int? measurementTypeId;
   final String? measurementTypeKey;
+  final int? measurementRecordId;
 
   final String? strength;
   final double? intakeQuantity;
@@ -54,6 +55,7 @@ class TodayAgendaItem {
     this.irregularHeartbeatDetected,
     this.measurementTypeId,
     this.measurementTypeKey,
+    this.measurementRecordId,
     this.strength,
     this.intakeQuantity,
     this.dosageForm,

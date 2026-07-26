@@ -136,4 +136,27 @@ class MedicationDao extends DatabaseAccessor<AppDatabase>
   Future<bool> updateLog(MedicationLogsCompanion entry) {
     return update(medicationLogs).replace(entry);
   }
+
+  Future<MedicationLog?> getLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) {
+    return (select(medicationLogs)
+          ..where((t) =>
+              t.medicationScheduleId.equals(scheduleId) &
+              t.scheduledTime.equals(scheduledTime))
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
+  Future<int> deleteLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) {
+    return (delete(medicationLogs)
+          ..where((t) =>
+              t.medicationScheduleId.equals(scheduleId) &
+              t.scheduledTime.equals(scheduledTime)))
+        .go();
+  }
 }

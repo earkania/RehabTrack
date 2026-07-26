@@ -84,6 +84,9 @@ class AppLocalizationsKa extends AppLocalizations {
   String get error => 'შეცდომა';
 
   @override
+  String get actionFailed => 'მოქმედების შესრულება ვერ მოხერხდა';
+
+  @override
   String get retry => 'ხელახლა';
 
   @override
@@ -963,4 +966,16 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get failedToUpdateItem => 'ელემენტის განახლება ვერ მოხერხდა';
+
+  @override
+  String get changeToSkipped => 'შეცვალეთ გამოტოვებულზე';
+
+  @override
+  String get changeToTaken => 'შეცვალეთ მიღებულზე';
+
+  @override
+  String get resetToPending => 'დააბრუნეთ მოლოდინში';
+
+  @override
+  String get editReading => 'ჩანაწერის რედაქტირება';
 }

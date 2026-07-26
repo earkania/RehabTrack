@@ -209,6 +209,42 @@ This design ensures:
 
 ---
 
+# Scheduled Action Refinement — Design Rules
+
+**Approved:** 2026-07-26
+
+## Status correction semantics
+
+**Medication:**
+- `Completed` → `Change to Skipped` — updates the existing log's status field to `skipped`
+- `Skipped` → `Change to Taken` — updates the existing log's status field to `taken`
+- `Completed/Skipped` → `Reset to Pending` — deletes the log record for the occurrence, reverting the item to pending
+
+**Measurement:**
+- `Completed/Skipped` → `Reset to Pending` — deletes the `MeasurementReminderLog` record for the occurrence, reverting the item to pending
+
+Status correction is best-effort: the menu item is always shown, even if the underlying log record may not exist. If the log is missing, a new log with the target status is created.
+
+## Record Now with occurrence context
+
+When the user taps "Record Now" from the Today screen popup menu, the occurrence context (`scheduledOccurrenceTime` and `reminderScheduleId`) is passed to the measurement entry screen via GoRouter `extra`.
+
+On save, the measurement entry screen marks the corresponding `MeasurementReminderLog` as `completed` if context was provided. This ensures the Today screen reflects the correct status immediately after saving.
+
+The "Add Reading" button on the Measurements screen remains independent — it does not carry occurrence context and does not affect reminder logs.
+
+## Menu structure
+
+**Measurement actionable:** Record Now, Skip, Schedules, History, Trends
+**Measurement completed/skipped:** Reset to Pending, Schedules, History, Trends
+**Medication actionable:** Mark as Taken, Skip, Details, History
+**Medication completed:** Change to Skipped, Reset to Pending, Details, History
+**Medication skipped:** Change to Taken, Reset to Pending, Details, History
+
+"Schedules" replaces "Details" for measurement items, navigating to `MeasurementScheduleListScreen`.
+
+---
+
 # Future Features
 
 Keep an expandable checklist for ideas that may be implemented later.

@@ -89,6 +89,12 @@ class FakeMeasurementRepository implements MeasurementRepository {
   Stream<List<MeasurementReminderLog>> watchReminderLogsForSchedule(int scheduleId) => const Stream.empty();
   @override
   Future<List<MeasurementReminderLog>> getTodayReminderLogs(int profileId) async => [];
+
+  @override
+  Future<void> deleteReminderLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) async {}
 }
 
 class FakeMedicationRepository implements MedicationRepository {
@@ -216,6 +222,18 @@ class FakeMedicationRepository implements MedicationRepository {
   ) async {
     componentsByAlternativeId[alternativeId] = components;
   }
+
+  @override
+  Future<MedicationLog?> getLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) async => null;
+
+  @override
+  Future<void> deleteLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  ) async {}
 }
 
 class FakeNotificationService implements NotificationService {

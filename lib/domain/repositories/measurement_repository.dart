@@ -78,6 +78,10 @@ abstract class MeasurementRepository {
     int scheduleId,
     DateTime scheduledTime,
   );
+  Future<void> deleteReminderLogForOccurrence(
+    int scheduleId,
+    DateTime scheduledTime,
+  );
   Future<List<MeasurementReminderLog>> getReminderLogsForSchedule(
     int scheduleId,
   );
