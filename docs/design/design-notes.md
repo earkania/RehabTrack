@@ -281,6 +281,45 @@ Keep an expandable checklist for ideas that may be implemented later.
 - [ ] AI health assistant
 - [ ] Voice reminders
 - [ ] Home screen widgets
+- [x] Patient profiles foundation (Phase 7A)
+
+---
+
+# Patient Profiles — Design Rules
+
+**Approved:** 2026-07-28
+
+## Active profile architecture
+
+The active profile is stored as a setting (`active_profile_id` in `AppSettings`) and managed by `ActiveProfileIdNotifier` (Riverpod `AsyncNotifier`).
+
+**Key design decisions:**
+
+1. **Default on first launch:** When no setting exists and profiles exist, the first profile (alphabetically by firstName) is automatically set as active. This is persisted to settings immediately. The `build()` method writes the setting directly (without `ref.invalidateSelf()`) to avoid a disposal-during-build error.
+
+2. **Setting-only source of truth:** The `isPrimary` flag on the `Profiles` table is a separate concept from the active profile setting. A profile can be primary without being active, and vice versa. The `isPrimary` flag is for display ordering; the `active_profile_id` setting determines which profile's data is shown throughout the app.
+
+3. **Synchronous convenience provider:** `currentActiveProfileIdProvider` is a synchronous `Provider<int?>` that extracts the value from the `AsyncValue`. This allows callers to read the profile ID without dealing with `AsyncValue` wrapping. All existing callers (Today, Medications, Measurements, etc.) use this provider.
+
+4. **Provider invalidation on switch:** `setActiveProfileId()` calls `ref.invalidateSelf()`, which triggers a full rebuild of the notifier. The convenience provider re-reads automatically. Callers that watch `currentActiveProfileIdProvider` rebuild automatically.
+
+## Profile data model
+
+**Relationship to Owner:** Stored as a string key (`self`, `spouse`, `parent`, `child`, `sibling`, `other`) rather than an integer enum value. This makes the database human-readable and extensible without schema changes. The `parsedRelationship` getter on the domain entity provides typed access.
+
+**Profile photo storage:** Photos are stored locally in the app's documents directory under `profile_images/`. The `photoPath` column stores the filename only (not the full path). The `ProfileImageService` handles path resolution. Photos are resized to 512x512 JPEG (quality 85) on import to conserve storage.
+
+**Profile ordering:** Profiles are ordered by `isPrimary DESC, firstName ASC` in all queries. This ensures the primary profile always appears first in lists and is the default selection.
+
+## Multi-profile data isolation
+
+**Phase 7A scope:** All 13 tables with `profileId` foreign keys already exist from Phase 2. Phase 7A activates the active profile setting but does NOT yet implement:
+- Profile switching UI (manual selection from a list)
+- Profile deletion
+- Profile creation (only editing the initial/default profile)
+- Data migration between profiles
+
+**Future profile switching:** When implemented, switching profiles only requires updating `active_profile_id` in settings. All providers already filter by profile ID, so data isolation is automatic. No schema changes needed.
 
 ---
 

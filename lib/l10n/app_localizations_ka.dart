@@ -1010,4 +1010,149 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get dailySummary => 'დღის შეჯამება';
+
+  @override
+  String get patientProfile => 'პაციენტის პროფილი';
+
+  @override
+  String get editPatientProfile => 'პაციენტის პროფილის რედაქტირება';
+
+  @override
+  String get personalInformation => 'პირადი ინფორმაცია';
+
+  @override
+  String get contactInformation => 'საკონტაქტო ინფორმაცია';
+
+  @override
+  String get emergencyContact => 'საგანგებო კონტაქტი';
+
+  @override
+  String get additionalInformation => 'დამატებითი ინფორმაცია';
+
+  @override
+  String get firstName => 'სახელი';
+
+  @override
+  String get lastName => 'გვარი';
+
+  @override
+  String get phone => 'ტელეფონი';
+
+  @override
+  String get email => 'ელ. ფოსტა';
+
+  @override
+  String get address => 'მისამართი';
+
+  @override
+  String get heightCm => 'სიმაღლე';
+
+  @override
+  String get weightKg => 'წონა';
+
+  @override
+  String get bloodType => 'სისხლის ჯგუფი';
+
+  @override
+  String get allergies => 'ალერგიები';
+
+  @override
+  String get gender => 'სქესი';
+
+  @override
+  String get relationship => 'ურთიერთობა';
+
+  @override
+  String get selectDate => 'აირჩიეთ თარიღი';
+
+  @override
+  String get male => 'მამრობითი';
+
+  @override
+  String get female => 'მდედრობითი';
+
+  @override
+  String get self_ => 'თავად';
+
+  @override
+  String get child_ => 'შვილი';
+
+  @override
+  String get spouse_ => 'მეუღლე';
+
+  @override
+  String get parent_ => 'მშობელი';
+
+  @override
+  String get sibling_ => 'და-ძმა';
+
+  @override
+  String get grandparent_ => 'პაპა-ბებია';
+
+  @override
+  String get grandchild_ => 'შვილიშვილი';
+
+  @override
+  String get other_ => 'სხვა';
+
+  @override
+  String get profileUpdated => 'პროფილი განახლდა';
+
+  @override
+  String get failedToSaveProfile => 'პროფილის შენახვა ვერ მოხერხდა';
+
+  @override
+  String get switchProfile => 'პროფილის შეცვლა';
+
+  @override
+  String get noProfiles => 'პროფილები ჯერ არ არის';
+
+  @override
+  String get createFirstProfile => 'შექმენით თქვენი პირველი პაციენტის პროფილი';
+
+  @override
+  String get profileSummary => 'პროფილის შეჯამება';
+
+  @override
+  String get age => 'ასაკი';
+
+  @override
+  String yearsOld(int years) {
+    return '$years წლის';
+  }
+
+  @override
+  String get activeProfile => 'აქტიური პროფილი';
+
+  @override
+  String get birthDateLabel => 'დაბადების თარიღი';
+
+  @override
+  String get heightLabel => 'სიმაღლე';
+
+  @override
+  String get weightLabel => 'წონა';
+
+  @override
+  String get nameLabel => 'სახელი';
+
+  @override
+  String get emergencyContactNameLabel => 'კონტაქტის სახელი';
+
+  @override
+  String get emergencyContactPhoneLabel => 'კონტაქტის ტელეფონი';
+
+  @override
+  String get profileNotSetUp => 'პროფილი არ არის დაყენებული';
+
+  @override
+  String get profileNotSetUpDescription =>
+      'შექმენით პაციენტის პროფილი დასაწყებად.\nთქვენი პროფილის ინფორმაცია გამოყენებული იქნება აპლიკაციაში.';
+
+  @override
+  String get addProfileInformation => 'პროფილის ინფორმაციის დამატება';
+
+  @override
+  String get profileInformationNotEntered =>
+      'პროფილის ინფორმაცია ჯერ არ არის შეყვანილი.';
 }

@@ -24,7 +24,7 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final profileId = ref.read(activeProfileIdProvider) ?? 1;
+      final profileId = ref.read(currentActiveProfileIdProvider) ?? 1;
       final now = DateTime.now();
       final medication = Medication(
         profileId: profileId,

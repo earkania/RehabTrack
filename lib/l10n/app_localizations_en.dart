@@ -1016,4 +1016,149 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dailySummary => 'Daily Summary';
+
+  @override
+  String get patientProfile => 'Patient Profile';
+
+  @override
+  String get editPatientProfile => 'Edit Patient Profile';
+
+  @override
+  String get personalInformation => 'Personal Information';
+
+  @override
+  String get contactInformation => 'Contact Information';
+
+  @override
+  String get emergencyContact => 'Emergency Contact';
+
+  @override
+  String get additionalInformation => 'Additional Information';
+
+  @override
+  String get firstName => 'First Name';
+
+  @override
+  String get lastName => 'Last Name';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get heightCm => 'Height';
+
+  @override
+  String get weightKg => 'Weight';
+
+  @override
+  String get bloodType => 'Blood Type';
+
+  @override
+  String get allergies => 'Allergies';
+
+  @override
+  String get gender => 'Gender';
+
+  @override
+  String get relationship => 'Relationship';
+
+  @override
+  String get selectDate => 'Select date';
+
+  @override
+  String get male => 'Male';
+
+  @override
+  String get female => 'Female';
+
+  @override
+  String get self_ => 'Self';
+
+  @override
+  String get child_ => 'Child';
+
+  @override
+  String get spouse_ => 'Spouse';
+
+  @override
+  String get parent_ => 'Parent';
+
+  @override
+  String get sibling_ => 'Sibling';
+
+  @override
+  String get grandparent_ => 'Grandparent';
+
+  @override
+  String get grandchild_ => 'Grandchild';
+
+  @override
+  String get other_ => 'Other';
+
+  @override
+  String get profileUpdated => 'Profile updated';
+
+  @override
+  String get failedToSaveProfile => 'Failed to save profile';
+
+  @override
+  String get switchProfile => 'Switch Profile';
+
+  @override
+  String get noProfiles => 'No profiles yet';
+
+  @override
+  String get createFirstProfile => 'Create your first patient profile';
+
+  @override
+  String get profileSummary => 'Profile Summary';
+
+  @override
+  String get age => 'Age';
+
+  @override
+  String yearsOld(int years) {
+    return '$years years old';
+  }
+
+  @override
+  String get activeProfile => 'Active Profile';
+
+  @override
+  String get birthDateLabel => 'Birth Date';
+
+  @override
+  String get heightLabel => 'Height';
+
+  @override
+  String get weightLabel => 'Weight';
+
+  @override
+  String get nameLabel => 'Name';
+
+  @override
+  String get emergencyContactNameLabel => 'Contact Name';
+
+  @override
+  String get emergencyContactPhoneLabel => 'Contact Phone';
+
+  @override
+  String get profileNotSetUp => 'Profile not set up';
+
+  @override
+  String get profileNotSetUpDescription =>
+      'Create a patient profile to get started.\nYour profile information will be used across the app.';
+
+  @override
+  String get addProfileInformation => 'Add Profile Information';
+
+  @override
+  String get profileInformationNotEntered =>
+      'Profile information has not been entered yet.';
 }

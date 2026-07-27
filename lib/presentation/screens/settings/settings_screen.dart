@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 
 import 'package:rehab_track/core/localization/app_locale.dart';
@@ -20,6 +21,15 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         children: [
           const SizedBox(height: 8),
+          _buildSectionHeader(context, l10n.patientProfile),
+          ListTile(
+            leading: const Icon(Icons.person_outlined),
+            title: Text(l10n.patientProfile),
+            subtitle: Text(l10n.activeProfile),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/settings/patient-profile'),
+          ),
+          const Divider(),
           _buildSectionHeader(context, l10n.language),
           _buildLanguageTile(
             context,

@@ -18,7 +18,7 @@ final _todayAgendaServiceProvider = Provider<TodayAgendaService>((ref) {
 
 final dailyAgendaProvider =
     FutureProvider.autoDispose<TodayAgenda>((ref) async {
-  final profileId = ref.watch(activeProfileIdProvider);
+  final profileId = ref.watch(currentActiveProfileIdProvider);
   if (profileId == null) {
     final selectedDate = ref.watch(selectedAgendaDateProvider);
     return TodayAgenda(

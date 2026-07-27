@@ -6,6 +6,8 @@ class AppRoutes {
   static const medications = '/medications';
   static const records = '/records';
   static const settings = '/settings';
+  static const patientProfile = '/settings/patient-profile';
+  static const patientProfileEdit = '/settings/patient-profile/edit';
 
   // Measurements
   static String measurementAdd(int typeId) => '/measurements/measurement/$typeId/add';

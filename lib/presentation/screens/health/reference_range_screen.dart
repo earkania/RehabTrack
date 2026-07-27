@@ -24,7 +24,7 @@ class _ReferenceRangeScreenState extends ConsumerState<ReferenceRangeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final profileId = ref.watch(activeProfileIdProvider);
+    final profileId = ref.watch(currentActiveProfileIdProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -142,7 +142,7 @@ class _TypeRangeDetailScreenState extends ConsumerState<TypeRangeDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final profileId = ref.watch(activeProfileIdProvider);
+    final profileId = ref.watch(currentActiveProfileIdProvider);
 
     if (profileId == null) {
       return Scaffold(
