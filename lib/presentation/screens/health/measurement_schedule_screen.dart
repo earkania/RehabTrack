@@ -10,6 +10,7 @@ import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
+import 'package:rehab_track/presentation/widgets/common/date_field.dart';
 import 'package:rehab_track/data/services/notification/measurement_notification_helper.dart';
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
@@ -397,18 +398,20 @@ class _MeasurementScheduleScreenState
     return Row(
       children: [
         Expanded(
-          child: _DatePickerField(
+          child: DateField(
             label: l10n.startDate,
-            selectedDate: _startDate,
-            onDateSelected: (date) => setState(() => _startDate = date),
+            date: _startDate,
+            onTap: () => _pickDate(isStart: true),
+            onClear: () => setState(() => _startDate = null),
           ),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
-          child: _DatePickerField(
+          child: DateField(
             label: l10n.endDate,
-            selectedDate: _endDate,
-            onDateSelected: (date) => setState(() => _endDate = date),
+            date: _endDate,
+            onTap: () => _pickDate(isStart: false),
+            onClear: () => setState(() => _endDate = null),
           ),
         ),
       ],
@@ -434,48 +437,30 @@ class _MeasurementScheduleScreenState
       maxLines: 2,
     );
   }
-}
 
-class _DatePickerField extends StatelessWidget {
-  final String label;
-  final DateTime? selectedDate;
-  final ValueChanged<DateTime?> onDateSelected;
+  Future<void> _pickDate({required bool isStart}) async {
+    final now = DateTime.now();
+    final initial = isStart ? (_startDate ?? now) : (_endDate ?? now);
+    final firstDate = isStart ? DateTime(2000) : (_startDate ?? DateTime(2000));
 
-  const _DatePickerField({
-    required this.label,
-    required this.selectedDate,
-    required this.onDateSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: selectedDate ?? DateTime.now(),
-          firstDate: DateTime.now().subtract(const Duration(days: 365)),
-          lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
-        );
-        onDateSelected(picked);
-      },
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              selectedDate != null
-                  ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
-                  : label,
-            ),
-            const Icon(Icons.calendar_today, size: 18),
-          ],
-        ),
-      ),
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: firstDate,
+      lastDate: DateTime(2100),
     );
+
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          _startDate = picked;
+          if (_endDate != null && _endDate!.isBefore(picked)) {
+            _endDate = null;
+          }
+        } else {
+          _endDate = picked;
+        }
+      });
+    }
   }
 }

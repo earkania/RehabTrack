@@ -375,5 +375,16 @@
   "changeToSkipped": "შეცვალეთ გამოტოვებულზე",
   "changeToTaken": "შეცვალეთ მიღებულზე",
   "resetToPending": "დააბრუნეთ მოლოდინში",
-  "editReading": "ჩანაწერის რედაქტირება"
+  "editReading": "ჩანაწერის რედაქტირება",
+  "dailyPlan": "დღის გეგმა",
+  "previousDay": "წინა დღე",
+  "nextDay": "მომდევნო დღე",
+  "returnToToday": "დღეს",
+  "nothingScheduledForThisDay": "ამ დღისთვის არაფერია დაგეგმილი",
+  "firstPlannedItem": "პირველი დაგეგმილი ელემენტი",
+  "scheduledAt": "დაგეგმილია {time}",
+  "history": "ისტორია",
+  "medicationsMissed": "გამოტოვებული მედიკამენტები",
+  "measurementsMissed": "გამოტოვებული გაზომვები",
+  "dailySummary": "დღის შეჯამება"
 }

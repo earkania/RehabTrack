@@ -19,14 +19,30 @@ class TodayAgendaService {
 
   Future<TodayAgenda> generateAgenda(
     int profileId, {
+    DateTime? selectedDate,
     DateTime? now,
   }) async {
     final currentTime = now ?? DateTime.now();
-    final today = DateTime(currentTime.year, currentTime.month, currentTime.day);
-    final dayEnd = today.add(const Duration(days: 1));
+    final targetDate = selectedDate != null
+        ? DateTime(selectedDate.year, selectedDate.month, selectedDate.day)
+        : DateTime(currentTime.year, currentTime.month, currentTime.day);
+    final dayEnd = targetDate.add(const Duration(days: 1));
 
-    final medicationItems = await _generateMedicationItems(profileId, today, dayEnd, currentTime);
-    final measurementItems = await _generateMeasurementItems(profileId, today, dayEnd, currentTime);
+    final isPastDate = targetDate.isBefore(
+      DateTime(currentTime.year, currentTime.month, currentTime.day),
+    );
+    final isFutureDate = targetDate.isAfter(
+      DateTime(currentTime.year, currentTime.month, currentTime.day),
+    );
+
+    final medicationItems = await _generateMedicationItems(
+      profileId, targetDate, dayEnd, currentTime,
+      isPastDate: isPastDate, isFutureDate: isFutureDate,
+    );
+    final measurementItems = await _generateMeasurementItems(
+      profileId, targetDate, dayEnd, currentTime,
+      isPastDate: isPastDate, isFutureDate: isFutureDate,
+    );
 
     final allItems = [...medicationItems, ...measurementItems];
     allItems.sort((a, b) {
@@ -38,7 +54,7 @@ class TodayAgendaService {
     final summary = _computeSummary(medicationItems, measurementItems);
 
     return TodayAgenda(
-      date: today,
+      date: targetDate,
       items: allItems,
       summary: summary,
     );
@@ -54,10 +70,12 @@ class TodayAgendaService {
 
   Future<List<TodayAgendaItem>> _generateMedicationItems(
     int profileId,
-    DateTime today,
+    DateTime targetDate,
     DateTime dayEnd,
-    DateTime currentTime,
-  ) async {
+    DateTime currentTime, {
+    required bool isPastDate,
+    required bool isFutureDate,
+  }) async {
     final medications =
         await _medicationRepository.getActiveMedications(profileId);
 
@@ -70,17 +88,20 @@ class TodayAgendaService {
 
       for (final schedule in schedules) {
         if (!schedule.active) continue;
-        if (!_scheduleAppliesOnDate(schedule.scheduleConfig, today)) continue;
+        if (!_scheduleAppliesOnDate(schedule.scheduleConfig, targetDate,
+            startDate: schedule.startDate)) {
+          continue;
+        }
 
         final times = schedule.scheduleConfig.times;
         final logs = await _medicationRepository.getLogs(
           schedule.id!,
-          from: today,
+          from: targetDate,
           to: dayEnd,
         );
 
         for (final timeStr in times) {
-          final scheduledDateTime = _parseTimeForDate(timeStr, today);
+          final scheduledDateTime = _parseTimeForDate(timeStr, targetDate);
           final log = _findLogForTime(logs, scheduledDateTime);
 
           items.add(await _buildMedicationItem(
@@ -89,6 +110,8 @@ class TodayAgendaService {
             scheduledDateTime: scheduledDateTime,
             log: log,
             currentTime: currentTime,
+            isPastDate: isPastDate,
+            isFutureDate: isFutureDate,
           ));
         }
       }
@@ -99,10 +122,12 @@ class TodayAgendaService {
 
   Future<List<TodayAgendaItem>> _generateMeasurementItems(
     int profileId,
-    DateTime today,
+    DateTime targetDate,
     DateTime dayEnd,
-    DateTime currentTime,
-  ) async {
+    DateTime currentTime, {
+    required bool isPastDate,
+    required bool isFutureDate,
+  }) async {
     final schedules =
         await _measurementRepository.getActiveSchedules(profileId);
 
@@ -111,7 +136,7 @@ class TodayAgendaService {
 
     for (final schedule in schedules) {
       if (!schedule.active || schedule.id == null) continue;
-      if (!_measurementScheduleAppliesOnDate(schedule, today)) continue;
+      if (!_measurementScheduleAppliesOnDate(schedule, targetDate)) continue;
 
       final typeId = schedule.measurementTypeId;
       if (!typeMap.containsKey(typeId)) {
@@ -120,19 +145,19 @@ class TodayAgendaService {
       }
       final type = typeMap[typeId];
 
-      final scheduledDateTime = _parseTimeForDate(schedule.time, today);
+      final scheduledDateTime = _parseTimeForDate(schedule.time, targetDate);
 
       final logs = await _measurementRepository.getReminderLogsForSchedule(
         schedule.id!,
       );
 
-      final todayLogs = logs.where((log) {
+      final dayLogs = logs.where((log) {
         final logDate = log.scheduledTime;
-        return logDate.isAfter(today.subtract(const Duration(seconds: 1))) &&
+        return logDate.isAfter(targetDate.subtract(const Duration(seconds: 1))) &&
             logDate.isBefore(dayEnd);
       }).toList();
 
-      final log = _findMeasurementLogForTime(todayLogs, scheduledDateTime);
+      final log = _findMeasurementLogForTime(dayLogs, scheduledDateTime);
 
       items.add(_buildMeasurementItem(
         schedule: schedule,
@@ -141,6 +166,8 @@ class TodayAgendaService {
         log: log,
         currentTime: currentTime,
         typeName: type?.name ?? 'Measurement',
+        isPastDate: isPastDate,
+        isFutureDate: isFutureDate,
       ));
     }
 
@@ -184,36 +211,65 @@ class TodayAgendaService {
     }).toList();
   }
 
-  static bool scheduleAppliesOnDate(ScheduleConfig config, DateTime date) {
+  static bool scheduleAppliesOnDate(
+    ScheduleConfig config,
+    DateTime date, {
+    DateTime? startDate,
+  }) {
+    final targetDateOnly = DateTime(date.year, date.month, date.day);
+
+    if (startDate != null) {
+      final startDateOnly =
+          DateTime(startDate.year, startDate.month, startDate.day);
+      if (targetDateOnly.isBefore(startDateOnly)) return false;
+    }
+
     return switch (config) {
       DailySchedule() => true,
       IntervalDaysSchedule(:final intervalDays) =>
-        _intervalScheduleAppliesOnDate(intervalDays, date),
+        _intervalScheduleAppliesOnDate(intervalDays, date,
+            anchorDate: startDate),
     };
   }
 
-  static bool _scheduleAppliesOnDate(ScheduleConfig config, DateTime date) {
-    return scheduleAppliesOnDate(config, date);
+  static bool _scheduleAppliesOnDate(
+    ScheduleConfig config,
+    DateTime date, {
+    DateTime? startDate,
+  }) {
+    return scheduleAppliesOnDate(config, date, startDate: startDate);
   }
 
   static bool _measurementScheduleAppliesOnDate(
     MeasurementSchedule schedule,
     DateTime date,
   ) {
+    final targetDateOnly = DateTime(date.year, date.month, date.day);
+
+    if (schedule.startDate != null) {
+      final startDateOnly = DateTime(
+          schedule.startDate!.year, schedule.startDate!.month, schedule.startDate!.day);
+      if (targetDateOnly.isBefore(startDateOnly)) return false;
+    }
+
     if (schedule.isDaily) return true;
     if (schedule.intervalDays == null || schedule.intervalDays! <= 0) return false;
-    return _intervalScheduleAppliesOnDate(schedule.intervalDays!, date);
+    return _intervalScheduleAppliesOnDate(schedule.intervalDays!, date,
+        anchorDate: schedule.startDate);
   }
 
   static bool _intervalScheduleAppliesOnDate(
     int intervalDays,
-    DateTime date,
-  ) {
+    DateTime date, {
+    DateTime? anchorDate,
+  }) {
     if (intervalDays <= 0) return false;
 
-    final now = DateTime.now();
-    final scheduleStartDate = DateTime(now.year, now.month, now.day);
+    final anchor = anchorDate ?? DateTime.now();
+    final scheduleStartDate = DateTime(anchor.year, anchor.month, anchor.day);
     final targetDate = DateTime(date.year, date.month, date.day);
+
+    if (targetDate.isBefore(scheduleStartDate)) return false;
 
     final diff = targetDate.difference(scheduleStartDate).inDays;
     return diff % intervalDays == 0;
@@ -232,9 +288,13 @@ class TodayAgendaService {
     required DateTime scheduledDateTime,
     required MedicationLog? log,
     required DateTime currentTime,
+    required bool isPastDate,
+    required bool isFutureDate,
   }) async {
-    final status =
-        _determineMedicationStatus(scheduledDateTime, log, currentTime);
+    final status = _determineMedicationStatus(
+      scheduledDateTime, log, currentTime,
+      isPastDate: isPastDate, isFutureDate: isFutureDate,
+    );
     final effectiveId =
         'med_${schedule.id}_${scheduledDateTime.hour}${scheduledDateTime.minute}';
 
@@ -277,9 +337,13 @@ class TodayAgendaService {
     required MeasurementReminderLog? log,
     required DateTime currentTime,
     required String typeName,
+    required bool isPastDate,
+    required bool isFutureDate,
   }) {
-    final status =
-        _determineMeasurementStatus(scheduledDateTime, log, currentTime);
+    final status = _determineMeasurementStatus(
+      scheduledDateTime, log, currentTime,
+      isPastDate: isPastDate, isFutureDate: isFutureDate,
+    );
     final effectiveId =
         'meas_${schedule.id}_${scheduledDateTime.hour}${scheduledDateTime.minute}';
 
@@ -307,6 +371,8 @@ class TodayAgendaService {
     MedicationLog? log,
     DateTime currentTime, {
     Duration graceWindow = const Duration(minutes: 30),
+    bool isPastDate = false,
+    bool isFutureDate = false,
   }) {
     if (log != null) {
       return switch (log.status) {
@@ -316,6 +382,9 @@ class TodayAgendaService {
         _ => TodayAgendaItemStatus.upcoming,
       };
     }
+
+    if (isPastDate) return TodayAgendaItemStatus.missed;
+    if (isFutureDate) return TodayAgendaItemStatus.upcoming;
 
     final diff = currentTime.difference(scheduledDateTime);
     if (diff.isNegative) return TodayAgendaItemStatus.upcoming;
@@ -328,6 +397,8 @@ class TodayAgendaService {
     MeasurementReminderLog? log,
     DateTime currentTime, {
     Duration graceWindow = const Duration(minutes: 30),
+    bool isPastDate = false,
+    bool isFutureDate = false,
   }) {
     if (log != null) {
       return switch (log.status) {
@@ -342,6 +413,9 @@ class TodayAgendaService {
       };
     }
 
+    if (isPastDate) return TodayAgendaItemStatus.missed;
+    if (isFutureDate) return TodayAgendaItemStatus.upcoming;
+
     final diff = currentTime.difference(scheduledDateTime);
     if (diff.isNegative) return TodayAgendaItemStatus.upcoming;
     if (diff <= graceWindow) return TodayAgendaItemStatus.due;
@@ -351,19 +425,31 @@ class TodayAgendaService {
   TodayAgendaItemStatus _determineMedicationStatus(
     DateTime scheduledDateTime,
     MedicationLog? log,
-    DateTime currentTime,
-  ) {
-    return determineMedicationStatus(scheduledDateTime, log, currentTime,
-        graceWindow: _graceWindow);
+    DateTime currentTime, {
+    bool isPastDate = false,
+    bool isFutureDate = false,
+  }) {
+    return determineMedicationStatus(
+      scheduledDateTime, log, currentTime,
+      graceWindow: _graceWindow,
+      isPastDate: isPastDate,
+      isFutureDate: isFutureDate,
+    );
   }
 
   TodayAgendaItemStatus _determineMeasurementStatus(
     DateTime scheduledDateTime,
     MeasurementReminderLog? log,
-    DateTime currentTime,
-  ) {
-    return determineMeasurementStatus(scheduledDateTime, log, currentTime,
-        graceWindow: _graceWindow);
+    DateTime currentTime, {
+    bool isPastDate = false,
+    bool isFutureDate = false,
+  }) {
+    return determineMeasurementStatus(
+      scheduledDateTime, log, currentTime,
+      graceWindow: _graceWindow,
+      isPastDate: isPastDate,
+      isFutureDate: isFutureDate,
+    );
   }
 
   MedicationLog? _findLogForTime(
@@ -413,6 +499,9 @@ class TodayAgendaService {
       medicationOverdue: medicationItems
           .where((i) => i.status == TodayAgendaItemStatus.overdue)
           .length,
+      medicationMissed: medicationItems
+          .where((i) => i.status == TodayAgendaItemStatus.missed)
+          .length,
       measurementTotal: measurementItems.length,
       measurementCompleted: measurementItems
           .where((i) => i.status == TodayAgendaItemStatus.completed)
@@ -422,6 +511,9 @@ class TodayAgendaService {
           .length,
       measurementOverdue: measurementItems
           .where((i) => i.status == TodayAgendaItemStatus.overdue)
+          .length,
+      measurementMissed: measurementItems
+          .where((i) => i.status == TodayAgendaItemStatus.missed)
           .length,
     );
   }

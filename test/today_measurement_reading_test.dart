@@ -13,7 +13,7 @@ Widget _wrap(Widget child) {
   return ProviderScope(
     overrides: [
       effectiveRangesForCurrentProfileProvider
-          .overrideWith((_, __) async => null),
+          .overrideWith((_, _) async => null),
     ],
     child: MaterialApp(
       localizationsDelegates: const [

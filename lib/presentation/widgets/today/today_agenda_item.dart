@@ -11,9 +11,9 @@ import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
+import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/widgets/today/today_background.dart';
 import 'package:rehab_track/presentation/widgets/today/today_measurement_reading.dart';
-import 'package:intl/intl.dart';
 
 class TodayAgendaItemWidget extends ConsumerWidget {
   final TodayAgendaItem item;
@@ -27,7 +27,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final timeStr = DateFormat.Hm().format(item.effectiveTime);
+    final timeStr = LocalizedDateFormat.hourMinute(context, item.effectiveTime);
     final now = DateTime.now();
     final background = TodayBackground.forItem(item, now);
 
@@ -218,6 +218,10 @@ class _StatusIcon extends StatelessWidget {
         Icons.snooze,
         theme.colorScheme.tertiary,
       ),
+      TodayAgendaItemStatus.missed => (
+        Icons.event_busy,
+        theme.colorScheme.onSurfaceVariant,
+      ),
     };
 
     return Icon(icon, color: color, size: 22);
@@ -262,6 +266,17 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
   }
 
   void _buildMedicationMenu(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final itemDate = DateTime(
+        item.scheduledDateTime.year, item.scheduledDateTime.month, item.scheduledDateTime.day);
+    final isFutureItem = itemDate.isAfter(today);
+
+    if (isFutureItem) {
+      _addNavigationOnlyItems(items, l10n);
+      return;
+    }
+
     if (item.isActionable) {
       items.add(PopupMenuItem(
         value: 'mark_taken',
@@ -359,6 +374,17 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
   }
 
   void _buildMeasurementMenu(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final itemDate = DateTime(
+        item.scheduledDateTime.year, item.scheduledDateTime.month, item.scheduledDateTime.day);
+    final isFutureItem = itemDate.isAfter(today);
+
+    if (isFutureItem) {
+      _addMeasurementNavigationOnlyItems(items, l10n);
+      return;
+    }
+
     if (item.isActionable) {
       items.add(PopupMenuItem(
         value: 'record_now',
@@ -447,6 +473,67 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     ));
   }
 
+  void _addNavigationOnlyItems(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    items.add(PopupMenuItem(
+      value: 'details',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.info_outline, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.openDetails),
+        ],
+      ),
+    ));
+    items.add(PopupMenuItem(
+      value: 'history',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.history, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.viewHistory),
+        ],
+      ),
+    ));
+  }
+
+  void _addMeasurementNavigationOnlyItems(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    items.add(PopupMenuItem(
+      value: 'schedules',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.schedule, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.schedules),
+        ],
+      ),
+    ));
+    items.add(PopupMenuItem(
+      value: 'history',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.history, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.viewHistory),
+        ],
+      ),
+    ));
+    items.add(PopupMenuItem(
+      value: 'trends',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.show_chart, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.viewTrends),
+        ],
+      ),
+    ));
+  }
+
   void _handleAction(
     BuildContext context,
     String value,
@@ -482,6 +569,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     if (item.medicationId == null || item.sourceScheduleId <= 0) return;
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
       final repo = ref.read(medicationRepositoryProvider);
@@ -500,7 +588,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(l10n.actionFailed)),
       );
     } finally {
@@ -528,6 +616,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     if (_isProcessing) return;
     if (item.sourceScheduleId <= 0) return;
     setState(() => _isProcessing = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
       if (item.type == TodayAgendaItemType.medication &&
@@ -559,7 +648,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(l10n.actionFailed)),
       );
     } finally {
@@ -571,6 +660,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     if (_isProcessing) return;
     if (item.sourceScheduleId <= 0) return;
     setState(() => _isProcessing = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
       if (item.type == TodayAgendaItemType.medication) {
@@ -590,7 +680,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(l10n.actionFailed)),
       );
     } finally {
@@ -606,6 +696,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     if (_isProcessing) return;
     if (item.sourceScheduleId <= 0) return;
     setState(() => _isProcessing = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
       final repo = ref.read(medicationRepositoryProvider);
@@ -633,7 +724,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(l10n.actionFailed)),
       );
     } finally {

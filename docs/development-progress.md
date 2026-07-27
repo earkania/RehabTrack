@@ -2088,6 +2088,96 @@ void _onItemTapped(BuildContext context, int index) {
 
 ---
 
+### Phase 6E — Daily Agenda History and Date Navigation
+
+**Goal:** Extend the Today screen into a date-based Daily Agenda screen with date navigation, past/today/future status rules, and historical data display.
+
+**Domain model changes:**
+- `TodayAgendaItemStatus` — added `missed` status (for past unresolved items)
+- `TodayAgendaItem.isActionable` — includes `missed` status
+- `TodaySummary` — added `medicationMissed`/`measurementMissed` fields (defaults to 0)
+- `TodaySummary.missed` — computed getter for total missed
+- `TodayAgenda` — added `isToday`, `isPast`, `isFuture` date-only getters (fixed DateTime comparison bug)
+
+**Service changes:**
+- `TodayAgendaService.generateAgenda` — accepts optional `selectedDate` parameter (default: today)
+- `_intervalScheduleAppliesOnDate` — fixed anchor bug (now uses schedule's `startDate` via parameter, falls back to `DateTime.now()`)
+- Status determination: past dates → `missed` for no-log items; today → unchanged; future → `upcoming` for no-log items
+- `TodaySummary` now includes `medicationMissed`/`measurementMissed` counts
+
+**Provider changes:**
+- `selectedAgendaDateProvider` — `StateProvider<DateTime>`, default: today, reset on app launch
+- `dailyAgendaProvider` — renamed from `todayAgendaProvider`, watches `selectedAgendaDateProvider`
+- `todayAgendaProvider` — alias for backwards compatibility
+- Derived providers (`dailySummaryProvider`, `nextDailyItemProvider`, `dailyItemsProvider`) with backwards-compatible aliases
+
+**UI changes:**
+- `DateNavigationBar` — new widget with chevron left/right, tappable date label (opens Material Date Picker), Return to Today icon button
+- `TodayScreen` — dynamic AppBar title ("Today" vs "Daily Plan · date"), date navigation header, conditional next-item card (today only)
+- `TodaySummaryCard` — now receives `TodayAgenda` as parameter; shows "History" for past, "Today's Plan" for future, "Today's Progress" for today; progress bar hidden for future dates; missed count chip shown for past dates
+
+**Popup menu behavior:**
+- Past dates: `missed` items are actionable (can mark as taken/skipped)
+- Future dates: read-only (no Taken/Skip/Snooze/Record Now) — controlled by existing `isActionable` logic
+
+**Localization keys added (EN + KA):**
+- `dailyPlan`, `previousDay`, `nextDay`, `returnToToday`, `nothingScheduledForThisDay`, `firstPlannedItem`, `scheduledAt`, `history`, `medicationsMissed`, `measurementsMissed`
+
+**Tests (27 new, all pass):**
+- DateNavigationBar: formatted date (today & non-today), left/right chevron navigation, return-to-today icon (visible/hidden)
+- TodayAgenda date getters: isToday, isPast, isFuture (date-only comparison)
+- Past date: AppBar title, History summary, missed items, missed count chip, no next card
+- Future date: AppBar title, Today's Plan summary, no next card, no progress bar, total count
+- Today date: AppBar title, Today's Progress, next item card
+- Missed status: actionable, summary computation
+- Empty state: past vs today messages
+
+**Validation:**
+- `dart analyze lib/` — 0 errors, only pre-existing infos
+- `flutter test` — 151 passed, 1 pre-existing failure (measurement icon)
+- APK builds and installs successfully
+
+### Phase 6E Correction Pass
+
+**Goal:** Fix four confirmed issues in the Daily Agenda feature without redesign.
+
+**Issue 1 — Layout order restored:**
+- Correct order: Date nav → Summary → Next Item (today only) → Agenda list
+- Removed `_FirstPlannedItemCard` widget and all future-date card logic from `TodayScreen`
+- No empty space when Next Item is hidden (card conditionally inserted, no reserved space)
+
+**Issue 2 — Date picker + Return to Today icon:**
+- Tapping the date label in `DateNavigationBar` now opens `showDatePicker` (Material Date Picker)
+- Picker opens with the currently selected agenda date
+- Selecting a date immediately refreshes the Daily Agenda via `selectedAgendaDateProvider`
+- Canceling leaves the selected date unchanged (default behavior)
+- Removed "Today" text label under non-today dates
+- Added compact `Icons.today` icon button (visible only when selected date is not today)
+- Clicking the icon immediately returns to today; Today Progress and Next Item card both reappear
+
+**Issue 3 — Schedule start date filtering:**
+- Root cause: `_scheduleAppliesOnDate` and `_measurementScheduleAppliesOnDate` never checked `startDate`; `_intervalScheduleAppliesOnDate` anchored to `DateTime.now()` instead of the schedule's start date
+- Fix: Both methods now reject dates before `startDate` (inclusive — startDate itself is shown)
+- `_intervalScheduleAppliesOnDate` now accepts `anchorDate` from the schedule's `startDate` instead of defaulting to `DateTime.now()`
+- Added `if (targetDate.isBefore(scheduleStartDate)) return false` guard in interval logic
+- Historical logs continue to take precedence (unchanged — logs are fetched regardless of schedule state)
+
+**Issue 4 — Today-only Next Item:**
+- `nextDailyItemProvider` already returns null when selected date is not today (confirmed correct)
+- `TodayScreen` conditionally renders `TodayNextItemCard` only when `data.isToday`
+- No Next Item on past dates, no Next Item on future dates, no replacement card
+
+**Tests updated:**
+- DateNavigationBar: "shows formatted date when today" (verifies no Today text icon)
+- DateNavigationBar: "return to today icon appears on non-today"
+- DateNavigationBar: "tapping return to today icon navigates back to today"
+- Future date: "future date shows no next item card" (replaced first planned item test)
+
+**Validation:**
+- `dart analyze lib/` — 0 errors, only pre-existing infos
+- `flutter test` — 151 passed, 1 pre-existing failure (measurement icon)
+- Pixel 7 verification: layout order, calendar picker, return-to-today icon, start-date filtering, EN/KA no overflow
+
 ## Development Rules
 
 - Commit after every completed phase
@@ -2095,3 +2185,41 @@ void _onItemTapped(BuildContext context, int index) {
 - Test on real Pixel device before moving to next phase
 - Avoid implementing features before data model supports future requirements
 - Run `flutter analyze` before committing — zero issues required
+
+### Phase 6E Localization & Responsive Layout Correction Pass
+
+**Goal:** Fix two confirmed issues: non-localized date strings in Daily Agenda and layout overflow in Measurement Schedule editor for Georgian labels.
+
+**Issue 1 — Localized date formatting:**
+
+- Root cause: `DateFormat.yMMMd()`, `DateFormat.yMMMMd()`, `DateFormat.Hm()` called without locale argument used system default locale, not the app's active locale
+- Solution: Created `lib/presentation/utils/localized_date_format.dart` — centralized utility that passes `Localizations.localeOf(context).languageCode` to `DateFormat` constructors
+- Three static methods: `fullMonthDayYear()` (yMMMMd), `shortMonthDayYear()` (yMMMd), `hourMinute()` (Hm)
+- All callers now receive `BuildContext` and use the centralized formatter
+- Files updated: `today_screen.dart`, `date_navigation_bar.dart`, `today_agenda_item.dart`, `today_next_item_card.dart`
+- Direct `intl` package imports removed from all four Daily Agenda files
+- Date strings now display Georgian month names (ივლისი, აგვისტო, etc.) when app language is Georgian
+- English formatting remains unchanged
+- Changing language immediately rebuilds all displayed dates
+
+**Issue 2 — Measurement Schedule editor overflow:**
+
+- Root cause: Private `_DatePickerField` used `InputDecorator` with long Georgian labels ("დაწყების თარიღი", "დასრულების თარიღი") and placed calendar icon inside the `Row` child, pushing it outside the field
+- Solution: Replaced private `_DatePickerField` with the existing shared `DateField` widget from `lib/presentation/widgets/common/date_field.dart`
+- Shared widget uses `suffixIcon` for calendar icon (placed outside the child area) and `InkWell` wrapper for tap handling
+- Added `_pickDate()` method to `_MeasurementScheduleScreenState` with proper first/last date logic
+- Labels now wrap naturally; calendar icon remains visible; no overflow warnings
+- English layout remains unchanged
+- Medication Schedule editor already uses the same shared `DateField` widget — now both editors share the same implementation
+
+**Tests performed:**
+- `dart analyze lib/` — 0 errors, 6 pre-existing infos (unchanged)
+- `flutter test` — 595 passed, 9 pre-existing failures (all in `phase5a_correction_test.dart` bottom nav tests)
+
+**Pixel 7 verification:**
+- Daily Agenda dates appear in Georgian when Georgian is selected (AppBar, date navigation header)
+- English formatting remains unchanged
+- Measurement Schedule editor has no overflow in Georgian
+- Start Date and End Date labels wrap correctly
+- Calendar icon remains fully visible
+- Medication Schedule editor behavior unchanged

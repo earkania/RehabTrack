@@ -13,6 +13,7 @@ enum TodayAgendaItemStatus {
   completed,
   skipped,
   snoozed,
+  missed,
 }
 
 class TodayAgendaItem {
@@ -146,7 +147,8 @@ class TodayAgendaItem {
       status == TodayAgendaItemStatus.upcoming ||
       status == TodayAgendaItemStatus.due ||
       status == TodayAgendaItemStatus.overdue ||
-      status == TodayAgendaItemStatus.snoozed;
+      status == TodayAgendaItemStatus.snoozed ||
+      status == TodayAgendaItemStatus.missed;
 
   bool get isCompleted =>
       status == TodayAgendaItemStatus.completed ||
@@ -170,26 +172,31 @@ class TodaySummary {
   final int medicationCompleted;
   final int medicationSkipped;
   final int medicationOverdue;
+  final int medicationMissed;
   final int measurementTotal;
   final int measurementCompleted;
   final int measurementSkipped;
   final int measurementOverdue;
+  final int measurementMissed;
 
   const TodaySummary({
     required this.medicationTotal,
     required this.medicationCompleted,
     required this.medicationSkipped,
     required this.medicationOverdue,
+    this.medicationMissed = 0,
     required this.measurementTotal,
     required this.measurementCompleted,
     required this.measurementSkipped,
     required this.measurementOverdue,
+    this.measurementMissed = 0,
   });
 
   int get total => medicationTotal + measurementTotal;
   int get completed => medicationCompleted + measurementCompleted;
   int get skipped => medicationSkipped + measurementSkipped;
   int get overdue => medicationOverdue + measurementOverdue;
+  int get missed => medicationMissed + measurementMissed;
   int get handled => completed + skipped;
 
   double get completionPercentage =>
@@ -203,10 +210,12 @@ class TodaySummary {
         medicationCompleted = 0,
         medicationSkipped = 0,
         medicationOverdue = 0,
+        medicationMissed = 0,
         measurementTotal = 0,
         measurementCompleted = 0,
         measurementSkipped = 0,
-        measurementOverdue = 0;
+        measurementOverdue = 0,
+        measurementMissed = 0;
 }
 
 class TodayAgenda {
@@ -221,6 +230,23 @@ class TodayAgenda {
   });
 
   bool get isEmpty => items.isEmpty;
+
+  bool get isToday {
+    final now = DateTime.now();
+    return date.year == now.year && date.month == now.month && date.day == now.day;
+  }
+
+  bool get isPast {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return date.isBefore(today);
+  }
+
+  bool get isFuture {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return date.isAfter(today);
+  }
 
   List<TodayAgendaItem> get allItems =>
       List.unmodifiable(items);

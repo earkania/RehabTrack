@@ -284,6 +284,55 @@ Keep an expandable checklist for ideas that may be implemented later.
 
 ---
 
+## Phase 6E — Daily Agenda History and Date Navigation
+
+### Status rules for different date contexts
+
+| Date context | No log with schedule | With log |
+|---|---|---|
+| **Past** | `missed` | stored action (completed/skipped) |
+| **Today** | `due`/`overdue`/`upcoming` (existing logic) | stored action |
+| **Future** | `upcoming` | stored action |
+
+### Past date behavior
+- Inactive schedules do not generate planned future occurrences
+- Historical logs must still be considered even if a schedule is now inactive
+- Items use the `missed` status for no-log occurrences (not `overdue`)
+- Progress bar and completion percentage hidden for past dates
+- "History" summary title shown instead of "Today's Progress"
+- Missed count chip displayed (event_busy icon)
+
+### Future date behavior
+- Planning view only — no action buttons (Taken/Skip/Snooze/Record Now)
+- "Today's Plan" summary title shown
+- No progress bar — total count only
+- No Next Item card (today-only behavior)
+
+### Date navigation
+- Chevron left/right for day-by-day navigation
+- Tappable date label opens Material Date Picker
+- `Icons.today` return button appears only when selected date is not today
+- AppBar title: "Today" for today, "Daily Plan · formatted date" otherwise
+- Selected date stored in `selectedAgendaDateProvider` (reset on app launch)
+
+### Schedule start date filtering
+- Occurrences must never be generated before the schedule's `startDate`
+- `startDate` is inclusive — the schedule appears on its start date
+- `_intervalScheduleAppliesOnDate` anchors to the schedule's `startDate` (not `DateTime.now()`)
+- `DailySchedule` and `MeasurementSchedule` both check `startDate` before generating
+- End date behavior unchanged
+
+### Data precedence for past dates
+1. Stored action logs (ground truth)
+2. Schedule reconstruction (when no logs exist)
+3. Known limitation: inactive schedules may not appear in historical views (documented)
+
+### Known limitations
+- Inactive schedules are not queried for past dates (only active schedules processed)
+- Historical view limited to schedules that were active when generated
+
+---
+
 # Notes From Real Usage
 
 Create a section specifically intended for recording observations that arise while actually using the application.
@@ -296,3 +345,17 @@ Examples:
 - Features that reduce routine effort
 - Missing information that would be useful
 - Things that are confusing or inconvenient
+
+### Date formatting decision
+- All date formatting in Daily Agenda uses `LocalizedDateFormat` utility
+- Utility passes `Localizations.localeOf(context).languageCode` to `DateFormat` constructors
+- This ensures Georgian month names are used when the app language is Georgian
+- Pattern: `fullMonthDayYear` (yMMMMd) for date navigation header, `shortMonthDayYear` (yMMMd) for AppBar subtitle, `hourMinute` (Hm) for agenda item times
+- No hardcoded locale strings — all date formatting is locale-aware
+
+### Shared date field widget
+- `DateField` widget in `lib/presentation/widgets/common/date_field.dart` is the standard date picker field
+- Used by both Medication Schedule editor and Measurement Schedule editor
+- Uses `InputDecorator` with `suffixIcon` for calendar icon (placed outside child area)
+- Labels wrap naturally — no overflow with long Georgian text
+- `onTap` and `onClear` callbacks for parent widget integration

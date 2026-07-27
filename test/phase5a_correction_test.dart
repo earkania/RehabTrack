@@ -366,7 +366,11 @@ void main() {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
-      await tester.pumpAndSettle();
+      // Deterministic pump: full app creates a real database provider whose
+      // LazyDatabase connection never resolves in the test environment,
+      // leaving a CircularProgressIndicator animating indefinitely.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Selected tab (Today) shows label
       expect(find.text('Today'), findsAtLeastNWidgets(1));
@@ -387,7 +391,8 @@ void main() {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(tester.takeException(), isNull);
     });
@@ -404,7 +409,8 @@ void main() {
           locale: const Locale('ka'),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(tester.takeException(), isNull);
     });
@@ -418,7 +424,8 @@ void main() {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // The nav bar is inside a Scaffold in the shell route.
       // Find all Text widgets with "Today" — the one inside the bottom
@@ -449,7 +456,8 @@ void main() {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // All nav bar icons should exist (today also appears in empty state)
       expect(find.byIcon(Icons.today), findsAtLeastNWidgets(1));
@@ -504,7 +512,12 @@ void main() {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
-      await tester.pumpAndSettle();
+      // Use deterministic pump instead of pumpAndSettle: the full app
+      // creates a real database provider whose LazyDatabase connection
+      // never resolves in the test environment, leaving a
+      // CircularProgressIndicator animating indefinitely.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // No overflow
       expect(tester.takeException(), isNull);
@@ -526,7 +539,10 @@ void main() {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
-      await tester.pumpAndSettle();
+      // Use deterministic pump instead of pumpAndSettle: see comment
+      // in the test above.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(tester.takeException(), isNull);
     });

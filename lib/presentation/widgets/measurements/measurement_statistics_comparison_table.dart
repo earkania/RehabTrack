@@ -4,14 +4,14 @@ import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/utils/measurement_formatter.dart';
 
-class _SeriesColumn {
+class SeriesColumn {
   final String label;
   final String compactLabel;
   final String unit;
   final String? fieldKey;
   final MeasurementStatistics? statistics;
 
-  const _SeriesColumn({
+  const SeriesColumn({
     required this.label,
     required this.compactLabel,
     required this.unit,
@@ -21,7 +21,7 @@ class _SeriesColumn {
 }
 
 class MeasurementStatisticsComparisonTable extends StatelessWidget {
-  final List<_SeriesColumn> columns;
+  final List<SeriesColumn> columns;
 
   const MeasurementStatisticsComparisonTable({
     super.key,
@@ -173,22 +173,22 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
     required Map<String, MeasurementStatistics> fieldStatistics,
     required AppLocalizations l10n,
   }) {
-    final columns = <_SeriesColumn>[
-      _SeriesColumn(
+    final columns = <SeriesColumn>[
+      SeriesColumn(
         label: l10n.systolicLabel,
         compactLabel: l10n.systolicShort,
         unit: 'mmHg',
         fieldKey: 'systolic',
         statistics: fieldStatistics['systolic'],
       ),
-      _SeriesColumn(
+      SeriesColumn(
         label: l10n.diastolicLabel,
         compactLabel: l10n.diastolicShort,
         unit: 'mmHg',
         fieldKey: 'diastolic',
         statistics: fieldStatistics['diastolic'],
       ),
-      _SeriesColumn(
+      SeriesColumn(
         label: l10n.pulseLabelStat,
         compactLabel: l10n.pulseShort,
         unit: 'bpm',

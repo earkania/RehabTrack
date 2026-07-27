@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
-import 'package:rehab_track/presentation/providers/today_provider.dart';
 
-class TodaySummaryCard extends ConsumerWidget {
-  const TodaySummaryCard({super.key});
+class TodaySummaryCard extends StatelessWidget {
+  final TodayAgenda agenda;
+
+  const TodaySummaryCard({super.key, required this.agenda});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final summary = ref.watch(todaySummaryProvider);
+    final summary = agenda.summary;
     final theme = Theme.of(context);
 
     if (summary.total == 0) return const SizedBox.shrink();
+
+    final String title;
+    if (agenda.isPast) {
+      title = l10n.dailySummary;
+    } else {
+      title = l10n.todaysProgress;
+    }
 
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -22,46 +30,64 @@ class TodaySummaryCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l10n.todaysProgress,
+              title,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 12),
-            LinearProgressIndicator(
-              value: summary.handledPercentage,
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
-              backgroundColor: theme.colorScheme.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                summary.completionPercentage >= 1.0
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.tertiary,
+            if (!agenda.isFuture) ...[
+              LinearProgressIndicator(
+                value: summary.handledPercentage,
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(4),
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  summary.completionPercentage >= 1.0
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.tertiary,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
+            ],
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _CountChip(
-                  label: '${summary.completed}',
-                  icon: Icons.check_circle_outline,
-                  color: theme.colorScheme.primary,
-                ),
-                if (summary.skipped > 0)
+                if (!agenda.isFuture) ...[
                   _CountChip(
-                    label: '${summary.skipped}',
-                    icon: Icons.remove_circle_outline,
-                    color: theme.colorScheme.outline,
+                    label: '${summary.completed}',
+                    icon: Icons.check_circle_outline,
+                    color: theme.colorScheme.primary,
                   ),
-                if (summary.overdue > 0)
+                  if (summary.skipped > 0)
+                    _CountChip(
+                      label: '${summary.skipped}',
+                      icon: Icons.remove_circle_outline,
+                      color: theme.colorScheme.outline,
+                    ),
+                  if (summary.overdue > 0)
+                    _CountChip(
+                      label: '${summary.overdue}',
+                      icon: Icons.warning_amber_rounded,
+                      color: theme.colorScheme.error,
+                    ),
+                  if (summary.missed > 0)
+                    _CountChip(
+                      label: '${summary.missed}',
+                      icon: Icons.event_busy,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                ] else ...[
                   _CountChip(
-                    label: '${summary.overdue}',
-                    icon: Icons.warning_amber_rounded,
-                    color: theme.colorScheme.error,
+                    label: '${summary.total}',
+                    icon: Icons.schedule,
+                    color: theme.colorScheme.primary,
                   ),
+                ],
                 Text(
-                  '${summary.completed}/${summary.total}',
+                  agenda.isFuture
+                      ? '${summary.total}'
+                      : '${summary.completed}/${summary.total}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
