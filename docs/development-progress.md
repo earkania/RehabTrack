@@ -2112,10 +2112,9 @@ void _onItemTapped(BuildContext context, int index) {
 - Derived providers (`dailySummaryProvider`, `nextDailyItemProvider`, `dailyItemsProvider`) with backwards-compatible aliases
 
 **UI changes:**
-- `DateNavigationBar` — new widget with chevron left/right, tappable date label, "Today" button
-- `TodayScreen` — dynamic AppBar title ("Today" vs "Daily Plan · date"), date navigation header, conditional next-item card (hidden for past, "First planned item" for future)
+- `DateNavigationBar` — new widget with chevron left/right, tappable date label (opens Material Date Picker), Return to Today icon button
+- `TodayScreen` — dynamic AppBar title ("Today" vs "Daily Plan · date"), date navigation header, conditional next-item card (today only)
 - `TodaySummaryCard` — now receives `TodayAgenda` as parameter; shows "History" for past, "Today's Plan" for future, "Today's Progress" for today; progress bar hidden for future dates; missed count chip shown for past dates
-- `_FirstPlannedItemCard` — new widget for future dates showing first scheduled item
 
 **Popup menu behavior:**
 - Past dates: `missed` items are actionable (can mark as taken/skipped)
@@ -2124,19 +2123,60 @@ void _onItemTapped(BuildContext context, int index) {
 **Localization keys added (EN + KA):**
 - `dailyPlan`, `previousDay`, `nextDay`, `returnToToday`, `nothingScheduledForThisDay`, `firstPlannedItem`, `scheduledAt`, `history`, `medicationsMissed`, `measurementsMissed`
 
-**Tests (25 new, all pass):**
-- DateNavigationBar: Today label, formatted date, left/right chevron navigation, tap-to-today
+**Tests (27 new, all pass):**
+- DateNavigationBar: formatted date (today & non-today), left/right chevron navigation, return-to-today icon (visible/hidden)
 - TodayAgenda date getters: isToday, isPast, isFuture (date-only comparison)
 - Past date: AppBar title, History summary, missed items, missed count chip, no next card
-- Future date: AppBar title, Today's Plan summary, first planned item card, no progress bar, total count
+- Future date: AppBar title, Today's Plan summary, no next card, no progress bar, total count
 - Today date: AppBar title, Today's Progress, next item card
 - Missed status: actionable, summary computation
 - Empty state: past vs today messages
 
 **Validation:**
 - `dart analyze lib/` — 0 errors, only pre-existing infos
-- `flutter test` — 150 passed, 1 pre-existing failure (measurement icon)
+- `flutter test` — 151 passed, 1 pre-existing failure (measurement icon)
 - APK builds and installs successfully
+
+### Phase 6E Correction Pass
+
+**Goal:** Fix four confirmed issues in the Daily Agenda feature without redesign.
+
+**Issue 1 — Layout order restored:**
+- Correct order: Date nav → Summary → Next Item (today only) → Agenda list
+- Removed `_FirstPlannedItemCard` widget and all future-date card logic from `TodayScreen`
+- No empty space when Next Item is hidden (card conditionally inserted, no reserved space)
+
+**Issue 2 — Date picker + Return to Today icon:**
+- Tapping the date label in `DateNavigationBar` now opens `showDatePicker` (Material Date Picker)
+- Picker opens with the currently selected agenda date
+- Selecting a date immediately refreshes the Daily Agenda via `selectedAgendaDateProvider`
+- Canceling leaves the selected date unchanged (default behavior)
+- Removed "Today" text label under non-today dates
+- Added compact `Icons.today` icon button (visible only when selected date is not today)
+- Clicking the icon immediately returns to today; Today Progress and Next Item card both reappear
+
+**Issue 3 — Schedule start date filtering:**
+- Root cause: `_scheduleAppliesOnDate` and `_measurementScheduleAppliesOnDate` never checked `startDate`; `_intervalScheduleAppliesOnDate` anchored to `DateTime.now()` instead of the schedule's start date
+- Fix: Both methods now reject dates before `startDate` (inclusive — startDate itself is shown)
+- `_intervalScheduleAppliesOnDate` now accepts `anchorDate` from the schedule's `startDate` instead of defaulting to `DateTime.now()`
+- Added `if (targetDate.isBefore(scheduleStartDate)) return false` guard in interval logic
+- Historical logs continue to take precedence (unchanged — logs are fetched regardless of schedule state)
+
+**Issue 4 — Today-only Next Item:**
+- `nextDailyItemProvider` already returns null when selected date is not today (confirmed correct)
+- `TodayScreen` conditionally renders `TodayNextItemCard` only when `data.isToday`
+- No Next Item on past dates, no Next Item on future dates, no replacement card
+
+**Tests updated:**
+- DateNavigationBar: "shows formatted date when today" (verifies no Today text icon)
+- DateNavigationBar: "return to today icon appears on non-today"
+- DateNavigationBar: "tapping return to today icon navigates back to today"
+- Future date: "future date shows no next item card" (replaced first planned item test)
+
+**Validation:**
+- `dart analyze lib/` — 0 errors, only pre-existing infos
+- `flutter test` — 151 passed, 1 pre-existing failure (measurement icon)
+- Pixel 7 verification: layout order, calendar picker, return-to-today icon, start-date filtering, EN/KA no overflow
 
 ## Development Rules
 

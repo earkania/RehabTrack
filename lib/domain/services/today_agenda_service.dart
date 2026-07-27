@@ -88,7 +88,10 @@ class TodayAgendaService {
 
       for (final schedule in schedules) {
         if (!schedule.active) continue;
-        if (!_scheduleAppliesOnDate(schedule.scheduleConfig, targetDate)) continue;
+        if (!_scheduleAppliesOnDate(schedule.scheduleConfig, targetDate,
+            startDate: schedule.startDate)) {
+          continue;
+        }
 
         final times = schedule.scheduleConfig.times;
         final logs = await _medicationRepository.getLogs(
@@ -208,25 +211,51 @@ class TodayAgendaService {
     }).toList();
   }
 
-  static bool scheduleAppliesOnDate(ScheduleConfig config, DateTime date) {
+  static bool scheduleAppliesOnDate(
+    ScheduleConfig config,
+    DateTime date, {
+    DateTime? startDate,
+  }) {
+    final targetDateOnly = DateTime(date.year, date.month, date.day);
+
+    if (startDate != null) {
+      final startDateOnly =
+          DateTime(startDate.year, startDate.month, startDate.day);
+      if (targetDateOnly.isBefore(startDateOnly)) return false;
+    }
+
     return switch (config) {
       DailySchedule() => true,
       IntervalDaysSchedule(:final intervalDays) =>
-        _intervalScheduleAppliesOnDate(intervalDays, date),
+        _intervalScheduleAppliesOnDate(intervalDays, date,
+            anchorDate: startDate),
     };
   }
 
-  static bool _scheduleAppliesOnDate(ScheduleConfig config, DateTime date) {
-    return scheduleAppliesOnDate(config, date);
+  static bool _scheduleAppliesOnDate(
+    ScheduleConfig config,
+    DateTime date, {
+    DateTime? startDate,
+  }) {
+    return scheduleAppliesOnDate(config, date, startDate: startDate);
   }
 
   static bool _measurementScheduleAppliesOnDate(
     MeasurementSchedule schedule,
     DateTime date,
   ) {
+    final targetDateOnly = DateTime(date.year, date.month, date.day);
+
+    if (schedule.startDate != null) {
+      final startDateOnly = DateTime(
+          schedule.startDate!.year, schedule.startDate!.month, schedule.startDate!.day);
+      if (targetDateOnly.isBefore(startDateOnly)) return false;
+    }
+
     if (schedule.isDaily) return true;
     if (schedule.intervalDays == null || schedule.intervalDays! <= 0) return false;
-    return _intervalScheduleAppliesOnDate(schedule.intervalDays!, date);
+    return _intervalScheduleAppliesOnDate(schedule.intervalDays!, date,
+        anchorDate: schedule.startDate);
   }
 
   static bool _intervalScheduleAppliesOnDate(
@@ -239,6 +268,8 @@ class TodayAgendaService {
     final anchor = anchorDate ?? DateTime.now();
     final scheduleStartDate = DateTime(anchor.year, anchor.month, anchor.day);
     final targetDate = DateTime(date.year, date.month, date.day);
+
+    if (targetDate.isBefore(scheduleStartDate)) return false;
 
     final diff = targetDate.difference(scheduleStartDate).inDays;
     return diff % intervalDays == 0;

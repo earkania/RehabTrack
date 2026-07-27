@@ -144,7 +144,7 @@ TodayAgenda _futureAgenda() {
 
 void main() {
   group('DateNavigationBar', () {
-    testWidgets('shows "Today" label when selected date is today', (tester) async {
+    testWidgets('shows formatted date when today', (tester) async {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
 
@@ -168,7 +168,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Today'), findsOneWidget);
+      expect(find.byIcon(Icons.today), findsNothing);
     });
 
     testWidgets('shows formatted date when not today', (tester) async {
@@ -266,7 +266,7 @@ void main() {
       expect(newDate, equals(expected));
     });
 
-    testWidgets('tapping date label on non-today navigates back to today', (tester) async {
+    testWidgets('return to today icon appears on non-today', (tester) async {
       final past = DateTime.now().subtract(const Duration(days: 3));
       final d = DateTime(past.year, past.month, past.day);
 
@@ -289,8 +289,33 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final dateText = find.text('Today').last;
-      await tester.tap(dateText);
+      expect(find.byIcon(Icons.today), findsOneWidget);
+    });
+
+    testWidgets('tapping return to today icon navigates back to today', (tester) async {
+      final past = DateTime.now().subtract(const Duration(days: 3));
+      final d = DateTime(past.year, past.month, past.day);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            selectedAgendaDateProvider.overrideWith((ref) => d),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const Scaffold(body: DateNavigationBar()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.today));
       await tester.pumpAndSettle();
 
       final container = ProviderScope.containerOf(
@@ -414,13 +439,13 @@ void main() {
       expect(find.text("Today's Plan"), findsOneWidget);
     });
 
-    testWidgets('future date shows first planned item card', (tester) async {
+    testWidgets('future date shows no next item card', (tester) async {
       final agenda = _futureAgenda();
 
       await tester.pumpWidget(_wrapScreen(agenda: agenda, selectedDate: agenda.date));
       await tester.pumpAndSettle();
 
-      expect(find.text('First planned item'), findsOneWidget);
+      expect(find.text('Next'), findsNothing);
     });
 
     testWidgets('future date has no progress bar', (tester) async {

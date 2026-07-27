@@ -304,16 +304,23 @@ Keep an expandable checklist for ideas that may be implemented later.
 
 ### Future date behavior
 - Planning view only — no action buttons (Taken/Skip/Snooze/Record Now)
-- "First planned item" card shown at the top
 - "Today's Plan" summary title shown
 - No progress bar — total count only
+- No Next Item card (today-only behavior)
 
 ### Date navigation
 - Chevron left/right for day-by-day navigation
-- Tappable date label returns to today
-- "Today" button appears when viewing non-today dates
+- Tappable date label opens Material Date Picker
+- `Icons.today` return button appears only when selected date is not today
 - AppBar title: "Today" for today, "Daily Plan · formatted date" otherwise
 - Selected date stored in `selectedAgendaDateProvider` (reset on app launch)
+
+### Schedule start date filtering
+- Occurrences must never be generated before the schedule's `startDate`
+- `startDate` is inclusive — the schedule appears on its start date
+- `_intervalScheduleAppliesOnDate` anchors to the schedule's `startDate` (not `DateTime.now()`)
+- `DailySchedule` and `MeasurementSchedule` both check `startDate` before generating
+- End date behavior unchanged
 
 ### Data precedence for past dates
 1. Stored action logs (ground truth)
@@ -323,7 +330,6 @@ Keep an expandable checklist for ideas that may be implemented later.
 ### Known limitations
 - Inactive schedules are not queried for past dates (only active schedules processed)
 - Historical view limited to schedules that were active when generated
-- The `_intervalScheduleAppliesOnDate` anchor is now configurable (defaults to `DateTime.now()`)
 
 ---
 
