@@ -4,9 +4,9 @@ import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
+import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
-import 'package:intl/intl.dart';
 
 class TodayNextItemCard extends ConsumerWidget {
   const TodayNextItemCard({super.key});
@@ -19,7 +19,7 @@ class TodayNextItemCard extends ConsumerWidget {
 
     if (nextItem == null) return const SizedBox.shrink();
 
-    final timeStr = DateFormat.Hm().format(nextItem.effectiveTime);
+    final timeStr = LocalizedDateFormat.hourMinute(context, nextItem.effectiveTime);
     final isMedication = nextItem.type == TodayAgendaItemType.medication;
 
     final strength = nextItem.strength;

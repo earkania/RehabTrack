@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
+import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 class DateNavigationBar extends ConsumerWidget {
   const DateNavigationBar({super.key});
@@ -13,7 +13,7 @@ class DateNavigationBar extends ConsumerWidget {
     final today = DateTime(now.year, now.month, now.day);
     final isToday = selectedDate.isAtSameMomentAs(today);
 
-    final dateLabel = DateFormat.yMMMMd().format(selectedDate);
+    final dateLabel = LocalizedDateFormat.fullMonthDayYear(context, selectedDate);
     final theme = Theme.of(context);
 
     return Container(

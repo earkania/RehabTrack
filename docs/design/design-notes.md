@@ -345,3 +345,17 @@ Examples:
 - Features that reduce routine effort
 - Missing information that would be useful
 - Things that are confusing or inconvenient
+
+### Date formatting decision
+- All date formatting in Daily Agenda uses `LocalizedDateFormat` utility
+- Utility passes `Localizations.localeOf(context).languageCode` to `DateFormat` constructors
+- This ensures Georgian month names are used when the app language is Georgian
+- Pattern: `fullMonthDayYear` (yMMMMd) for date navigation header, `shortMonthDayYear` (yMMMd) for AppBar subtitle, `hourMinute` (Hm) for agenda item times
+- No hardcoded locale strings — all date formatting is locale-aware
+
+### Shared date field widget
+- `DateField` widget in `lib/presentation/widgets/common/date_field.dart` is the standard date picker field
+- Used by both Medication Schedule editor and Measurement Schedule editor
+- Uses `InputDecorator` with `suffixIcon` for calendar icon (placed outside child area)
+- Labels wrap naturally — no overflow with long Georgian text
+- `onTap` and `onClear` callbacks for parent widget integration

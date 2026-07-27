@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
+import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 import 'package:rehab_track/presentation/widgets/today/date_navigation_bar.dart';
 import 'package:rehab_track/presentation/widgets/today/today_agenda_item.dart';
@@ -24,7 +24,7 @@ class TodayScreen extends ConsumerWidget {
 
     final appBarTitle = isToday
         ? l10n.today
-        : '${l10n.dailyPlan} · ${DateFormat.yMMMd().format(selectedDate)}';
+        : '${l10n.dailyPlan} · ${LocalizedDateFormat.shortMonthDayYear(context, selectedDate)}';
 
     return Scaffold(
       appBar: AppBar(

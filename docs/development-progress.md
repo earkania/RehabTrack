@@ -2185,3 +2185,41 @@ void _onItemTapped(BuildContext context, int index) {
 - Test on real Pixel device before moving to next phase
 - Avoid implementing features before data model supports future requirements
 - Run `flutter analyze` before committing — zero issues required
+
+### Phase 6E Localization & Responsive Layout Correction Pass
+
+**Goal:** Fix two confirmed issues: non-localized date strings in Daily Agenda and layout overflow in Measurement Schedule editor for Georgian labels.
+
+**Issue 1 — Localized date formatting:**
+
+- Root cause: `DateFormat.yMMMd()`, `DateFormat.yMMMMd()`, `DateFormat.Hm()` called without locale argument used system default locale, not the app's active locale
+- Solution: Created `lib/presentation/utils/localized_date_format.dart` — centralized utility that passes `Localizations.localeOf(context).languageCode` to `DateFormat` constructors
+- Three static methods: `fullMonthDayYear()` (yMMMMd), `shortMonthDayYear()` (yMMMd), `hourMinute()` (Hm)
+- All callers now receive `BuildContext` and use the centralized formatter
+- Files updated: `today_screen.dart`, `date_navigation_bar.dart`, `today_agenda_item.dart`, `today_next_item_card.dart`
+- Direct `intl` package imports removed from all four Daily Agenda files
+- Date strings now display Georgian month names (ივლისი, აგვისტო, etc.) when app language is Georgian
+- English formatting remains unchanged
+- Changing language immediately rebuilds all displayed dates
+
+**Issue 2 — Measurement Schedule editor overflow:**
+
+- Root cause: Private `_DatePickerField` used `InputDecorator` with long Georgian labels ("დაწყების თარიღი", "დასრულების თარიღი") and placed calendar icon inside the `Row` child, pushing it outside the field
+- Solution: Replaced private `_DatePickerField` with the existing shared `DateField` widget from `lib/presentation/widgets/common/date_field.dart`
+- Shared widget uses `suffixIcon` for calendar icon (placed outside the child area) and `InkWell` wrapper for tap handling
+- Added `_pickDate()` method to `_MeasurementScheduleScreenState` with proper first/last date logic
+- Labels now wrap naturally; calendar icon remains visible; no overflow warnings
+- English layout remains unchanged
+- Medication Schedule editor already uses the same shared `DateField` widget — now both editors share the same implementation
+
+**Tests performed:**
+- `dart analyze lib/` — 0 errors, 6 pre-existing infos (unchanged)
+- `flutter test` — 595 passed, 9 pre-existing failures (all in `phase5a_correction_test.dart` bottom nav tests)
+
+**Pixel 7 verification:**
+- Daily Agenda dates appear in Georgian when Georgian is selected (AppBar, date navigation header)
+- English formatting remains unchanged
+- Measurement Schedule editor has no overflow in Georgian
+- Start Date and End Date labels wrap correctly
+- Calendar icon remains fully visible
+- Medication Schedule editor behavior unchanged

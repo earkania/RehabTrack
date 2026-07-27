@@ -11,9 +11,9 @@ import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
+import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/widgets/today/today_background.dart';
 import 'package:rehab_track/presentation/widgets/today/today_measurement_reading.dart';
-import 'package:intl/intl.dart';
 
 class TodayAgendaItemWidget extends ConsumerWidget {
   final TodayAgendaItem item;
@@ -27,7 +27,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final timeStr = DateFormat.Hm().format(item.effectiveTime);
+    final timeStr = LocalizedDateFormat.hourMinute(context, item.effectiveTime);
     final now = DateTime.now();
     final background = TodayBackground.forItem(item, now);
 
