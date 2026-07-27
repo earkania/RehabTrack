@@ -26,7 +26,8 @@ void main() {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // The selected tab (Today, index 0) should show its label
       expect(find.text('Today'), findsAtLeastNWidgets(1));

@@ -855,11 +855,12 @@ void main() {
         scheduledDateTime: DateTime(2025, 7, 25, 8, 0),
         title: 'Test',
         status: TodayAgendaItemStatus.upcoming,
+        measurementTypeKey: 'blood_pressure',
       );
 
       await tester.pumpWidget(_wrapWithApp(TodayAgendaItemWidget(item: item)));
 
-      expect(find.byIcon(Icons.monitor_heart_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.monitor_heart), findsOneWidget);
     });
 
     testWidgets('menu shows correct actions for overdue medication',
