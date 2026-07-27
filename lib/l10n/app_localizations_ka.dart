@@ -1007,4 +1007,7 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get measurementsMissed => 'გამოტოვებული გაზომვები';
+
+  @override
+  String get dailySummary => 'დღის შეჯამება';
 }

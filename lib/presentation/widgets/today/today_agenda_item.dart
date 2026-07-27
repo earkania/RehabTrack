@@ -266,6 +266,17 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
   }
 
   void _buildMedicationMenu(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final itemDate = DateTime(
+        item.scheduledDateTime.year, item.scheduledDateTime.month, item.scheduledDateTime.day);
+    final isFutureItem = itemDate.isAfter(today);
+
+    if (isFutureItem) {
+      _addNavigationOnlyItems(items, l10n);
+      return;
+    }
+
     if (item.isActionable) {
       items.add(PopupMenuItem(
         value: 'mark_taken',
@@ -363,6 +374,17 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
   }
 
   void _buildMeasurementMenu(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final itemDate = DateTime(
+        item.scheduledDateTime.year, item.scheduledDateTime.month, item.scheduledDateTime.day);
+    final isFutureItem = itemDate.isAfter(today);
+
+    if (isFutureItem) {
+      _addMeasurementNavigationOnlyItems(items, l10n);
+      return;
+    }
+
     if (item.isActionable) {
       items.add(PopupMenuItem(
         value: 'record_now',
@@ -438,6 +460,67 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ),
     ));
 
+    items.add(PopupMenuItem(
+      value: 'trends',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.show_chart, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.viewTrends),
+        ],
+      ),
+    ));
+  }
+
+  void _addNavigationOnlyItems(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    items.add(PopupMenuItem(
+      value: 'details',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.info_outline, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.openDetails),
+        ],
+      ),
+    ));
+    items.add(PopupMenuItem(
+      value: 'history',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.history, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.viewHistory),
+        ],
+      ),
+    ));
+  }
+
+  void _addMeasurementNavigationOnlyItems(List<PopupMenuItem<String>> items, AppLocalizations l10n) {
+    items.add(PopupMenuItem(
+      value: 'schedules',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.schedule, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.schedules),
+        ],
+      ),
+    ));
+    items.add(PopupMenuItem(
+      value: 'history',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.history, size: 20),
+          const SizedBox(width: 8),
+          Text(l10n.viewHistory),
+        ],
+      ),
+    ));
     items.add(PopupMenuItem(
       value: 'trends',
       child: Row(

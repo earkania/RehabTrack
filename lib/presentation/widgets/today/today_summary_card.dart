@@ -17,9 +17,7 @@ class TodaySummaryCard extends StatelessWidget {
 
     final String title;
     if (agenda.isPast) {
-      title = l10n.history;
-    } else if (agenda.isFuture) {
-      title = l10n.todaysPlan;
+      title = l10n.dailySummary;
     } else {
       title = l10n.todaysProgress;
     }

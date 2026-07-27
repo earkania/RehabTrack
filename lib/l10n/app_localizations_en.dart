@@ -1013,4 +1013,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get measurementsMissed => 'Missed measurements';
+
+  @override
+  String get dailySummary => 'Daily Summary';
 }

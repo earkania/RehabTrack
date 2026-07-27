@@ -53,22 +53,35 @@ class DateNavigationBar extends ConsumerWidget {
               ),
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            tooltip: 'Next day',
-            onPressed: () {
-              final newDate = selectedDate.add(const Duration(days: 1));
-              ref.read(selectedAgendaDateProvider.notifier).state = newDate;
-            },
-          ),
-          if (!isToday)
-            IconButton(
+          Visibility(
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: !isToday,
+            child: IconButton(
               icon: const Icon(Icons.today),
               tooltip: 'Return to today',
               onPressed: () {
                 ref.read(selectedAgendaDateProvider.notifier).state = today;
               },
             ),
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.chevron_right,
+              color: isToday
+                  ? theme.colorScheme.onSurface.withValues(alpha: 0.38)
+                  : null,
+            ),
+            tooltip: 'Next day',
+            onPressed: isToday
+                ? null
+                : () {
+                    final newDate = selectedDate.add(const Duration(days: 1));
+                    ref.read(selectedAgendaDateProvider.notifier).state =
+                        newDate;
+                  },
+          ),
         ],
       ),
     );

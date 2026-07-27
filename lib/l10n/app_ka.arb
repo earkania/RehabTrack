@@ -385,5 +385,6 @@
   "scheduledAt": "დაგეგმილია {time}",
   "history": "ისტორია",
   "medicationsMissed": "გამოტოვებული მედიკამენტები",
-  "measurementsMissed": "გამოტოვებული გაზომვები"
+  "measurementsMissed": "გამოტოვებული გაზომვები",
+  "dailySummary": "დღის შეჯამება"
 }

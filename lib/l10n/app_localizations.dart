@@ -2005,6 +2005,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Missed measurements'**
   String get measurementsMissed;
+
+  /// No description provided for @dailySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Summary'**
+  String get dailySummary;
 }
 
 class _AppLocalizationsDelegate

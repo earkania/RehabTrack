@@ -45,12 +45,12 @@ TodayAgenda _todayAgenda({
   final d = date ?? DateTime(now.year, now.month, now.day);
   final agendaItems = items ?? [
     TodayAgendaItem(
-      id: 'med_1_0800',
+      id: 'med_1',
       type: TodayAgendaItemType.medication,
       sourceScheduleId: 1,
-      scheduledDateTime: DateTime(d.year, d.month, d.day, 8, 0),
+      scheduledDateTime: DateTime(d.year, d.month, d.day, 23, 0),
       title: 'Aspirin',
-      status: TodayAgendaItemStatus.due,
+      status: TodayAgendaItemStatus.upcoming,
     ),
   ];
   return TodayAgenda(
@@ -168,7 +168,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.today), findsNothing);
+      final todayIcon = tester.widget<Visibility>(find.ancestor(
+        of: find.byIcon(Icons.today),
+        matching: find.byType(Visibility),
+      ));
+      expect(todayIcon.visible, isFalse);
     });
 
     testWidgets('shows formatted date when not today', (tester) async {
@@ -233,13 +237,13 @@ void main() {
     });
 
     testWidgets('right chevron navigates to next day', (tester) async {
-      final today = DateTime.now();
-      final todayDate = DateTime(today.year, today.month, today.day);
+      final past = DateTime.now().subtract(const Duration(days: 1));
+      final pastDate = DateTime(past.year, past.month, past.day);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            selectedAgendaDateProvider.overrideWith((ref) => todayDate),
+            selectedAgendaDateProvider.overrideWith((ref) => pastDate),
           ],
           child: MaterialApp(
             localizationsDelegates: const [
@@ -262,7 +266,7 @@ void main() {
         tester.element(find.byType(DateNavigationBar)),
       );
       final newDate = container.read(selectedAgendaDateProvider);
-      final expected = todayDate.add(const Duration(days: 1));
+      final expected = pastDate.add(const Duration(days: 1));
       expect(newDate, equals(expected));
     });
 
@@ -385,7 +389,7 @@ void main() {
       await tester.pumpWidget(_wrapScreen(agenda: agenda, selectedDate: agenda.date));
       await tester.pumpAndSettle();
 
-      expect(find.text('History'), findsOneWidget);
+      expect(find.text('Daily Summary'), findsOneWidget);
     });
 
     testWidgets('past date shows missed items', (tester) async {
@@ -430,13 +434,14 @@ void main() {
       expect(title.data, contains('Daily Plan'));
     });
 
-    testWidgets('shows Todays Plan summary title for future date', (tester) async {
+    testWidgets('summary card is hidden for future date', (tester) async {
       final agenda = _futureAgenda();
 
       await tester.pumpWidget(_wrapScreen(agenda: agenda, selectedDate: agenda.date));
       await tester.pumpAndSettle();
 
-      expect(find.text("Today's Plan"), findsOneWidget);
+      expect(find.text("Today's Progress"), findsNothing);
+      expect(find.text("Daily Summary"), findsNothing);
     });
 
     testWidgets('future date shows no next item card', (tester) async {
@@ -457,13 +462,13 @@ void main() {
       expect(find.byType(LinearProgressIndicator), findsNothing);
     });
 
-    testWidgets('future date shows total count only', (tester) async {
+    testWidgets('future date shows no summary card', (tester) async {
       final agenda = _futureAgenda();
 
       await tester.pumpWidget(_wrapScreen(agenda: agenda, selectedDate: agenda.date));
       await tester.pumpAndSettle();
 
-      expect(find.text('2'), findsWidgets);
+      expect(find.text('2'), findsNothing);
     });
   });
 

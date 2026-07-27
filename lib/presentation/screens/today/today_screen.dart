@@ -30,46 +30,52 @@ class TodayScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(appBarTitle),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(dailyAgendaProvider);
-          await ref.read(dailyAgendaProvider.future);
-        },
-        child: agenda.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(l10n.error),
-                const SizedBox(height: 8),
-                TextButton(
-                  onPressed: () => ref.invalidate(dailyAgendaProvider),
-                  child: Text(l10n.retry),
+      body: Column(
+        children: [
+          const DateNavigationBar(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(dailyAgendaProvider);
+                await ref.read(dailyAgendaProvider.future);
+              },
+              child: agenda.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, _) => Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(l10n.error),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () => ref.invalidate(dailyAgendaProvider),
+                        child: Text(l10n.retry),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+                data: (data) {
+                  if (data.isEmpty) {
+                    return ListView(
+                      children: [
+                        const SizedBox(height: 80),
+                        EmptyState(
+                          icon: Icons.today,
+                          title: isToday
+                              ? l10n.nothingScheduledToday
+                              : l10n.nothingScheduledForThisDay,
+                          subtitle: '',
+                        ),
+                      ],
+                    );
+                  }
+
+                  return _TodayBody(data: data);
+                },
+              ),
             ),
           ),
-          data: (data) {
-            if (data.isEmpty) {
-              return ListView(
-                children: [
-                  const DateNavigationBar(),
-                  const SizedBox(height: 80),
-                  EmptyState(
-                    icon: Icons.today,
-                    title: isToday
-                        ? l10n.nothingScheduledToday
-                        : l10n.nothingScheduledForThisDay,
-                    subtitle: '',
-                  ),
-                ],
-              );
-            }
-
-            return _TodayBody(data: data);
-          },
-        ),
+        ],
       ),
     );
   }
@@ -87,8 +93,8 @@ class _TodayBody extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        const SliverToBoxAdapter(child: DateNavigationBar()),
-        SliverToBoxAdapter(child: TodaySummaryCard(agenda: data)),
+        if (!data.isFuture)
+          SliverToBoxAdapter(child: TodaySummaryCard(agenda: data)),
         if (data.isToday) const SliverToBoxAdapter(child: TodayNextItemCard()),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),

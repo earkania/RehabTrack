@@ -385,5 +385,6 @@
   "scheduledAt": "Scheduled at {time}",
   "history": "History",
   "medicationsMissed": "Missed medications",
-  "measurementsMissed": "Missed measurements"
+  "measurementsMissed": "Missed measurements",
+  "dailySummary": "Daily Summary"
 }
