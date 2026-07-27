@@ -569,6 +569,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     if (item.medicationId == null || item.sourceScheduleId <= 0) return;
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
       final repo = ref.read(medicationRepositoryProvider);
@@ -587,7 +588,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(l10n.actionFailed)),
       );
     } finally {
@@ -615,6 +616,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     if (_isProcessing) return;
     if (item.sourceScheduleId <= 0) return;
     setState(() => _isProcessing = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
       if (item.type == TodayAgendaItemType.medication &&
@@ -646,7 +648,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(l10n.actionFailed)),
       );
     } finally {
@@ -658,6 +660,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     if (_isProcessing) return;
     if (item.sourceScheduleId <= 0) return;
     setState(() => _isProcessing = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
       if (item.type == TodayAgendaItemType.medication) {
@@ -677,7 +680,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(l10n.actionFailed)),
       );
     } finally {
@@ -693,6 +696,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     if (_isProcessing) return;
     if (item.sourceScheduleId <= 0) return;
     setState(() => _isProcessing = true);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
       final repo = ref.read(medicationRepositoryProvider);
@@ -720,7 +724,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text(l10n.actionFailed)),
       );
     } finally {

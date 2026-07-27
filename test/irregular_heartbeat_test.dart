@@ -155,7 +155,7 @@ void main() {
       final recordId = await database.into(database.measurementRecords).insert(
         db.MeasurementRecordsCompanion.insert(
           profileId: profileId,
-          measurementTypeId: bpType!.id!,
+          measurementTypeId: bpType!.id,
           timestamp: DateTime(2024),
           valuePrimary: 120,
           unit: 'mmHg',
@@ -186,7 +186,7 @@ void main() {
       final recordId = await database.into(database.measurementRecords).insert(
         db.MeasurementRecordsCompanion.insert(
           profileId: profileId,
-          measurementTypeId: bpType!.id!,
+          measurementTypeId: bpType!.id,
           timestamp: DateTime(2024),
           valuePrimary: 120,
           unit: 'mmHg',
@@ -218,7 +218,7 @@ void main() {
       final recordId = await database.into(database.measurementRecords).insert(
         db.MeasurementRecordsCompanion.insert(
           profileId: profileId,
-          measurementTypeId: bpType!.id!,
+          measurementTypeId: bpType!.id,
           timestamp: DateTime(2024),
           valuePrimary: 130,
           unit: 'mmHg',
@@ -250,7 +250,7 @@ void main() {
       final recordId = await database.into(database.measurementRecords).insert(
         db.MeasurementRecordsCompanion.insert(
           profileId: profileId,
-          measurementTypeId: weightType!.id!,
+          measurementTypeId: weightType!.id,
           timestamp: DateTime(2024),
           valuePrimary: 75,
           unit: 'kg',
@@ -281,7 +281,7 @@ void main() {
       final recordId = await database.into(database.measurementRecords).insert(
         db.MeasurementRecordsCompanion.insert(
           profileId: profileId,
-          measurementTypeId: bpType!.id!,
+          measurementTypeId: bpType!.id,
           timestamp: DateTime(2024),
           valuePrimary: 120,
           unit: 'mmHg',
@@ -320,7 +320,7 @@ void main() {
       final recordId = await database.into(database.measurementRecords).insert(
         db.MeasurementRecordsCompanion.insert(
           profileId: profileId,
-          measurementTypeId: bpType!.id!,
+          measurementTypeId: bpType!.id,
           timestamp: DateTime(2024),
           valuePrimary: 120,
           unit: 'mmHg',
@@ -359,7 +359,7 @@ void main() {
       final recordId = await database.into(database.measurementRecords).insert(
         db.MeasurementRecordsCompanion.insert(
           profileId: profileId,
-          measurementTypeId: pulseType!.id!,
+          measurementTypeId: pulseType!.id,
           timestamp: DateTime(2024),
           valuePrimary: 72,
           unit: 'bpm',

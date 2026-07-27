@@ -17,13 +17,13 @@ import 'package:rehab_track/presentation/utils/dose_formatter.dart';
 class NotificationActionBridge {
   NotificationActionBridge({
     required this._notificationService,
-    required ScheduleRecoveryService scheduleRecoveryService,
+    required this.scheduleRecoveryService,
     required this._medicationRepository,
     required this._measurementRepository,
-  }) : _scheduleRecoveryService = scheduleRecoveryService;
+  });
 
   final NotificationService _notificationService;
-  final ScheduleRecoveryService _scheduleRecoveryService;
+  final ScheduleRecoveryService scheduleRecoveryService;
   final MedicationRepository _medicationRepository;
   final MeasurementRepository _measurementRepository;
 
@@ -386,7 +386,7 @@ class NotificationActionBridge {
         return;
       }
 
-      await _scheduleRecoveryService.recoverAllSchedules(
+      await scheduleRecoveryService.recoverAllSchedules(
         activeSchedules: entries,
       );
       log('NotificationActionBridge: measurement recovery complete, '
@@ -467,7 +467,7 @@ class NotificationActionBridge {
         return;
       }
 
-      await _scheduleRecoveryService.recoverAllSchedules(
+      await scheduleRecoveryService.recoverAllSchedules(
         activeSchedules: entries,
       );
       log('NotificationActionBridge: recovery complete, '

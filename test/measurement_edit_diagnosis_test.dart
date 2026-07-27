@@ -37,7 +37,7 @@ void main() {
       final recordId = await repo.createRecord(
         MeasurementRecord(
           profileId: profileId,
-          measurementTypeId: bpType!.id!,
+          measurementTypeId: bpType!.id,
           timestamp: now,
           valuePrimary: 120,
           unit: 'mmHg',
@@ -134,7 +134,7 @@ void main() {
       final recordId = await repo.createRecord(
         MeasurementRecord(
           profileId: profileId,
-          measurementTypeId: bpType!.id!,
+          measurementTypeId: bpType!.id,
           timestamp: DateTime(2024, 1, 1),
           valuePrimary: 120,
           unit: 'mmHg',
@@ -213,7 +213,7 @@ void main() {
       final recordId = await repo.createRecord(
         MeasurementRecord(
           profileId: profileId,
-          measurementTypeId: bpType!.id!,
+          measurementTypeId: bpType!.id,
           timestamp: DateTime(2024),
           valuePrimary: 120,
           unit: 'mmHg',
