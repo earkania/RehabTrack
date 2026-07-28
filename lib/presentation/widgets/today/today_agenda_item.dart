@@ -29,7 +29,15 @@ class TodayAgendaItemWidget extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final timeStr = LocalizedDateFormat.hourMinute(context, item.effectiveTime);
     final now = DateTime.now();
-    final background = TodayBackground.forItem(item, now);
+    final graceMinutes = ref.watch(nextItemGracePeriodProvider);
+    final gracePeriod = Duration(minutes: graceMinutes);
+    final selectedDate = ref.watch(selectedAgendaDateProvider);
+    final today = DateTime(now.year, now.month, now.day);
+    final isToday = selectedDate.isAtSameMomentAs(today);
+    final effectiveStatus = isToday
+        ? classifyAgendaItem(item, now, gracePeriod)
+        : item.status;
+    final background = TodayBackground.forItem(item, now, gracePeriod);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -115,7 +123,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                 ],
               ),
             ),
-            _StatusIcon(status: item.status),
+            _StatusIcon(status: effectiveStatus),
             _AgendaItemMenu(item: item),
           ],
         ),

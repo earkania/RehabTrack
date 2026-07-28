@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/core/constants/app_constants.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
@@ -18,8 +19,11 @@ final _todayAgendaServiceProvider = Provider<TodayAgendaService>((ref) {
   );
 });
 
+final todayRefreshTickProvider = StateProvider<int>((ref) => 0);
+
 final dailyAgendaProvider =
     FutureProvider.autoDispose<TodayAgenda>((ref) async {
+  ref.watch(todayRefreshTickProvider);
   final profileId = ref.watch(currentActiveProfileIdProvider);
   if (profileId == null) {
     final selectedDate = ref.watch(selectedAgendaDateProvider);
@@ -31,7 +35,12 @@ final dailyAgendaProvider =
   }
   final service = ref.watch(_todayAgendaServiceProvider);
   final selectedDate = ref.watch(selectedAgendaDateProvider);
-  return service.generateAgenda(profileId, selectedDate: selectedDate);
+  final graceMinutes = ref.watch(nextItemGracePeriodProvider);
+  return service.generateAgenda(
+    profileId,
+    selectedDate: selectedDate,
+    gracePeriod: Duration(minutes: graceMinutes),
+  );
 });
 
 final todayAgendaProvider = dailyAgendaProvider;
@@ -108,3 +117,44 @@ final dailyItemsProvider = Provider<List<TodayAgendaItem>>((ref) {
 });
 
 final todayItemsProvider = dailyItemsProvider;
+
+final todayAutoRefreshProvider = Provider.autoDispose<void>((ref) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final selectedDate = ref.watch(selectedAgendaDateProvider);
+  if (!selectedDate.isAtSameMomentAs(today)) return;
+
+  final agendaAsync = ref.watch(dailyAgendaProvider);
+  final graceMinutes = ref.watch(nextItemGracePeriodProvider);
+  final agenda = agendaAsync.valueOrNull;
+  if (agenda == null || agenda.items.isEmpty) return;
+
+  final gracePeriod = Duration(minutes: graceMinutes);
+  final boundaries = <DateTime>[
+    today.add(const Duration(days: 1)),
+  ];
+
+  for (final item in agenda.items) {
+    if (item.isCompleted) continue;
+    final effective = item.effectiveTime;
+    if (effective.isAfter(now)) {
+      boundaries.add(effective);
+    }
+    final overdueAt = effective.add(gracePeriod);
+    if (overdueAt.isAfter(now)) {
+      boundaries.add(overdueAt);
+    }
+  }
+
+  final future = boundaries.where((d) => d.isAfter(now)).toList()..sort();
+  if (future.isEmpty) return;
+
+  final delay = future.first.difference(now);
+  if (delay <= Duration.zero) return;
+
+  final timer = Timer(delay, () {
+    ref.read(todayRefreshTickProvider.notifier).state++;
+  });
+
+  ref.onDispose(timer.cancel);
+});

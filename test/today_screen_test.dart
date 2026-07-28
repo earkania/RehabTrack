@@ -13,10 +13,15 @@ import 'package:rehab_track/presentation/widgets/today/today_next_item_card.dart
 import 'package:rehab_track/presentation/widgets/today/today_background.dart';
 
 Widget _wrapWithApp(Widget child, {TodayAgenda? agenda}) {
+  final overrides = <Override>[
+    todayAutoRefreshProvider.overrideWith((ref) {}),
+    selectedAgendaDateProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
+  ];
+  if (agenda != null) {
+    overrides.add(todayAgendaProvider.overrideWith((_) async => agenda));
+  }
   return ProviderScope(
-    overrides: agenda != null
-        ? [todayAgendaProvider.overrideWith((_) async => agenda)]
-        : [],
+    overrides: overrides,
     child: MaterialApp(
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -72,6 +77,10 @@ Widget _wrapWithGoRouter(Widget child) {
   );
 
   return ProviderScope(
+    overrides: [
+      selectedAgendaDateProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
+      todayAutoRefreshProvider.overrideWith((ref) {}),
+    ],
     child: MaterialApp.router(
       routerConfig: router,
       localizationsDelegates: const [
@@ -144,7 +153,11 @@ TodayAgenda _mockAgenda({
 
 Widget _buildScreen({required TodayAgenda agenda}) {
   return ProviderScope(
-    overrides: [todayAgendaProvider.overrideWith((_) async => agenda)],
+    overrides: [
+      todayAgendaProvider.overrideWith((_) async => agenda),
+      todayAutoRefreshProvider.overrideWith((ref) {}),
+      selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+    ],
     child: MaterialApp(
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -250,7 +263,7 @@ void main() {
         status: TodayAgendaItemStatus.overdue,
       );
 
-      final bg = TodayBackground.forItem(item, DateTime.now());
+      final bg = TodayBackground.forItem(item, DateTime.now(), const Duration(minutes: 15));
       final theme = ThemeData.light();
       expect(bg.cardColor(theme), isNull);
     });
@@ -266,14 +279,16 @@ void main() {
         status: TodayAgendaItemStatus.upcoming,
       );
 
-      final bg = TodayBackground.forItem(item, DateTime.now());
+      final bg = TodayBackground.forItem(item, DateTime.now(), const Duration(minutes: 15));
       final theme = ThemeData.light();
       expect(bg.cardColor(theme), isNotNull);
     });
 
     testWidgets('empty state shows when no items', (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
       final agenda = TodayAgenda(
-        date: DateTime(2025, 7, 25),
+        date: today,
         items: const [],
         summary: const TodaySummary.empty(),
       );
@@ -305,7 +320,11 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [todayAgendaProvider.overrideWith((_) async => agenda)],
+          overrides: [
+            todayAgendaProvider.overrideWith((_) async => agenda),
+            todayAutoRefreshProvider.overrideWith((ref) {}),
+            selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+          ],
           child: MaterialApp(
             locale: const Locale('ka'),
             localizationsDelegates: const [
@@ -331,7 +350,11 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [todayAgendaProvider.overrideWith((_) async => agenda)],
+          overrides: [
+            todayAgendaProvider.overrideWith((_) async => agenda),
+            todayAutoRefreshProvider.overrideWith((ref) {}),
+            selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+          ],
           child: MaterialApp(
             theme: ThemeData.light(),
             localizationsDelegates: const [
@@ -356,7 +379,11 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [todayAgendaProvider.overrideWith((_) async => agenda)],
+          overrides: [
+            todayAgendaProvider.overrideWith((_) async => agenda),
+            todayAutoRefreshProvider.overrideWith((ref) {}),
+            selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+          ],
           child: MaterialApp(
             theme: ThemeData.dark(),
             localizationsDelegates: const [
@@ -393,7 +420,11 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [todayAgendaProvider.overrideWith((_) async => agenda)],
+          overrides: [
+            todayAgendaProvider.overrideWith((_) async => agenda),
+            todayAutoRefreshProvider.overrideWith((ref) {}),
+            selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+          ],
           child: MaterialApp(
             locale: const Locale('ka'),
             localizationsDelegates: const [
@@ -441,7 +472,7 @@ void main() {
         status: TodayAgendaItemStatus.overdue,
       );
 
-      final bg = TodayBackground.forItem(pastItem, DateTime.now());
+      final bg = TodayBackground.forItem(pastItem, DateTime.now(), const Duration(minutes: 15));
       expect(bg.position, TodayItemTimePosition.past);
 
       final lightColor = bg.cardColor(lightTheme);
@@ -459,12 +490,12 @@ void main() {
         id: 'due',
         type: TodayAgendaItemType.medication,
         sourceScheduleId: 1,
-        scheduledDateTime: now.add(const Duration(minutes: 10)),
+        scheduledDateTime: now,
         title: 'Due Item',
         status: TodayAgendaItemStatus.due,
       );
 
-      final bg = TodayBackground.forItem(dueItem, now);
+      final bg = TodayBackground.forItem(dueItem, now, const Duration(minutes: 15));
       expect(bg.position, TodayItemTimePosition.current);
 
       final lightColor = bg.cardColor(lightTheme);
@@ -487,7 +518,7 @@ void main() {
         status: TodayAgendaItemStatus.upcoming,
       );
 
-      final bg = TodayBackground.forItem(futureItem, now);
+      final bg = TodayBackground.forItem(futureItem, now, const Duration(minutes: 15));
       expect(bg.position, TodayItemTimePosition.future);
 
       expect(bg.cardColor(lightTheme), isNotNull);
@@ -508,6 +539,7 @@ void main() {
           status: TodayAgendaItemStatus.overdue,
         ),
         now,
+        const Duration(minutes: 15),
       );
 
       final currentBg = TodayBackground.forItem(
@@ -515,11 +547,12 @@ void main() {
           id: '2',
           type: TodayAgendaItemType.medication,
           sourceScheduleId: 2,
-          scheduledDateTime: now.add(const Duration(minutes: 10)),
+          scheduledDateTime: now,
           title: 'Current',
           status: TodayAgendaItemStatus.due,
         ),
         now,
+        const Duration(minutes: 15),
       );
 
       final futureBg = TodayBackground.forItem(
@@ -532,6 +565,7 @@ void main() {
           status: TodayAgendaItemStatus.upcoming,
         ),
         now,
+        const Duration(minutes: 15),
       );
 
       // Past must be null; current and future must be non-null
@@ -556,26 +590,29 @@ void main() {
         status: TodayAgendaItemStatus.due,
       );
 
-      // 60 minutes before: future (outside 30-min grace window)
+      // 60 minutes before: future (upcoming)
       final bgFuture = TodayBackground.forItem(
         item,
         DateTime(2025, 7, 25, 11, 0),
+        const Duration(minutes: 15),
       );
       expect(bgFuture.position, TodayItemTimePosition.future);
 
-      // 15 minutes before: due (within 30-min grace window)
-      final bgDue = TodayBackground.forItem(
-        item,
-        DateTime(2025, 7, 25, 11, 45),
-      );
-      expect(bgDue.position, TodayItemTimePosition.current);
-
-      // At scheduled time: current (within grace window)
+      // At scheduled time: current (due within grace)
       final bgCurrent = TodayBackground.forItem(
         item,
         DateTime(2025, 7, 25, 12, 0),
+        const Duration(minutes: 15),
       );
       expect(bgCurrent.position, TodayItemTimePosition.current);
+
+      // 31 minutes after: past (overdue, outside 15-min grace)
+      final bgPast = TodayBackground.forItem(
+        item,
+        DateTime(2025, 7, 25, 12, 31),
+        const Duration(minutes: 15),
+      );
+      expect(bgPast.position, TodayItemTimePosition.past);
     });
   });
 

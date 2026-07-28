@@ -2,6 +2,22 @@ import 'package:rehab_track/core/constants/app_constants.dart';
 import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 
+TodayAgendaItemStatus classifyAgendaItem(
+  TodayAgendaItem item,
+  DateTime now,
+  Duration gracePeriod,
+) {
+  if (item.isCompleted) return item.status;
+  if (item.status == TodayAgendaItemStatus.snoozed) {
+    return TodayAgendaItemStatus.snoozed;
+  }
+  final effective = item.effectiveTime;
+  if (effective.isAfter(now)) return TodayAgendaItemStatus.upcoming;
+  final boundary = effective.add(gracePeriod);
+  if (now.isBefore(boundary)) return TodayAgendaItemStatus.due;
+  return TodayAgendaItemStatus.overdue;
+}
+
 enum TodayAgendaItemType {
   medication,
   measurement,

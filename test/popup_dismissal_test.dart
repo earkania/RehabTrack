@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_router.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/widgets/today/today_agenda_item.dart';
 
 Widget _buildShellApp({required int initialIndex}) {
@@ -52,15 +54,21 @@ Widget _buildShellApp({required int initialIndex}) {
     ],
   );
 
-  return MaterialApp.router(
-    routerConfig: router,
-    localizationsDelegates: const [
-      AppLocalizations.delegate,
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
+  return ProviderScope(
+    overrides: [
+      selectedAgendaDateProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
+      todayAutoRefreshProvider.overrideWith((ref) {}),
     ],
-    supportedLocales: AppLocalizations.supportedLocales,
+    child: MaterialApp.router(
+      routerConfig: router,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+    ),
   );
 }
 

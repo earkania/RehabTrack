@@ -528,7 +528,7 @@ void main() {
         title: 'Test',
         status: TodayAgendaItemStatus.completed,
       );
-      final bg = TodayBackground.forItem(item, now);
+      final bg = TodayBackground.forItem(item, now, const Duration(minutes: 15));
       expect(bg.position, TodayItemTimePosition.past);
     });
 
@@ -543,7 +543,7 @@ void main() {
         status: TodayAgendaItemStatus.completed,
       );
       // scheduled at 12:00, now 11:50 — not past, not overdue, but completed
-      final bg = TodayBackground.forItem(item, now);
+      final bg = TodayBackground.forItem(item, now, const Duration(minutes: 15));
       expect(bg.position, TodayItemTimePosition.past);
     });
 
@@ -557,7 +557,7 @@ void main() {
         title: 'Test',
         status: TodayAgendaItemStatus.skipped,
       );
-      final bg = TodayBackground.forItem(item, now);
+      final bg = TodayBackground.forItem(item, now, const Duration(minutes: 15));
       expect(bg.position, TodayItemTimePosition.past);
     });
   });

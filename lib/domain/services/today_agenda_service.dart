@@ -12,16 +12,13 @@ class TodayAgendaService {
   final MedicationRepository _medicationRepository;
   final MeasurementRepository _measurementRepository;
 
-  static const Duration _graceWindow = AppConstants.statusGraceWindow;
-
   TodayAgendaService(this._medicationRepository, this._measurementRepository);
-
-  static Duration get graceWindow => _graceWindow;
 
   Future<TodayAgenda> generateAgenda(
     int profileId, {
     DateTime? selectedDate,
     DateTime? now,
+    Duration gracePeriod = AppConstants.nextItemGraceWindow,
   }) async {
     final currentTime = now ?? DateTime.now();
     final targetDate = selectedDate != null
@@ -39,10 +36,12 @@ class TodayAgendaService {
     final medicationItems = await _generateMedicationItems(
       profileId, targetDate, dayEnd, currentTime,
       isPastDate: isPastDate, isFutureDate: isFutureDate,
+      gracePeriod: gracePeriod,
     );
     final measurementItems = await _generateMeasurementItems(
       profileId, targetDate, dayEnd, currentTime,
       isPastDate: isPastDate, isFutureDate: isFutureDate,
+      gracePeriod: gracePeriod,
     );
 
     final allItems = [...medicationItems, ...measurementItems];
@@ -76,6 +75,7 @@ class TodayAgendaService {
     DateTime currentTime, {
     required bool isPastDate,
     required bool isFutureDate,
+    Duration gracePeriod = AppConstants.nextItemGraceWindow,
   }) async {
     final medications =
         await _medicationRepository.getActiveMedications(profileId);
@@ -113,6 +113,7 @@ class TodayAgendaService {
             currentTime: currentTime,
             isPastDate: isPastDate,
             isFutureDate: isFutureDate,
+            gracePeriod: gracePeriod,
           ));
         }
       }
@@ -128,6 +129,7 @@ class TodayAgendaService {
     DateTime currentTime, {
     required bool isPastDate,
     required bool isFutureDate,
+    Duration gracePeriod = AppConstants.nextItemGraceWindow,
   }) async {
     final schedules =
         await _measurementRepository.getActiveSchedules(profileId);
@@ -169,6 +171,7 @@ class TodayAgendaService {
         typeName: type?.name ?? 'Measurement',
         isPastDate: isPastDate,
         isFutureDate: isFutureDate,
+        gracePeriod: gracePeriod,
       ));
     }
 
@@ -291,10 +294,12 @@ class TodayAgendaService {
     required DateTime currentTime,
     required bool isPastDate,
     required bool isFutureDate,
+    Duration gracePeriod = AppConstants.nextItemGraceWindow,
   }) async {
     final status = _determineMedicationStatus(
       scheduledDateTime, log, currentTime,
       isPastDate: isPastDate, isFutureDate: isFutureDate,
+      gracePeriod: gracePeriod,
     );
     final effectiveId =
         'med_${schedule.id}_${scheduledDateTime.hour}${scheduledDateTime.minute}';
@@ -340,10 +345,12 @@ class TodayAgendaService {
     required String typeName,
     required bool isPastDate,
     required bool isFutureDate,
+    Duration gracePeriod = AppConstants.nextItemGraceWindow,
   }) {
     final status = _determineMeasurementStatus(
       scheduledDateTime, log, currentTime,
       isPastDate: isPastDate, isFutureDate: isFutureDate,
+      gracePeriod: gracePeriod,
     );
     final effectiveId =
         'meas_${schedule.id}_${scheduledDateTime.hour}${scheduledDateTime.minute}';
@@ -371,7 +378,7 @@ class TodayAgendaService {
     DateTime scheduledDateTime,
     MedicationLog? log,
     DateTime currentTime, {
-    Duration graceWindow = const Duration(minutes: 30),
+    Duration graceWindow = AppConstants.nextItemGraceWindow,
     bool isPastDate = false,
     bool isFutureDate = false,
   }) {
@@ -397,7 +404,7 @@ class TodayAgendaService {
     DateTime scheduledDateTime,
     MeasurementReminderLog? log,
     DateTime currentTime, {
-    Duration graceWindow = const Duration(minutes: 30),
+    Duration graceWindow = AppConstants.nextItemGraceWindow,
     bool isPastDate = false,
     bool isFutureDate = false,
   }) {
@@ -429,10 +436,11 @@ class TodayAgendaService {
     DateTime currentTime, {
     bool isPastDate = false,
     bool isFutureDate = false,
+    Duration gracePeriod = AppConstants.nextItemGraceWindow,
   }) {
     return determineMedicationStatus(
       scheduledDateTime, log, currentTime,
-      graceWindow: _graceWindow,
+      graceWindow: gracePeriod,
       isPastDate: isPastDate,
       isFutureDate: isFutureDate,
     );
@@ -444,10 +452,11 @@ class TodayAgendaService {
     DateTime currentTime, {
     bool isPastDate = false,
     bool isFutureDate = false,
+    Duration gracePeriod = AppConstants.nextItemGraceWindow,
   }) {
     return determineMeasurementStatus(
       scheduledDateTime, log, currentTime,
-      graceWindow: _graceWindow,
+      graceWindow: gracePeriod,
       isPastDate: isPastDate,
       isFutureDate: isFutureDate,
     );

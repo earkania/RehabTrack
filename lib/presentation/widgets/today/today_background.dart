@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rehab_track/core/constants/app_constants.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
 
 enum TodayItemTimePosition {
@@ -13,14 +12,19 @@ class TodayBackground {
 
   const TodayBackground._(this.position);
 
-  factory TodayBackground.forItem(TodayAgendaItem item, DateTime now) {
-    if (item.isCompleted) return TodayBackground._(TodayItemTimePosition.past);
-    if (item.isOverdue) return TodayBackground._(TodayItemTimePosition.past);
-    if (item.isDue(now, AppConstants.statusGraceWindow)) {
-      return TodayBackground._(TodayItemTimePosition.current);
-    }
-    if (item.isPast(now)) return TodayBackground._(TodayItemTimePosition.past);
-    return TodayBackground._(TodayItemTimePosition.future);
+  factory TodayBackground.forItem(
+    TodayAgendaItem item,
+    DateTime now,
+    Duration gracePeriod,
+  ) {
+    final status = classifyAgendaItem(item, now, gracePeriod);
+    return switch (status) {
+      TodayAgendaItemStatus.upcoming =>
+        TodayBackground._(TodayItemTimePosition.future),
+      TodayAgendaItemStatus.due =>
+        TodayBackground._(TodayItemTimePosition.current),
+      _ => TodayBackground._(TodayItemTimePosition.past),
+    };
   }
 
   Color? cardColor(ThemeData theme) {
