@@ -2452,7 +2452,85 @@ void _onItemTapped(BuildContext context, int index) {
 | `flutter gen-l10n` | Completed successfully |
 | `build_runner` | 242 outputs written |
 | `flutter analyze` | Passed (0 issues) |
-| `flutter test` | Passed (663/663) |
+| `flutter test` | Passed (682/682) |
+| Pixel 7 verification | App launches cleanly after `pm clear`, no logcat errors |
+
+### Phase 7A Correction 2 — Patient Profile Endless Loading Fix
+
+**Date:** 2026-07-28
+
+**Status:** Completed
+
+**Root Cause:**
+
+Both `PatientProfileViewScreen` and `PatientProfileEditScreen` created an **anonymous `StreamProvider` inside `build()`**:
+
+```dart
+final profileAsync = ref.watch(
+  StreamProvider(
+    (ref) => ref.watch(profileRepositoryProvider).watchActiveProfile(profileId),
+  ),
+);
+```
+
+Each `build()` call creates a new anonymous provider with a distinct identity. `ref.watch()` sees it as a brand-new provider, starts in `AsyncLoading`, and subscribes to the stream. If anything triggers a rebuild before the first emission (e.g., another watched provider changing), the old provider is discarded and a fresh one starts loading again — resulting in an infinite loading loop.
+
+**Fix:**
+
+- Created a stable top-level `StreamProvider.family` in `lib/presentation/providers/profile_provider.dart`:
+  ```dart
+  final watchProfileByIdProvider = StreamProvider.family<Profile?, int>(
+    (ref, profileId) {
+      final repo = ref.watch(profileRepositoryProvider);
+      return repo.watchActiveProfile(profileId);
+    },
+  );
+  ```
+- Updated `PatientProfileViewScreen` and `PatientProfileEditScreen` to use `ref.watch(watchProfileByIdProvider(profileId))` instead of the anonymous `StreamProvider`.
+- Provider identity is now stable (same family + same argument = same provider), so `ref.watch()` reuses the existing subscription across rebuilds.
+
+**Repository Query:**
+
+- `ProfileDao.watchActiveProfile(int profileId)` uses `watchSingleOrNull()` — correctly emits the profile row or `null` when absent. No change needed.
+
+**Empty-Profile UI Behaviour:**
+
+- A default profile with empty firstName/lastName is a valid profile — the screen displays avatar fallback + "Profile information has not been entered yet." message + edit action.
+- No special-casing of empty profiles as missing.
+
+**Tests Added:**
+
+- `test/profile_repository_watch_test.dart` (4 tests):
+  - `watchActiveProfile` emits profile when row exists
+  - `watchActiveProfile` emits null when row does not exist
+  - `watchActiveProfile` emits updates after profile is saved
+  - `watchActiveProfile` emits null for previously missing ID
+
+- `test/watch_profile_by_id_provider_test.dart` (5 tests):
+  - Resolves to profile when it exists
+  - Resolves to null when profile does not exist
+  - Empty profile fields are still a valid data state
+  - Does not remain in loading state
+  - Multiple IDs resolve independently
+
+- `test/patient_profile_view_screen_test.dart` (10 tests):
+  - Exits loading state and shows content
+  - Empty valid profile shows editable empty state
+  - Edit action is visible for empty profile
+  - Populated profile displays values
+  - Missing profile displays recovery UI
+  - No active profile ID displays recovery UI
+  - No infinite CircularProgressIndicator after provider settles
+  - AppBar edit icon is visible
+  - Personal information section shows unavailable for empty fields
+  - Profile sections are present
+
+### Validation Results (Post-Correction 2)
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (682/682) |
 | Pixel 7 verification | App launches cleanly after `pm clear`, no logcat errors |
 
 ### Known Limitations

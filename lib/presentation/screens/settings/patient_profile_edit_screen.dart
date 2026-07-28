@@ -99,13 +99,7 @@ class _PatientProfileEditScreenState
       return _buildCreateForm(context, l10n);
     }
 
-    final profileAsync = ref.watch(
-      StreamProvider(
-        (ref) => ref
-            .watch(profileRepositoryProvider)
-            .watchActiveProfile(profileId),
-      ),
-    );
+    final profileAsync = ref.watch(watchProfileByIdProvider(profileId));
 
     return profileAsync.when(
       loading: () => Scaffold(

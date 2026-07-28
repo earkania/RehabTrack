@@ -86,6 +86,14 @@ class ActiveProfileIdNotifier extends AsyncNotifier<int?> {
   }
 }
 
+/// Watches a single profile by ID, emitting null when the row is absent.
+final watchProfileByIdProvider = StreamProvider.family<Profile?, int>(
+  (ref, profileId) {
+    final repo = ref.watch(profileRepositoryProvider);
+    return repo.watchActiveProfile(profileId);
+  },
+);
+
 /// Synchronous convenience provider that extracts the int? from the AsyncValue.
 final currentActiveProfileIdProvider = Provider<int?>((ref) {
   final asyncValue = ref.watch(activeProfileIdProvider);

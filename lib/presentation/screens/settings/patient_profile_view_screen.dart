@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
-import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/widgets/profile/profile_avatar.dart';
 
@@ -19,13 +18,7 @@ class PatientProfileViewScreen extends ConsumerWidget {
       return _buildRecoveryState(context, l10n);
     }
 
-    final profileAsync = ref.watch(
-      StreamProvider(
-        (ref) => ref
-            .watch(profileRepositoryProvider)
-            .watchActiveProfile(profileId),
-      ),
-    );
+    final profileAsync = ref.watch(watchProfileByIdProvider(profileId));
 
     return profileAsync.when(
       loading: () => Scaffold(
