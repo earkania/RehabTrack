@@ -426,3 +426,30 @@ Examples:
 - `CAMERA` permission added to AndroidManifest.xml for camera capture
 - `image_picker` handles runtime permission requests automatically on Android
 - Gallery access uses storage permissions (handled by image_picker internally)
+
+## Next Item Grace Period — Design Rules (Approved 2026-07-28)
+
+### Problem
+
+The Next Item overdue grace period was hardcoded (15 minutes). Users needed to configure it for their workflow.
+
+### Design Decision
+
+- **Global setting** (not per-profile) — keep implementation simple; profile-specific deferred
+- **Existing key-value storage** (AppSettings Drift table) — no schema change
+- **StateNotifierProvider** pattern matching `activeProfileIdProvider` — reads from settings on init, persists on write
+- **Reactive**: `nextDailyItemProvider` watches the grace period provider; changing the setting immediately recalculates Next Item without reloading agenda data
+- **Domain purity**: `TodayAgenda.nextItem()` accepts optional `Duration? graceWindow` — no repository dependency in domain layer
+
+### Allowed Values
+
+5, 10, 15, 30, 60 minutes. Stored as integer minutes. Invalid/zero/negative values fall back to 15.
+
+### Separation of Concerns
+
+- **Next Item grace period** (configurable): Controls Next-card eligibility after scheduled time. Used in `nextItem()`.
+- **Status/due visual window** (`statusGraceWindow`, hardcoded 30 min): Controls due/overdue status classification. Remains separate unless explicitly unified in future design.
+
+### Rationale for Separation
+
+The Next grace period determines whether an unresolved item appears in the "Next" card. The status grace period determines whether an item is styled as "due" (blue tint) vs "overdue" (red tint). These are conceptually distinct — a user might want a short Next card (get to items quickly) but a longer due window (avoid red panic). Keeping them independent is more flexible.

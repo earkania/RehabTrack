@@ -1189,4 +1189,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get cameraPermissionRequired =>
       'Camera permission is required to take photos';
+
+  @override
+  String get nextItemGracePeriod => 'Next item grace period';
+
+  @override
+  String get nextItemGracePeriodDescription =>
+      'Keep an unfinished item in Next for this long after its scheduled time.';
+
+  @override
+  String minutesValue(int minutes) {
+    return '$minutes minutes';
+  }
+
+  @override
+  String get fiveMinutes => '5 minutes';
+
+  @override
+  String get tenMinutes => '10 minutes';
+
+  @override
+  String get fifteenMinutes => '15 minutes';
+
+  @override
+  String get thirtyMinutes => '30 minutes';
+
+  @override
+  String get sixtyMinutes => '60 minutes';
 }

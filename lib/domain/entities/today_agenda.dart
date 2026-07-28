@@ -1,3 +1,4 @@
+import 'package:rehab_track/core/constants/app_constants.dart';
 import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 
@@ -251,19 +252,20 @@ class TodayAgenda {
   List<TodayAgendaItem> get allItems =>
       List.unmodifiable(items);
 
-  TodayAgendaItem? nextItem({DateTime? now}) {
+  TodayAgendaItem? nextItem({DateTime? now, Duration? graceWindow}) {
     final currentTime = now ?? DateTime.now();
-    final graceWindow = const Duration(minutes: 30);
+    final window = graceWindow ?? AppConstants.nextItemGraceWindow;
     return items
-        .where((item) => !item.isCompleted && !item.isOverdue)
+        .where((item) => !item.isCompleted)
         .fold<TodayAgendaItem?>(null, (earliest, item) {
       final effective = item.effectiveTime;
-      final isDueItem = !effective.isBefore(currentTime) &&
-          effective.difference(currentTime) <= graceWindow;
-      final isFutureItem = effective.isAfter(currentTime);
-      if (!isDueItem && !isFutureItem) return earliest;
-      if (earliest == null) return item;
-      return effective.isBefore(earliest.effectiveTime) ? item : earliest;
+      final diff = currentTime.difference(effective);
+      // Eligible if in the future, or past but within grace window
+      if (diff.isNegative || diff <= window) {
+        if (earliest == null) return item;
+        return effective.isBefore(earliest.effectiveTime) ? item : earliest;
+      }
+      return earliest;
     });
   }
 }

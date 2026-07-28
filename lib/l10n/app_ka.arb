@@ -447,5 +447,18 @@
   "photoSelectionCancelled": "ფოტოს არჩევა გაუქმდა",
   "failedToLoadPhoto": "ფოტოს ჩატვირთვა ვერ მოხერხდა",
   "failedToSavePhoto": "ფოტოს შენახვა ვერ მოხერხდა",
-  "cameraPermissionRequired": "ფოტოს გადასაღებად საჭიროა კამერის ნებართვა"
+  "cameraPermissionRequired": "ფოტოს გადასაღებად საჭიროა კამერის ნებართვა",
+  "nextItemGracePeriod": "შემდეგი ჩანაწერის დაყოვნების პერიოდი",
+  "nextItemGracePeriodDescription": "დაუსრულებელი ელემენტი რჩება შემდეგი ჩანაწერის ბარათში არჩეული პერიოდის განმავლობაში მისი დაგეგმილი დროიდან.",
+  "minutesValue": "{minutes} წუთი",
+  "@minutesValue": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "fiveMinutes": "5 წუთი",
+  "tenMinutes": "10 წუთი",
+  "fifteenMinutes": "15 წუთი",
+  "thirtyMinutes": "30 წუთი",
+  "sixtyMinutes": "60 წუთი"
 }

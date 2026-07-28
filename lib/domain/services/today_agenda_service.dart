@@ -1,3 +1,4 @@
+import 'package:rehab_track/core/constants/app_constants.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
@@ -11,7 +12,7 @@ class TodayAgendaService {
   final MedicationRepository _medicationRepository;
   final MeasurementRepository _measurementRepository;
 
-  static const Duration _graceWindow = Duration(minutes: 30);
+  static const Duration _graceWindow = AppConstants.statusGraceWindow;
 
   TodayAgendaService(this._medicationRepository, this._measurementRepository);
 

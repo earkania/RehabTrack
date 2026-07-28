@@ -2585,6 +2585,63 @@ Each `build()` call creates a new anonymous provider with a distinct identity. `
 | `flutter analyze` | Passed (0 issues) |
 | `flutter test` | Passed (701/701) |
 
+### Phase 7B — Measurement Schedule Save & Today Fixes (2026-07-28)
+
+Five logic bugs fixed:
+1. **False save failure**: Notification scheduling errors no longer mask DB success
+2. **Completed item remains current**: `TodayBackground.forItem()` checks `isCompleted` before `isDue`
+3. **Overdue grace period**: `nextItem()` grace window reduced from 30 min to 15 min
+4. **State recalculation**: Provider invalidation triggers immediate agenda regeneration
+5. **Equal-time ordering**: Stable sort by `effectiveTime` then `id`; Next advances after completion
+
+**Key change**: `lib/core/constants/app_constants.dart` created — `statusGraceWindow` (30 min) and `nextItemGraceWindow` (15 min) as single source of truth.
+
+**Tests**: 7 new tests (grace period, eq-time, background for completed/skipped) — 39 total in `today_agenda_test.dart`.
+
+**Validation**: `flutter analyze` — 0 issues. `flutter test` — 709/709 passing.
+
+### Phase 7C — Configurable Next Item Grace Period Setting (2026-07-28)
+
+**Feature**: User-configurable global setting for the Next Item overdue grace period.
+
+**Scope**: Settings only. No changes to medication/measurement schedules, patient profiles, or Next Item selection rules.
+
+**Implementation**:
+- **Settings storage**: Existing key-value `AppSettings` Drift table — key `next_item_grace_period_minutes`
+- **Provider**: `NextItemGracePeriodNotifier` (`StateNotifier<int>`) in `today_provider.dart` — reads from settings on init, persists on write
+- **Domain**: `TodayAgenda.nextItem()` accepts optional `graceWindow` parameter (defaults to `AppConstants.nextItemGraceWindow`)
+- **UI**: Settings screen tile under "Today" section — `Icons.timer_outlined`, subtitle shows current value in minutes, tap opens `SimpleDialog` with radio selection
+- **Reactivity**: `nextDailyItemProvider` watches `nextItemGracePeriodProvider` — changing the setting immediately recalculates Next Item without reloading agenda data
+
+**Default**: 15 minutes
+
+**Allowed values**: 5, 10, 15, 30, 60 minutes
+
+**Persistence**: Survives app restart. Clean install defaults to 15. Invalid/missing/zero/negative values fall back to 15.
+
+**Localization keys added**: `nextItemGracePeriod`, `nextItemGracePeriodDescription`, `minutesValue` (parameterised), `fiveMinutes`, `tenMinutes`, `fifteenMinutes`, `thirtyMinutes`, `sixtyMinutes` — en + ka.
+
+**Files modified**:
+- `lib/l10n/app_en.arb` — 10 new keys
+- `lib/l10n/app_ka.arb` — 10 new keys
+- `lib/core/constants/app_constants.dart` — added `nextItemGracePeriodSettingsKey`
+- `lib/domain/entities/today_agenda.dart` — `nextItem()` accepts optional `graceWindow`
+- `lib/presentation/providers/today_provider.dart` — `NextItemGracePeriodNotifier` + `nextItemGracePeriodProvider`
+- `lib/presentation/screens/settings/settings_screen.dart` — UI tile + selection dialog
+
+**New tests**:
+- `test/today_agenda_test.dart` — 7 domain tests: custom grace windows, completed/skipped exclusion, medication/measurement parity, equal-time stability
+- `test/next_item_grace_period_test.dart` — 20 tests: repository (default, save all values, persistence, invalid fallback), provider (default, read persisted, save, ignore invalid, reactive)
+- `test/settings_grace_period_test.dart` — 12 widget tests: English/Georgian labels, current value display, dialog opens with 5 options, selection updates tile, narrow-screen layout, radio icon states
+
+### Validation Results (Post-Grace Period Setting)
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (746/746) |
+| Pixel 7 verification | Pending user confirmation |
+
 ### Known Limitations
 
 - Profile photo is stored locally only — no cloud sync
@@ -2592,3 +2649,4 @@ Each `build()` call creates a new anonymous provider with a distinct identity. `
 - No profile switching UI (only programmatic via provider)
 - Profile list screen not yet created (only view + edit for single profile)
 - No accessibility testing performed on profile screens
+- Grace period setting is global — not per-patient-profile

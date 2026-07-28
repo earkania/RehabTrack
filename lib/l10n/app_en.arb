@@ -447,5 +447,18 @@
   "photoSelectionCancelled": "Photo selection was cancelled",
   "failedToLoadPhoto": "Failed to load photo",
   "failedToSavePhoto": "Failed to save photo",
-  "cameraPermissionRequired": "Camera permission is required to take photos"
+  "cameraPermissionRequired": "Camera permission is required to take photos",
+  "nextItemGracePeriod": "Next item grace period",
+  "nextItemGracePeriodDescription": "Keep an unfinished item in Next for this long after its scheduled time.",
+  "minutesValue": "{minutes} minutes",
+  "@minutesValue": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "fiveMinutes": "5 minutes",
+  "tenMinutes": "10 minutes",
+  "fifteenMinutes": "15 minutes",
+  "thirtyMinutes": "30 minutes",
+  "sixtyMinutes": "60 minutes"
 }

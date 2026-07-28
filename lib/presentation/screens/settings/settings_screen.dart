@@ -6,6 +6,7 @@ import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/core/localization/app_locale.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/widgets/profile/profile_avatar.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -21,6 +22,8 @@ class SettingsScreen extends ConsumerWidget {
         ? ref.watch(watchProfileByIdProvider(profileId))
         : null;
     final profile = profileAsync?.valueOrNull;
+
+    final gracePeriodMinutes = ref.watch(nextItemGracePeriodProvider);
 
     final hasName =
         profile != null &&
@@ -81,6 +84,15 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () {},
           ),
           const Divider(),
+          _buildSectionHeader(context, l10n.today),
+          ListTile(
+            leading: const Icon(Icons.timer_outlined),
+            title: Text(l10n.nextItemGracePeriod),
+            subtitle: Text(l10n.minutesValue(gracePeriodMinutes)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showGracePeriodDialog(context, ref, l10n, gracePeriodMinutes),
+          ),
+          const Divider(),
           _buildSectionHeader(context, l10n.notifications),
           SwitchListTile(
             secondary: const Icon(Icons.notifications_outlined),
@@ -112,6 +124,54 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _showGracePeriodDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    int current,
+  ) {
+    final options = [5, 10, 15, 30, 60];
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return SimpleDialog(
+          title: Text(l10n.nextItemGracePeriod),
+          children: options.map((minutes) {
+            final label = _gracePeriodLabel(l10n, minutes);
+            final isSelected = minutes == current;
+            return ListTile(
+              leading: Icon(
+                isSelected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                color: isSelected
+                    ? Theme.of(ctx).colorScheme.primary
+                    : null,
+              ),
+              title: Text(label),
+              onTap: () {
+                ref.read(nextItemGracePeriodProvider.notifier).setGracePeriod(minutes);
+                Navigator.pop(ctx);
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  String _gracePeriodLabel(AppLocalizations l10n, int minutes) {
+    return switch (minutes) {
+      5 => l10n.fiveMinutes,
+      10 => l10n.tenMinutes,
+      15 => l10n.fifteenMinutes,
+      30 => l10n.thirtyMinutes,
+      60 => l10n.sixtyMinutes,
+      _ => '$minutes ${l10n.minutesValue(minutes)}',
+    };
   }
 
   Widget _buildLanguageTile(

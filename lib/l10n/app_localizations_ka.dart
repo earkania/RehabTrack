@@ -1183,4 +1183,31 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get cameraPermissionRequired =>
       'ფოტოს გადასაღებად საჭიროა კამერის ნებართვა';
+
+  @override
+  String get nextItemGracePeriod => 'შემდეგი ჩანაწერის დაყოვნების პერიოდი';
+
+  @override
+  String get nextItemGracePeriodDescription =>
+      'დაუსრულებელი ელემენტი რჩება შემდეგი ჩანაწერის ბარათში არჩეული პერიოდის განმავლობაში მისი დაგეგმილი დროიდან.';
+
+  @override
+  String minutesValue(int minutes) {
+    return '$minutes წუთი';
+  }
+
+  @override
+  String get fiveMinutes => '5 წუთი';
+
+  @override
+  String get tenMinutes => '10 წუთი';
+
+  @override
+  String get fifteenMinutes => '15 წუთი';
+
+  @override
+  String get thirtyMinutes => '30 წუთი';
+
+  @override
+  String get sixtyMinutes => '60 წუთი';
 }

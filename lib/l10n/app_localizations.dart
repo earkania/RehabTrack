@@ -2347,6 +2347,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Camera permission is required to take photos'**
   String get cameraPermissionRequired;
+
+  /// No description provided for @nextItemGracePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Next item grace period'**
+  String get nextItemGracePeriod;
+
+  /// No description provided for @nextItemGracePeriodDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep an unfinished item in Next for this long after its scheduled time.'**
+  String get nextItemGracePeriodDescription;
+
+  /// No description provided for @minutesValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} minutes'**
+  String minutesValue(int minutes);
+
+  /// No description provided for @fiveMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'5 minutes'**
+  String get fiveMinutes;
+
+  /// No description provided for @tenMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'10 minutes'**
+  String get tenMinutes;
+
+  /// No description provided for @fifteenMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'15 minutes'**
+  String get fifteenMinutes;
+
+  /// No description provided for @thirtyMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'30 minutes'**
+  String get thirtyMinutes;
+
+  /// No description provided for @sixtyMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'60 minutes'**
+  String get sixtyMinutes;
 }
 
 class _AppLocalizationsDelegate
