@@ -438,5 +438,14 @@
   "profileNotSetUp": "პროფილი არ არის დაყენებული",
   "profileNotSetUpDescription": "შექმენით პაციენტის პროფილი დასაწყებად.\nთქვენი პროფილის ინფორმაცია გამოყენებული იქნება აპლიკაციაში.",
   "addProfileInformation": "პროფილის ინფორმაციის დამატება",
-  "profileInformationNotEntered": "პროფილის ინფორმაცია ჯერ არ არის შეყვანილი."
+  "profileInformationNotEntered": "პროფილის ინფორმაცია ჯერ არ არის შეყვანილი.",
+  "profilePhoto": "პროფილის ფოტო",
+  "changeProfilePhoto": "პროფილის ფოტოს შეცვლა",
+  "chooseFromGallery": "აირჩიეთ გალერეიდან",
+  "takePhoto": "გადაიღეთ ფოტო",
+  "removeProfilePhoto": "ფოტოს წაშლა",
+  "photoSelectionCancelled": "ფოტოს არჩევა გაუქმდა",
+  "failedToLoadPhoto": "ფოტოს ჩატვირთვა ვერ მოხერხდა",
+  "failedToSavePhoto": "ფოტოს შენახვა ვერ მოხერხდა",
+  "cameraPermissionRequired": "ფოტოს გადასაღებად საჭიროა კამერის ნებართვა"
 }

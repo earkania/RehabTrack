@@ -8,6 +8,7 @@ import 'package:rehab_track/data/repositories/doctor_repository_impl.dart';
 import 'package:rehab_track/data/repositories/document_repository_impl.dart';
 import 'package:rehab_track/data/repositories/settings_repository_impl.dart';
 import 'package:rehab_track/data/repositories/reference_range_repository_impl.dart';
+import 'package:rehab_track/data/services/profile_image_service.dart';
 import 'package:rehab_track/domain/repositories/profile_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
@@ -60,4 +61,8 @@ final settingsRepositoryProvider =
 final referenceRangeRepositoryProvider =
     Provider<ReferenceRangeRepository>((ref) {
   return ReferenceRangeRepositoryImpl(ref.watch(databaseProvider));
+});
+
+final profileImageServiceProvider = Provider<ProfileImageService>((ref) {
+  return ProfileImageService();
 });

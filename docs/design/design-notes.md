@@ -398,3 +398,31 @@ Examples:
 - Uses `InputDecorator` with `suffixIcon` for calendar icon (placed outside child area)
 - Labels wrap naturally — no overflow with long Georgian text
 - `onTap` and `onClear` callbacks for parent widget integration
+
+---
+
+## Patient Profile — Photo Selection
+
+### Implementation decisions
+
+- **image_picker** used for gallery and camera selection (no custom camera implementation needed)
+- Photos resized to 512x512 JPEG at 85% quality via existing `ProfileImageService.importProfilePhoto()` to conserve storage
+- Old photo deleted only after new photo saves successfully — prevents data loss on failure
+- `_pendingPhotoPath` tracks photo changes before form save — photo not committed until user taps Save
+- Tappable avatar with camera overlay icon provides clear affordance for photo actions
+- Bottom sheet presents gallery/camera/remove options — standard Material 3 pattern
+
+### Profile avatar widget
+
+- `ProfileAvatar` in `lib/presentation/widgets/profile/profile_avatar.dart` handles three states:
+  1. Photo available: `Image.file()` with `errorBuilder` fallback to initials
+  2. No photo: Initials on colored circle (color derived from name hash)
+  3. No name: `?` character
+- Reused in: view screen, edit screen, Settings tile (with `radius: 20` for compact display)
+- Camera overlay icon (white circle + camera icon) appears only in edit mode when tappable
+
+### Camera permission
+
+- `CAMERA` permission added to AndroidManifest.xml for camera capture
+- `image_picker` handles runtime permission requests automatically on Android
+- Gallery access uses storage permissions (handled by image_picker internally)

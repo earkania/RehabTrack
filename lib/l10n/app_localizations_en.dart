@@ -1161,4 +1161,32 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileInformationNotEntered =>
       'Profile information has not been entered yet.';
+
+  @override
+  String get profilePhoto => 'Profile photo';
+
+  @override
+  String get changeProfilePhoto => 'Change profile photo';
+
+  @override
+  String get chooseFromGallery => 'Choose from gallery';
+
+  @override
+  String get takePhoto => 'Take photo';
+
+  @override
+  String get removeProfilePhoto => 'Remove photo';
+
+  @override
+  String get photoSelectionCancelled => 'Photo selection was cancelled';
+
+  @override
+  String get failedToLoadPhoto => 'Failed to load photo';
+
+  @override
+  String get failedToSavePhoto => 'Failed to save photo';
+
+  @override
+  String get cameraPermissionRequired =>
+      'Camera permission is required to take photos';
 }

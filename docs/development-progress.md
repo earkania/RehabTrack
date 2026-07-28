@@ -2533,11 +2533,62 @@ Each `build()` call creates a new anonymous provider with a distinct identity. `
 | `flutter test` | Passed (682/682) |
 | Pixel 7 verification | App launches cleanly after `pm clear`, no logcat errors |
 
+### Phase 7A — Photo Selection for Patient Profile
+
+**Date:** 2026-07-28
+
+**Status:** Completed
+
+**What was done:**
+
+- **`image_picker` integration:** Added `image_picker: ^1.1.2` to `pubspec.yaml` for gallery and camera photo selection
+- **Camera permission:** Added `<uses-permission android:name="android.permission.CAMERA"/>` to `AndroidManifest.xml`
+- **Provider wiring:** Created `profileImageServiceProvider` in `database_provider.dart`, connecting the existing `ProfileImageService` (previously dead code) to the provider system
+- **Edit screen photo UI:** Added tappable `ProfileAvatar` with camera overlay icon at top of `PatientProfileEditScreen`. Tapping shows a bottom sheet with three actions: Choose from Gallery, Take Photo, Remove Photo
+- **Photo processing flow:**
+  - Gallery: `ImagePicker.pickImage(source: ImageSource.gallery)` → `_resizeImageBytes()` → `ProfileImageService.importProfilePhoto()`
+  - Camera: `ImagePicker.pickImage(source: ImageSource.camera)` → same processing pipeline
+  - Remove: Sets `photoPath` to `null`, deletes managed file via `ProfileImageService.removeProfilePhoto()`
+- **Old photo cleanup:** Previous photo file only deleted after new photo successfully saved (prevents data loss on failure)
+- **`_pendingPhotoPath` state:** Tracks photo changes before form save — prevents intermediate saves from losing uncommitted photo selection
+- **l10n keys:** Added 10 new keys (English + Georgian): `profilePhoto`, `changeProfilePhoto`, `chooseFromGallery`, `takePhoto`, `removeProfilePhoto`, `photoSelectionCancelled`, `failedToLoadPhoto`, `failedToSavePhoto`, `cameraPermissionRequired`, `cameraPermissionDenied`
+
+**Tests Added:**
+
+- `test/patient_profile_edit_photo_test.dart` (9 tests):
+  - Tappable avatar with camera icon visible
+  - Camera icon overlay present
+  - Photo actions bottom sheet shows on tap
+  - Choose from gallery option visible
+  - Take photo option visible
+  - Remove photo option hidden when no photo exists
+  - Cancel button closes bottom sheet
+  - English layout renders without overflow
+  - Form fields still present below photo section
+
+- `test/profile_image_service_storage_test.dart` (10 tests):
+  - `importProfilePhoto` copies file to private storage directory
+  - `importProfilePhoto` does not delete external source file
+  - `removeProfilePhoto` deletes managed file
+  - `removeProfilePhoto` handles missing file gracefully
+  - `getProfilePhoto` returns null for null path
+  - `getProfilePhoto` returns null for nonexistent file
+  - `profilePhotoExists` returns false for null
+  - `profilePhotoExists` returns false for nonexistent file
+  - `profilePhotoExists` returns true for existing file
+  - Replacement photo removes old file after success
+
+### Validation Results (Post-Photo Feature)
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (701/701) |
+
 ### Known Limitations
 
 - Profile photo is stored locally only — no cloud sync
 - No profile deletion (multi-profile management deferred)
 - No profile switching UI (only programmatic via provider)
 - Profile list screen not yet created (only view + edit for single profile)
-- `ProfileImageService` not unit-tested for `importAndResizeProfilePhoto` (requires platform channel mocking)
 - No accessibility testing performed on profile screens

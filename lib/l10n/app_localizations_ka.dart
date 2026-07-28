@@ -1155,4 +1155,32 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get profileInformationNotEntered =>
       'პროფილის ინფორმაცია ჯერ არ არის შეყვანილი.';
+
+  @override
+  String get profilePhoto => 'პროფილის ფოტო';
+
+  @override
+  String get changeProfilePhoto => 'პროფილის ფოტოს შეცვლა';
+
+  @override
+  String get chooseFromGallery => 'აირჩიეთ გალერეიდან';
+
+  @override
+  String get takePhoto => 'გადაიღეთ ფოტო';
+
+  @override
+  String get removeProfilePhoto => 'ფოტოს წაშლა';
+
+  @override
+  String get photoSelectionCancelled => 'ფოტოს არჩევა გაუქმდა';
+
+  @override
+  String get failedToLoadPhoto => 'ფოტოს ჩატვირთვა ვერ მოხერხდა';
+
+  @override
+  String get failedToSavePhoto => 'ფოტოს შენახვა ვერ მოხერხდა';
+
+  @override
+  String get cameraPermissionRequired =>
+      'ფოტოს გადასაღებად საჭიროა კამერის ნებართვა';
 }

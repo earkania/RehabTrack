@@ -438,5 +438,14 @@
   "profileNotSetUp": "Profile not set up",
   "profileNotSetUpDescription": "Create a patient profile to get started.\nYour profile information will be used across the app.",
   "addProfileInformation": "Add Profile Information",
-  "profileInformationNotEntered": "Profile information has not been entered yet."
+  "profileInformationNotEntered": "Profile information has not been entered yet.",
+  "profilePhoto": "Profile photo",
+  "changeProfilePhoto": "Change profile photo",
+  "chooseFromGallery": "Choose from gallery",
+  "takePhoto": "Take photo",
+  "removeProfilePhoto": "Remove photo",
+  "photoSelectionCancelled": "Photo selection was cancelled",
+  "failedToLoadPhoto": "Failed to load photo",
+  "failedToSavePhoto": "Failed to save photo",
+  "cameraPermissionRequired": "Camera permission is required to take photos"
 }

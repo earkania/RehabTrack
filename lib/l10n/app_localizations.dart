@@ -2293,6 +2293,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile information has not been entered yet.'**
   String get profileInformationNotEntered;
+
+  /// No description provided for @profilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get profilePhoto;
+
+  /// No description provided for @changeProfilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change profile photo'**
+  String get changeProfilePhoto;
+
+  /// No description provided for @chooseFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get chooseFromGallery;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get takePhoto;
+
+  /// No description provided for @removeProfilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get removeProfilePhoto;
+
+  /// No description provided for @photoSelectionCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo selection was cancelled'**
+  String get photoSelectionCancelled;
+
+  /// No description provided for @failedToLoadPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load photo'**
+  String get failedToLoadPhoto;
+
+  /// No description provided for @failedToSavePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save photo'**
+  String get failedToSavePhoto;
+
+  /// No description provided for @cameraPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required to take photos'**
+  String get cameraPermissionRequired;
 }
 
 class _AppLocalizationsDelegate

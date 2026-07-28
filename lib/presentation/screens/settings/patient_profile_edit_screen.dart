@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
+import 'package:rehab_track/presentation/widgets/profile/profile_avatar.dart';
 
 class PatientProfileEditScreen extends ConsumerStatefulWidget {
   const PatientProfileEditScreen({super.key});
@@ -35,6 +37,7 @@ class _PatientProfileEditScreenState
   String? _selectedRelationship;
   bool _isSaving = false;
   bool _initialized = false;
+  String? _pendingPhotoPath;
 
   @override
   void initState() {
@@ -162,11 +165,62 @@ class _PatientProfileEditScreenState
     AppLocalizations l10n,
     Profile profile,
   ) {
+    final displayPhotoPath = _pendingPhotoPath ?? profile.photoPath;
+
     return Form(
       key: _formKey,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Center(
+            child: GestureDetector(
+              onTap: () => _showPhotoActions(context, l10n, profile),
+              child: Stack(
+                children: [
+                  ProfileAvatar(
+                    photoPath: displayPhotoPath,
+                    firstName: profile.firstName,
+                    lastName: profile.lastName,
+                    radius: 56,
+                    isPrimary: profile.isPrimary,
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.surface,
+                          width: 2,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.camera_alt,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Center(
+            child: TextButton.icon(
+              onPressed: () => _showPhotoActions(context, l10n, profile),
+              icon: const Icon(Icons.photo_camera_outlined, size: 18),
+              label: Text(
+                displayPhotoPath != null
+                    ? l10n.changeProfilePhoto
+                    : l10n.profilePhoto,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           Text(
             l10n.personalInformation,
             style: Theme.of(context).textTheme.titleMedium,
@@ -379,6 +433,144 @@ class _PatientProfileEditScreenState
     );
   }
 
+  void _showPhotoActions(
+    BuildContext context,
+    AppLocalizations l10n,
+    Profile profile,
+  ) {
+    final hasPhoto = profile.photoPath != null || _pendingPhotoPath != null;
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                l10n.changeProfilePhoto,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: Text(l10n.chooseFromGallery),
+                contentPadding: EdgeInsets.zero,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickImage(ImageSource.gallery, l10n, profile);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt_outlined),
+                title: Text(l10n.takePhoto),
+                contentPadding: EdgeInsets.zero,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickImage(ImageSource.camera, l10n, profile);
+                },
+              ),
+              if (hasPhoto)
+                ListTile(
+                  leading: Icon(
+                    Icons.delete_outline,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  title: Text(
+                    l10n.removeProfilePhoto,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.zero,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _removePhoto(l10n, profile);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(
+    ImageSource source,
+    AppLocalizations l10n,
+    Profile profile,
+  ) async {
+    final picker = ImagePicker();
+    try {
+      final picked = await picker.pickImage(
+        source: source,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 85,
+      );
+      if (picked == null) return;
+
+      final imageService = ref.read(profileImageServiceProvider);
+      final profileId = profile.id;
+      if (profileId == null) return;
+
+      final imageBytes = await picked.readAsBytes();
+      final newPath = await imageService.importProfilePhoto(
+        profileId: profileId,
+        imageBytes: imageBytes,
+      );
+
+      // Delete old managed photo after new one is saved
+      final oldPath = profile.photoPath;
+      if (oldPath != null && oldPath != newPath) {
+        await imageService.removeProfilePhoto(oldPath);
+      }
+
+      // Save profile with new photo path
+      final repo = ref.read(profileRepositoryProvider);
+      final updated = profile.copyWith(
+        photoPath: newPath,
+        updatedAt: DateTime.now(),
+      );
+      await repo.updateProfile(updated);
+
+      setState(() => _pendingPhotoPath = newPath);
+    } catch (e) {
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.failedToSavePhoto)),
+        );
+      }
+    }
+  }
+
+  Future<void> _removePhoto(AppLocalizations l10n, Profile profile) async {
+    final photoPath = _pendingPhotoPath ?? profile.photoPath;
+    if (photoPath == null) return;
+
+    try {
+      final imageService = ref.read(profileImageServiceProvider);
+      await imageService.removeProfilePhoto(photoPath);
+
+      final repo = ref.read(profileRepositoryProvider);
+      final updated = profile.copyWith(
+        photoPath: null,
+        updatedAt: DateTime.now(),
+      );
+      await repo.updateProfile(updated);
+
+      setState(() => _pendingPhotoPath = null);
+    } catch (e) {
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.failedToSavePhoto)),
+        );
+      }
+    }
+  }
+
   Future<void> _save(AppLocalizations l10n, Profile profile) async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
@@ -410,6 +602,7 @@ class _PatientProfileEditScreenState
             ? null
             : _allergiesController.text,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
+        photoPath: _pendingPhotoPath ?? profile.photoPath,
         updatedAt: DateTime.now(),
       );
 
