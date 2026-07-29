@@ -13,6 +13,8 @@ void main() {
   // This must happen before runApp so that the callback is registered
   // before any notification can be received.
   container.read(notificationInitializerProvider);
+  // Activate the reminder-toggle watcher so it reacts to changes.
+  container.read(reminderToggleWatcherProvider);
 
   runApp(
     UncontrolledProviderScope(

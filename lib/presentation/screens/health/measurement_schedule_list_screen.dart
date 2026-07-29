@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
+import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
+import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
@@ -193,7 +195,19 @@ class _ScheduleList extends ConsumerWidget {
     );
     if (confirmed == true && context.mounted) {
       final repo = ref.read(measurementRepositoryProvider);
+      final scheduler = ref.read(notificationSchedulerProvider);
       try {
+        final config = schedule.isDaily
+            ? DailySchedule(times: [schedule.time])
+            : IntervalDaysSchedule(
+                intervalDays: schedule.intervalDays ?? 1,
+                times: [schedule.time],
+              );
+        await scheduler.cancelNotificationsInRange(
+          scheduleId: schedule.id!,
+          config: config,
+          isMeasurement: true,
+        );
         await repo.deleteSchedule(schedule.id!);
         ref.invalidate(todayAgendaProvider);
         if (context.mounted) {

@@ -2,11 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/domain/repositories/settings_repository.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
+import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
+
+class FakeNotificationServiceForSettings extends NotificationService {
+  FakeNotificationServiceForSettings() : super();
+
+  @override
+  bool get isInitialized => true;
+
+  @override
+  Future<bool> initialize() async => true;
+
+  @override
+  Future<bool> hasNotificationPermission() async => true;
+
+  @override
+  Future<bool> hasExactAlarmPermission() async => true;
+
+  @override
+  Future<void> waitForInitialization() async {}
+
+  @override
+  Future<void> scheduleNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+    String? payload,
+    required String channelId,
+    bool includeActions = false,
+    bool isMeasurement = false,
+    bool playSound = true,
+    bool enableVibration = true,
+  }) async {}
+}
 
 class FakeSettingsRepo implements SettingsRepository {
   final Map<String, String> _store = {};
@@ -41,6 +77,9 @@ Widget _buildApp({
     overrides: [
       settingsRepositoryProvider.overrideWithValue(settings),
       currentActiveProfileIdProvider.overrideWith((ref) => null),
+      notificationServiceProvider.overrideWithValue(
+        FakeNotificationServiceForSettings(),
+      ),
     ],
     child: MaterialApp(
       localizationsDelegates: const [

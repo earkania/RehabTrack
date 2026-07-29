@@ -1,4 +1,4 @@
-enum NotificationActionType { taken, skipped, snoozed }
+enum NotificationActionType { taken, skipped, snoozed, recordNow, dismiss }
 
 class NotificationActionResponse {
   const NotificationActionResponse({

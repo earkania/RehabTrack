@@ -1,11 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:timezone/timezone.dart' as tz;
 
+import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/core/localization/app_locale.dart';
+import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
+import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
+import 'package:rehab_track/presentation/providers/reminder_settings_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/widgets/profile/profile_avatar.dart';
 
@@ -25,15 +30,21 @@ class SettingsScreen extends ConsumerWidget {
 
     final gracePeriodMinutes = ref.watch(nextItemGracePeriodProvider);
 
+    final medicationReminders = ref.watch(medicationRemindersEnabledProvider);
+    final measurementReminders = ref.watch(measurementRemindersEnabledProvider);
+    final reminderSound = ref.watch(reminderSoundEnabledProvider);
+    final reminderVibration = ref.watch(reminderVibrationEnabledProvider);
+    final snoozeDuration = ref.watch(defaultSnoozeDurationProvider);
+
     final hasName =
         profile != null &&
         (profile.firstName.isNotEmpty || profile.lastName.isNotEmpty);
-    final displayName = hasName ? profile.fullName : l10n.patientProfile;
+    final displayName = hasName
+        ? '${profile.firstName} ${profile.lastName}'.trim()
+        : l10n.patientProfile;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settings),
-      ),
+      appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         children: [
           const SizedBox(height: 8),
@@ -54,22 +65,19 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
           _buildSectionHeader(context, l10n.language),
           _buildLanguageTile(
-            context,
-            ref,
+            context, ref,
             title: 'System',
             locale: AppLocale.system,
             currentLocale: currentLocale,
           ),
           _buildLanguageTile(
-            context,
-            ref,
+            context, ref,
             title: 'English',
             locale: AppLocale.english,
             currentLocale: currentLocale,
           ),
           _buildLanguageTile(
-            context,
-            ref,
+            context, ref,
             title: 'ქართული',
             locale: AppLocale.georgian,
             currentLocale: currentLocale,
@@ -93,12 +101,103 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => _showGracePeriodDialog(context, ref, l10n, gracePeriodMinutes),
           ),
           const Divider(),
-          _buildSectionHeader(context, l10n.notifications),
+          _buildSectionHeader(context, l10n.reminders),
           SwitchListTile(
-            secondary: const Icon(Icons.notifications_outlined),
-            title: Text(l10n.enableNotifications),
-            value: true,
-            onChanged: (value) {},
+            secondary: const Icon(Icons.medication_outlined),
+            title: Text(l10n.medicationReminders),
+            value: medicationReminders,
+            onChanged: (value) {
+              ref.read(medicationRemindersEnabledProvider.notifier).setEnabled(value);
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.monitor_heart_outlined),
+            title: Text(l10n.measurementReminders),
+            value: measurementReminders,
+            onChanged: (value) {
+              ref.read(measurementRemindersEnabledProvider.notifier).setEnabled(value);
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.volume_up_outlined),
+            title: Text(l10n.reminderSound),
+            value: reminderSound,
+            onChanged: (value) {
+              ref.read(reminderSoundEnabledProvider.notifier).setEnabled(value);
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.vibration_outlined),
+            title: Text(l10n.reminderVibration),
+            value: reminderVibration,
+            onChanged: (value) {
+              ref.read(reminderVibrationEnabledProvider.notifier).setEnabled(value);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.timer_outlined),
+            title: Text(l10n.defaultSnoozeDuration),
+            subtitle: Text(l10n.minutesValue(snoozeDuration)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showSnoozeDurationDialog(context, ref, l10n, snoozeDuration),
+          ),
+          const Divider(),
+          _buildPermissionTile(
+            context, ref, l10n,
+            title: l10n.notificationPermission,
+            provider: notificationPermissionProvider,
+            grantedLabel: l10n.permissionGranted,
+            deniedLabel: l10n.permissionDenied,
+            onRequest: () async {
+              final service = ref.read(notificationServiceProvider);
+              await service.requestNotificationPermission();
+              ref.invalidate(notificationPermissionProvider);
+            },
+          ),
+          _buildPermissionTile(
+            context, ref, l10n,
+            title: l10n.exactAlarmAccess,
+            provider: exactAlarmPermissionProvider,
+            grantedLabel: l10n.permissionGranted,
+            deniedLabel: l10n.permissionDenied,
+            onRequest: () async {
+              final service = ref.read(notificationServiceProvider);
+              await service.requestExactAlarmPermission();
+              ref.invalidate(exactAlarmPermissionProvider);
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.medication_outlined),
+            title: Text(l10n.testMedicationReminder),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _sendTestReminder(context, ref, l10n, isMeasurement: false),
+          ),
+          ListTile(
+            leading: const Icon(Icons.monitor_heart_outlined),
+            title: Text(l10n.testMeasurementReminder),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _sendTestReminder(context, ref, l10n, isMeasurement: true),
+          ),
+          const Divider(),
+          _buildSectionHeader(context, l10n.systemControls),
+          ListTile(
+            leading: const Icon(Icons.settings_outlined),
+            title: Text(l10n.androidNotificationSettings),
+            subtitle: Text(l10n.androidNotificationSettingsDescription),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              ref.read(notificationServiceProvider).openAppNotificationSettings();
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(72, 0, 16, 8),
+            child: Text(
+              l10n.androidMayHideUnusedCategories,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
           const Divider(),
           _buildSectionHeader(context, l10n.security),
@@ -109,6 +208,18 @@ class SettingsScreen extends ConsumerWidget {
             value: false,
             onChanged: (value) {},
           ),
+          if (kDebugMode) ...[
+            const Divider(),
+            _buildSectionHeader(context, 'Debug'),
+            ListTile(
+              leading: const Icon(Icons.bug_report),
+              title: const Text('Notification Diagnostics'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.push('/settings/notification-diagnostics');
+              },
+            ),
+          ],
         ],
       ),
     );
@@ -126,6 +237,34 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildPermissionTile(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n, {
+    required String title,
+    required FutureProvider<bool> provider,
+    required String grantedLabel,
+    required String deniedLabel,
+    required VoidCallback onRequest,
+  }) {
+    final permissionState = ref.watch(provider);
+    return ListTile(
+      leading: const Icon(Icons.security_outlined),
+      title: Text(title),
+      subtitle: Text(
+        permissionState.when(
+          data: (granted) => granted ? grantedLabel : deniedLabel,
+          loading: () => l10n.loading,
+          error: (_, _) => deniedLabel,
+        ),
+      ),
+      trailing: TextButton(
+        onPressed: onRequest,
+        child: Text(l10n.request),
+      ),
+    );
+  }
+
   void _showGracePeriodDialog(
     BuildContext context,
     WidgetRef ref,
@@ -133,27 +272,58 @@ class SettingsScreen extends ConsumerWidget {
     int current,
   ) {
     final options = [5, 10, 15, 30, 60];
-
     showDialog(
       context: context,
       builder: (ctx) {
         return SimpleDialog(
           title: Text(l10n.nextItemGracePeriod),
           children: options.map((minutes) {
-            final label = _gracePeriodLabel(l10n, minutes);
-            final isSelected = minutes == current;
             return ListTile(
               leading: Icon(
-                isSelected
+                minutes == current
                     ? Icons.radio_button_checked
                     : Icons.radio_button_unchecked,
-                color: isSelected
+                color: minutes == current
                     ? Theme.of(ctx).colorScheme.primary
                     : null,
               ),
-              title: Text(label),
+              title: Text(_gracePeriodLabel(l10n, minutes)),
               onTap: () {
                 ref.read(nextItemGracePeriodProvider.notifier).setGracePeriod(minutes);
+                Navigator.pop(ctx);
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  void _showSnoozeDurationDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    int current,
+  ) {
+    final options = [5, 10, 15, 30, 60];
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return SimpleDialog(
+          title: Text(l10n.defaultSnoozeDuration),
+          children: options.map((minutes) {
+            return ListTile(
+              leading: Icon(
+                minutes == current
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                color: minutes == current
+                    ? Theme.of(ctx).colorScheme.primary
+                    : null,
+              ),
+              title: Text(l10n.minutesValue(minutes)),
+              onTap: () {
+                ref.read(defaultSnoozeDurationProvider.notifier).setDuration(minutes);
                 Navigator.pop(ctx);
               },
             );
@@ -174,6 +344,61 @@ class SettingsScreen extends ConsumerWidget {
     };
   }
 
+  Future<void> _sendTestReminder(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n, {
+    required bool isMeasurement,
+  }) async {
+    final service = ref.read(notificationServiceProvider);
+    final hasPermission = await service.hasNotificationPermission();
+    if (!hasPermission) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.noPermission)),
+        );
+      }
+      return;
+    }
+
+    final playSound = ref.read(reminderSoundEnabledProvider);
+    final enableVibration = ref.read(reminderVibrationEnabledProvider);
+
+    final now = DateTime.now();
+    final testTime = now.add(const Duration(seconds: 5));
+    final tzDate = tz.TZDateTime(
+      tz.local,
+      testTime.year,
+      testTime.month,
+      testTime.day,
+      testTime.hour,
+      testTime.minute,
+      testTime.second,
+    );
+
+    final channelId = isMeasurement
+        ? NotificationService.measurementChannelId
+        : NotificationService.medicationChannelId;
+
+    final id = isMeasurement ? 999998 : 999999;
+
+    await service.scheduleNotification(
+      id: id,
+      title: l10n.testReminderTitle,
+      body: l10n.testReminderBody,
+      scheduledDate: tzDate,
+      channelId: channelId,
+      playSound: playSound,
+      enableVibration: enableVibration,
+    );
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.testReminderSent)),
+      );
+    }
+  }
+
   Widget _buildLanguageTile(
     BuildContext context,
     WidgetRef ref, {
@@ -182,16 +407,13 @@ class SettingsScreen extends ConsumerWidget {
     required Locale? currentLocale,
   }) {
     final isSelected = currentLocale == locale.locale;
-
     return ListTile(
       leading: Icon(
         isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
         color: isSelected ? Theme.of(context).colorScheme.primary : null,
       ),
       title: Text(title),
-      onTap: () {
-        ref.read(localeProvider.notifier).setLocale(locale);
-      },
+      onTap: () => ref.read(localeProvider.notifier).setLocale(locale),
     );
   }
 }

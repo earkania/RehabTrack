@@ -867,7 +867,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get measurementReminder => 'Measurement Reminder';
 
   @override
-  String get measurementReminders => 'Measurement Reminders';
+  String get measurementReminders => 'Measurement reminders';
 
   @override
   String timeToRecordMeasurement(String name) {
@@ -1216,4 +1216,151 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sixtyMinutes => '60 minutes';
+
+  @override
+  String get reminders => 'Reminders';
+
+  @override
+  String get medicationReminders => 'Medication reminders';
+
+  @override
+  String get reminderSound => 'Sound';
+
+  @override
+  String get reminderVibration => 'Vibration';
+
+  @override
+  String get defaultSnoozeDuration => 'Default snooze duration';
+
+  @override
+  String get notificationPermission => 'Notification permission';
+
+  @override
+  String get exactAlarmAccess => 'Exact alarm access';
+
+  @override
+  String get permissionGranted => 'Granted';
+
+  @override
+  String get permissionDenied => 'Denied';
+
+  @override
+  String get permissionRequired => 'Required';
+
+  @override
+  String get openNotificationSettings => 'Open notification settings';
+
+  @override
+  String get openAlarmSettings => 'Open alarm settings';
+
+  @override
+  String get androidNotificationSettings => 'Android notification settings';
+
+  @override
+  String get androidNotificationSettingsDescription =>
+      'Manage system notification categories, sounds, and alerts';
+
+  @override
+  String get systemControls => 'System controls';
+
+  @override
+  String get androidMayHideUnusedCategories =>
+      'Android may hide notification categories until they have been used.';
+
+  @override
+  String get testMedicationReminder => 'Test medication reminder';
+
+  @override
+  String get testMeasurementReminder => 'Test measurement reminder';
+
+  @override
+  String get testReminder => 'Test reminder';
+
+  @override
+  String get testReminderTitle => 'Test Reminder';
+
+  @override
+  String get testReminderBody =>
+      'This is a test reminder to verify notification sound, vibration, and presentation.';
+
+  @override
+  String get medicationReminder => 'Medication Reminder';
+
+  @override
+  String get markAsTaken => 'Mark as Taken';
+
+  @override
+  String get snooze => 'Snooze';
+
+  @override
+  String get scheduleSavedReminderFailed =>
+      'Schedule saved, but reminder could not be scheduled';
+
+  @override
+  String get reminderSchedulingFailed => 'Reminder scheduling failed';
+
+  @override
+  String get reminderDetails => 'Reminder Details';
+
+  @override
+  String get reminderPermissionExplanation =>
+      'RehabTrack needs notification permission to show reminders for medications and measurements.';
+
+  @override
+  String get exactAlarmExplanation =>
+      'Exact alarm permission allows reminders to appear at the precise scheduled time. Without it, reminder timing may be less precise.';
+
+  @override
+  String get alarmStyleReminders => 'Alarm-style presentation';
+
+  @override
+  String get lockScreenReminderDetails =>
+      'Show full reminder details on lock screen';
+
+  @override
+  String get noPermission => 'No permission';
+
+  @override
+  String get channelDisabled => 'Channel disabled';
+
+  @override
+  String get scheduleSaved => 'Schedule saved';
+
+  @override
+  String get notGranted => 'Not granted';
+
+  @override
+  String get notRequired => 'Not required';
+
+  @override
+  String get requestPermission => 'Request permission';
+
+  @override
+  String get reminderWarningNoPermission =>
+      'Reminders cannot be displayed because notification permission is denied.';
+
+  @override
+  String get reminderWarningNoExactAlarm =>
+      'Reminder timing may be less precise without exact alarm access.';
+
+  @override
+  String snoozeMinutes(Object minutes) {
+    return 'Snooze for $minutes minutes';
+  }
+
+  @override
+  String get healthReminder => 'Health reminder';
+
+  @override
+  String get healthReminderLockScreen => 'Open RehabTrack for details';
+
+  @override
+  String get remindersNotAvailable => 'Reminders not available';
+
+  @override
+  String get testReminderSent =>
+      'Test reminder sent! Check your notifications.';
+
+  @override
+  String get request => 'Request';
 }

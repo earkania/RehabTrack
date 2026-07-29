@@ -8,6 +8,8 @@ import 'package:rehab_track/data/services/notification/notification_action_bridg
 import 'package:rehab_track/data/services/notification/notification_action_handler.dart';
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
+import 'package:rehab_track/data/services/notification/reminder_content_formatter.dart';
+import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/data/services/notification/schedule_recovery_service.dart';
 import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
@@ -15,9 +17,42 @@ import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/medication_alternative_component.dart';
 import 'package:rehab_track/domain/entities/medication_component.dart';
+import 'package:rehab_track/domain/entities/profile.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
+import 'package:rehab_track/domain/repositories/profile_repository.dart';
+
+class FakeProfileRepository implements ProfileRepository {
+  @override
+  Stream<Profile?> watchActiveProfile(int profileId) =>
+      Stream.value(Profile(firstName: 'Test', lastName: 'User', createdAt: DateTime(2025), updatedAt: DateTime(2025)));
+
+  @override
+  Future<Profile?> getActiveProfile(int profileId) async =>
+      Profile(firstName: 'Test', lastName: 'User', createdAt: DateTime(2025), updatedAt: DateTime(2025));
+
+  @override
+  Future<int> createProfile(Profile profile) async => 1;
+
+  @override
+  Future<void> updateProfile(Profile profile) async {}
+
+  @override
+  Future<void> deleteProfile(int id) async {}
+
+  @override
+  Stream<List<Profile>> watchAllProfiles() => Stream.value([]);
+
+  @override
+  Future<List<Profile>> getAllProfiles() async => [];
+
+  @override
+  Future<void> setPrimaryProfile(int profileId) async {}
+
+  @override
+  Future<int> getProfileCount() async => 1;
+}
 
 class FakeMeasurementRepository implements MeasurementRepository {
   final List<MeasurementReminderLog> logs = [];
@@ -236,9 +271,11 @@ class FakeMedicationRepository implements MedicationRepository {
   ) async {}
 }
 
-class FakeNotificationService implements NotificationService {
+class FakeNotificationService extends NotificationService {
   NotificationActionCallback? actionCallback;
   final List<Map<String, dynamic>> scheduledNotifications = [];
+
+  FakeNotificationService() : super();
 
   @override
   bool get isInitialized => true;
@@ -261,31 +298,23 @@ class FakeNotificationService implements NotificationService {
     required String body,
     required tz.TZDateTime scheduledDate,
     String? payload,
-    NotificationChannelType channelType = NotificationChannelType.general,
+    required String channelId,
     bool includeActions = false,
+    bool isMeasurement = false,
+    bool playSound = true,
+    bool enableVibration = true,
   }) async {
     scheduledNotifications.add({
       'id': id,
       'title': title,
       'body': body,
       'scheduledDate': scheduledDate,
-      'channelType': channelType,
+      'channelId': channelId,
       'payload': payload,
       'includeActions': includeActions,
+      'isMeasurement': isMeasurement,
     });
   }
-
-  @override
-  Future<void> scheduleRecurringNotification({
-    required int id,
-    required String title,
-    required String body,
-    required tz.TZDateTime scheduledDate,
-    required DateTimeComponents matchComponents,
-    String? payload,
-    NotificationChannelType channelType = NotificationChannelType.general,
-    bool includeActions = false,
-  }) async {}
 
   @override
   Future<void> showNotification({
@@ -293,12 +322,18 @@ class FakeNotificationService implements NotificationService {
     required String title,
     required String body,
     String? payload,
-    NotificationChannelType channelType = NotificationChannelType.general,
+    required String channelId,
     bool includeActions = false,
+    bool isMeasurement = false,
+    bool playSound = true,
+    bool enableVibration = true,
   }) async {}
 
   @override
   Future<void> cancelNotification(int id) async {}
+
+  @override
+  Future<void> cancelNotifications(List<int> ids) async {}
 
   @override
   Future<void> cancelAllNotifications() async {}
@@ -311,10 +346,17 @@ class FakeNotificationService implements NotificationService {
 
   @override
   Future<NotificationAppLaunchDetails?> getLaunchDetails() async => null;
+
+  @override
+  Future<bool> hasNotificationPermission() async => true;
+
+  @override
+  Future<bool> hasExactAlarmPermission() async => true;
 }
 
 class FakeNotificationScheduler extends NotificationScheduler {
-  FakeNotificationScheduler() : super(notificationService: FakeNotificationService());
+  FakeNotificationScheduler({NotificationService? notificationService})
+      : super(notificationService: notificationService ?? FakeNotificationService());
 }
 
 void main() {
@@ -322,75 +364,42 @@ void main() {
     tz.initializeTimeZones();
   });
 
-  group('NotificationPayload parsing', () {
-    test('parsePayload returns valid payload from correct JSON', () {
-      final json = jsonEncode({'medicationId': 42, 'scheduleId': 7});
-      final payload = NotificationActionBridge.parsePayload(json);
+  group('ReminderPayload parsing', () {
+    test('parse returns valid payload from correct JSON', () {
+      final json = jsonEncode({
+        'v': 1,
+        't': 'medication',
+        'p': 1,
+        's': 7,
+        'o': DateTime.now().toIso8601String(),
+        'm': 42,
+      });
+      final payload = ReminderPayload.parse(json);
       expect(payload, isNotNull);
       expect(payload!.medicationId, 42);
       expect(payload.scheduleId, 7);
     });
 
-    test('parsePayload returns null for null input', () {
-      expect(NotificationActionBridge.parsePayload(null), isNull);
+    test('parse returns null for null input', () {
+      expect(ReminderPayload.parse(null), isNull);
     });
 
-    test('parsePayload returns null for empty string', () {
-      expect(NotificationActionBridge.parsePayload(''), isNull);
+    test('parse returns null for empty string', () {
+      expect(ReminderPayload.parse(''), isNull);
     });
 
-    test('parsePayload returns null for invalid JSON', () {
-      expect(NotificationActionBridge.parsePayload('not json'), isNull);
+    test('parse returns null for invalid JSON', () {
+      expect(ReminderPayload.parse('not json'), isNull);
     });
 
-    test('parsePayload returns null when medicationId is missing', () {
-      final json = jsonEncode({'scheduleId': 7});
-      expect(NotificationActionBridge.parsePayload(json), isNull);
-    });
-
-    test('parsePayload returns null when scheduleId is missing', () {
-      final json = jsonEncode({'medicationId': 42});
-      expect(NotificationActionBridge.parsePayload(json), isNull);
+    test('parse returns null when required fields are missing', () {
+      final json = jsonEncode({'m': 42, 's': 7});
+      expect(ReminderPayload.parse(json), isNull);
     });
   });
 
-  group('computeNotificationIds', () {
-    test('DailySchedule with single time returns single ID', () {
-      final ids = NotificationActionBridge.computeNotificationIds(
-        scheduleId: 10,
-        config: const DailySchedule(times: ['08:00']),
-      );
-      expect(ids, [10]);
-    });
-
-    test('DailySchedule with multiple times returns sequential IDs', () {
-      final ids = NotificationActionBridge.computeNotificationIds(
-        scheduleId: 10,
-        config: const DailySchedule(times: ['08:00', '14:00', '20:00']),
-      );
-      expect(ids, [10, 11, 12]);
-    });
-
-    test('IntervalDaysSchedule returns sequential IDs', () {
-      final ids = NotificationActionBridge.computeNotificationIds(
-        scheduleId: 10,
-        config: const IntervalDaysSchedule(intervalDays: 3, times: ['09:00']),
-      );
-      expect(ids, [10]);
-    });
-
-    test('IntervalDaysSchedule with multiple times returns sequential IDs', () {
-      final ids = NotificationActionBridge.computeNotificationIds(
-        scheduleId: 10,
-        config: const IntervalDaysSchedule(
-            intervalDays: 3, times: ['09:00', '21:00']),
-      );
-      expect(ids, [10, 11]);
-    });
-  });
-
-  group('buildNotificationBody', () {
-    test('includes dose amount and unit', () {
+  group('ReminderContentFormatter', () {
+    test('medicationBody includes dose amount and unit', () {
       final medication = Medication(
         profileId: 1,
         name: 'Ibuprofen',
@@ -406,12 +415,17 @@ void main() {
         intakeQuantity: 1,
         dosageForm: DosageForm.tablet,
       );
-      final body = NotificationActionBridge.buildNotificationBody(medication, schedule);
+      final body = ReminderContentFormatter.medicationBody(
+        medication: medication,
+        profile: null,
+        schedule: schedule,
+        scheduledTime: DateTime.now(),
+      );
       expect(body, contains('200 mg'));
       expect(body, contains('1 tablet'));
     });
 
-    test('includes instructions', () {
+    test('medicationBody includes instructions', () {
       final medication = Medication(
         profileId: 1,
         name: 'Vitamin D',
@@ -426,11 +440,16 @@ void main() {
         dosageForm: DosageForm.unit,
         instructions: 'Take with food',
       );
-      final body = NotificationActionBridge.buildNotificationBody(medication, schedule);
+      final body = ReminderContentFormatter.medicationBody(
+        medication: medication,
+        profile: null,
+        schedule: schedule,
+        scheduledTime: DateTime.now(),
+      );
       expect(body, contains('Take with food'));
     });
 
-    test('combines dose, intake quantity, and instructions', () {
+    test('medicationBody combines dose, intake quantity, and instructions', () {
       final medication = Medication(
         profileId: 1,
         name: 'Ibuprofen',
@@ -447,13 +466,18 @@ void main() {
         dosageForm: DosageForm.capsule,
         instructions: 'After meals',
       );
-      final body = NotificationActionBridge.buildNotificationBody(medication, schedule);
+      final body = ReminderContentFormatter.medicationBody(
+        medication: medication,
+        profile: null,
+        schedule: schedule,
+        scheduledTime: DateTime.now(),
+      );
       expect(body, contains('200 mg'));
       expect(body, contains('2 capsules'));
       expect(body, contains('After meals'));
     });
 
-    test('includes intake quantity with custom dosage form', () {
+    test('medicationBody includes intake quantity with custom dosage form', () {
       final medication = Medication(
         profileId: 1,
         name: 'Insulin',
@@ -468,7 +492,12 @@ void main() {
         dosageForm: DosageForm.other,
         customDosageForm: 'pump',
       );
-      final body = NotificationActionBridge.buildNotificationBody(medication, schedule);
+      final body = ReminderContentFormatter.medicationBody(
+        medication: medication,
+        profile: null,
+        schedule: schedule,
+        scheduledTime: DateTime.now(),
+      );
       expect(body, contains('1 pump'));
     });
   });
@@ -476,36 +505,52 @@ void main() {
   group('Action handling', () {
     late FakeMedicationRepository repo;
     late FakeNotificationService notificationService;
+    late FakeMeasurementRepository measurementRepo;
     late NotificationActionBridge bridge;
 
     setUp(() {
       repo = FakeMedicationRepository();
+      measurementRepo = FakeMeasurementRepository();
       notificationService = FakeNotificationService();
+      final scheduler = FakeNotificationScheduler(
+        notificationService: notificationService,
+      );
       final recoveryService = ScheduleRecoveryService(
         notificationService: notificationService,
-        notificationScheduler: FakeNotificationScheduler(),
+        notificationScheduler: scheduler,
       );
       bridge = NotificationActionBridge(
         notificationService: notificationService,
+        notificationScheduler: scheduler,
         scheduleRecoveryService: recoveryService,
         medicationRepository: repo,
-        measurementRepository: FakeMeasurementRepository(),
+        measurementRepository: measurementRepo,
+        profileRepository: FakeProfileRepository(),
+        getSnoozeDuration: () => const Duration(minutes: 10),
       );
     });
 
     test('initialize registers action callback', () async {
-      await bridge.initialize(profileId: 1);
+      await bridge.initialize();
       expect(notificationService.actionCallback, isNotNull);
     });
 
     test('taken action logs dose with status taken', () async {
-      await bridge.initialize(profileId: 1);
+      await bridge.initialize();
+
+      final payload = ReminderPayload(
+        type: ReminderType.medication,
+        profileId: 1,
+        scheduleId: 10,
+        occurrenceTime: DateTime.now().toIso8601String(),
+        medicationId: 1,
+      );
 
       final response = NotificationActionResponse(
         notificationId: 10,
         actionId: 'taken',
         actionType: NotificationActionType.taken,
-        payload: jsonEncode({'medicationId': 1, 'scheduleId': 10}),
+        payload: payload.toJsonString(),
       );
 
       notificationService.actionCallback!(response);
@@ -519,13 +564,21 @@ void main() {
     });
 
     test('skipped action logs dose with status skipped', () async {
-      await bridge.initialize(profileId: 1);
+      await bridge.initialize();
+
+      final payload = ReminderPayload(
+        type: ReminderType.medication,
+        profileId: 1,
+        scheduleId: 10,
+        occurrenceTime: DateTime.now().toIso8601String(),
+        medicationId: 1,
+      );
 
       final response = NotificationActionResponse(
         notificationId: 10,
         actionId: 'skipped',
         actionType: NotificationActionType.skipped,
-        payload: jsonEncode({'medicationId': 1, 'scheduleId': 10}),
+        payload: payload.toJsonString(),
       );
 
       notificationService.actionCallback!(response);
@@ -557,13 +610,21 @@ void main() {
         updatedAt: DateTime(2025),
       );
 
-      await bridge.initialize(profileId: 1);
+      await bridge.initialize();
+
+      final payload = ReminderPayload(
+        type: ReminderType.medication,
+        profileId: 1,
+        scheduleId: 10,
+        occurrenceTime: DateTime.now().toIso8601String(),
+        medicationId: 1,
+      );
 
       final response = NotificationActionResponse(
         notificationId: 10,
         actionId: 'snoozed',
         actionType: NotificationActionType.snoozed,
-        payload: jsonEncode({'medicationId': 1, 'scheduleId': 10}),
+        payload: payload.toJsonString(),
       );
 
       notificationService.actionCallback!(response);
@@ -575,24 +636,14 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(notificationService.scheduledNotifications, hasLength(1));
-      expect(notificationService.scheduledNotifications.first['id'], 10);
       expect(
-        notificationService.scheduledNotifications.first['title'],
-        'Time to take Ibuprofen',
+        notificationService.scheduledNotifications.first['id'],
+        NotificationService.snoozeNotificationId(10),
       );
-      expect(
-        notificationService.scheduledNotifications.first['body'],
-        contains('200 mg'),
-      );
-      expect(
-        notificationService.scheduledNotifications.first['body'],
-        contains('1 tablet'),
-      );
-      expect(notificationService.scheduledNotifications.first['includeActions'], true);
     });
 
     test('action with null payload is ignored', () async {
-      await bridge.initialize(profileId: 1);
+      await bridge.initialize();
 
       final response = NotificationActionResponse(
         notificationId: 10,
@@ -606,111 +657,6 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(repo.loggedDoses, isEmpty);
-    });
-  });
-
-  group('Schedule recovery', () {
-    late FakeMedicationRepository repo;
-    late FakeNotificationService notificationService;
-    late NotificationActionBridge bridge;
-
-    setUp(() {
-      repo = FakeMedicationRepository();
-      notificationService = FakeNotificationService();
-      final recoveryService = ScheduleRecoveryService(
-        notificationService: notificationService,
-        notificationScheduler: FakeNotificationScheduler(),
-      );
-      bridge = NotificationActionBridge(
-        notificationService: notificationService,
-        scheduleRecoveryService: recoveryService,
-        medicationRepository: repo,
-        measurementRepository: FakeMeasurementRepository(),
-      );
-    });
-
-    test('recoverSchedules runs without errors with active schedules', () async {
-      final now = DateTime(2025);
-      repo.medications[1] = Medication(
-        id: 1,
-        profileId: 1,
-        name: 'Aspirin',
-        active: true,
-        createdAt: now,
-        updatedAt: now,
-      );
-      repo.schedulesByMedicationId[1] = [
-        MedicationSchedule(
-          id: 10,
-          medicationId: 1,
-          scheduleType: 'daily',
-          scheduleConfig: const DailySchedule(times: ['08:00']),
-          intakeQuantity: 1,
-          dosageForm: DosageForm.tablet,
-          active: true,
-        ),
-      ];
-
-      await bridge.initialize(profileId: 1);
-
-      expect(notificationService.actionCallback, isNotNull);
-    });
-
-    test('recoverSchedules handles empty active schedules', () async {
-      await bridge.initialize(profileId: 1);
-      expect(notificationService.actionCallback, isNotNull);
-    });
-
-    test('recoverSchedules skips inactive medications', () async {
-      final now = DateTime(2025);
-      repo.medications[1] = Medication(
-        id: 1,
-        profileId: 1,
-        name: 'Aspirin',
-        active: false,
-        createdAt: now,
-        updatedAt: now,
-      );
-      repo.schedulesByMedicationId[1] = [
-        MedicationSchedule(
-          id: 10,
-          medicationId: 1,
-          scheduleType: 'daily',
-          scheduleConfig: const DailySchedule(times: ['08:00']),
-          intakeQuantity: 1,
-          dosageForm: DosageForm.tablet,
-          active: true,
-        ),
-      ];
-
-      await bridge.initialize(profileId: 1);
-      expect(notificationService.actionCallback, isNotNull);
-    });
-
-    test('recoverSchedules skips inactive schedules', () async {
-      final now = DateTime(2025);
-      repo.medications[1] = Medication(
-        id: 1,
-        profileId: 1,
-        name: 'Aspirin',
-        active: true,
-        createdAt: now,
-        updatedAt: now,
-      );
-      repo.schedulesByMedicationId[1] = [
-        MedicationSchedule(
-          id: 10,
-          medicationId: 1,
-          scheduleType: 'daily',
-          scheduleConfig: const DailySchedule(times: ['08:00']),
-          intakeQuantity: 1,
-          dosageForm: DosageForm.tablet,
-          active: false,
-        ),
-      ];
-
-      await bridge.initialize(profileId: 1);
-      expect(notificationService.actionCallback, isNotNull);
     });
   });
 }

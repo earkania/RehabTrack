@@ -2634,13 +2634,106 @@ Five logic bugs fixed:
 - `test/next_item_grace_period_test.dart` — 20 tests: repository (default, save all values, persistence, invalid fallback), provider (default, read persisted, save, ignore invalid, reactive)
 - `test/settings_grace_period_test.dart` — 12 widget tests: English/Georgian labels, current value display, dialog opens with 5 options, selection updates tile, narrow-screen layout, radio icon states
 
-### Validation Results (Post-Grace Period Setting)
+### Phase 7B — Reliable Reminder Notifications (2026-07-29)
+
+**Feature**: Medication and measurement reminders now produce reliable sound, vibration, heads-up notifications, and configurable reminder settings.
+
+**Scope**: Notification infrastructure only. No TTS, cloud push, or unrelated health modules. Rolling 30-day horizon with individual (non-recurring) notifications.
+
+**Implementation**:
+
+#### Notification Service (`notification_service.dart`)
+- Added `dart:typed_data` import; vibration pattern changed from `static const` to `static final Int64List`
+- High importance on all three channels (`rehabtrack_medications`, `rehabtrack_measurements`, `rehabtrack_general`)
+- `AndroidNotificationCategory.alarm` for medication/measurement channels
+- Channel creation extracted into `_createChannels()` method
+
+#### Reminder Content Formatter (`reminder_content_formatter.dart`)
+- `Profile? profile` and `DateTime scheduledTime` parameters added to `medicationTitle`, `medicationBody`, `measurementTitle`, `measurementBody`
+- Body includes patient name and "Scheduled for HH:MM" line
+
+#### Notification Action Bridge (`notification_action_bridge.dart`)
+- Full rewrite: accepts `ProfileRepository`, `getSnoozeDuration` callback
+- Snooze uses configurable `Duration` from settings (default 10 min)
+- All action handlers call `_cancelOccurrenceNotifications` before scheduling
+- Recovery passes `profileId` through payload
+- `_buildMedicationRecoveryEntry`/`_buildMeasurementRecoveryEntry` helpers
+- Removed duplicate `fullName` extension on Profile (redundant with entity getter)
+
+#### Reminder Settings (`reminder_settings_provider.dart`)
+- New providers: `medicationRemindersEnabledProvider`, `measurementRemindersEnabledProvider`, `reminderSoundEnabledProvider`, `reminderVibrationEnabledProvider`, `defaultSnoozeDurationProvider`
+- All persisted via `SettingsRepository` key-value store
+
+#### App Constants (`app_constants.dart`)
+- 5 new keys: `medicationRemindersEnabledKey`, `measurementRemindersEnabledKey`, `reminderSoundEnabledKey`, `reminderVibrationEnabledKey`, `defaultSnoozeDurationKey`
+
+#### Notification Provider (`notification_provider.dart`)
+- `NotificationScheduler` now receives `playSound`/`enableVibration` from settings providers
+- Bridge gets `ProfileRepository` + `getSnoozeDuration` from `defaultSnoozeDurationProvider`
+- `notificationInitializerProvider` remains `FutureProvider<void>` with `await`
+- `notificationPermissionProvider` and `exactAlarmPermissionProvider` added
+
+#### Notification Scheduler (`notification_scheduler.dart`)
+- `playSound`/`enableVibration` instance fields with nullable override params in `scheduleSingleOccurrence`
+- Passes through to `NotificationService.scheduleNotification`
+
+#### Settings Screen (`settings_screen.dart`)
+- Full Reminders section with `_buildPermissionTile` for notification + exact alarm permissions
+- Toggle switches for medication/measurement reminders, sound, vibration
+- Snooze duration selector (5/10/15/30/60 min) via `SimpleDialog`
+- Test reminder button schedules notification 5 seconds from now
+- Permission status shows granted/denied with Request button
+
+#### Measurement Schedule List (`measurement_schedule_list_screen.dart`)
+- Delete calls `scheduler.cancelNotificationsInRange` before `repo.deleteSchedule`
+
+#### Localization
+- Added `reminders`, `medicationReminders`, `measurementReminders`, `reminderSound`, `reminderVibration`, `defaultSnoozeDuration`, `notificationPermission`, `exactAlarmAccess`, `permissionGranted`, `permissionDenied`, `testReminder`, `testReminderTitle`, `testReminderBody`, `reminderDetails`, `reminderPermissionExplanation`, `exactAlarmExplanation`, `alarmStyleReminders`, `lockScreenReminderDetails`, `requestPermission`, `scheduleSaved`, `notGranted`, `notRequired`, `request`, `reminderWarningNoPermission`, `reminderWarningNoExactAlarm`, `snoozeMinutes`, `testReminderSent`, `remindersNotAvailable` to both EN and KA
+
+#### Bug Fixes
+- `Int64List` import and `const`→`final` in notification_service.dart
+- `Icons.notifications_settings_outlined` → `Icons.notifications_active_outlined` (non-existent icon)
+- `medication_repository_impl.dart`: formatter calls now pass `medication:`, `profile: null`, `scheduledTime: DateTime.now()` named params
+- `measurement_repository_impl.dart`: same fix for measurement formatter calls
+- Removed unused `fullName` extension on `Profile` from bridge
+
+#### Test Fixes
+- `notification_action_bridge_test.dart`: `FakeNotificationScheduler` now accepts shared `NotificationService`; all 6 action handlers use same scheduler instance; `profile`/`scheduledTime`/`getSnoozeDuration`/`profileRepository` params added
+- `settings_grace_period_test.dart`: `FakeNotificationServiceForSettings` overrides `notificationServiceProvider`; prevents `FlutterLocalNotificationsPlatform._instance` late-init error
+
+**Files Created:**
+- `lib/presentation/providers/reminder_settings_provider.dart`
+
+**Files Modified:**
+- `lib/data/services/notification/notification_service.dart`
+- `lib/data/services/notification/notification_scheduler.dart`
+- `lib/data/services/notification/notification_action_bridge.dart`
+- `lib/data/services/notification/reminder_content_formatter.dart`
+- `lib/presentation/providers/notification_provider.dart`
+- `lib/presentation/screens/settings/settings_screen.dart`
+- `lib/presentation/screens/health/measurement_schedule_list_screen.dart`
+- `lib/core/constants/app_constants.dart`
+- `lib/data/repositories/medication_repository_impl.dart`
+- `lib/data/repositories/measurement_repository_impl.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_ka.arb`
+- `test/notification_action_bridge_test.dart`
+- `test/settings_grace_period_test.dart`
+
+**Not implemented (deferred):**
+- Reminder Details screen and router route
+- In-app reminder banner overlay
+- `main.dart` FutureProvider await fix (current impl works on real device)
+- Notification tap navigation to details
+
+### Validation Results (Post-Phase 7B)
 
 | Check | Result |
 |---|---|
-| `flutter analyze` | Passed (0 issues) |
-| `flutter test` | Passed (746/746) |
-| Pixel 7 verification | Pending user confirmation |
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (8 info lints — pre-existing `prefer_initializing_formals`) |
+| `flutter test` | Passed (736/737; 1 pre-existing failure in `today_screen_test.dart`) |
+| Pixel 7 build/run | APK built and installed successfully |
 
 ### Known Limitations
 

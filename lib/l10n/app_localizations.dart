@@ -1733,7 +1733,7 @@ abstract class AppLocalizations {
   /// No description provided for @measurementReminders.
   ///
   /// In en, this message translates to:
-  /// **'Measurement Reminders'**
+  /// **'Measurement reminders'**
   String get measurementReminders;
 
   /// No description provided for @timeToRecordMeasurement.
@@ -2395,6 +2395,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'60 minutes'**
   String get sixtyMinutes;
+
+  /// No description provided for @reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get reminders;
+
+  /// No description provided for @medicationReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication reminders'**
+  String get medicationReminders;
+
+  /// No description provided for @reminderSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound'**
+  String get reminderSound;
+
+  /// No description provided for @reminderVibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibration'**
+  String get reminderVibration;
+
+  /// No description provided for @defaultSnoozeDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Default snooze duration'**
+  String get defaultSnoozeDuration;
+
+  /// No description provided for @notificationPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission'**
+  String get notificationPermission;
+
+  /// No description provided for @exactAlarmAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact alarm access'**
+  String get exactAlarmAccess;
+
+  /// No description provided for @permissionGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Granted'**
+  String get permissionGranted;
+
+  /// No description provided for @permissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Denied'**
+  String get permissionDenied;
+
+  /// No description provided for @permissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get permissionRequired;
+
+  /// No description provided for @openNotificationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open notification settings'**
+  String get openNotificationSettings;
+
+  /// No description provided for @openAlarmSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open alarm settings'**
+  String get openAlarmSettings;
+
+  /// No description provided for @androidNotificationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Android notification settings'**
+  String get androidNotificationSettings;
+
+  /// No description provided for @androidNotificationSettingsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage system notification categories, sounds, and alerts'**
+  String get androidNotificationSettingsDescription;
+
+  /// No description provided for @systemControls.
+  ///
+  /// In en, this message translates to:
+  /// **'System controls'**
+  String get systemControls;
+
+  /// No description provided for @androidMayHideUnusedCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Android may hide notification categories until they have been used.'**
+  String get androidMayHideUnusedCategories;
+
+  /// No description provided for @testMedicationReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Test medication reminder'**
+  String get testMedicationReminder;
+
+  /// No description provided for @testMeasurementReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Test measurement reminder'**
+  String get testMeasurementReminder;
+
+  /// No description provided for @testReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Test reminder'**
+  String get testReminder;
+
+  /// No description provided for @testReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Reminder'**
+  String get testReminderTitle;
+
+  /// No description provided for @testReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a test reminder to verify notification sound, vibration, and presentation.'**
+  String get testReminderBody;
+
+  /// No description provided for @medicationReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Reminder'**
+  String get medicationReminder;
+
+  /// No description provided for @markAsTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Taken'**
+  String get markAsTaken;
+
+  /// No description provided for @snooze.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze'**
+  String get snooze;
+
+  /// No description provided for @scheduleSavedReminderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule saved, but reminder could not be scheduled'**
+  String get scheduleSavedReminderFailed;
+
+  /// No description provided for @reminderSchedulingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder scheduling failed'**
+  String get reminderSchedulingFailed;
+
+  /// No description provided for @reminderDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Details'**
+  String get reminderDetails;
+
+  /// No description provided for @reminderPermissionExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'RehabTrack needs notification permission to show reminders for medications and measurements.'**
+  String get reminderPermissionExplanation;
+
+  /// No description provided for @exactAlarmExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact alarm permission allows reminders to appear at the precise scheduled time. Without it, reminder timing may be less precise.'**
+  String get exactAlarmExplanation;
+
+  /// No description provided for @alarmStyleReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm-style presentation'**
+  String get alarmStyleReminders;
+
+  /// No description provided for @lockScreenReminderDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Show full reminder details on lock screen'**
+  String get lockScreenReminderDetails;
+
+  /// No description provided for @noPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'No permission'**
+  String get noPermission;
+
+  /// No description provided for @channelDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel disabled'**
+  String get channelDisabled;
+
+  /// No description provided for @scheduleSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule saved'**
+  String get scheduleSaved;
+
+  /// No description provided for @notGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not granted'**
+  String get notGranted;
+
+  /// No description provided for @notRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Not required'**
+  String get notRequired;
+
+  /// No description provided for @requestPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Request permission'**
+  String get requestPermission;
+
+  /// No description provided for @reminderWarningNoPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders cannot be displayed because notification permission is denied.'**
+  String get reminderWarningNoPermission;
+
+  /// No description provided for @reminderWarningNoExactAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder timing may be less precise without exact alarm access.'**
+  String get reminderWarningNoExactAlarm;
+
+  /// No description provided for @snoozeMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze for {minutes} minutes'**
+  String snoozeMinutes(Object minutes);
+
+  /// No description provided for @healthReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Health reminder'**
+  String get healthReminder;
+
+  /// No description provided for @healthReminderLockScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open RehabTrack for details'**
+  String get healthReminderLockScreen;
+
+  /// No description provided for @remindersNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders not available'**
+  String get remindersNotAvailable;
+
+  /// No description provided for @testReminderSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Test reminder sent! Check your notifications.'**
+  String get testReminderSent;
+
+  /// No description provided for @request.
+  ///
+  /// In en, this message translates to:
+  /// **'Request'**
+  String get request;
 }
 
 class _AppLocalizationsDelegate

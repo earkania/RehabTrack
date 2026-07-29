@@ -1210,4 +1210,152 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get sixtyMinutes => '60 წუთი';
+
+  @override
+  String get reminders => 'შეხსენებები';
+
+  @override
+  String get medicationReminders => 'მედიკამენტების შეხსენებები';
+
+  @override
+  String get reminderSound => 'ხმა';
+
+  @override
+  String get reminderVibration => 'ვიბრაცია';
+
+  @override
+  String get defaultSnoozeDuration => 'გადადების ხანგრძლივობა';
+
+  @override
+  String get notificationPermission => 'შეტყობინების ნებართვა';
+
+  @override
+  String get exactAlarmAccess => 'ზუსტი მაღვიძარას წვდომა';
+
+  @override
+  String get permissionGranted => 'ნებადართულია';
+
+  @override
+  String get permissionDenied => 'აკრძალულია';
+
+  @override
+  String get permissionRequired => 'საჭიროა';
+
+  @override
+  String get openNotificationSettings => 'შეტყობინებების პარამეტრები';
+
+  @override
+  String get openAlarmSettings => 'მაღვიძარას პარამეტრები';
+
+  @override
+  String get androidNotificationSettings =>
+      'Android შეტყობინებების პარამეტრები';
+
+  @override
+  String get androidNotificationSettingsDescription =>
+      'მართეთ სისტემური შეტყობინებების კატეგორიები, ხმები და გაფრთხილებები';
+
+  @override
+  String get systemControls => 'სისტემური კონტროლი';
+
+  @override
+  String get androidMayHideUnusedCategories =>
+      'Android-მა შეიძლება დამალოს კატეგორიები, სანამ ისინი არ გამოიყენება.';
+
+  @override
+  String get testMedicationReminder => 'მედიკამენტის ტესტური შეხსენება';
+
+  @override
+  String get testMeasurementReminder => 'გაზომვის ტესტური შეხსენება';
+
+  @override
+  String get testReminder => 'ტესტური შეხსენება';
+
+  @override
+  String get testReminderTitle => 'ტესტური შეხსენება';
+
+  @override
+  String get testReminderBody =>
+      'ეს არის ტესტური შეხსენება შეტყობინების ხმის, ვიბრაციის და გამოჩენის შესამოწმებლად.';
+
+  @override
+  String get medicationReminder => 'მედიკამენტის შეხსენება';
+
+  @override
+  String get markAsTaken => 'მიღებულია';
+
+  @override
+  String get snooze => 'გადადება';
+
+  @override
+  String get scheduleSavedReminderFailed =>
+      'გრაფიკი შენახულია, მაგრამ შეხსენების დაგეგმვა ვერ მოხერხდა';
+
+  @override
+  String get reminderSchedulingFailed => 'შეხსენების დაგეგმვა ვერ მოხერხდა';
+
+  @override
+  String get reminderDetails => 'შეხსენების დეტალები';
+
+  @override
+  String get reminderPermissionExplanation =>
+      'RehabTrack-ს სჭირდება შეტყობინების ნებართვა მედიკამენტების და გაზომვების შეხსენებების ჩვენებისთვის.';
+
+  @override
+  String get exactAlarmExplanation =>
+      'ზუსტი მაღვიძარას ნებართვა საშუალებას აძლევს შეხსენებებს გამოჩნდეს ზუსტად დაგეგმილ დროს. მის გარეშე, შეხსენების დრო შეიძლება იყოს ნაკლებად ზუსტი.';
+
+  @override
+  String get alarmStyleReminders => 'მაღვიძარას სტილის პრეზენტაცია';
+
+  @override
+  String get lockScreenReminderDetails =>
+      'სრული შეხსენების დეტალების ჩვენება ჩაკეტილ ეკრანზე';
+
+  @override
+  String get noPermission => 'ნებართვა არ არის';
+
+  @override
+  String get channelDisabled => 'არხი გამორთულია';
+
+  @override
+  String get scheduleSaved => 'გრაფიკი შენახულია';
+
+  @override
+  String get notGranted => 'მინიჭებული არ არის';
+
+  @override
+  String get notRequired => 'არ არის საჭირო';
+
+  @override
+  String get requestPermission => 'ნებართვის მოთხოვნა';
+
+  @override
+  String get reminderWarningNoPermission =>
+      'შეხსენებების ჩვენება შეუძლებელია, რადგან შეტყობინების ნებართვა აკრძალულია.';
+
+  @override
+  String get reminderWarningNoExactAlarm =>
+      'შეხსენების დრო შეიძლება იყოს ნაკლებად ზუსტი ზუსტი მაღვიძარას წვდომის გარეშე.';
+
+  @override
+  String snoozeMinutes(Object minutes) {
+    return 'გადადება $minutes წუთით';
+  }
+
+  @override
+  String get healthReminder => 'ჯანმრთელობის შეხსენება';
+
+  @override
+  String get healthReminderLockScreen => 'გახსენით RehabTrack დეტალებისთვის';
+
+  @override
+  String get remindersNotAvailable => 'შეხსენებები მიუწვდომელია';
+
+  @override
+  String get testReminderSent =>
+      'ტესტური შეხსენება გაიგზავნა! შეამოწმეთ შეტყობინებები.';
+
+  @override
+  String get request => 'მოთხოვნა';
 }

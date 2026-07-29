@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
+import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
@@ -11,9 +12,9 @@ import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/widgets/common/date_field.dart';
-import 'package:rehab_track/data/services/notification/measurement_notification_helper.dart';
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
+import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 
 enum ScheduleType { daily, intervalDays }
 
@@ -126,8 +127,15 @@ class _MeasurementScheduleScreenState
         }
 
         try {
-          await scheduler.cancelNotification(
-            MeasurementNotificationHelper.baseNotificationId(existing.id!),
+          await scheduler.cancelNotificationsInRange(
+            scheduleId: existing.id!,
+            config: existing.isDaily
+                ? DailySchedule(times: [existing.time])
+                : IntervalDaysSchedule(
+                    intervalDays: existing.intervalDays ?? 1,
+                    times: [existing.time],
+                  ),
+            isMeasurement: true,
           );
         } catch (_) {
           // Notification cancellation is non-critical
@@ -217,10 +225,19 @@ class _MeasurementScheduleScreenState
       );
       final typeName = type?.name ?? 'Measurement';
 
-      final notifPayload = MeasurementNotificationHelper.buildPayload(
-        scheduleId: schedule.id!,
-        measurementTypeId: schedule.measurementTypeId,
+      final config = schedule.isDaily
+          ? DailySchedule(times: [schedule.time])
+          : IntervalDaysSchedule(
+              intervalDays: schedule.intervalDays ?? 1,
+              times: [schedule.time],
+            );
+
+      final payload = ReminderPayload(
+        type: ReminderType.measurement,
         profileId: profileId,
+        scheduleId: schedule.id!,
+        occurrenceTime: DateTime.now().toIso8601String(),
+        measurementTypeId: schedule.measurementTypeId,
       );
 
       final bodyParts = <String>[];
@@ -231,33 +248,18 @@ class _MeasurementScheduleScreenState
       }
       final body = bodyParts.join(' — ');
 
-      final notificationId =
-          MeasurementNotificationHelper.computeNotificationId(
-        schedule.id!,
+      await scheduler.scheduleOccurrences(
+        scheduleId: schedule.id!,
+        title: typeName,
+        body: body,
+        config: config,
+        channelId: NotificationService.measurementChannelId,
+        payload: payload.toJsonString(),
+        includeActions: true,
+        isMeasurement: true,
+        startDate: schedule.startDate,
+        endDate: schedule.endDate,
       );
-
-      if (schedule.isIntervalDays && schedule.intervalDays != null) {
-        await scheduler.scheduleSingleIntervalNotification(
-          notificationId: notificationId,
-          title: 'Time to record $typeName',
-          body: body,
-          time: schedule.time,
-          intervalDays: schedule.intervalDays!,
-          channelType: NotificationChannelType.measurement,
-          payload: notifPayload,
-          includeActions: true,
-        );
-      } else {
-        await scheduler.scheduleSingleNotification(
-          notificationId: notificationId,
-          title: 'Time to record $typeName',
-          body: body,
-          time: schedule.time,
-          channelType: NotificationChannelType.measurement,
-          payload: notifPayload,
-          includeActions: true,
-        );
-      }
     } catch (_) {
       // Notification scheduling is non-critical — the schedule was saved.
       // Do not report failure to the user.
