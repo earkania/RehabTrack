@@ -820,26 +820,26 @@ void main() {
   });
 
   group('NextItemCard', () {
-    testWidgets('shows correct next item (21:32 example)', (tester) async {
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
+    testWidgets('shows earliest non-past non-completed item', (tester) async {
+      final fixedNow = DateTime(2025, 7, 25, 10, 0);
+      final today = DateTime(2025, 7, 25);
       final agenda = TodayAgenda(
         date: today,
         items: [
           TodayAgendaItem(
-            id: 'overdue',
+            id: 'past',
             type: TodayAgendaItemType.medication,
             sourceScheduleId: 1,
-            scheduledDateTime: today.add(const Duration(hours: 10)),
-            title: 'Concor',
+            scheduledDateTime: DateTime(2025, 7, 25, 8, 0),
+            title: 'Medication A',
             status: TodayAgendaItemStatus.overdue,
           ),
           TodayAgendaItem(
-            id: 'upcoming',
+            id: 'future',
             type: TodayAgendaItemType.medication,
             sourceScheduleId: 2,
-            scheduledDateTime: today.add(const Duration(days: 1, hours: 10)),
-            title: 'Physiotens',
+            scheduledDateTime: DateTime(2025, 7, 25, 14, 0),
+            title: 'Medication B',
             status: TodayAgendaItemStatus.upcoming,
           ),
         ],
@@ -848,7 +848,14 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [todayAgendaProvider.overrideWith((_) async => agenda)],
+          overrides: [
+            todayAgendaProvider.overrideWith((_) async => agenda),
+            nextTodayItemProvider.overrideWith((ref) {
+              return agenda.nextItem(now: fixedNow, graceWindow: const Duration(minutes: 15));
+            }),
+            selectedAgendaDateProvider.overrideWith((_) => today),
+            todayAutoRefreshProvider.overrideWith((ref) {}),
+          ],
           child: MaterialApp(
             localizationsDelegates: const [
               AppLocalizations.delegate,
@@ -863,8 +870,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Physiotens'), findsOneWidget);
-      expect(find.textContaining('Concor'), findsNothing);
+      expect(find.textContaining('Medication B'), findsOneWidget);
+      expect(find.textContaining('Medication A'), findsNothing);
     });
   });
 

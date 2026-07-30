@@ -7,8 +7,10 @@ import 'package:rehab_track/domain/repositories/settings_repository.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
+final nowProvider = Provider<DateTime>((ref) => DateTime.now());
+
 final selectedAgendaDateProvider = StateProvider<DateTime>((ref) {
-  final now = DateTime.now();
+  final now = ref.watch(nowProvider);
   return DateTime(now.year, now.month, now.day);
 });
 
@@ -95,11 +97,11 @@ final nextDailyItemProvider = Provider<TodayAgendaItem?>((ref) {
   final agenda = ref.watch(dailyAgendaProvider);
   final selectedDate = ref.watch(selectedAgendaDateProvider);
   final gracePeriodMinutes = ref.watch(nextItemGracePeriodProvider);
-  final now = DateTime.now();
+  final now = ref.watch(nowProvider);
   final today = DateTime(now.year, now.month, now.day);
   if (!selectedDate.isAtSameMomentAs(today)) return null;
   return agenda.when(
-    data: (data) => data.nextItem(graceWindow: Duration(minutes: gracePeriodMinutes)),
+    data: (data) => data.nextItem(now: now, graceWindow: Duration(minutes: gracePeriodMinutes)),
     loading: () => null,
     error: (_, _) => null,
   );
