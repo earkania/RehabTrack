@@ -26,6 +26,7 @@ class NotificationScheduler {
     required ScheduleConfig config,
     required String channelId,
     String? payload,
+    String Function(tz.TZDateTime occDateTime)? perOccurrencePayload,
     bool includeActions = false,
     bool isMeasurement = false,
     DateTime? startDate,
@@ -66,13 +67,17 @@ class NotificationScheduler {
               slotIndex: slotIndex,
             );
 
+      final occPayload = perOccurrencePayload != null
+          ? perOccurrencePayload(occ.dateTime)
+          : payload;
+
       try {
         await _notificationService.scheduleNotification(
           id: notificationId,
           title: title,
           body: body,
           scheduledDate: occ.dateTime,
-          payload: payload,
+          payload: occPayload,
           channelId: channelId,
           includeActions: includeActions,
           isMeasurement: isMeasurement,

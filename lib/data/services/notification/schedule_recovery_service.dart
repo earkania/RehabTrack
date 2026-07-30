@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../notification/notification_scheduler.dart';
 import '../notification/notification_service.dart';
@@ -32,6 +33,7 @@ class ScheduleRecoveryService {
           config: entry.config,
           channelId: entry.channelId,
           payload: entry.payload,
+          perOccurrencePayload: entry.perOccurrencePayload,
           includeActions: entry.includeActions,
           isMeasurement: entry.isMeasurement,
           startDate: entry.startDate,
@@ -48,13 +50,14 @@ class ScheduleRecoveryService {
 }
 
 class ScheduleRecoveryEntry {
-  const ScheduleRecoveryEntry({
+  ScheduleRecoveryEntry({
     required this.scheduleId,
     required this.title,
     required this.body,
     required this.config,
     required this.channelId,
     this.payload,
+    this.perOccurrencePayload,
     this.includeActions = false,
     this.isMeasurement = false,
     required this.profileId,
@@ -68,6 +71,7 @@ class ScheduleRecoveryEntry {
   final dynamic config;
   final String channelId;
   final String? payload;
+  final String Function(tz.TZDateTime occDateTime)? perOccurrencePayload;
   final bool includeActions;
   final bool isMeasurement;
   final int profileId;

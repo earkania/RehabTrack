@@ -328,33 +328,54 @@ class MedicationRepositoryImpl implements MedicationRepository {
       final medication = await getMedication(schedule.medicationId);
       if (medication == null) return;
 
-      final payload = ReminderPayload(
-        type: ReminderType.medication,
-        profileId: medication.profileId,
-        scheduleId: schedule.id!,
-        occurrenceTime: DateTime.now().toIso8601String(),
-        medicationId: medication.id,
+      // Medication strength is stored in medicationComponents (not on the medication
+      // itself). Fetch components to get the dose info for the notification title.
+      String? doseAmount = medication.doseAmount;
+      String? doseUnit = medication.doseUnit;
+      if ((doseAmount == null || doseAmount.isEmpty) && medication.id != null) {
+        final components = await getComponents(medication.id!);
+        if (components.isNotEmpty) {
+          final first = components.first;
+          doseAmount = first.doseAmount;
+          doseUnit = first.doseUnit;
+        }
+      }
+
+      final title = ReminderContentFormatter.medicationTitle(
+        medication: medication,
+        profile: null,
+        doseAmount: doseAmount,
+        doseUnit: doseUnit,
+      );
+      log('[MedicationRepository] scheduling: medId=${medication.id} name="${medication.name}" '
+          'doseAmount="$doseAmount" doseUnit="$doseUnit" '
+          'title="$title"');
+      final body = ReminderContentFormatter.medicationBody(
+        medication: medication,
+        profile: null,
+        schedule: schedule,
+        scheduledTime: DateTime.now(),
       );
 
       await scheduler.scheduleOccurrences(
         scheduleId: schedule.id!,
-        title: ReminderContentFormatter.medicationTitle(
-          medication: medication,
-          profile: null,
-        ),
-        body: ReminderContentFormatter.medicationBody(
-          medication: medication,
-          profile: null,
-          schedule: schedule,
-          scheduledTime: DateTime.now(),
-        ),
+        title: title,
+        body: body,
         config: schedule.scheduleConfig,
         channelId: NotificationService.medicationChannelId,
-        payload: payload.toJsonString(),
         includeActions: true,
         isMeasurement: false,
         startDate: schedule.startDate,
         endDate: schedule.endDate,
+        perOccurrencePayload: (occDateTime) {
+          return ReminderPayload(
+            type: ReminderType.medication,
+            profileId: medication.profileId,
+            scheduleId: schedule.id!,
+            occurrenceTime: occDateTime.toIso8601String(),
+            medicationId: medication.id,
+          ).toJsonString();
+        },
       );
     } catch (e, stack) {
       log('[MedicationRepository] scheduleNotifications FAILED: $e');

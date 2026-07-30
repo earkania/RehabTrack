@@ -232,14 +232,6 @@ class _MeasurementScheduleScreenState
               times: [schedule.time],
             );
 
-      final payload = ReminderPayload(
-        type: ReminderType.measurement,
-        profileId: profileId,
-        scheduleId: schedule.id!,
-        occurrenceTime: DateTime.now().toIso8601String(),
-        measurementTypeId: schedule.measurementTypeId,
-      );
-
       final bodyParts = <String>[];
       bodyParts.add('Please record your ${typeName.toLowerCase()}');
       if (schedule.instructions != null &&
@@ -254,11 +246,19 @@ class _MeasurementScheduleScreenState
         body: body,
         config: config,
         channelId: NotificationService.measurementChannelId,
-        payload: payload.toJsonString(),
         includeActions: true,
         isMeasurement: true,
         startDate: schedule.startDate,
         endDate: schedule.endDate,
+        perOccurrencePayload: (occDateTime) {
+          return ReminderPayload(
+            type: ReminderType.measurement,
+            profileId: profileId,
+            scheduleId: schedule.id!,
+            occurrenceTime: occDateTime.toIso8601String(),
+            measurementTypeId: schedule.measurementTypeId,
+          ).toJsonString();
+        },
       );
     } catch (_) {
       // Notification scheduling is non-critical — the schedule was saved.

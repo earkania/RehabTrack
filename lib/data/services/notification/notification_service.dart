@@ -41,7 +41,6 @@ void _handleNotificationResponse(NotificationResponse response) {
   if (response.actionId == null || response.actionId!.isEmpty) {
     final tapCallback = _notificationTapCallback;
     if (tapCallback != null) {
-      debugPrint('[NotificationService] notification tap, invoking navigation callback');
       tapCallback();
     }
     return;
@@ -312,17 +311,17 @@ class NotificationService {
     AndroidNotificationAction(
       'medication_mark_taken',
       'Mark as Taken',
-      showsUserInterface: false,
+      showsUserInterface: true,
     ),
     AndroidNotificationAction(
       'medication_snooze',
       'Snooze',
-      showsUserInterface: false,
+      showsUserInterface: true,
     ),
     AndroidNotificationAction(
       'medication_skip',
       'Skip',
-      showsUserInterface: false,
+      showsUserInterface: true,
     ),
   ];
 
@@ -330,17 +329,17 @@ class NotificationService {
     AndroidNotificationAction(
       'measurement_record_now',
       'Record Now',
-      showsUserInterface: false,
+      showsUserInterface: true,
     ),
     AndroidNotificationAction(
       'measurement_snooze',
       'Snooze',
-      showsUserInterface: false,
+      showsUserInterface: true,
     ),
     AndroidNotificationAction(
       'measurement_skip',
       'Skip',
-      showsUserInterface: false,
+      showsUserInterface: true,
     ),
   ];
 

@@ -3,13 +3,17 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/router/app_router.dart';
+import '../../core/router/app_routes.dart';
 import '../../data/services/notification/notification_action_bridge.dart';
+import '../../data/services/notification/notification_action_handler.dart';
 import '../../data/services/notification/notification_scheduler.dart';
 import '../../data/services/notification/notification_service.dart';
 import '../../data/services/notification/schedule_recovery_service.dart';
 import 'database_provider.dart';
 import 'profile_provider.dart';
 import 'reminder_settings_provider.dart';
+import 'today_provider.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   final service = NotificationService();
@@ -64,6 +68,32 @@ final notificationActionBridgeProvider =
     showDetailsOnLockScreen: () {
       return ref.read(showDetailsOnLockScreenProvider);
     },
+    onActionProcessed: (actionType, payload) {
+      ref.invalidate(todayAgendaProvider);
+      final now = DateTime.now();
+      ref.read(selectedAgendaDateProvider.notifier).state =
+          DateTime(now.year, now.month, now.day);
+      try {
+        if (actionType == NotificationActionType.measurementRecordNow &&
+            payload.measurementTypeId != null) {
+          final scheduledTime = payload.occurrenceDateTime ?? now;
+          final extra = RecordNowExtra(
+            reminderScheduleId: payload.scheduleId,
+            scheduledOccurrenceTime: scheduledTime,
+          );
+          // Navigate to Today first so the user can press back to return.
+          ref.read(routerProvider).go(AppRoutes.home);
+          ref.read(routerProvider).push(
+            AppRoutes.measurementAdd(payload.measurementTypeId!),
+            extra: extra,
+          );
+        } else {
+          ref.read(routerProvider).go(AppRoutes.home);
+        }
+      } catch (_) {
+        // Navigation may fail during initialization before router is ready.
+      }
+    },
   );
   return bridge;
 });
@@ -98,6 +128,15 @@ final notificationInitializerProvider = FutureProvider<void>((ref) async {
 
   // Process any pending actions that were stored by the background callback.
   await bridge.processPendingActions();
+
+  // Check if app was launched by a notification action (terminated process case).
+  await bridge.processAppLaunchAction();
+
+  // Invalidate the agenda so it re-fetches after any actions processed above.
+  // The onActionProcessed callback on the bridge also handles live taps, but
+  // during initialization the agenda may not have been read yet, so invalidate
+  // explicitly here.
+  ref.invalidate(todayAgendaProvider);
 
   // Recovery runs after a short delay to let DB queries settle.
   await Future.delayed(const Duration(seconds: 2));

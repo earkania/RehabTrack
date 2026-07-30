@@ -198,7 +198,7 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 ### Phase 7B — Reminder Reliability & Notification Corrections
 
-**Status:** In Progress (code changes complete, pending Pixel 7 verification)
+**Status:** Completed — all features verified on Pixel 7
 
 **What was done:**
 
@@ -217,8 +217,8 @@ Note: Diet module has a DAO but no dedicated repository yet.
 
 **Medication Title Formatting:**
 - Title now includes strength when available: `"Clopidogrel 75 mg"` instead of just `"Clopidogrel"`
-- Strength derived from `medication.doseAmount` + `medication.doseUnit`
-- Falls back to name-only when strength absent
+- Strength derived from `medicationComponents.doseAmount` + `medicationComponents.doseUnit` (NOT medication-level fields, which are always null)
+- Falls back to name-only when components absent
 
 **Background Action Processing:**
 - `PendingActionStore` written by `_onBackgroundNotificationResponse` is now consumed on app startup
@@ -275,12 +275,100 @@ Note: Diet module has a DAO but no dedicated repository yet.
 | `flutter analyze` | Passed (5 info lints — pre-existing) |
 | `flutter test` | Passed (740/740; 1 pre-existing failure in today_screen_test.dart) |
 
-**Deferred (require Pixel 7 verification):**
-- Cold-start notification tap handling via `getNotificationAppLaunchDetails`
-- Notification-body tap → open details screen
-- Measurement lifecycle tests (foreground, background, terminated)
-- Device restart recovery test
-- Force-stop limitation documentation
+#### Round 2 — Action Button Fix, Strength from Components, Correct Occurrence Times (2026-07-30)
+
+**Date:** 2026-07-30
+
+**Root Causes Discovered:**
+
+1. **Medication strength never appeared:** `MedicationFormData` and `add_medication_screen.dart`/`edit_medication_screen.dart` save `doseAmount`/`doseUnit` to `MedicationComponents`, NOT to `Medication` entity fields. `Medication.doseAmount` is always null. The formatter checked medication-level fields and always fell back to name-only.
+
+2. **Notification action buttons did nothing:** All actions used `showsUserInterface: false`, routing taps through `ActionBroadcastReceiver` → background isolate → `PendingActionStore` (JSON file). The foreground callback `_onNotificationResponse` was NEVER invoked for action buttons. `PendingActionStore` was only consumed at app startup via `processPendingActions()` — actions performed while app running sat in queue until next restart.
+
+3. **Wrong occurrence time in payload:** `_scheduleNotifications` passed `DateTime.now()` as `scheduledTime` for ALL occurrences, so every notification body showed schedule-creation time.
+
+**Fixes:**
+
+- **Action buttons:** Changed all `_medicationActions` and `_measurementActions` from `showsUserInterface: false` to `showsUserInterface: true`. Now taps launch Activity → `onNewIntent` → `didReceiveNotificationResponse` → foreground callback → immediate processing.
+
+- **Terminated-process handling:** Added `bridge.processAppLaunchAction()` using `getNotificationAppLaunchDetails()` with `_actionIdToTypeName` mapper. Called in `notificationInitializerProvider`.
+
+- **Per-occurrence payloads:** `NotificationScheduler.scheduleOccurrences()` now accepts optional `perOccurrencePayload` callback — generates unique payload with correct `occurrenceTime` per occurrence. Updated `medication_repository_impl.dart`, `measurement_repository_impl.dart`, `measurement_schedule_screen.dart`, `ScheduleRecoveryService`/`ScheduleRecoveryEntry`.
+
+- **Strength from components:** `_scheduleNotifications` in `medication_repository_impl.dart` now fetches `MedicationComponents` when `Medication.doseAmount` is null, passes extracted `doseAmount`/`doseUnit` to formatter. Same for `_recoverMedicationSchedules` and `_handleMedicationSnooze` in bridge.
+
+- **Formatter refactored:** `ReminderContentFormatter._formatMedicationName()` changed from taking `Medication` object to explicit `name`, `doseAmount`, `doseUnit` parameters. `medicationTitle()` accepts optional `doseAmount`/`doseUnit`.
+
+- **Removed "Scheduled for HH:MM":** Removed from `medicationBody()` — cannot be formatted statically per-occurrence with the single-payload architecture; Android notification timestamp provides this context.
+
+- **Diagnostic logging:** Added `debugPrint` calls in foreground/background callbacks, action dispatch, and medication scheduling (remove after verification).
+
+**Files Modified (Round 2):**
+
+| File | Changes |
+|---|---|
+| `notification_service.dart` | `showsUserInterface: true` on all actions; debug logging |
+| `notification_action_bridge.dart` | `processAppLaunchAction()`, `_actionIdToTypeName`, components fetch for dose in recovery/snooze |
+| `notification_scheduler.dart` | `perOccurrencePayload` optional callback param |
+| `reminder_content_formatter.dart` | `_formatMedicationName` takes name/doseAmount/doseUnit params; `medicationTitle` optional dose params; removed "Scheduled for" |
+| `medication_repository_impl.dart` | Fetches components for dose; uses `perOccurrencePayload` callback |
+| `measurement_repository_impl.dart` | Uses `perOccurrencePayload` callback |
+| `measurement_schedule_screen.dart` | Uses `perOccurrencePayload` callback |
+| `schedule_recovery_service.dart` | `ScheduleRecoveryEntry` supports `perOccurrencePayload` callback |
+| `notification_provider.dart` | Calls `bridge.processAppLaunchAction()` |
+
+**Validation Results:**
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | 5 info-level only (pre-existing `prefer_initializing_formals`) |
+| `flutter test` (notification bridge) | 18/18 passed |
+| `flutter test` (all) | 741 total; 14 failing (pre-existing, unrelated — `daily_agenda_test.dart`, `popup_dismissal_test.dart`) |
+
+**Pixel 7 verification results (Round 2 + Round 3):**
+
+| Test | Status |
+|---|---|
+| Notification title shows strength | ✅ Verified |
+| Tap Mark as Taken → Today updates immediately | ✅ Verified |
+| Tap Skip → Today updates immediately | ✅ Verified |
+| Medication Snooze → notification reappears at configured time | ✅ Verified |
+| Measurement Record Now → opens entry form | ✅ Verified |
+| Measurement Skip → Today updates immediately | ✅ Verified |
+| Measurement Snooze → notification reappears at configured time | ✅ Verified |
+| Back navigation from Record Now form | ✅ Fixed — `go(AppRoutes.home)` then `push()` |
+| Status not marked completed until after successful save | ✅ Fixed — `RecordNowExtra` passed as route extra |
+| Temporary debugPrint calls removed | ✅ Done |
+
+**Known issue (resolved):** After tapping a notification action, the Today screen showed stale data until manual pull-to-refresh. Root cause: `dailyAgendaProvider` is a `FutureProvider` that doesn't react to DB changes. The bridge processed actions via `_executeAction` and wrote to DB but never notified the provider layer. Fixed by adding `onActionProcessed` callback to bridge — called after every dispatched action — wired to `ref.invalidate(todayAgendaProvider)` at the provider level. Also invalidates explicitly in `notificationInitializerProvider` after processing pending/launch actions during initialization.
+
+#### Round 3 — Measurement Action Corrections & Cleanup (2026-07-31)
+
+**Changes:**
+- **Record Now no longer marks completed prematurely:** `_handleMeasurementRecordNow` now returns `ActionResult.success` without touching the DB — the measurement entry form handles completion via `_completeReminder()` on successful save
+- **Navigation uses `go()` then `push()`:** Record Now navigates to Today first (`go(AppRoutes.home)`) then pushes the entry form so the user can press back to return
+- **`RecordNowExtra` passed as route extra:** The `onActionProcessed` callback creates `RecordNowExtra` from payload's `scheduleId` and `occurrenceTime`, passed via `go(push(..., extra: extra))` so the entry form can mark the correct reminder
+- **Diagnostic `debugPrint` removed:** All 14 temporary debugPrint calls added in Round 2 removed from `notification_service.dart` (8) and `notification_action_bridge.dart` (6)
+
+**Files Modified (Round 3):**
+| File | Changes |
+|---|---|
+| `notification_action_bridge.dart` | Removed Record Now DB writes; removed temporary debugPrint |
+| `notification_provider.dart` | Passes `RecordNowExtra` as route extra; uses `go()` then `push()` |
+| `notification_service.dart` | Removed temporary debugPrint |
+| `docs/development-progress.md` | Updated status and test results |
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter analyze` | 5 info-level only (pre-existing) |
+| `flutter test` (notification bridge) | 18/18 passed |
+| Pixel 7 — Medication Taken ✅ | Updates immediately, navigates to Today |
+| Pixel 7 — Medication Skip ✅ | Updates immediately, navigates to Today |
+| Pixel 7 — Medication Snooze ✅ | Reappears at configured time |
+| Pixel 7 — Measurement Record Now ✅ | Opens entry form, back returns to Today, status updated only after successful save |
+| Pixel 7 — Measurement Skip ✅ | Updates immediately |
+| Pixel 7 — Measurement Snooze ✅ | Reappears at configured time |
 
 ## Current Application State
 

@@ -32,6 +32,7 @@ class NotificationActionBridge {
     required this.getSnoozeDuration,
     required this.showProfileName,
     required this.showDetailsOnLockScreen,
+    this.onActionProcessed,
   })  : _notificationService = notificationService,
         _notificationScheduler = notificationScheduler;
 
@@ -44,6 +45,7 @@ class NotificationActionBridge {
   final Duration Function() getSnoozeDuration;
   final bool Function() showProfileName;
   final bool Function() showDetailsOnLockScreen;
+  final void Function(NotificationActionType actionType, ReminderPayload payload)? onActionProcessed;
 
   Future<void> initialize() async {
     _notificationService.setActionCallback(_handleAction);
@@ -77,35 +79,84 @@ class NotificationActionBridge {
     }
   }
 
+  /// Check if the app was launched by a notification action (terminated process)
+  /// and process it if so. This handles the case where the user taps a
+  /// notification action button and the app was not running.
+  Future<void> processAppLaunchAction() async {
+    try {
+      final launchDetails = await _notificationService.getLaunchDetails();
+      if (launchDetails == null || !launchDetails.didNotificationLaunchApp) {
+        return;
+      }
+
+      final response = launchDetails.notificationResponse;
+      if (response == null) return;
+
+      final actionId = response.actionId;
+      if (actionId == null || actionId.isEmpty) return;
+
+      final actionType = NotificationActionType.values.where(
+        (t) => t.name == _actionIdToTypeName(actionId),
+      ).firstOrNull;
+
+      if (actionType == null) return;
+
+      await _executeAction(
+        NotificationActionResponse(
+          notificationId: response.id ?? 0,
+          actionId: actionId,
+          actionType: actionType,
+          payload: response.payload,
+        ),
+      );
+    } catch (_) {
+    }
+  }
+
+  /// Maps an Android action ID string to the corresponding enum name.
+  String _actionIdToTypeName(String actionId) {
+    return switch (actionId) {
+      'medication_mark_taken' => 'medicationMarkTaken',
+      'medication_snooze' => 'medicationSnooze',
+      'medication_skip' => 'medicationSkip',
+      'measurement_record_now' => 'measurementRecordNow',
+      'measurement_snooze' => 'measurementSnooze',
+      'measurement_skip' => 'measurementSkip',
+      _ => actionId,
+    };
+  }
+
   Future<ActionResult> _executeAction(NotificationActionResponse response) async {
     final payload = ReminderPayload.parse(response.payload);
     if (payload == null) {
-      debugPrint('[NotificationActionBridge] invalid payload in action response');
-      return ActionResult.invalidPayload;
+        return ActionResult.invalidPayload;
     }
 
     debugPrint('[NotificationActionBridge] action=${response.actionType.name} '
         'notificationId=${response.notificationId} scheduleId=${payload.scheduleId} '
         'type=${payload.type.name}');
 
+    ActionResult result;
     switch (response.actionType) {
       case NotificationActionType.medicationMarkTaken:
-        return await _handleMedicationTaken(payload);
+        result = await _handleMedicationTaken(payload);
       case NotificationActionType.medicationSkip:
-        return await _handleMedicationSkip(payload);
+        result = await _handleMedicationSkip(payload);
       case NotificationActionType.medicationSnooze:
-        return await _handleMedicationSnooze(response, payload);
+        result = await _handleMedicationSnooze(response, payload);
       case NotificationActionType.measurementRecordNow:
-        return await _handleMeasurementRecordNow(payload);
+        result = await _handleMeasurementRecordNow(payload);
       case NotificationActionType.measurementSnooze:
-        return await _handleMeasurementSnooze(response, payload);
+        result = await _handleMeasurementSnooze(response, payload);
       case NotificationActionType.measurementSkip:
-        return await _handleMeasurementSkip(payload);
+        result = await _handleMeasurementSkip(payload);
       case NotificationActionType.tap:
-        return ActionResult.success;
+        result = ActionResult.success;
       case NotificationActionType.dismiss:
-        return ActionResult.success;
+        result = ActionResult.success;
     }
+    onActionProcessed?.call(response.actionType, payload);
+    return result;
   }
 
   Future<void> _handleAction(NotificationActionResponse response) async {
@@ -218,6 +269,17 @@ class NotificationActionBridge {
         return ActionResult.entityNotFound;
       }
 
+      // Fetch components for dose info in snoozed notification title
+      String? doseAmount = medication.doseAmount;
+      String? doseUnit = medication.doseUnit;
+      if ((doseAmount == null || doseAmount.isEmpty) && medication.id != null) {
+        final components = await _medicationRepository.getComponents(medication.id!);
+        if (components.isNotEmpty) {
+          doseAmount = components.first.doseAmount;
+          doseUnit = components.first.doseUnit;
+        }
+      }
+
       final profile = payload.profileId > 0
           ? await _profileRepository.getActiveProfile(payload.profileId)
           : null;
@@ -260,6 +322,8 @@ class NotificationActionBridge {
           profile: profile,
           medication: medication,
           showProfileName: showName,
+          doseAmount: doseAmount,
+          doseUnit: doseUnit,
         ),
         body: ReminderContentFormatter.medicationBody(
           profile: profile,
@@ -288,44 +352,10 @@ class NotificationActionBridge {
   // --- Measurement: Record Now ---
 
   Future<ActionResult> _handleMeasurementRecordNow(ReminderPayload payload) async {
-    final scheduledTime = payload.occurrenceDateTime ?? DateTime.now();
-
-    try {
-      final existing = await _measurementRepository.getReminderLog(
-        payload.scheduleId,
-        scheduledTime,
-      );
-
-      if (existing != null && existing.id != null) {
-        if (existing.status == MeasurementReminderAction.completed) {
-          debugPrint('[NotificationActionBridge] measurement already recorded for schedule ${payload.scheduleId}');
-          return ActionResult.alreadyCompleted;
-        }
-        await _measurementRepository.updateReminderLog(
-          existing.copyWith(
-            status: MeasurementReminderAction.completed,
-            actionTime: DateTime.now(),
-          ),
-        );
-      } else {
-        await _measurementRepository.logReminder(
-          MeasurementReminderLog(
-            measurementScheduleId: payload.scheduleId,
-            scheduledTime: scheduledTime,
-            actionTime: DateTime.now(),
-            status: MeasurementReminderAction.completed,
-            createdAt: DateTime.now(),
-          ),
-        );
-      }
-
-      await _cancelOccurrenceNotifications(payload);
-      debugPrint('[NotificationActionBridge] recordNow schedule ${payload.scheduleId}');
-      return ActionResult.success;
-    } catch (e) {
-      debugPrint('[NotificationActionBridge] recordNow FAILED: $e');
-      return ActionResult.databaseError;
-    }
+    // Don't mark as completed here — the measurement entry form handles that
+    // after the user enters and saves values successfully.
+    // Navigation to the entry form happens via the onActionProcessed callback.
+    return ActionResult.success;
   }
 
   // --- Measurement: Skip ---
@@ -481,13 +511,31 @@ class NotificationActionBridge {
       for (final medication in medications) {
         if (!medication.active || medication.id == null) continue;
 
+        // Fetch components to get dose info for notification title
+        String? doseAmount = medication.doseAmount;
+        String? doseUnit = medication.doseUnit;
+        if ((doseAmount == null || doseAmount.isEmpty) && medication.id != null) {
+          final components = await _medicationRepository.getComponents(medication.id!);
+          if (components.isNotEmpty) {
+            doseAmount = components.first.doseAmount;
+            doseUnit = components.first.doseUnit;
+          }
+        }
+
         final schedules = await _medicationRepository
             .watchSchedules(medication.id!)
             .first;
 
         for (final schedule in schedules) {
           if (!schedule.active || schedule.id == null) continue;
-          entries.add(_buildMedicationRecoveryEntry(medication, schedule));
+          entries.add(
+            _buildMedicationRecoveryEntry(
+              medication,
+              schedule,
+              doseAmount: doseAmount,
+              doseUnit: doseUnit,
+            ),
+          );
         }
       }
 
@@ -508,21 +556,14 @@ class NotificationActionBridge {
 
   ScheduleRecoveryEntry _buildMedicationRecoveryEntry(
     Medication medication,
-    MedicationSchedule schedule,
-  ) {
-    final payload = ReminderPayload(
-      type: ReminderType.medication,
-      profileId: medication.profileId,
-      scheduleId: schedule.id!,
-      occurrenceTime: DateTime.now().toIso8601String(),
-      medicationId: medication.id,
-    );
-
+    MedicationSchedule schedule, {
+    String? doseAmount,
+    String? doseUnit,
+  }) {
     return ScheduleRecoveryEntry(
       scheduleId: schedule.id!,
       config: schedule.scheduleConfig,
       channelId: NotificationService.medicationChannelId,
-      payload: payload.toJsonString(),
       includeActions: true,
       isMeasurement: false,
       profileId: medication.profileId,
@@ -530,6 +571,8 @@ class NotificationActionBridge {
         profile: null,
         medication: medication,
         showProfileName: true,
+        doseAmount: doseAmount,
+        doseUnit: doseUnit,
       ),
       body: ReminderContentFormatter.medicationBody(
         profile: null,
@@ -540,6 +583,15 @@ class NotificationActionBridge {
       ),
       startDate: schedule.startDate,
       endDate: schedule.endDate,
+      perOccurrencePayload: (occDateTime) {
+        return ReminderPayload(
+          type: ReminderType.medication,
+          profileId: medication.profileId,
+          scheduleId: schedule.id!,
+          occurrenceTime: occDateTime.toIso8601String(),
+          medicationId: medication.id,
+        ).toJsonString();
+      },
     );
   }
 

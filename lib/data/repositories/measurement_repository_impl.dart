@@ -421,14 +421,6 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
               times: [schedule.time],
             );
 
-      final payload = ReminderPayload(
-        type: ReminderType.measurement,
-        profileId: schedule.profileId,
-        scheduleId: schedule.id!,
-        occurrenceTime: DateTime.now().toIso8601String(),
-        measurementTypeId: schedule.measurementTypeId,
-      );
-
       final title = type != null
           ? ReminderContentFormatter.measurementTitle(
               type: type,
@@ -450,11 +442,19 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         body: body,
         config: scheduleConfig,
         channelId: NotificationService.measurementChannelId,
-        payload: payload.toJsonString(),
         includeActions: true,
         isMeasurement: true,
         startDate: schedule.startDate,
         endDate: schedule.endDate,
+        perOccurrencePayload: (occDateTime) {
+          return ReminderPayload(
+            type: ReminderType.measurement,
+            profileId: schedule.profileId,
+            scheduleId: schedule.id!,
+            occurrenceTime: occDateTime.toIso8601String(),
+            measurementTypeId: schedule.measurementTypeId,
+          ).toJsonString();
+        },
       );
     } catch (_) {
       // Notification scheduling is best-effort; database is already saved.

@@ -9,8 +9,14 @@ class ReminderContentFormatter {
     required Profile? profile,
     required Medication medication,
     bool showProfileName = true,
+    String? doseAmount,
+    String? doseUnit,
   }) {
-    final nameWithStrength = _formatMedicationName(medication);
+    final nameWithStrength = _formatMedicationName(
+      medication.name,
+      doseAmount: doseAmount ?? medication.doseAmount,
+      doseUnit: doseUnit ?? medication.doseUnit,
+    );
     return nameWithStrength;
   }
 
@@ -36,10 +42,6 @@ class ReminderContentFormatter {
         schedule.instructions!.isNotEmpty) {
       parts.add(schedule.instructions!);
     }
-
-    final timeStr =
-        '${scheduledTime.hour.toString().padLeft(2, '0')}:${scheduledTime.minute.toString().padLeft(2, '0')}';
-    parts.add('Scheduled for $timeStr');
 
     return parts.join(' \u2014 ');
   }
@@ -93,16 +95,19 @@ class ReminderContentFormatter {
     return parts.join(' \u2014 ');
   }
 
-  static String _formatMedicationName(Medication medication) {
-    if (medication.doseAmount != null &&
-        medication.doseAmount!.isNotEmpty) {
-      final dose = medication.doseAmount!;
-      final unit = (medication.doseUnit != null && medication.doseUnit!.isNotEmpty)
-          ? ' ${medication.doseUnit!}'
+  static String _formatMedicationName(
+    String name, {
+    String? doseAmount,
+    String? doseUnit,
+  }) {
+    if (doseAmount != null && doseAmount.isNotEmpty) {
+      final dose = doseAmount;
+      final unit = (doseUnit != null && doseUnit.isNotEmpty)
+          ? ' $doseUnit'
           : '';
-      return '${medication.name} $dose$unit';
+      return '$name $dose$unit';
     }
-    return medication.name;
+    return name;
   }
 
   static String _formatIntakeQuantity(MedicationSchedule schedule) {
