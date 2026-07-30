@@ -36,7 +36,7 @@ final medicationRepositoryProvider =
 
 final measurementRepositoryProvider =
     Provider<MeasurementRepository>((ref) {
-  return MeasurementRepositoryImpl(ref.watch(databaseProvider));
+  return MeasurementRepositoryImpl(ref.watch(databaseProvider), ref: ref);
 });
 
 final exerciseRepositoryProvider =

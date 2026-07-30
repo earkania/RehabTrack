@@ -1,10 +1,12 @@
-import 'dart:convert';
+import 'dart:developer';
 
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/data/database/app_database.dart' as db;
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
+import 'package:rehab_track/data/services/notification/reminder_content_formatter.dart';
+import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
@@ -326,27 +328,58 @@ class MedicationRepositoryImpl implements MedicationRepository {
       final medication = await getMedication(schedule.medicationId);
       if (medication == null) return;
 
-      final components = await getComponents(medication.id!);
+      // Medication strength is stored in medicationComponents (not on the medication
+      // itself). Fetch components to get the dose info for the notification title.
+      String? doseAmount = medication.doseAmount;
+      String? doseUnit = medication.doseUnit;
+      if ((doseAmount == null || doseAmount.isEmpty) && medication.id != null) {
+        final components = await getComponents(medication.id!);
+        if (components.isNotEmpty) {
+          final first = components.first;
+          doseAmount = first.doseAmount;
+          doseUnit = first.doseUnit;
+        }
+      }
 
-      final title = 'Time to take ${medication.name}';
-      final body =
-          _buildNotificationBody(medication, schedule, components);
-      final payload = jsonEncode({
-        'medicationId': medication.id,
-        'scheduleId': schedule.id,
-      });
+      final title = ReminderContentFormatter.medicationTitle(
+        medication: medication,
+        profile: null,
+        doseAmount: doseAmount,
+        doseUnit: doseUnit,
+      );
+      log('[MedicationRepository] scheduling: medId=${medication.id} name="${medication.name}" '
+          'doseAmount="$doseAmount" doseUnit="$doseUnit" '
+          'title="$title"');
+      final body = ReminderContentFormatter.medicationBody(
+        medication: medication,
+        profile: null,
+        schedule: schedule,
+        scheduledTime: DateTime.now(),
+      );
 
-      await scheduler.scheduleFromConfig(
-        notificationId: schedule.id!,
+      await scheduler.scheduleOccurrences(
+        scheduleId: schedule.id!,
         title: title,
         body: body,
         config: schedule.scheduleConfig,
-        channelType: NotificationChannelType.medication,
-        payload: payload,
+        channelId: NotificationService.medicationChannelId,
         includeActions: true,
+        isMeasurement: false,
+        startDate: schedule.startDate,
+        endDate: schedule.endDate,
+        perOccurrencePayload: (occDateTime) {
+          return ReminderPayload(
+            type: ReminderType.medication,
+            profileId: medication.profileId,
+            scheduleId: schedule.id!,
+            occurrenceTime: occDateTime.toIso8601String(),
+            medicationId: medication.id,
+          ).toJsonString();
+        },
       );
-    } catch (_) {
-      // Notification scheduling is best-effort; database is already saved.
+    } catch (e, stack) {
+      log('[MedicationRepository] scheduleNotifications FAILED: $e');
+      log('[MedicationRepository] scheduleNotifications stack: $stack');
     }
   }
 
@@ -356,82 +389,14 @@ class MedicationRepositoryImpl implements MedicationRepository {
     if (schedule.id == null) return;
 
     try {
-      await scheduler.cancelNotificationsForSchedule(
-        baseNotificationId: schedule.id!,
+      await scheduler.cancelNotificationsInRange(
+        scheduleId: schedule.id!,
         config: schedule.scheduleConfig,
+        isMeasurement: false,
       );
     } catch (_) {
       // Best-effort cancellation.
     }
-  }
-
-  String _buildNotificationBody(
-    Medication medication,
-    MedicationSchedule schedule,
-    List<MedicationComponent> components,
-  ) {
-    final parts = <String>[];
-
-    final dose = components.isNotEmpty
-        ? _formatDoseFromComponents(components)
-        : _formatDoseShort(medication);
-    if (dose.isNotEmpty) parts.add(dose);
-
-    final intakeText = _formatIntakeQuantity(schedule);
-    if (intakeText.isNotEmpty) parts.add('take $intakeText');
-
-    if (schedule.instructions != null &&
-        schedule.instructions!.isNotEmpty) {
-      parts.add(schedule.instructions!);
-    }
-
-    return parts.isEmpty ? '' : parts.join(' — ');
-  }
-
-  String _formatIntakeQuantity(MedicationSchedule schedule) {
-    final qty = schedule.intakeQuantity;
-    final qtyStr = qty == qty.roundToDouble()
-        ? qty.toInt().toString()
-        : qty.toString();
-    final form = schedule.customDosageForm?.isNotEmpty == true
-        ? schedule.customDosageForm!
-        : schedule.dosageForm.name;
-    final pluralized = qty == 1 ? form : '${form}s';
-    return '$qtyStr $pluralized';
-  }
-
-  String _formatDoseFromComponents(List<MedicationComponent> components) {
-    if (components.isEmpty) return '';
-    if (components.length == 1) {
-      return _formatSingleComponent(
-          components.first.doseAmount, components.first.doseUnit);
-    }
-    final buffer = StringBuffer();
-    for (var i = 0; i < components.length; i++) {
-      if (i > 0) buffer.write('/');
-      buffer.write(components[i].doseAmount);
-      if (components[i].doseUnit.isNotEmpty) {
-        buffer.write(' ${components[i].doseUnit}');
-      }
-    }
-    return buffer.toString();
-  }
-
-  String _formatSingleComponent(String amount, String unit) {
-    if (amount.isEmpty) return '';
-    if (unit.isEmpty) return amount;
-    return '$amount $unit';
-  }
-
-  String _formatDoseShort(Medication medication) {
-    final parts = <String>[];
-    if (medication.doseAmount != null && medication.doseAmount!.isNotEmpty) {
-      parts.add(medication.doseAmount!);
-    }
-    if (medication.doseUnit != null && medication.doseUnit!.isNotEmpty) {
-      parts.add(medication.doseUnit!);
-    }
-    return parts.join(' ');
   }
 
   @override

@@ -1,12 +1,29 @@
 import 'package:drift/drift.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/data/database/app_database.dart' as db;
+import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
+import 'package:rehab_track/data/services/notification/notification_service.dart';
+import 'package:rehab_track/data/services/notification/reminder_content_formatter.dart';
+import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
+import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
+import 'package:rehab_track/presentation/providers/notification_provider.dart';
 
 class MeasurementRepositoryImpl implements MeasurementRepository {
   final db.AppDatabase _database;
+  final Ref? _ref;
 
-  MeasurementRepositoryImpl(this._database);
+  MeasurementRepositoryImpl(this._database, {this._ref});
+
+  NotificationScheduler? get _scheduler {
+    if (_ref == null) return null;
+    try {
+      return _ref.read(notificationSchedulerProvider);
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Stream<List<MeasurementType>> watchActiveMeasurementTypes(
@@ -330,7 +347,7 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
   @override
   Future<int> createSchedule(MeasurementSchedule schedule) async {
     final now = DateTime.now();
-    return _database.measurementDao.insertSchedule(
+    final scheduleId = await _database.measurementDao.insertSchedule(
       db.MeasurementSchedulesCompanion.insert(
         profileId: schedule.profileId,
         measurementTypeId: schedule.measurementTypeId,
@@ -345,10 +362,17 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         updatedAt: now,
       ),
     );
+
+    final savedSchedule = schedule.copyWith(id: scheduleId);
+    await _scheduleNotifications(savedSchedule);
+
+    return scheduleId;
   }
 
   @override
   Future<void> updateSchedule(MeasurementSchedule schedule) async {
+    await _cancelNotifications(schedule);
+
     await _database.measurementDao.updateSchedule(
       db.MeasurementSchedulesCompanion(
         id: Value(schedule.id!),
@@ -366,11 +390,98 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         updatedAt: Value(DateTime.now()),
       ),
     );
+
+    await _scheduleNotifications(schedule);
   }
 
   @override
   Future<void> deleteSchedule(int id) async {
+    final row = await _database.measurementDao.getSchedule(id);
+    if (row != null) {
+      final schedule = _scheduleToDomain(row);
+      await _cancelNotifications(schedule);
+    }
     await _database.measurementDao.deleteSchedule(id);
+  }
+
+  Future<void> _scheduleNotifications(MeasurementSchedule schedule) async {
+    final scheduler = _scheduler;
+    if (scheduler == null) return;
+    if (!schedule.active) return;
+
+    try {
+      final type = schedule.id != null
+          ? await getMeasurementType(schedule.measurementTypeId)
+          : null;
+
+      final scheduleConfig = schedule.isDaily
+          ? DailySchedule(times: [schedule.time])
+          : IntervalDaysSchedule(
+              intervalDays: schedule.intervalDays ?? 1,
+              times: [schedule.time],
+            );
+
+      final title = type != null
+          ? ReminderContentFormatter.measurementTitle(
+              type: type,
+              profile: null,
+            )
+          : 'Measurement Reminder';
+      final body = type != null
+          ? ReminderContentFormatter.measurementBody(
+              profile: null,
+              type: type,
+              schedule: schedule,
+              scheduledTime: DateTime.now(),
+            )
+          : 'Please record your measurement';
+
+      await scheduler.scheduleOccurrences(
+        scheduleId: schedule.id!,
+        title: title,
+        body: body,
+        config: scheduleConfig,
+        channelId: NotificationService.measurementChannelId,
+        includeActions: true,
+        isMeasurement: true,
+        startDate: schedule.startDate,
+        endDate: schedule.endDate,
+        perOccurrencePayload: (occDateTime) {
+          return ReminderPayload(
+            type: ReminderType.measurement,
+            profileId: schedule.profileId,
+            scheduleId: schedule.id!,
+            occurrenceTime: occDateTime.toIso8601String(),
+            measurementTypeId: schedule.measurementTypeId,
+          ).toJsonString();
+        },
+      );
+    } catch (_) {
+      // Notification scheduling is best-effort; database is already saved.
+    }
+  }
+
+  Future<void> _cancelNotifications(MeasurementSchedule schedule) async {
+    final scheduler = _scheduler;
+    if (scheduler == null) return;
+    if (schedule.id == null) return;
+
+    try {
+      final scheduleConfig = schedule.isDaily
+          ? DailySchedule(times: [schedule.time])
+          : IntervalDaysSchedule(
+              intervalDays: schedule.intervalDays ?? 1,
+              times: [schedule.time],
+            );
+
+      await scheduler.cancelNotificationsInRange(
+        scheduleId: schedule.id!,
+        config: scheduleConfig,
+        isMeasurement: true,
+      );
+    } catch (_) {
+      // Best-effort cancellation.
+    }
   }
 
   // --- Reminder Logs ---

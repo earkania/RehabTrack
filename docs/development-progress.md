@@ -196,6 +196,180 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - Boot rescheduling requires app to start (no native receiver)
 - Notification actions are infrastructure only — not connected to medication logs yet
 
+### Phase 7B — Reminder Reliability & Notification Corrections
+
+**Status:** Completed — all features verified on Pixel 7
+
+**What was done:**
+
+#### Defect Fixes
+
+**Notification Action IDs:**
+- Changed from generic `action_taken`, `action_skipped`, `action_snoozed`, `action_recordNow` to stable identifiers:
+  - `medication_mark_taken`, `medication_skip`, `medication_snooze`
+  - `measurement_record_now`, `measurement_skip`, `measurement_snooze`
+- Action type enum updated to match: `medicationMarkTaken`, `medicationSkip`, `medicationSnooze`, etc.
+
+**Test Reminder Differentiation:**
+- Medication test: title = "Test medication reminder", body = "This is a test of medication reminder alerts."
+- Measurement test: title = "Test measurement reminder", body = "This is a test of measurement reminder alerts."
+- Different IDs (999999 medication, 999998 measurement) on appropriate channels
+
+**Medication Title Formatting:**
+- Title now includes strength when available: `"Clopidogrel 75 mg"` instead of just `"Clopidogrel"`
+- Strength derived from `medicationComponents.doseAmount` + `medicationComponents.doseUnit` (NOT medication-level fields, which are always null)
+- Falls back to name-only when components absent
+
+**Background Action Processing:**
+- `PendingActionStore` written by `_onBackgroundNotificationResponse` is now consumed on app startup
+- `NotificationActionBridge.processPendingActions()` called at initialization
+- All action handlers are async with proper `await`
+
+**Configurable Settings:**
+- `showPatientNameInNotifications` (default: true) — controls patient name visibility in notification body
+- `showDetailsOnLockScreen` (default: true) — controls lock-screen notification visibility (uses `NotificationVisibility`)
+
+**Lock Screen Privacy:**
+- `NotificationService.scheduleNotification()` and `showNotification()` accept `NotificationVisibility` parameter
+- When `showDetailsOnLockScreen` is disabled, notification uses `NotificationVisibility.secret`
+
+**Idempotency & Action Results:**
+- All medication actions check for existing logs before creating duplicates
+- Structured `ActionResult` enum: success, alreadyCompleted, invalidPayload, entityNotFound, databaseError, unexpectedError
+- Snooze preserves original occurrence identity, cancels current notification, schedules Android-backed alarm
+
+**Timezone Handling:**
+- Timezone detected from Android `TimeZone.getDefault().id` (returns IANA name like "Asia/Tbilisi")
+- `tz.local` set correctly in `NotificationService.initialize()`
+- All scheduling uses `TZDateTime` with `tz.local` — no double conversion
+
+**Notification Channel Updates:**
+- Only 2 channels remain: `rehabtrack_medications` and `rehabtrack_measurements` (General removed)
+- Test notifications now use the appropriate channel (medication vs measurement)
+
+#### Files Modified
+
+| File | Changes |
+|---|---|
+| `notification_action_handler.dart` | New enum values for stable action IDs |
+| `notification_service.dart` | Updated action IDs, added `visibility` param, updated `_parseActionType` |
+| `notification_scheduler.dart` | Added `visibility` support, `NotificationVisibility` import |
+| `notification_action_bridge.dart` | Rewritten: async handlers, pending action processing, idempotency, Result type, new action types |
+| `reminder_content_formatter.dart` | Added `_formatMedicationName` with strength, `showProfileName` param, `medicationSubtext` |
+| `reminder_payload.dart` | Added `notificationId` field, version bump to 2 |
+| `app_constants.dart` | Added `showPatientNameInNotificationsKey`, `showDetailsOnLockScreenKey` |
+| `reminder_settings_provider.dart` | Added `showPatientNameInNotificationsProvider`, `showDetailsOnLockScreenProvider` |
+| `notification_provider.dart` | Added `processPendingActions()` call, `showProfileName`/`showDetailsOnLockScreen` injections |
+| `settings_screen.dart` | Fixed test reminders differentiation, added Show patient name / Show details on lock screen toggles |
+| `medication_repository_impl.dart` | No changes (already used correct API) |
+
+#### Tests Updated
+
+- `notification_action_bridge_test.dart` — Updated action types, added medicationTitle tests, profile visibility tests
+- `settings_grace_period_test.dart` — Added `visibility` param to fake service
+
+#### Validation Results
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (5 info lints — pre-existing) |
+| `flutter test` | Passed (740/740; 1 pre-existing failure in today_screen_test.dart) |
+
+#### Round 2 — Action Button Fix, Strength from Components, Correct Occurrence Times (2026-07-30)
+
+**Date:** 2026-07-30
+
+**Root Causes Discovered:**
+
+1. **Medication strength never appeared:** `MedicationFormData` and `add_medication_screen.dart`/`edit_medication_screen.dart` save `doseAmount`/`doseUnit` to `MedicationComponents`, NOT to `Medication` entity fields. `Medication.doseAmount` is always null. The formatter checked medication-level fields and always fell back to name-only.
+
+2. **Notification action buttons did nothing:** All actions used `showsUserInterface: false`, routing taps through `ActionBroadcastReceiver` → background isolate → `PendingActionStore` (JSON file). The foreground callback `_onNotificationResponse` was NEVER invoked for action buttons. `PendingActionStore` was only consumed at app startup via `processPendingActions()` — actions performed while app running sat in queue until next restart.
+
+3. **Wrong occurrence time in payload:** `_scheduleNotifications` passed `DateTime.now()` as `scheduledTime` for ALL occurrences, so every notification body showed schedule-creation time.
+
+**Fixes:**
+
+- **Action buttons:** Changed all `_medicationActions` and `_measurementActions` from `showsUserInterface: false` to `showsUserInterface: true`. Now taps launch Activity → `onNewIntent` → `didReceiveNotificationResponse` → foreground callback → immediate processing.
+
+- **Terminated-process handling:** Added `bridge.processAppLaunchAction()` using `getNotificationAppLaunchDetails()` with `_actionIdToTypeName` mapper. Called in `notificationInitializerProvider`.
+
+- **Per-occurrence payloads:** `NotificationScheduler.scheduleOccurrences()` now accepts optional `perOccurrencePayload` callback — generates unique payload with correct `occurrenceTime` per occurrence. Updated `medication_repository_impl.dart`, `measurement_repository_impl.dart`, `measurement_schedule_screen.dart`, `ScheduleRecoveryService`/`ScheduleRecoveryEntry`.
+
+- **Strength from components:** `_scheduleNotifications` in `medication_repository_impl.dart` now fetches `MedicationComponents` when `Medication.doseAmount` is null, passes extracted `doseAmount`/`doseUnit` to formatter. Same for `_recoverMedicationSchedules` and `_handleMedicationSnooze` in bridge.
+
+- **Formatter refactored:** `ReminderContentFormatter._formatMedicationName()` changed from taking `Medication` object to explicit `name`, `doseAmount`, `doseUnit` parameters. `medicationTitle()` accepts optional `doseAmount`/`doseUnit`.
+
+- **Removed "Scheduled for HH:MM":** Removed from `medicationBody()` — cannot be formatted statically per-occurrence with the single-payload architecture; Android notification timestamp provides this context.
+
+- **Diagnostic logging:** Added `debugPrint` calls in foreground/background callbacks, action dispatch, and medication scheduling (remove after verification).
+
+**Files Modified (Round 2):**
+
+| File | Changes |
+|---|---|
+| `notification_service.dart` | `showsUserInterface: true` on all actions; debug logging |
+| `notification_action_bridge.dart` | `processAppLaunchAction()`, `_actionIdToTypeName`, components fetch for dose in recovery/snooze |
+| `notification_scheduler.dart` | `perOccurrencePayload` optional callback param |
+| `reminder_content_formatter.dart` | `_formatMedicationName` takes name/doseAmount/doseUnit params; `medicationTitle` optional dose params; removed "Scheduled for" |
+| `medication_repository_impl.dart` | Fetches components for dose; uses `perOccurrencePayload` callback |
+| `measurement_repository_impl.dart` | Uses `perOccurrencePayload` callback |
+| `measurement_schedule_screen.dart` | Uses `perOccurrencePayload` callback |
+| `schedule_recovery_service.dart` | `ScheduleRecoveryEntry` supports `perOccurrencePayload` callback |
+| `notification_provider.dart` | Calls `bridge.processAppLaunchAction()` |
+
+**Validation Results:**
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | 5 info-level only (pre-existing `prefer_initializing_formals`) |
+| `flutter test` (notification bridge) | 18/18 passed |
+| `flutter test` (all) | 741 total; 14 failing (pre-existing, unrelated — `daily_agenda_test.dart`, `popup_dismissal_test.dart`) |
+
+**Pixel 7 verification results (Round 2 + Round 3):**
+
+| Test | Status |
+|---|---|
+| Notification title shows strength | ✅ Verified |
+| Tap Mark as Taken → Today updates immediately | ✅ Verified |
+| Tap Skip → Today updates immediately | ✅ Verified |
+| Medication Snooze → notification reappears at configured time | ✅ Verified |
+| Measurement Record Now → opens entry form | ✅ Verified |
+| Measurement Skip → Today updates immediately | ✅ Verified |
+| Measurement Snooze → notification reappears at configured time | ✅ Verified |
+| Back navigation from Record Now form | ✅ Fixed — `go(AppRoutes.home)` then `push()` |
+| Status not marked completed until after successful save | ✅ Fixed — `RecordNowExtra` passed as route extra |
+| Temporary debugPrint calls removed | ✅ Done |
+
+**Known issue (resolved):** After tapping a notification action, the Today screen showed stale data until manual pull-to-refresh. Root cause: `dailyAgendaProvider` is a `FutureProvider` that doesn't react to DB changes. The bridge processed actions via `_executeAction` and wrote to DB but never notified the provider layer. Fixed by adding `onActionProcessed` callback to bridge — called after every dispatched action — wired to `ref.invalidate(todayAgendaProvider)` at the provider level. Also invalidates explicitly in `notificationInitializerProvider` after processing pending/launch actions during initialization.
+
+#### Round 3 — Measurement Action Corrections & Cleanup (2026-07-31)
+
+**Changes:**
+- **Record Now no longer marks completed prematurely:** `_handleMeasurementRecordNow` now returns `ActionResult.success` without touching the DB — the measurement entry form handles completion via `_completeReminder()` on successful save
+- **Navigation uses `go()` then `push()`:** Record Now navigates to Today first (`go(AppRoutes.home)`) then pushes the entry form so the user can press back to return
+- **`RecordNowExtra` passed as route extra:** The `onActionProcessed` callback creates `RecordNowExtra` from payload's `scheduleId` and `occurrenceTime`, passed via `go(push(..., extra: extra))` so the entry form can mark the correct reminder
+- **Diagnostic `debugPrint` removed:** All 14 temporary debugPrint calls added in Round 2 removed from `notification_service.dart` (8) and `notification_action_bridge.dart` (6)
+
+**Files Modified (Round 3):**
+| File | Changes |
+|---|---|
+| `notification_action_bridge.dart` | Removed Record Now DB writes; removed temporary debugPrint |
+| `notification_provider.dart` | Passes `RecordNowExtra` as route extra; uses `go()` then `push()` |
+| `notification_service.dart` | Removed temporary debugPrint |
+| `docs/development-progress.md` | Updated status and test results |
+
+**Validation Results:**
+| Check | Result |
+|---|---|
+| `flutter analyze` | 5 info-level only (pre-existing) |
+| `flutter test` (notification bridge) | 18/18 passed |
+| Pixel 7 — Medication Taken ✅ | Updates immediately, navigates to Today |
+| Pixel 7 — Medication Skip ✅ | Updates immediately, navigates to Today |
+| Pixel 7 — Medication Snooze ✅ | Reappears at configured time |
+| Pixel 7 — Measurement Record Now ✅ | Opens entry form, back returns to Today, status updated only after successful save |
+| Pixel 7 — Measurement Skip ✅ | Updates immediately |
+| Pixel 7 — Measurement Snooze ✅ | Reappears at configured time |
+
 ## Current Application State
 
 **App launches successfully on Pixel 7.**
@@ -2634,13 +2808,106 @@ Five logic bugs fixed:
 - `test/next_item_grace_period_test.dart` — 20 tests: repository (default, save all values, persistence, invalid fallback), provider (default, read persisted, save, ignore invalid, reactive)
 - `test/settings_grace_period_test.dart` — 12 widget tests: English/Georgian labels, current value display, dialog opens with 5 options, selection updates tile, narrow-screen layout, radio icon states
 
-### Validation Results (Post-Grace Period Setting)
+### Phase 7B — Reliable Reminder Notifications (2026-07-29)
+
+**Feature**: Medication and measurement reminders now produce reliable sound, vibration, heads-up notifications, and configurable reminder settings.
+
+**Scope**: Notification infrastructure only. No TTS, cloud push, or unrelated health modules. Rolling 30-day horizon with individual (non-recurring) notifications.
+
+**Implementation**:
+
+#### Notification Service (`notification_service.dart`)
+- Added `dart:typed_data` import; vibration pattern changed from `static const` to `static final Int64List`
+- High importance on all three channels (`rehabtrack_medications`, `rehabtrack_measurements`, `rehabtrack_general`)
+- `AndroidNotificationCategory.alarm` for medication/measurement channels
+- Channel creation extracted into `_createChannels()` method
+
+#### Reminder Content Formatter (`reminder_content_formatter.dart`)
+- `Profile? profile` and `DateTime scheduledTime` parameters added to `medicationTitle`, `medicationBody`, `measurementTitle`, `measurementBody`
+- Body includes patient name and "Scheduled for HH:MM" line
+
+#### Notification Action Bridge (`notification_action_bridge.dart`)
+- Full rewrite: accepts `ProfileRepository`, `getSnoozeDuration` callback
+- Snooze uses configurable `Duration` from settings (default 10 min)
+- All action handlers call `_cancelOccurrenceNotifications` before scheduling
+- Recovery passes `profileId` through payload
+- `_buildMedicationRecoveryEntry`/`_buildMeasurementRecoveryEntry` helpers
+- Removed duplicate `fullName` extension on Profile (redundant with entity getter)
+
+#### Reminder Settings (`reminder_settings_provider.dart`)
+- New providers: `medicationRemindersEnabledProvider`, `measurementRemindersEnabledProvider`, `reminderSoundEnabledProvider`, `reminderVibrationEnabledProvider`, `defaultSnoozeDurationProvider`
+- All persisted via `SettingsRepository` key-value store
+
+#### App Constants (`app_constants.dart`)
+- 5 new keys: `medicationRemindersEnabledKey`, `measurementRemindersEnabledKey`, `reminderSoundEnabledKey`, `reminderVibrationEnabledKey`, `defaultSnoozeDurationKey`
+
+#### Notification Provider (`notification_provider.dart`)
+- `NotificationScheduler` now receives `playSound`/`enableVibration` from settings providers
+- Bridge gets `ProfileRepository` + `getSnoozeDuration` from `defaultSnoozeDurationProvider`
+- `notificationInitializerProvider` remains `FutureProvider<void>` with `await`
+- `notificationPermissionProvider` and `exactAlarmPermissionProvider` added
+
+#### Notification Scheduler (`notification_scheduler.dart`)
+- `playSound`/`enableVibration` instance fields with nullable override params in `scheduleSingleOccurrence`
+- Passes through to `NotificationService.scheduleNotification`
+
+#### Settings Screen (`settings_screen.dart`)
+- Full Reminders section with `_buildPermissionTile` for notification + exact alarm permissions
+- Toggle switches for medication/measurement reminders, sound, vibration
+- Snooze duration selector (5/10/15/30/60 min) via `SimpleDialog`
+- Test reminder button schedules notification 5 seconds from now
+- Permission status shows granted/denied with Request button
+
+#### Measurement Schedule List (`measurement_schedule_list_screen.dart`)
+- Delete calls `scheduler.cancelNotificationsInRange` before `repo.deleteSchedule`
+
+#### Localization
+- Added `reminders`, `medicationReminders`, `measurementReminders`, `reminderSound`, `reminderVibration`, `defaultSnoozeDuration`, `notificationPermission`, `exactAlarmAccess`, `permissionGranted`, `permissionDenied`, `testReminder`, `testReminderTitle`, `testReminderBody`, `reminderDetails`, `reminderPermissionExplanation`, `exactAlarmExplanation`, `alarmStyleReminders`, `lockScreenReminderDetails`, `requestPermission`, `scheduleSaved`, `notGranted`, `notRequired`, `request`, `reminderWarningNoPermission`, `reminderWarningNoExactAlarm`, `snoozeMinutes`, `testReminderSent`, `remindersNotAvailable` to both EN and KA
+
+#### Bug Fixes
+- `Int64List` import and `const`→`final` in notification_service.dart
+- `Icons.notifications_settings_outlined` → `Icons.notifications_active_outlined` (non-existent icon)
+- `medication_repository_impl.dart`: formatter calls now pass `medication:`, `profile: null`, `scheduledTime: DateTime.now()` named params
+- `measurement_repository_impl.dart`: same fix for measurement formatter calls
+- Removed unused `fullName` extension on `Profile` from bridge
+
+#### Test Fixes
+- `notification_action_bridge_test.dart`: `FakeNotificationScheduler` now accepts shared `NotificationService`; all 6 action handlers use same scheduler instance; `profile`/`scheduledTime`/`getSnoozeDuration`/`profileRepository` params added
+- `settings_grace_period_test.dart`: `FakeNotificationServiceForSettings` overrides `notificationServiceProvider`; prevents `FlutterLocalNotificationsPlatform._instance` late-init error
+
+**Files Created:**
+- `lib/presentation/providers/reminder_settings_provider.dart`
+
+**Files Modified:**
+- `lib/data/services/notification/notification_service.dart`
+- `lib/data/services/notification/notification_scheduler.dart`
+- `lib/data/services/notification/notification_action_bridge.dart`
+- `lib/data/services/notification/reminder_content_formatter.dart`
+- `lib/presentation/providers/notification_provider.dart`
+- `lib/presentation/screens/settings/settings_screen.dart`
+- `lib/presentation/screens/health/measurement_schedule_list_screen.dart`
+- `lib/core/constants/app_constants.dart`
+- `lib/data/repositories/medication_repository_impl.dart`
+- `lib/data/repositories/measurement_repository_impl.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_ka.arb`
+- `test/notification_action_bridge_test.dart`
+- `test/settings_grace_period_test.dart`
+
+**Not implemented (deferred):**
+- Reminder Details screen and router route
+- In-app reminder banner overlay
+- `main.dart` FutureProvider await fix (current impl works on real device)
+- Notification tap navigation to details
+
+### Validation Results (Post-Phase 7B)
 
 | Check | Result |
 |---|---|
-| `flutter analyze` | Passed (0 issues) |
-| `flutter test` | Passed (746/746) |
-| Pixel 7 verification | Pending user confirmation |
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (8 info lints — pre-existing `prefer_initializing_formals`) |
+| `flutter test` | Passed (736/737; 1 pre-existing failure in `today_screen_test.dart`) |
+| Pixel 7 build/run | APK built and installed successfully |
 
 ### Known Limitations
 

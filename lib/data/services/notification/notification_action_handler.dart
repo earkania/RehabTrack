@@ -1,4 +1,13 @@
-enum NotificationActionType { taken, skipped, snoozed }
+enum NotificationActionType {
+  medicationMarkTaken,
+  medicationSnooze,
+  medicationSkip,
+  measurementRecordNow,
+  measurementSnooze,
+  measurementSkip,
+  tap,
+  dismiss,
+}
 
 class NotificationActionResponse {
   const NotificationActionResponse({

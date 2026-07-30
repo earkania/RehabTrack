@@ -453,3 +453,115 @@ The Next Item overdue grace period was hardcoded (15 minutes). Users needed to c
 ### Rationale for Separation
 
 The Next grace period determines whether an unresolved item appears in the "Next" card. The status grace period determines whether an item is styled as "due" (blue tint) vs "overdue" (red tint). These are conceptually distinct — a user might want a short Next card (get to items quickly) but a longer due window (avoid red panic). Keeping them independent is more flexible.
+
+---
+
+# Reliable Reminder Notifications — Design Notes (Approved 2026-07-29)
+
+## Phase 7B Scope
+
+Medication and measurement reminders produce reliable sound, vibration, and heads-up notifications on Android. No TTS, cloud push, or unrelated health modules.
+
+## Notification Channels
+
+Three channels created at startup with `AndroidNotificationChannel`:
+
+| Channel ID | Purpose | Importance | Category |
+|---|---|---|---|
+| `rehabtrack_medications` | Medication dose reminders | High | alarm |
+| `rehabtrack_measurements` | Measurement recording reminders | High | alarm |
+| `rehabtrack_general` | Test reminders, general alerts | Default | (none) |
+
+## Vibration Pattern
+
+```
+Int64List.fromList([0, 250, 200, 250])
+```
+— vibrate 250ms, pause 200ms, vibrate 250ms (repeats via channel).
+
+## Notification ID Offsets
+
+| Type | Offset | Range |
+|---|---|---|
+| Medication | 100,000 | 100000–999999 |
+| Measurement | 1,000,000 | 1000000–1999999 |
+| Snooze | 2,000,000 | 2000000+ |
+
+Offsets are added to the schedule's `id` to produce unique notification IDs.
+
+## Scheduling Model
+
+- Rolling 30-day horizon: occurrences computed from `scheduleConfig` (Daily or IntervalDays) for the next 30 days.
+- Individual (non-recurring) notifications: each occurrence is one `scheduleNotification` call.
+- `cancelNotificationsInRange` cancels all future occurrences for a given schedule.
+
+## Action Model
+
+The bridge handles 5 action types:
+
+1. **Taken** — Creates a `MedicationLog` with `taken` status; cancels pending snoozes for this occurrence
+2. **Skipped** — Creates a `MedicationLog` with `skipped` status; cancels pending snoozes
+3. **Snoozed** — Schedules a single notification `getSnoozeDuration()` minutes from now; cancels pending snoozes first; copies original payload with `snoozeSourceOccurrence` set
+4. **Record Now** — Only for measurement; navigates to measurement entry screen with `RecordNowExtra`
+5. **Dismiss** — Removes notification; cancels pending snoozes
+
+All action handlers call `_cancelOccurrenceNotifications()` first to prevent duplicate notifications.
+
+## Configurable Reminder Settings
+
+All settings use `StateNotifierProvider` pattern over `SettingsRepository` (key-value, not profile-specific):
+
+| Setting | Default | Provider |
+|---|---|---|
+| Medication reminders enabled | true | `medicationRemindersEnabledProvider` |
+| Measurement reminders enabled | true | `measurementRemindersEnabledProvider` |
+| Sound enabled | true | `reminderSoundEnabledProvider` |
+| Vibration enabled | true | `reminderVibrationEnabledProvider` |
+| Snooze duration (minutes) | 10 | `defaultSnoozeDurationProvider` |
+
+## Snooze Design
+
+- Snooze duration is a `Duration Function()` callback injected into `NotificationActionBridge` — allows runtime configurability without coupling bridge to settings storage
+- The factory provider reads from `defaultSnoozeDurationProvider` at bridge creation time
+- Re-snoozing: each snooze call first cancels any existing snoozes for that occurrence, then schedules a new one
+- Snooze notification ID: `snoozeNotificationId(originalId) = 2000000 + originalId`
+
+## Notification Content
+
+- **Title**: Medication/measurement name
+- **Body**: Patient name (if available) + dose info/schedule instructions + "Scheduled for HH:MM"
+- **Payload**: JSON-encoded `ReminderPayload` with version, type, profileId, scheduleId, occurrenceTime, medicationId/measurementTypeId, optional snooze source
+
+## Test Reminder
+
+- Schedules a notification on `rehabtrack_general` channel 5 seconds from now
+- Body: "This is a test reminder to verify notification sound, vibration, and presentation."
+- ID: 999999
+- Accessible from Settings → Reminders → Test reminder tile
+
+## Notification Initialization
+
+- `NotificationActionBridge.initialize()` registers the action callback with `NotificationService`
+- `scheduleRecoveryService.recoverAll(profileId)` runs after a 2-second delay (to let DB queries settle)
+- Recovery iterates all medication and measurement schedules, computes future occurrences, and re-schedules them
+
+## Deferred Items
+
+- Full-screen intent (locked-device presentation) — fallback is high-importance heads-up notification
+- In-app reminder banner/queue
+- Reminder Details screen (tap notification → navigate to details)
+- Notification tap routing through GoRouter
+- `main.dart` FutureProvider await (current implementation works on real device)
+
+## Key Files
+
+| File | Purpose |
+|---|---|
+| `notification_service.dart` | Core plugin wrapper, channels, scheduling, action parsing |
+| `notification_scheduler.dart` | 30-day rolling horizon computation |
+| `notification_action_bridge.dart` | Action response handling and recovery |
+| `reminder_content_formatter.dart` | Notification title/body with patient identity and time |
+| `reminder_payload.dart` | Typed JSON payload for notification data |
+| `reminder_settings_provider.dart` | Configurable reminder preferences |
+| `notification_provider.dart` | Riverpod providers wiring all services |
+| `settings_screen.dart` | Reminder settings UI with permission tiles

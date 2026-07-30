@@ -26,6 +26,7 @@ import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_view_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_edit_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/notification_diagnostics_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -219,6 +220,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.patientProfileEdit,
         builder: (context, state) => const PatientProfileEditScreen(),
+      ),
+      GoRoute(
+        path: '/settings/notification-diagnostics',
+        builder: (context, state) => const NotificationDiagnosticsScreen(),
       ),
       GoRoute(
         path: '/measurements/ranges/:typeKey',
