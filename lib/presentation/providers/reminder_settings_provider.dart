@@ -104,3 +104,21 @@ class SnoozeDurationNotifier extends StateNotifier<int> {
     );
   }
 }
+
+final showPatientNameInNotificationsProvider =
+    StateNotifierProvider<ReminderEnabledNotifier, bool>((ref) {
+  return ReminderEnabledNotifier(
+    ref.read(settingsRepositoryProvider),
+    AppConstants.showPatientNameInNotificationsKey,
+    true,
+  );
+});
+
+final showDetailsOnLockScreenProvider =
+    StateNotifierProvider<ReminderEnabledNotifier, bool>((ref) {
+  return ReminderEnabledNotifier(
+    ref.read(settingsRepositoryProvider),
+    AppConstants.showDetailsOnLockScreenKey,
+    true,
+  );
+});

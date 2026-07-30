@@ -1,3 +1,4 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../../domain/entities/schedule_config.dart';
@@ -8,17 +9,16 @@ class NotificationScheduler {
     required NotificationService notificationService,
     this.playSound = true,
     this.enableVibration = true,
+    this.notificationVisibility = NotificationVisibility.public,
   }) : _notificationService = notificationService;
 
   final NotificationService _notificationService;
   final bool playSound;
   final bool enableVibration;
+  final NotificationVisibility notificationVisibility;
 
   static const _schedulingHorizonDays = 30;
 
-  /// Schedule all occurrences within the rolling horizon.
-  /// Uses individual (non-recurring) notifications so startDate/endDate
-  /// are respected and cancellation is clean.
   Future<List<int>> scheduleOccurrences({
     required int scheduleId,
     required String title,
@@ -33,6 +33,7 @@ class NotificationScheduler {
     bool? playSound,
     bool? enableVibration,
     tz.Location? location,
+    NotificationVisibility? visibility,
   }) async {
     final tzLocation = location ?? tz.local;
     final now = tz.TZDateTime.now(tzLocation);
@@ -77,6 +78,7 @@ class NotificationScheduler {
           isMeasurement: isMeasurement,
           playSound: playSound ?? this.playSound,
           enableVibration: enableVibration ?? this.enableVibration,
+          visibility: visibility ?? notificationVisibility,
         );
         scheduledIds.add(notificationId);
       } catch (_) {}
@@ -85,7 +87,6 @@ class NotificationScheduler {
     return scheduledIds;
   }
 
-  /// Schedule a single occurrence (used for snooze or test notifications).
   Future<int> scheduleSingleOccurrence({
     required int notificationId,
     required String title,
@@ -97,6 +98,7 @@ class NotificationScheduler {
     bool isMeasurement = false,
     bool? playSound,
     bool? enableVibration,
+    NotificationVisibility? visibility,
   }) async {
     await _notificationService.scheduleNotification(
       id: notificationId,
@@ -109,6 +111,7 @@ class NotificationScheduler {
       isMeasurement: isMeasurement,
       playSound: playSound ?? this.playSound,
       enableVibration: enableVibration ?? this.enableVibration,
+      visibility: visibility ?? notificationVisibility,
     );
     return notificationId;
   }

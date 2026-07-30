@@ -1,7 +1,6 @@
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
-import 'package:rehab_track/presentation/utils/dose_formatter.dart';
 
 class ReminderContentFormatter {
   ReminderContentFormatter._();
@@ -9,11 +8,10 @@ class ReminderContentFormatter {
   static String medicationTitle({
     required Profile? profile,
     required Medication medication,
+    bool showProfileName = true,
   }) {
-    if (profile != null && profile.fullName.isNotEmpty) {
-      return medication.name;
-    }
-    return medication.name;
+    final nameWithStrength = _formatMedicationName(medication);
+    return nameWithStrength;
   }
 
   static String medicationBody({
@@ -21,15 +19,15 @@ class ReminderContentFormatter {
     required Medication medication,
     required MedicationSchedule schedule,
     required DateTime scheduledTime,
+    bool showProfileName = true,
   }) {
     final parts = <String>[];
 
-    if (profile != null && profile.fullName.isNotEmpty) {
+    if (showProfileName &&
+        profile != null &&
+        profile.fullName.isNotEmpty) {
       parts.add(profile.fullName);
     }
-
-    final dose = DoseFormatter.format(medication);
-    if (dose.isNotEmpty) parts.add(dose);
 
     final intakeText = _formatIntakeQuantity(schedule);
     if (intakeText.isNotEmpty) parts.add(intakeText);
@@ -46,9 +44,22 @@ class ReminderContentFormatter {
     return parts.join(' \u2014 ');
   }
 
+  static String medicationSubtext({
+    required Profile? profile,
+    bool showProfileName = true,
+  }) {
+    if (showProfileName &&
+        profile != null &&
+        profile.fullName.isNotEmpty) {
+      return profile.fullName;
+    }
+    return '';
+  }
+
   static String measurementTitle({
     required Profile? profile,
     required MeasurementType type,
+    bool showProfileName = true,
   }) {
     return type.name;
   }
@@ -58,10 +69,13 @@ class ReminderContentFormatter {
     required MeasurementType type,
     required MeasurementSchedule schedule,
     required DateTime scheduledTime,
+    bool showProfileName = true,
   }) {
     final parts = <String>[];
 
-    if (profile != null && profile.fullName.isNotEmpty) {
+    if (showProfileName &&
+        profile != null &&
+        profile.fullName.isNotEmpty) {
       parts.add(profile.fullName);
     }
 
@@ -77,6 +91,18 @@ class ReminderContentFormatter {
     parts.add('Scheduled for $timeStr');
 
     return parts.join(' \u2014 ');
+  }
+
+  static String _formatMedicationName(Medication medication) {
+    if (medication.doseAmount != null &&
+        medication.doseAmount!.isNotEmpty) {
+      final dose = medication.doseAmount!;
+      final unit = (medication.doseUnit != null && medication.doseUnit!.isNotEmpty)
+          ? ' ${medication.doseUnit!}'
+          : '';
+      return '${medication.name} $dose$unit';
+    }
+    return medication.name;
   }
 
   static String _formatIntakeQuantity(MedicationSchedule schedule) {

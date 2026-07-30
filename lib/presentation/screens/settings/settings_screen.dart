@@ -35,6 +35,8 @@ class SettingsScreen extends ConsumerWidget {
     final reminderSound = ref.watch(reminderSoundEnabledProvider);
     final reminderVibration = ref.watch(reminderVibrationEnabledProvider);
     final snoozeDuration = ref.watch(defaultSnoozeDurationProvider);
+    final showPatientName = ref.watch(showPatientNameInNotificationsProvider);
+    final showLockScreenDetails = ref.watch(showDetailsOnLockScreenProvider);
 
     final hasName =
         profile != null &&
@@ -140,6 +142,24 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: Text(l10n.minutesValue(snoozeDuration)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showSnoozeDurationDialog(context, ref, l10n, snoozeDuration),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.person_outlined),
+            title: Text('Show patient name'),
+            subtitle: const Text('Display patient name in notifications'),
+            value: showPatientName,
+            onChanged: (value) {
+              ref.read(showPatientNameInNotificationsProvider.notifier).setEnabled(value);
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.lock_outline),
+            title: Text('Show details on lock screen'),
+            subtitle: const Text('Show medication details on the lock screen'),
+            value: showLockScreenDetails,
+            onChanged: (value) {
+              ref.read(showDetailsOnLockScreenProvider.notifier).setEnabled(value);
+            },
           ),
           const Divider(),
           _buildPermissionTile(
@@ -376,21 +396,31 @@ class SettingsScreen extends ConsumerWidget {
       testTime.second,
     );
 
-    final channelId = isMeasurement
-        ? NotificationService.measurementChannelId
-        : NotificationService.medicationChannelId;
-
-    final id = isMeasurement ? 999998 : 999999;
-
-    await service.scheduleNotification(
-      id: id,
-      title: l10n.testReminderTitle,
-      body: l10n.testReminderBody,
-      scheduledDate: tzDate,
-      channelId: channelId,
-      playSound: playSound,
-      enableVibration: enableVibration,
-    );
+    if (isMeasurement) {
+      const channelId = NotificationService.measurementChannelId;
+      const id = 999998;
+      await service.scheduleNotification(
+        id: id,
+        title: 'Test measurement reminder',
+        body: 'This is a test of measurement reminder alerts.',
+        scheduledDate: tzDate,
+        channelId: channelId,
+        playSound: playSound,
+        enableVibration: enableVibration,
+      );
+    } else {
+      const channelId = NotificationService.medicationChannelId;
+      const id = 999999;
+      await service.scheduleNotification(
+        id: id,
+        title: 'Test medication reminder',
+        body: 'This is a test of medication reminder alerts.',
+        scheduledDate: tzDate,
+        channelId: channelId,
+        playSound: playSound,
+        enableVibration: enableVibration,
+      );
+    }
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

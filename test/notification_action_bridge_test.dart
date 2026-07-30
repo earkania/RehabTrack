@@ -303,6 +303,7 @@ class FakeNotificationService extends NotificationService {
     bool isMeasurement = false,
     bool playSound = true,
     bool enableVibration = true,
+    NotificationVisibility visibility = NotificationVisibility.public,
   }) async {
     scheduledNotifications.add({
       'id': id,
@@ -327,6 +328,7 @@ class FakeNotificationService extends NotificationService {
     bool isMeasurement = false,
     bool playSound = true,
     bool enableVibration = true,
+    NotificationVisibility visibility = NotificationVisibility.public,
   }) async {}
 
   @override
@@ -399,7 +401,37 @@ void main() {
   });
 
   group('ReminderContentFormatter', () {
-    test('medicationBody includes dose amount and unit', () {
+    test('medicationTitle includes strength when present', () {
+      final medication = Medication(
+        profileId: 1,
+        name: 'Ibuprofen',
+        doseAmount: '200',
+        doseUnit: 'mg',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      final title = ReminderContentFormatter.medicationTitle(
+        medication: medication,
+        profile: null,
+      );
+      expect(title, 'Ibuprofen 200 mg');
+    });
+
+    test('medicationTitle shows name only when strength absent', () {
+      final medication = Medication(
+        profileId: 1,
+        name: 'Vitamin D',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      final title = ReminderContentFormatter.medicationTitle(
+        medication: medication,
+        profile: null,
+      );
+      expect(title, 'Vitamin D');
+    });
+
+    test('medicationBody includes intake quantity', () {
       final medication = Medication(
         profileId: 1,
         name: 'Ibuprofen',
@@ -421,7 +453,6 @@ void main() {
         schedule: schedule,
         scheduledTime: DateTime.now(),
       );
-      expect(body, contains('200 mg'));
       expect(body, contains('1 tablet'));
     });
 
@@ -449,7 +480,7 @@ void main() {
       expect(body, contains('Take with food'));
     });
 
-    test('medicationBody combines dose, intake quantity, and instructions', () {
+    test('medicationBody combines intake quantity and instructions', () {
       final medication = Medication(
         profileId: 1,
         name: 'Ibuprofen',
@@ -472,7 +503,6 @@ void main() {
         schedule: schedule,
         scheduledTime: DateTime.now(),
       );
-      expect(body, contains('200 mg'));
       expect(body, contains('2 capsules'));
       expect(body, contains('After meals'));
     });
@@ -499,6 +529,66 @@ void main() {
         scheduledTime: DateTime.now(),
       );
       expect(body, contains('1 pump'));
+    });
+
+    test('medicationBody includes profile name when enabled', () {
+      final profile = Profile(
+        firstName: 'Emzari',
+        lastName: 'Arkania',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      final medication = Medication(
+        profileId: 1,
+        name: 'Clopidogrel',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      const schedule = MedicationSchedule(
+        medicationId: 1,
+        scheduleType: 'daily',
+        scheduleConfig: DailySchedule(times: ['08:00']),
+        intakeQuantity: 1,
+        dosageForm: DosageForm.tablet,
+      );
+      final body = ReminderContentFormatter.medicationBody(
+        medication: medication,
+        profile: profile,
+        schedule: schedule,
+        scheduledTime: DateTime.now(),
+        showProfileName: true,
+      );
+      expect(body, contains('Emzari Arkania'));
+    });
+
+    test('medicationBody omits profile name when disabled', () {
+      final profile = Profile(
+        firstName: 'Emzari',
+        lastName: 'Arkania',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      final medication = Medication(
+        profileId: 1,
+        name: 'Clopidogrel',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      );
+      const schedule = MedicationSchedule(
+        medicationId: 1,
+        scheduleType: 'daily',
+        scheduleConfig: DailySchedule(times: ['08:00']),
+        intakeQuantity: 1,
+        dosageForm: DosageForm.tablet,
+      );
+      final body = ReminderContentFormatter.medicationBody(
+        medication: medication,
+        profile: profile,
+        schedule: schedule,
+        scheduledTime: DateTime.now(),
+        showProfileName: false,
+      );
+      expect(body, isNot(contains('Emzari Arkania')));
     });
   });
 
@@ -527,6 +617,8 @@ void main() {
         measurementRepository: measurementRepo,
         profileRepository: FakeProfileRepository(),
         getSnoozeDuration: () => const Duration(minutes: 10),
+        showProfileName: () => true,
+        showDetailsOnLockScreen: () => true,
       );
     });
 
@@ -548,13 +640,14 @@ void main() {
 
       final response = NotificationActionResponse(
         notificationId: 10,
-        actionId: 'taken',
-        actionType: NotificationActionType.taken,
+        actionId: 'medication_mark_taken',
+        actionType: NotificationActionType.medicationMarkTaken,
         payload: payload.toJsonString(),
       );
 
       notificationService.actionCallback!(response);
 
+      await Future<void>.delayed(Duration.zero);
       await Future<void>.delayed(Duration.zero);
 
       expect(repo.loggedDoses, hasLength(1));
@@ -576,13 +669,14 @@ void main() {
 
       final response = NotificationActionResponse(
         notificationId: 10,
-        actionId: 'skipped',
-        actionType: NotificationActionType.skipped,
+        actionId: 'medication_skip',
+        actionType: NotificationActionType.medicationSkip,
         payload: payload.toJsonString(),
       );
 
       notificationService.actionCallback!(response);
 
+      await Future<void>.delayed(Duration.zero);
       await Future<void>.delayed(Duration.zero);
 
       expect(repo.loggedDoses, hasLength(1));
@@ -622,8 +716,8 @@ void main() {
 
       final response = NotificationActionResponse(
         notificationId: 10,
-        actionId: 'snoozed',
-        actionType: NotificationActionType.snoozed,
+        actionId: 'medication_snooze',
+        actionType: NotificationActionType.medicationSnooze,
         payload: payload.toJsonString(),
       );
 
@@ -647,8 +741,8 @@ void main() {
 
       final response = NotificationActionResponse(
         notificationId: 10,
-        actionId: 'taken',
-        actionType: NotificationActionType.taken,
+        actionId: 'medication_mark_taken',
+        actionType: NotificationActionType.medicationMarkTaken,
         payload: null,
       );
 

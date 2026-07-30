@@ -8,19 +8,45 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'notification_action_handler.dart';
+import 'pending_action_store.dart';
 
 NotificationActionCallback? _notificationActionCallback;
+VoidCallback? _notificationTapCallback;
 
 @pragma('vm:entry-point')
 void _onBackgroundNotificationResponse(NotificationResponse response) {
-  _handleNotificationResponse(response);
+  _handleBackgroundNotificationResponse(response);
 }
 
 void _onNotificationResponse(NotificationResponse response) {
   _handleNotificationResponse(response);
 }
 
+void _handleBackgroundNotificationResponse(NotificationResponse response) {
+  final actionType = _parseActionType(response.actionId);
+  if (actionType == null) return;
+
+  PendingActionStore.instance.addPendingAction(
+    PendingActionEntry(
+      actionType: actionType,
+      notificationId: response.id ?? 0,
+      actionId: response.actionId ?? '',
+      payload: response.payload,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+    ),
+  );
+}
+
 void _handleNotificationResponse(NotificationResponse response) {
+  if (response.actionId == null || response.actionId!.isEmpty) {
+    final tapCallback = _notificationTapCallback;
+    if (tapCallback != null) {
+      debugPrint('[NotificationService] notification tap, invoking navigation callback');
+      tapCallback();
+    }
+    return;
+  }
+
   final callback = _notificationActionCallback;
   if (callback == null) return;
 
@@ -39,11 +65,12 @@ void _handleNotificationResponse(NotificationResponse response) {
 
 NotificationActionType? _parseActionType(String? actionId) {
   return switch (actionId) {
-    'action_taken' => NotificationActionType.taken,
-    'action_skipped' => NotificationActionType.skipped,
-    'action_snoozed' => NotificationActionType.snoozed,
-    'action_recordNow' => NotificationActionType.recordNow,
-    'action_dismiss' => NotificationActionType.dismiss,
+    'medication_mark_taken' => NotificationActionType.medicationMarkTaken,
+    'medication_snooze' => NotificationActionType.medicationSnooze,
+    'medication_skip' => NotificationActionType.medicationSkip,
+    'measurement_record_now' => NotificationActionType.measurementRecordNow,
+    'measurement_snooze' => NotificationActionType.measurementSnooze,
+    'measurement_skip' => NotificationActionType.measurementSkip,
     _ => null,
   };
 }
@@ -82,6 +109,10 @@ class NotificationService {
 
   void setActionCallback(NotificationActionCallback callback) {
     _notificationActionCallback = callback;
+  }
+
+  void setNotificationTapCallback(VoidCallback callback) {
+    _notificationTapCallback = callback;
   }
 
   Future<bool> initialize() async {
@@ -238,6 +269,7 @@ class NotificationService {
     List<AndroidNotificationAction>? actions,
     bool playSound = true,
     bool enableVibration = true,
+    NotificationVisibility visibility = NotificationVisibility.public,
   }) {
     return AndroidNotificationDetails(
       channelId,
@@ -250,7 +282,7 @@ class NotificationService {
       playSound: playSound,
       enableVibration: enableVibration,
       vibrationPattern: enableVibration ? _vibrationPattern : null,
-      visibility: NotificationVisibility.public,
+      visibility: visibility,
     );
   }
 
@@ -261,6 +293,7 @@ class NotificationService {
     List<AndroidNotificationAction>? actions,
     bool playSound = true,
     bool enableVibration = true,
+    NotificationVisibility visibility = NotificationVisibility.public,
   }) {
     return NotificationDetails(
       android: _channelDetails(
@@ -270,23 +303,24 @@ class NotificationService {
         actions: actions,
         playSound: playSound,
         enableVibration: enableVibration,
+        visibility: visibility,
       ),
     );
   }
 
   static const _medicationActions = [
     AndroidNotificationAction(
-      'action_taken',
+      'medication_mark_taken',
       'Mark as Taken',
       showsUserInterface: false,
     ),
     AndroidNotificationAction(
-      'action_snoozed',
+      'medication_snooze',
       'Snooze',
       showsUserInterface: false,
     ),
     AndroidNotificationAction(
-      'action_skipped',
+      'medication_skip',
       'Skip',
       showsUserInterface: false,
     ),
@@ -294,17 +328,17 @@ class NotificationService {
 
   static const _measurementActions = [
     AndroidNotificationAction(
-      'action_recordNow',
+      'measurement_record_now',
       'Record Now',
       showsUserInterface: false,
     ),
     AndroidNotificationAction(
-      'action_snoozed',
+      'measurement_snooze',
       'Snooze',
       showsUserInterface: false,
     ),
     AndroidNotificationAction(
-      'action_skipped',
+      'measurement_skip',
       'Skip',
       showsUserInterface: false,
     ),
@@ -320,6 +354,7 @@ class NotificationService {
     bool isMeasurement = false,
     bool playSound = true,
     bool enableVibration = true,
+    NotificationVisibility visibility = NotificationVisibility.public,
   }) async {
     if (!_initialized) {
       debugPrint('[NotificationService] showNotification SKIPPED: not initialized');
@@ -339,6 +374,7 @@ class NotificationService {
       actions: actions,
       playSound: playSound,
       enableVibration: enableVibration,
+      visibility: visibility,
     );
 
     debugPrint('[NotificationService] showNotification calling plugin.show');
@@ -363,6 +399,7 @@ class NotificationService {
     bool isMeasurement = false,
     bool playSound = true,
     bool enableVibration = true,
+    NotificationVisibility visibility = NotificationVisibility.public,
   }) async {
     if (!_initialized) {
       debugPrint('[NotificationService] scheduleNotification SKIPPED: not initialized');
@@ -382,6 +419,7 @@ class NotificationService {
       actions: actions,
       playSound: playSound,
       enableVibration: enableVibration,
+      visibility: visibility,
     );
 
     debugPrint('[NotificationService] zonedSchedule: id=$id channelId=$channelId scheduledDate=$scheduledDate');

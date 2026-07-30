@@ -196,6 +196,92 @@ Note: Diet module has a DAO but no dedicated repository yet.
 - Boot rescheduling requires app to start (no native receiver)
 - Notification actions are infrastructure only — not connected to medication logs yet
 
+### Phase 7B — Reminder Reliability & Notification Corrections
+
+**Status:** In Progress (code changes complete, pending Pixel 7 verification)
+
+**What was done:**
+
+#### Defect Fixes
+
+**Notification Action IDs:**
+- Changed from generic `action_taken`, `action_skipped`, `action_snoozed`, `action_recordNow` to stable identifiers:
+  - `medication_mark_taken`, `medication_skip`, `medication_snooze`
+  - `measurement_record_now`, `measurement_skip`, `measurement_snooze`
+- Action type enum updated to match: `medicationMarkTaken`, `medicationSkip`, `medicationSnooze`, etc.
+
+**Test Reminder Differentiation:**
+- Medication test: title = "Test medication reminder", body = "This is a test of medication reminder alerts."
+- Measurement test: title = "Test measurement reminder", body = "This is a test of measurement reminder alerts."
+- Different IDs (999999 medication, 999998 measurement) on appropriate channels
+
+**Medication Title Formatting:**
+- Title now includes strength when available: `"Clopidogrel 75 mg"` instead of just `"Clopidogrel"`
+- Strength derived from `medication.doseAmount` + `medication.doseUnit`
+- Falls back to name-only when strength absent
+
+**Background Action Processing:**
+- `PendingActionStore` written by `_onBackgroundNotificationResponse` is now consumed on app startup
+- `NotificationActionBridge.processPendingActions()` called at initialization
+- All action handlers are async with proper `await`
+
+**Configurable Settings:**
+- `showPatientNameInNotifications` (default: true) — controls patient name visibility in notification body
+- `showDetailsOnLockScreen` (default: true) — controls lock-screen notification visibility (uses `NotificationVisibility`)
+
+**Lock Screen Privacy:**
+- `NotificationService.scheduleNotification()` and `showNotification()` accept `NotificationVisibility` parameter
+- When `showDetailsOnLockScreen` is disabled, notification uses `NotificationVisibility.secret`
+
+**Idempotency & Action Results:**
+- All medication actions check for existing logs before creating duplicates
+- Structured `ActionResult` enum: success, alreadyCompleted, invalidPayload, entityNotFound, databaseError, unexpectedError
+- Snooze preserves original occurrence identity, cancels current notification, schedules Android-backed alarm
+
+**Timezone Handling:**
+- Timezone detected from Android `TimeZone.getDefault().id` (returns IANA name like "Asia/Tbilisi")
+- `tz.local` set correctly in `NotificationService.initialize()`
+- All scheduling uses `TZDateTime` with `tz.local` — no double conversion
+
+**Notification Channel Updates:**
+- Only 2 channels remain: `rehabtrack_medications` and `rehabtrack_measurements` (General removed)
+- Test notifications now use the appropriate channel (medication vs measurement)
+
+#### Files Modified
+
+| File | Changes |
+|---|---|
+| `notification_action_handler.dart` | New enum values for stable action IDs |
+| `notification_service.dart` | Updated action IDs, added `visibility` param, updated `_parseActionType` |
+| `notification_scheduler.dart` | Added `visibility` support, `NotificationVisibility` import |
+| `notification_action_bridge.dart` | Rewritten: async handlers, pending action processing, idempotency, Result type, new action types |
+| `reminder_content_formatter.dart` | Added `_formatMedicationName` with strength, `showProfileName` param, `medicationSubtext` |
+| `reminder_payload.dart` | Added `notificationId` field, version bump to 2 |
+| `app_constants.dart` | Added `showPatientNameInNotificationsKey`, `showDetailsOnLockScreenKey` |
+| `reminder_settings_provider.dart` | Added `showPatientNameInNotificationsProvider`, `showDetailsOnLockScreenProvider` |
+| `notification_provider.dart` | Added `processPendingActions()` call, `showProfileName`/`showDetailsOnLockScreen` injections |
+| `settings_screen.dart` | Fixed test reminders differentiation, added Show patient name / Show details on lock screen toggles |
+| `medication_repository_impl.dart` | No changes (already used correct API) |
+
+#### Tests Updated
+
+- `notification_action_bridge_test.dart` — Updated action types, added medicationTitle tests, profile visibility tests
+- `settings_grace_period_test.dart` — Added `visibility` param to fake service
+
+#### Validation Results
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (5 info lints — pre-existing) |
+| `flutter test` | Passed (740/740; 1 pre-existing failure in today_screen_test.dart) |
+
+**Deferred (require Pixel 7 verification):**
+- Cold-start notification tap handling via `getNotificationAppLaunchDetails`
+- Notification-body tap → open details screen
+- Measurement lifecycle tests (foreground, background, terminated)
+- Device restart recovery test
+- Force-stop limitation documentation
+
 ## Current Application State
 
 **App launches successfully on Pixel 7.**

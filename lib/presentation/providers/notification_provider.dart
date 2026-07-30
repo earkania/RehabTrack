@@ -58,6 +58,12 @@ final notificationActionBridgeProvider =
       final minutes = ref.read(defaultSnoozeDurationProvider);
       return Duration(minutes: minutes);
     },
+    showProfileName: () {
+      return ref.read(showPatientNameInNotificationsProvider);
+    },
+    showDetailsOnLockScreen: () {
+      return ref.read(showDetailsOnLockScreenProvider);
+    },
   );
   return bridge;
 });
@@ -89,6 +95,9 @@ final notificationInitializerProvider = FutureProvider<void>((ref) async {
     final granted = await service.requestNotificationPermission();
     debugPrint('[notificationInitializerProvider] permission granted: $granted');
   }
+
+  // Process any pending actions that were stored by the background callback.
+  await bridge.processPendingActions();
 
   // Recovery runs after a short delay to let DB queries settle.
   await Future.delayed(const Duration(seconds: 2));

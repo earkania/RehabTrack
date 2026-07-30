@@ -14,10 +14,11 @@ class ReminderPayload {
     this.measurementReminderLogId,
     this.measurementRecordId,
     this.snoozeSourceOccurrence,
+    this.notificationId,
     this.version = _currentVersion,
   });
 
-  static const _currentVersion = 1;
+  static const _currentVersion = 2;
 
   final int version;
   final ReminderType type;
@@ -30,6 +31,7 @@ class ReminderPayload {
   final int? measurementReminderLogId;
   final int? measurementRecordId;
   final String? snoozeSourceOccurrence;
+  final int? notificationId;
 
   DateTime? get occurrenceDateTime => DateTime.tryParse(occurrenceTime);
 
@@ -45,6 +47,7 @@ class ReminderPayload {
         if (measurementReminderLogId != null) 'rl': measurementReminderLogId,
         if (measurementRecordId != null) 'rr': measurementRecordId,
         if (snoozeSourceOccurrence != null) 'so': snoozeSourceOccurrence,
+        if (notificationId != null) 'ni': notificationId,
       };
 
   String toJsonString() => jsonEncode(toJson());
@@ -74,7 +77,7 @@ class ReminderPayload {
     }
 
     return ReminderPayload(
-      version: (json['v'] as int?) ?? 1,
+      version: (json['v'] as int?) ?? 2,
       type: type,
       profileId: profileId,
       scheduleId: scheduleId,
@@ -85,6 +88,7 @@ class ReminderPayload {
       measurementReminderLogId: json['rl'] as int?,
       measurementRecordId: json['rr'] as int?,
       snoozeSourceOccurrence: json['so'] as String?,
+      notificationId: json['ni'] as int?,
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:rehab_track/data/services/notification/notification_action_handler.dart';
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
+import 'package:rehab_track/data/services/notification/pending_action_store.dart';
 import 'package:rehab_track/data/services/notification/reminder_content_formatter.dart';
 import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/data/services/notification/schedule_recovery_service.dart';
@@ -18,16 +19,21 @@ import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/domain/repositories/profile_repository.dart';
 
+enum ActionResult { success, alreadyCompleted, invalidPayload, entityNotFound, databaseError, unexpectedError }
+
 class NotificationActionBridge {
   NotificationActionBridge({
-    required this._notificationService,
+    required NotificationService notificationService,
     required NotificationScheduler notificationScheduler,
     required this.scheduleRecoveryService,
     required this._medicationRepository,
     required this._measurementRepository,
     required this._profileRepository,
     required this.getSnoozeDuration,
-  })  : _notificationScheduler = notificationScheduler;
+    required this.showProfileName,
+    required this.showDetailsOnLockScreen,
+  })  : _notificationService = notificationService,
+        _notificationScheduler = notificationScheduler;
 
   final NotificationService _notificationService;
   final NotificationScheduler _notificationScheduler;
@@ -36,10 +42,13 @@ class NotificationActionBridge {
   final MeasurementRepository _measurementRepository;
   final ProfileRepository _profileRepository;
   final Duration Function() getSnoozeDuration;
+  final bool Function() showProfileName;
+  final bool Function() showDetailsOnLockScreen;
 
   Future<void> initialize() async {
     _notificationService.setActionCallback(_handleAction);
-    debugPrint('NotificationActionBridge: action callback registered');
+    _notificationService.setNotificationTapCallback(_onNotificationTap);
+    debugPrint('[NotificationActionBridge] action and tap callbacks registered');
   }
 
   Future<void> recoverAll(int profileId) async {
@@ -53,131 +62,160 @@ class NotificationActionBridge {
   Future<void> recoverMeasurementSchedules(int profileId) =>
       _recoverMeasurementSchedules(profileId);
 
-  void _handleAction(NotificationActionResponse response) {
-    debugPrint('NotificationActionBridge: action=${response.actionType.name}, '
-        'notificationId=${response.notificationId}');
+  Future<void> processPendingActions() async {
+    final entries = await PendingActionStore.instance.consumeAll();
+    if (entries.isEmpty) return;
 
+    debugPrint('[NotificationActionBridge] processing ${entries.length} pending action(s)');
+
+    for (final entry in entries) {
+      try {
+        await _executeAction(entry.toResponse());
+      } catch (e) {
+        debugPrint('[NotificationActionBridge] pending action failed: $e');
+      }
+    }
+  }
+
+  Future<ActionResult> _executeAction(NotificationActionResponse response) async {
     final payload = ReminderPayload.parse(response.payload);
     if (payload == null) {
-      debugPrint('NotificationActionBridge: invalid or missing payload, ignoring');
-      return;
+      debugPrint('[NotificationActionBridge] invalid payload in action response');
+      return ActionResult.invalidPayload;
     }
 
+    debugPrint('[NotificationActionBridge] action=${response.actionType.name} '
+        'notificationId=${response.notificationId} scheduleId=${payload.scheduleId} '
+        'type=${payload.type.name}');
+
     switch (response.actionType) {
-      case NotificationActionType.taken:
-        _handleMedicationTaken(payload);
-      case NotificationActionType.skipped:
-        _handleSkipped(payload);
-      case NotificationActionType.snoozed:
-        _handleSnooze(response, payload);
-      case NotificationActionType.recordNow:
-        _handleRecordNow(response, payload);
+      case NotificationActionType.medicationMarkTaken:
+        return await _handleMedicationTaken(payload);
+      case NotificationActionType.medicationSkip:
+        return await _handleMedicationSkip(payload);
+      case NotificationActionType.medicationSnooze:
+        return await _handleMedicationSnooze(response, payload);
+      case NotificationActionType.measurementRecordNow:
+        return await _handleMeasurementRecordNow(payload);
+      case NotificationActionType.measurementSnooze:
+        return await _handleMeasurementSnooze(response, payload);
+      case NotificationActionType.measurementSkip:
+        return await _handleMeasurementSkip(payload);
+      case NotificationActionType.tap:
+        return ActionResult.success;
       case NotificationActionType.dismiss:
-        break;
+        return ActionResult.success;
     }
+  }
+
+  Future<void> _handleAction(NotificationActionResponse response) async {
+    await _executeAction(response);
+  }
+
+  void _onNotificationTap() {
+    debugPrint('[NotificationActionBridge] notification tap');
   }
 
   // --- Medication: Taken ---
 
-  Future<void> _handleMedicationTaken(ReminderPayload payload) async {
+  Future<ActionResult> _handleMedicationTaken(ReminderPayload payload) async {
     final now = DateTime.now();
     final scheduledTime = payload.occurrenceDateTime ?? now;
-    final schedule =
-        await _medicationRepository.getSchedule(payload.scheduleId);
-
-    final logEntry = MedicationLog(
-      medicationScheduleId: payload.scheduleId,
-      scheduledTime: scheduledTime,
-      takenTime: now,
-      status: 'taken',
-      createdAt: now,
-      snapshotIntakeQuantity: schedule?.intakeQuantity,
-      snapshotDosageForm: schedule?.dosageForm,
-      snapshotCustomDosageForm: schedule?.customDosageForm,
-    );
 
     try {
-      await _medicationRepository.logDose(logEntry);
-      debugPrint('NotificationActionBridge: logged taken dose for schedule '
-          '${payload.scheduleId}');
-    } catch (e) {
-      debugPrint('NotificationActionBridge: failed to log taken dose: $e');
-    }
+      final existing = await _medicationRepository.getLogForOccurrence(
+        payload.scheduleId,
+        scheduledTime,
+      );
 
-    await _cancelOccurrenceNotifications(payload);
-  }
-
-  // --- Medication/Measurement: Skipped ---
-
-  Future<void> _handleSkipped(ReminderPayload payload) async {
-    switch (payload.type) {
-      case ReminderType.medication:
-        await _handleMedicationSkipped(payload);
-      case ReminderType.measurement:
-        await _handleMeasurementSkipped(payload);
-    }
-  }
-
-  Future<void> _handleMedicationSkipped(ReminderPayload payload) async {
-    final now = DateTime.now();
-    final scheduledTime = payload.occurrenceDateTime ?? now;
-    final schedule =
-        await _medicationRepository.getSchedule(payload.scheduleId);
-
-    final logEntry = MedicationLog(
-      medicationScheduleId: payload.scheduleId,
-      scheduledTime: scheduledTime,
-      status: 'skipped',
-      createdAt: now,
-      snapshotIntakeQuantity: schedule?.intakeQuantity,
-      snapshotDosageForm: schedule?.dosageForm,
-      snapshotCustomDosageForm: schedule?.customDosageForm,
-    );
-
-    try {
-      await _medicationRepository.logDose(logEntry);
-      debugPrint('NotificationActionBridge: logged skipped dose for schedule '
-          '${payload.scheduleId}');
-    } catch (e) {
-      debugPrint('NotificationActionBridge: failed to log skipped dose: $e');
-    }
-
-    await _cancelOccurrenceNotifications(payload);
-  }
-
-  // --- Snooze (medication and measurement) ---
-
-  Future<void> _handleSnooze(
-    NotificationActionResponse response,
-    ReminderPayload payload,
-  ) async {
-    switch (payload.type) {
-      case ReminderType.medication:
-        await _handleMedicationSnooze(response, payload);
-      case ReminderType.measurement:
-        await _handleMeasurementSnooze(response, payload);
-    }
-  }
-
-  Future<void> _handleMedicationSnooze(
-    NotificationActionResponse response,
-    ReminderPayload payload,
-  ) async {
-    try {
-      final schedule =
-          await _medicationRepository.getSchedule(payload.scheduleId);
-      if (schedule == null) {
-        debugPrint('NotificationActionBridge: schedule ${payload.scheduleId} '
-            'not found for snooze');
-        return;
+      if (existing != null) {
+        debugPrint('[NotificationActionBridge] dose already logged for schedule '
+            '${payload.scheduleId} at $scheduledTime, skipping duplicate');
+        return ActionResult.alreadyCompleted;
       }
 
-      final medication =
-          await _medicationRepository.getMedication(payload.medicationId!);
+      final schedule = await _medicationRepository.getSchedule(payload.scheduleId);
+
+      final logEntry = MedicationLog(
+        medicationScheduleId: payload.scheduleId,
+        scheduledTime: scheduledTime,
+        takenTime: now,
+        status: 'taken',
+        createdAt: now,
+        snapshotIntakeQuantity: schedule?.intakeQuantity,
+        snapshotDosageForm: schedule?.dosageForm,
+        snapshotCustomDosageForm: schedule?.customDosageForm,
+      );
+
+      await _medicationRepository.logDose(logEntry);
+      debugPrint('[NotificationActionBridge] marked taken schedule ${payload.scheduleId}');
+
+      await _cancelOccurrenceNotifications(payload);
+      return ActionResult.success;
+    } catch (e) {
+      debugPrint('[NotificationActionBridge] mark taken FAILED: $e');
+      return ActionResult.databaseError;
+    }
+  }
+
+  // --- Medication: Skip ---
+
+  Future<ActionResult> _handleMedicationSkip(ReminderPayload payload) async {
+    final now = DateTime.now();
+    final scheduledTime = payload.occurrenceDateTime ?? now;
+
+    try {
+      final existing = await _medicationRepository.getLogForOccurrence(
+        payload.scheduleId,
+        scheduledTime,
+      );
+
+      if (existing != null) {
+        debugPrint('[NotificationActionBridge] skip already logged for schedule '
+            '${payload.scheduleId} at $scheduledTime');
+        return ActionResult.alreadyCompleted;
+      }
+
+      final schedule = await _medicationRepository.getSchedule(payload.scheduleId);
+
+      final logEntry = MedicationLog(
+        medicationScheduleId: payload.scheduleId,
+        scheduledTime: scheduledTime,
+        status: 'skipped',
+        createdAt: now,
+        snapshotIntakeQuantity: schedule?.intakeQuantity,
+        snapshotDosageForm: schedule?.dosageForm,
+        snapshotCustomDosageForm: schedule?.customDosageForm,
+      );
+
+      await _medicationRepository.logDose(logEntry);
+      debugPrint('[NotificationActionBridge] skipped schedule ${payload.scheduleId}');
+
+      await _cancelOccurrenceNotifications(payload);
+      return ActionResult.success;
+    } catch (e) {
+      debugPrint('[NotificationActionBridge] skip FAILED: $e');
+      return ActionResult.databaseError;
+    }
+  }
+
+  // --- Medication: Snooze ---
+
+  Future<ActionResult> _handleMedicationSnooze(
+    NotificationActionResponse response,
+    ReminderPayload payload,
+  ) async {
+    try {
+      final schedule = await _medicationRepository.getSchedule(payload.scheduleId);
+      if (schedule == null) {
+        debugPrint('[NotificationActionBridge] schedule ${payload.scheduleId} not found for snooze');
+        return ActionResult.entityNotFound;
+      }
+
+      final medication = await _medicationRepository.getMedication(payload.medicationId!);
       if (medication == null) {
-        debugPrint('NotificationActionBridge: medication ${payload.medicationId} '
-            'not found for snooze');
-        return;
+        debugPrint('[NotificationActionBridge] medication ${payload.medicationId} not found for snooze');
+        return ActionResult.entityNotFound;
       }
 
       final profile = payload.profileId > 0
@@ -198,6 +236,8 @@ class NotificationActionBridge {
       );
       final scheduledOccurrence = payload.occurrenceDateTime ?? now;
 
+      final showName = showProfileName();
+
       final snoozePayload = ReminderPayload(
         type: ReminderType.medication,
         profileId: payload.profileId,
@@ -205,6 +245,9 @@ class NotificationActionBridge {
         occurrenceTime: payload.occurrenceTime,
         medicationId: payload.medicationId,
         snoozeSourceOccurrence: payload.occurrenceTime,
+        notificationId: NotificationService.snoozeNotificationId(
+          response.notificationId,
+        ),
       );
 
       final snoozeId = NotificationService.snoozeNotificationId(
@@ -216,12 +259,14 @@ class NotificationActionBridge {
         title: ReminderContentFormatter.medicationTitle(
           profile: profile,
           medication: medication,
+          showProfileName: showName,
         ),
         body: ReminderContentFormatter.medicationBody(
           profile: profile,
           medication: medication,
           schedule: schedule,
           scheduledTime: scheduledOccurrence,
+          showProfileName: showName,
         ),
         scheduledDate: scheduledDate,
         channelId: NotificationService.medicationChannelId,
@@ -230,98 +275,117 @@ class NotificationActionBridge {
         isMeasurement: false,
       );
 
-      debugPrint('NotificationActionBridge: snoozed medication notification '
-          '$snoozeId for $snoozeTime');
+      await _notificationService.cancelNotification(response.notificationId);
+
+      debugPrint('[NotificationActionBridge] snoozed medication $snoozeId for $snoozeTime');
+      return ActionResult.success;
     } catch (e) {
-      debugPrint('NotificationActionBridge: failed to snooze medication: $e');
+      debugPrint('[NotificationActionBridge] medication snooze FAILED: $e');
+      return ActionResult.unexpectedError;
     }
   }
 
-  // --- Measurement actions ---
+  // --- Measurement: Record Now ---
 
-  Future<void> _handleRecordNow(
-    NotificationActionResponse response,
-    ReminderPayload payload,
-  ) async {
+  Future<ActionResult> _handleMeasurementRecordNow(ReminderPayload payload) async {
     final scheduledTime = payload.occurrenceDateTime ?? DateTime.now();
 
-    final existing = await _measurementRepository.getReminderLog(
-      payload.scheduleId,
-      scheduledTime,
-    );
+    try {
+      final existing = await _measurementRepository.getReminderLog(
+        payload.scheduleId,
+        scheduledTime,
+      );
 
-    if (existing != null && existing.id != null) {
-      await _measurementRepository.updateReminderLog(
-        existing.copyWith(
-          status: MeasurementReminderAction.completed,
-          actionTime: DateTime.now(),
-        ),
-      );
-    } else {
-      await _measurementRepository.logReminder(
-        MeasurementReminderLog(
-          measurementScheduleId: payload.scheduleId,
-          scheduledTime: scheduledTime,
-          actionTime: DateTime.now(),
-          status: MeasurementReminderAction.completed,
-          createdAt: DateTime.now(),
-        ),
-      );
+      if (existing != null && existing.id != null) {
+        if (existing.status == MeasurementReminderAction.completed) {
+          debugPrint('[NotificationActionBridge] measurement already recorded for schedule ${payload.scheduleId}');
+          return ActionResult.alreadyCompleted;
+        }
+        await _measurementRepository.updateReminderLog(
+          existing.copyWith(
+            status: MeasurementReminderAction.completed,
+            actionTime: DateTime.now(),
+          ),
+        );
+      } else {
+        await _measurementRepository.logReminder(
+          MeasurementReminderLog(
+            measurementScheduleId: payload.scheduleId,
+            scheduledTime: scheduledTime,
+            actionTime: DateTime.now(),
+            status: MeasurementReminderAction.completed,
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
+
+      await _cancelOccurrenceNotifications(payload);
+      debugPrint('[NotificationActionBridge] recordNow schedule ${payload.scheduleId}');
+      return ActionResult.success;
+    } catch (e) {
+      debugPrint('[NotificationActionBridge] recordNow FAILED: $e');
+      return ActionResult.databaseError;
     }
-
-    await _cancelOccurrenceNotifications(payload);
-    debugPrint('NotificationActionBridge: recordNow for schedule ${payload.scheduleId}');
   }
 
-  Future<void> _handleMeasurementSkipped(ReminderPayload payload) async {
+  // --- Measurement: Skip ---
+
+  Future<ActionResult> _handleMeasurementSkip(ReminderPayload payload) async {
     final scheduledTime = payload.occurrenceDateTime ?? DateTime.now();
 
-    final existing = await _measurementRepository.getReminderLog(
-      payload.scheduleId,
-      scheduledTime,
-    );
+    try {
+      final existing = await _measurementRepository.getReminderLog(
+        payload.scheduleId,
+        scheduledTime,
+      );
 
-    if (existing != null && existing.id != null) {
-      await _measurementRepository.updateReminderLog(
-        existing.copyWith(
-          status: MeasurementReminderAction.skipped,
-          actionTime: DateTime.now(),
-        ),
-      );
-    } else {
-      await _measurementRepository.logReminder(
-        MeasurementReminderLog(
-          measurementScheduleId: payload.scheduleId,
-          scheduledTime: scheduledTime,
-          actionTime: DateTime.now(),
-          status: MeasurementReminderAction.skipped,
-          createdAt: DateTime.now(),
-        ),
-      );
+      if (existing != null && existing.id != null) {
+        if (existing.status == MeasurementReminderAction.skipped) {
+          debugPrint('[NotificationActionBridge] measurement already skipped for schedule ${payload.scheduleId}');
+          return ActionResult.alreadyCompleted;
+        }
+        await _measurementRepository.updateReminderLog(
+          existing.copyWith(
+            status: MeasurementReminderAction.skipped,
+            actionTime: DateTime.now(),
+          ),
+        );
+      } else {
+        await _measurementRepository.logReminder(
+          MeasurementReminderLog(
+            measurementScheduleId: payload.scheduleId,
+            scheduledTime: scheduledTime,
+            actionTime: DateTime.now(),
+            status: MeasurementReminderAction.skipped,
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
+
+      await _cancelOccurrenceNotifications(payload);
+      debugPrint('[NotificationActionBridge] measurement skip schedule ${payload.scheduleId}');
+      return ActionResult.success;
+    } catch (e) {
+      debugPrint('[NotificationActionBridge] measurement skip FAILED: $e');
+      return ActionResult.databaseError;
     }
-
-    await _cancelOccurrenceNotifications(payload);
-    debugPrint('NotificationActionBridge: measurement reminder skipped '
-        'for schedule ${payload.scheduleId}');
   }
 
-  Future<void> _handleMeasurementSnooze(
+  // --- Measurement: Snooze ---
+
+  Future<ActionResult> _handleMeasurementSnooze(
     NotificationActionResponse response,
     ReminderPayload payload,
   ) async {
     try {
-      final schedule = await _measurementRepository.getSchedule(
-        payload.scheduleId,
-      );
+      final schedule = await _measurementRepository.getSchedule(payload.scheduleId);
       if (schedule == null) {
-        debugPrint('NotificationActionBridge: measurement schedule '
-            '${payload.scheduleId} not found for snooze');
-        return;
+        debugPrint('[NotificationActionBridge] measurement schedule ${payload.scheduleId} not found for snooze');
+        return ActionResult.entityNotFound;
       }
 
       final type = payload.measurementTypeId != null
-          ? await _measurementRepository.getMeasurementType(
-              payload.measurementTypeId!)
+          ? await _measurementRepository.getMeasurementType(payload.measurementTypeId!)
           : null;
 
       final profile = payload.profileId > 0
@@ -342,6 +406,8 @@ class NotificationActionBridge {
       );
       final scheduledOccurrence = payload.occurrenceDateTime ?? now;
 
+      final showName = showProfileName();
+
       final snoozePayload = ReminderPayload(
         type: ReminderType.measurement,
         profileId: payload.profileId,
@@ -349,6 +415,9 @@ class NotificationActionBridge {
         occurrenceTime: payload.occurrenceTime,
         measurementTypeId: payload.measurementTypeId,
         snoozeSourceOccurrence: payload.occurrenceTime,
+        notificationId: NotificationService.snoozeNotificationId(
+          response.notificationId,
+        ),
       );
 
       final snoozeId = NotificationService.snoozeNotificationId(
@@ -361,6 +430,7 @@ class NotificationActionBridge {
             ? ReminderContentFormatter.measurementTitle(
                 profile: profile,
                 type: type,
+                showProfileName: showName,
               )
             : 'Measurement Reminder',
         body: type != null
@@ -369,6 +439,7 @@ class NotificationActionBridge {
                 type: type,
                 schedule: schedule,
                 scheduledTime: scheduledOccurrence,
+                showProfileName: showName,
               )
             : 'Please record your measurement',
         scheduledDate: scheduledDate,
@@ -378,47 +449,24 @@ class NotificationActionBridge {
         isMeasurement: true,
       );
 
-      // Log snooze
-      final scheduledTime = payload.occurrenceDateTime ?? DateTime.now();
-      final existing = await _measurementRepository.getReminderLog(
-        payload.scheduleId,
-        scheduledTime,
-      );
-      if (existing != null && existing.id != null) {
-        await _measurementRepository.updateReminderLog(
-          existing.copyWith(
-            status: MeasurementReminderAction.snoozed,
-            actionTime: DateTime.now(),
-          ),
-        );
-      }
+      await _notificationService.cancelNotification(response.notificationId);
 
-      debugPrint('NotificationActionBridge: snoozed measurement notification '
-          '$snoozeId for $snoozeTime');
+      debugPrint('[NotificationActionBridge] snoozed measurement $snoozeId for $snoozeTime');
+      return ActionResult.success;
     } catch (e) {
-      debugPrint('NotificationActionBridge: failed to snooze measurement: $e');
+      debugPrint('[NotificationActionBridge] measurement snooze FAILED: $e');
+      return ActionResult.unexpectedError;
     }
   }
+
+  // --- Notification cancellation ---
 
   Future<void> _cancelOccurrenceNotifications(ReminderPayload payload) async {
-    final originalId = _computeOriginalNotificationId(payload);
-    if (originalId != null) {
-      await _notificationService.cancelNotification(originalId);
+    if (payload.notificationId != null) {
+      await _notificationService.cancelNotification(payload.notificationId!);
     }
-    final snoozeId = NotificationService.snoozeNotificationId(originalId ?? 0);
+    final snoozeId = NotificationService.snoozeNotificationId(payload.notificationId ?? 0);
     await _notificationService.cancelNotification(snoozeId);
-  }
-
-  int? _computeOriginalNotificationId(ReminderPayload payload) {
-    if (payload.snoozeSourceOccurrence != null) {
-      // This is a snoozed notification — compute the original ID from the
-      // snooze ID by reversing snoozeNotificationId.
-      return null;
-    }
-    // For a direct occurrence notification there isn't a single deterministic
-    // reverse mapping from payload alone. This is an approximation for the
-    // common case.
-    return null;
   }
 
   // --- Recovery ---
@@ -444,18 +492,17 @@ class NotificationActionBridge {
       }
 
       if (entries.isEmpty) {
-        debugPrint('NotificationActionBridge: no active medication schedules '
-            'to recover');
+        debugPrint('[NotificationActionBridge] no active medication schedules to recover');
         return;
       }
 
       await scheduleRecoveryService.recoverAllSchedules(
         activeSchedules: entries,
       );
-      debugPrint('NotificationActionBridge: medication recovery complete, '
+      debugPrint('[NotificationActionBridge] medication recovery complete, '
           '${entries.length} schedule entries processed');
     } catch (e) {
-      debugPrint('NotificationActionBridge: medication recovery failed: $e');
+      debugPrint('[NotificationActionBridge] medication recovery FAILED: $e');
     }
   }
 
@@ -482,12 +529,14 @@ class NotificationActionBridge {
       title: ReminderContentFormatter.medicationTitle(
         profile: null,
         medication: medication,
+        showProfileName: true,
       ),
       body: ReminderContentFormatter.medicationBody(
         profile: null,
         medication: medication,
         schedule: schedule,
         scheduledTime: DateTime.now(),
+        showProfileName: true,
       ),
       startDate: schedule.startDate,
       endDate: schedule.endDate,
@@ -512,18 +561,17 @@ class NotificationActionBridge {
       }
 
       if (entries.isEmpty) {
-        debugPrint('NotificationActionBridge: no active measurement schedules '
-            'to recover');
+        debugPrint('[NotificationActionBridge] no active measurement schedules to recover');
         return;
       }
 
       await scheduleRecoveryService.recoverAllSchedules(
         activeSchedules: entries,
       );
-      debugPrint('NotificationActionBridge: measurement recovery complete, '
+      debugPrint('[NotificationActionBridge] measurement recovery complete, '
           '${entries.length} schedule entries processed');
     } catch (e) {
-      debugPrint('NotificationActionBridge: measurement recovery failed: $e');
+      debugPrint('[NotificationActionBridge] measurement recovery FAILED: $e');
     }
   }
 
@@ -558,6 +606,7 @@ class NotificationActionBridge {
           ? ReminderContentFormatter.measurementTitle(
               profile: null,
               type: type,
+              showProfileName: true,
             )
           : 'Measurement Reminder',
       body: type != null
@@ -566,6 +615,7 @@ class NotificationActionBridge {
               type: type,
               schedule: schedule,
               scheduledTime: DateTime.now(),
+              showProfileName: true,
             )
           : 'Please record your measurement',
       startDate: schedule.startDate,
