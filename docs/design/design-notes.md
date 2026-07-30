@@ -281,6 +281,45 @@ Keep an expandable checklist for ideas that may be implemented later.
 - [ ] AI health assistant
 - [ ] Voice reminders
 - [ ] Home screen widgets
+- [x] Patient profiles foundation (Phase 7A)
+
+---
+
+# Patient Profiles — Design Rules
+
+**Approved:** 2026-07-28
+
+## Active profile architecture
+
+The active profile is stored as a setting (`active_profile_id` in `AppSettings`) and managed by `ActiveProfileIdNotifier` (Riverpod `AsyncNotifier`).
+
+**Key design decisions:**
+
+1. **Default on first launch:** When no setting exists and profiles exist, the first profile (alphabetically by firstName) is automatically set as active. This is persisted to settings immediately. The `build()` method writes the setting directly (without `ref.invalidateSelf()`) to avoid a disposal-during-build error.
+
+2. **Setting-only source of truth:** The `isPrimary` flag on the `Profiles` table is a separate concept from the active profile setting. A profile can be primary without being active, and vice versa. The `isPrimary` flag is for display ordering; the `active_profile_id` setting determines which profile's data is shown throughout the app.
+
+3. **Synchronous convenience provider:** `currentActiveProfileIdProvider` is a synchronous `Provider<int?>` that extracts the value from the `AsyncValue`. This allows callers to read the profile ID without dealing with `AsyncValue` wrapping. All existing callers (Today, Medications, Measurements, etc.) use this provider.
+
+4. **Provider invalidation on switch:** `setActiveProfileId()` calls `ref.invalidateSelf()`, which triggers a full rebuild of the notifier. The convenience provider re-reads automatically. Callers that watch `currentActiveProfileIdProvider` rebuild automatically.
+
+## Profile data model
+
+**Relationship to Owner:** Stored as a string key (`self`, `spouse`, `parent`, `child`, `sibling`, `other`) rather than an integer enum value. This makes the database human-readable and extensible without schema changes. The `parsedRelationship` getter on the domain entity provides typed access.
+
+**Profile photo storage:** Photos are stored locally in the app's documents directory under `profile_images/`. The `photoPath` column stores the filename only (not the full path). The `ProfileImageService` handles path resolution. Photos are resized to 512x512 JPEG (quality 85) on import to conserve storage.
+
+**Profile ordering:** Profiles are ordered by `isPrimary DESC, firstName ASC` in all queries. This ensures the primary profile always appears first in lists and is the default selection.
+
+## Multi-profile data isolation
+
+**Phase 7A scope:** All 13 tables with `profileId` foreign keys already exist from Phase 2. Phase 7A activates the active profile setting but does NOT yet implement:
+- Profile switching UI (manual selection from a list)
+- Profile deletion
+- Profile creation (only editing the initial/default profile)
+- Data migration between profiles
+
+**Future profile switching:** When implemented, switching profiles only requires updating `active_profile_id` in settings. All providers already filter by profile ID, so data isolation is automatic. No schema changes needed.
 
 ---
 
@@ -359,3 +398,58 @@ Examples:
 - Uses `InputDecorator` with `suffixIcon` for calendar icon (placed outside child area)
 - Labels wrap naturally — no overflow with long Georgian text
 - `onTap` and `onClear` callbacks for parent widget integration
+
+---
+
+## Patient Profile — Photo Selection
+
+### Implementation decisions
+
+- **image_picker** used for gallery and camera selection (no custom camera implementation needed)
+- Photos resized to 512x512 JPEG at 85% quality via existing `ProfileImageService.importProfilePhoto()` to conserve storage
+- Old photo deleted only after new photo saves successfully — prevents data loss on failure
+- `_pendingPhotoPath` tracks photo changes before form save — photo not committed until user taps Save
+- Tappable avatar with camera overlay icon provides clear affordance for photo actions
+- Bottom sheet presents gallery/camera/remove options — standard Material 3 pattern
+
+### Profile avatar widget
+
+- `ProfileAvatar` in `lib/presentation/widgets/profile/profile_avatar.dart` handles three states:
+  1. Photo available: `Image.file()` with `errorBuilder` fallback to initials
+  2. No photo: Initials on colored circle (color derived from name hash)
+  3. No name: `?` character
+- Reused in: view screen, edit screen, Settings tile (with `radius: 20` for compact display)
+- Camera overlay icon (white circle + camera icon) appears only in edit mode when tappable
+
+### Camera permission
+
+- `CAMERA` permission added to AndroidManifest.xml for camera capture
+- `image_picker` handles runtime permission requests automatically on Android
+- Gallery access uses storage permissions (handled by image_picker internally)
+
+## Next Item Grace Period — Design Rules (Approved 2026-07-28)
+
+### Problem
+
+The Next Item overdue grace period was hardcoded (15 minutes). Users needed to configure it for their workflow.
+
+### Design Decision
+
+- **Global setting** (not per-profile) — keep implementation simple; profile-specific deferred
+- **Existing key-value storage** (AppSettings Drift table) — no schema change
+- **StateNotifierProvider** pattern matching `activeProfileIdProvider` — reads from settings on init, persists on write
+- **Reactive**: `nextDailyItemProvider` watches the grace period provider; changing the setting immediately recalculates Next Item without reloading agenda data
+- **Domain purity**: `TodayAgenda.nextItem()` accepts optional `Duration? graceWindow` — no repository dependency in domain layer
+
+### Allowed Values
+
+5, 10, 15, 30, 60 minutes. Stored as integer minutes. Invalid/zero/negative values fall back to 15.
+
+### Separation of Concerns
+
+- **Next Item grace period** (configurable): Controls Next-card eligibility after scheduled time. Used in `nextItem()`.
+- **Status/due visual window** (`statusGraceWindow`, hardcoded 30 min): Controls due/overdue status classification. Remains separate unless explicitly unified in future design.
+
+### Rationale for Separation
+
+The Next grace period determines whether an unresolved item appears in the "Next" card. The status grace period determines whether an item is styled as "due" (blue tint) vs "overdue" (red tint). These are conceptually distinct — a user might want a short Next card (get to items quickly) but a longer due window (avoid red panic). Keeping them independent is more flexible.

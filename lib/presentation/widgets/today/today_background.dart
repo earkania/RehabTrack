@@ -12,13 +12,19 @@ class TodayBackground {
 
   const TodayBackground._(this.position);
 
-  factory TodayBackground.forItem(TodayAgendaItem item, DateTime now) {
-    if (item.isOverdue) return TodayBackground._(TodayItemTimePosition.past);
-    if (item.isDue(now, const Duration(minutes: 30))) {
-      return TodayBackground._(TodayItemTimePosition.current);
-    }
-    if (item.isPast(now)) return TodayBackground._(TodayItemTimePosition.past);
-    return TodayBackground._(TodayItemTimePosition.future);
+  factory TodayBackground.forItem(
+    TodayAgendaItem item,
+    DateTime now,
+    Duration gracePeriod,
+  ) {
+    final status = classifyAgendaItem(item, now, gracePeriod);
+    return switch (status) {
+      TodayAgendaItemStatus.upcoming =>
+        TodayBackground._(TodayItemTimePosition.future),
+      TodayAgendaItemStatus.due =>
+        TodayBackground._(TodayItemTimePosition.current),
+      _ => TodayBackground._(TodayItemTimePosition.past),
+    };
   }
 
   Color? cardColor(ThemeData theme) {

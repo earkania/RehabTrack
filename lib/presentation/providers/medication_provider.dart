@@ -10,9 +10,9 @@ import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
 final medicationListProvider =
     StreamProvider.autoDispose<List<Medication>>((ref) {
-  final profileId = ref.watch(activeProfileIdProvider);
+  final profileId = ref.watch(currentActiveProfileIdProvider);
   if (profileId == null) {
-    return const Stream.empty();
+    return Stream.value(const <Medication>[]);
   }
   final repo = ref.watch(medicationRepositoryProvider);
   return repo.watchActiveMedications(profileId);

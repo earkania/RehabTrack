@@ -2011,6 +2011,390 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Daily Summary'**
   String get dailySummary;
+
+  /// No description provided for @patientProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Profile'**
+  String get patientProfile;
+
+  /// No description provided for @editPatientProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Patient Profile'**
+  String get editPatientProfile;
+
+  /// No description provided for @personalInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Information'**
+  String get personalInformation;
+
+  /// No description provided for @contactInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Information'**
+  String get contactInformation;
+
+  /// No description provided for @emergencyContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Contact'**
+  String get emergencyContact;
+
+  /// No description provided for @additionalInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Information'**
+  String get additionalInformation;
+
+  /// No description provided for @firstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get firstName;
+
+  /// No description provided for @lastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name'**
+  String get lastName;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// No description provided for @heightCm.
+  ///
+  /// In en, this message translates to:
+  /// **'Height'**
+  String get heightCm;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get weightKg;
+
+  /// No description provided for @bloodType.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Type'**
+  String get bloodType;
+
+  /// No description provided for @allergies.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergies'**
+  String get allergies;
+
+  /// No description provided for @gender.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get gender;
+
+  /// No description provided for @relationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship'**
+  String get relationship;
+
+  /// No description provided for @selectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectDate;
+
+  /// No description provided for @male.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get male;
+
+  /// No description provided for @female.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get female;
+
+  /// No description provided for @self_.
+  ///
+  /// In en, this message translates to:
+  /// **'Self'**
+  String get self_;
+
+  /// No description provided for @child_.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get child_;
+
+  /// No description provided for @spouse_.
+  ///
+  /// In en, this message translates to:
+  /// **'Spouse'**
+  String get spouse_;
+
+  /// No description provided for @parent_.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get parent_;
+
+  /// No description provided for @sibling_.
+  ///
+  /// In en, this message translates to:
+  /// **'Sibling'**
+  String get sibling_;
+
+  /// No description provided for @grandparent_.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandparent'**
+  String get grandparent_;
+
+  /// No description provided for @grandchild_.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandchild'**
+  String get grandchild_;
+
+  /// No description provided for @other_.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other_;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get profileUpdated;
+
+  /// No description provided for @failedToSaveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save profile'**
+  String get failedToSaveProfile;
+
+  /// No description provided for @switchProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Profile'**
+  String get switchProfile;
+
+  /// No description provided for @noProfiles.
+  ///
+  /// In en, this message translates to:
+  /// **'No profiles yet'**
+  String get noProfiles;
+
+  /// No description provided for @createFirstProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first patient profile'**
+  String get createFirstProfile;
+
+  /// No description provided for @profileSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Summary'**
+  String get profileSummary;
+
+  /// No description provided for @age.
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get age;
+
+  /// No description provided for @yearsOld.
+  ///
+  /// In en, this message translates to:
+  /// **'{years} years old'**
+  String yearsOld(int years);
+
+  /// No description provided for @activeProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Profile'**
+  String get activeProfile;
+
+  /// No description provided for @birthDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Date'**
+  String get birthDateLabel;
+
+  /// No description provided for @heightLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Height'**
+  String get heightLabel;
+
+  /// No description provided for @weightLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get weightLabel;
+
+  /// No description provided for @nameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get nameLabel;
+
+  /// No description provided for @emergencyContactNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Name'**
+  String get emergencyContactNameLabel;
+
+  /// No description provided for @emergencyContactPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Phone'**
+  String get emergencyContactPhoneLabel;
+
+  /// No description provided for @profileNotSetUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile not set up'**
+  String get profileNotSetUp;
+
+  /// No description provided for @profileNotSetUpDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a patient profile to get started.\nYour profile information will be used across the app.'**
+  String get profileNotSetUpDescription;
+
+  /// No description provided for @addProfileInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Profile Information'**
+  String get addProfileInformation;
+
+  /// No description provided for @profileInformationNotEntered.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile information has not been entered yet.'**
+  String get profileInformationNotEntered;
+
+  /// No description provided for @profilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get profilePhoto;
+
+  /// No description provided for @changeProfilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change profile photo'**
+  String get changeProfilePhoto;
+
+  /// No description provided for @chooseFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get chooseFromGallery;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get takePhoto;
+
+  /// No description provided for @removeProfilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get removeProfilePhoto;
+
+  /// No description provided for @photoSelectionCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo selection was cancelled'**
+  String get photoSelectionCancelled;
+
+  /// No description provided for @failedToLoadPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load photo'**
+  String get failedToLoadPhoto;
+
+  /// No description provided for @failedToSavePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save photo'**
+  String get failedToSavePhoto;
+
+  /// No description provided for @cameraPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required to take photos'**
+  String get cameraPermissionRequired;
+
+  /// No description provided for @nextItemGracePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Next item grace period'**
+  String get nextItemGracePeriod;
+
+  /// No description provided for @nextItemGracePeriodDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep an unfinished item in Next for this long after its scheduled time.'**
+  String get nextItemGracePeriodDescription;
+
+  /// No description provided for @minutesValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} minutes'**
+  String minutesValue(int minutes);
+
+  /// No description provided for @fiveMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'5 minutes'**
+  String get fiveMinutes;
+
+  /// No description provided for @tenMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'10 minutes'**
+  String get tenMinutes;
+
+  /// No description provided for @fifteenMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'15 minutes'**
+  String get fifteenMinutes;
+
+  /// No description provided for @thirtyMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'30 minutes'**
+  String get thirtyMinutes;
+
+  /// No description provided for @sixtyMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'60 minutes'**
+  String get sixtyMinutes;
 }
 
 class _AppLocalizationsDelegate

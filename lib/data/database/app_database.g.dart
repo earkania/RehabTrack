@@ -160,6 +160,87 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+    'phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _addressMeta = const VerificationMeta(
+    'address',
+  );
+  @override
+  late final GeneratedColumn<String> address = GeneratedColumn<String>(
+    'address',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _relationshipToOwnerMeta =
+      const VerificationMeta('relationshipToOwner');
+  @override
+  late final GeneratedColumn<String> relationshipToOwner =
+      GeneratedColumn<String>(
+        'relationship_to_owner',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _isPrimaryMeta = const VerificationMeta(
+    'isPrimary',
+  );
+  @override
+  late final GeneratedColumn<bool> isPrimary = GeneratedColumn<bool>(
+    'is_primary',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_primary" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _photoPathMeta = const VerificationMeta(
+    'photoPath',
+  );
+  @override
+  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
+    'photo_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -176,6 +257,13 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     notes,
     createdAt,
     updatedAt,
+    phone,
+    email,
+    address,
+    relationshipToOwner,
+    isPrimary,
+    isActive,
+    photoPath,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -284,6 +372,51 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
+    if (data.containsKey('phone')) {
+      context.handle(
+        _phoneMeta,
+        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
+      );
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    }
+    if (data.containsKey('address')) {
+      context.handle(
+        _addressMeta,
+        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+      );
+    }
+    if (data.containsKey('relationship_to_owner')) {
+      context.handle(
+        _relationshipToOwnerMeta,
+        relationshipToOwner.isAcceptableOrUnknown(
+          data['relationship_to_owner']!,
+          _relationshipToOwnerMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_primary')) {
+      context.handle(
+        _isPrimaryMeta,
+        isPrimary.isAcceptableOrUnknown(data['is_primary']!, _isPrimaryMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    if (data.containsKey('photo_path')) {
+      context.handle(
+        _photoPathMeta,
+        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+      );
+    }
     return context;
   }
 
@@ -349,6 +482,34 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      phone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone'],
+      ),
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      ),
+      address: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address'],
+      ),
+      relationshipToOwner: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relationship_to_owner'],
+      ),
+      isPrimary: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_primary'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+      photoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_path'],
+      ),
     );
   }
 
@@ -373,6 +534,13 @@ class Profile extends DataClass implements Insertable<Profile> {
   final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? phone;
+  final String? email;
+  final String? address;
+  final String? relationshipToOwner;
+  final bool isPrimary;
+  final bool isActive;
+  final String? photoPath;
   const Profile({
     required this.id,
     required this.firstName,
@@ -388,6 +556,13 @@ class Profile extends DataClass implements Insertable<Profile> {
     this.notes,
     required this.createdAt,
     required this.updatedAt,
+    this.phone,
+    this.email,
+    this.address,
+    this.relationshipToOwner,
+    required this.isPrimary,
+    required this.isActive,
+    this.photoPath,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -424,6 +599,23 @@ class Profile extends DataClass implements Insertable<Profile> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
+    if (!nullToAbsent || address != null) {
+      map['address'] = Variable<String>(address);
+    }
+    if (!nullToAbsent || relationshipToOwner != null) {
+      map['relationship_to_owner'] = Variable<String>(relationshipToOwner);
+    }
+    map['is_primary'] = Variable<bool>(isPrimary);
+    map['is_active'] = Variable<bool>(isActive);
+    if (!nullToAbsent || photoPath != null) {
+      map['photo_path'] = Variable<String>(photoPath);
+    }
     return map;
   }
 
@@ -461,6 +653,23 @@ class Profile extends DataClass implements Insertable<Profile> {
           : Value(notes),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      phone: phone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phone),
+      email: email == null && nullToAbsent
+          ? const Value.absent()
+          : Value(email),
+      address: address == null && nullToAbsent
+          ? const Value.absent()
+          : Value(address),
+      relationshipToOwner: relationshipToOwner == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relationshipToOwner),
+      isPrimary: Value(isPrimary),
+      isActive: Value(isActive),
+      photoPath: photoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoPath),
     );
   }
 
@@ -488,6 +697,15 @@ class Profile extends DataClass implements Insertable<Profile> {
       notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      phone: serializer.fromJson<String?>(json['phone']),
+      email: serializer.fromJson<String?>(json['email']),
+      address: serializer.fromJson<String?>(json['address']),
+      relationshipToOwner: serializer.fromJson<String?>(
+        json['relationshipToOwner'],
+      ),
+      isPrimary: serializer.fromJson<bool>(json['isPrimary']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+      photoPath: serializer.fromJson<String?>(json['photoPath']),
     );
   }
   @override
@@ -510,6 +728,13 @@ class Profile extends DataClass implements Insertable<Profile> {
       'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'phone': serializer.toJson<String?>(phone),
+      'email': serializer.toJson<String?>(email),
+      'address': serializer.toJson<String?>(address),
+      'relationshipToOwner': serializer.toJson<String?>(relationshipToOwner),
+      'isPrimary': serializer.toJson<bool>(isPrimary),
+      'isActive': serializer.toJson<bool>(isActive),
+      'photoPath': serializer.toJson<String?>(photoPath),
     };
   }
 
@@ -528,6 +753,13 @@ class Profile extends DataClass implements Insertable<Profile> {
     Value<String?> notes = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    Value<String?> phone = const Value.absent(),
+    Value<String?> email = const Value.absent(),
+    Value<String?> address = const Value.absent(),
+    Value<String?> relationshipToOwner = const Value.absent(),
+    bool? isPrimary,
+    bool? isActive,
+    Value<String?> photoPath = const Value.absent(),
   }) => Profile(
     id: id ?? this.id,
     firstName: firstName ?? this.firstName,
@@ -547,6 +779,15 @@ class Profile extends DataClass implements Insertable<Profile> {
     notes: notes.present ? notes.value : this.notes,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    phone: phone.present ? phone.value : this.phone,
+    email: email.present ? email.value : this.email,
+    address: address.present ? address.value : this.address,
+    relationshipToOwner: relationshipToOwner.present
+        ? relationshipToOwner.value
+        : this.relationshipToOwner,
+    isPrimary: isPrimary ?? this.isPrimary,
+    isActive: isActive ?? this.isActive,
+    photoPath: photoPath.present ? photoPath.value : this.photoPath,
   );
   Profile copyWithCompanion(ProfilesCompanion data) {
     return Profile(
@@ -568,6 +809,15 @@ class Profile extends DataClass implements Insertable<Profile> {
       notes: data.notes.present ? data.notes.value : this.notes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      email: data.email.present ? data.email.value : this.email,
+      address: data.address.present ? data.address.value : this.address,
+      relationshipToOwner: data.relationshipToOwner.present
+          ? data.relationshipToOwner.value
+          : this.relationshipToOwner,
+      isPrimary: data.isPrimary.present ? data.isPrimary.value : this.isPrimary,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
     );
   }
 
@@ -587,13 +837,20 @@ class Profile extends DataClass implements Insertable<Profile> {
           ..write('emergencyContactPhone: $emergencyContactPhone, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('phone: $phone, ')
+          ..write('email: $email, ')
+          ..write('address: $address, ')
+          ..write('relationshipToOwner: $relationshipToOwner, ')
+          ..write('isPrimary: $isPrimary, ')
+          ..write('isActive: $isActive, ')
+          ..write('photoPath: $photoPath')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     firstName,
     lastName,
@@ -608,7 +865,14 @@ class Profile extends DataClass implements Insertable<Profile> {
     notes,
     createdAt,
     updatedAt,
-  );
+    phone,
+    email,
+    address,
+    relationshipToOwner,
+    isPrimary,
+    isActive,
+    photoPath,
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -626,7 +890,14 @@ class Profile extends DataClass implements Insertable<Profile> {
           other.emergencyContactPhone == this.emergencyContactPhone &&
           other.notes == this.notes &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.phone == this.phone &&
+          other.email == this.email &&
+          other.address == this.address &&
+          other.relationshipToOwner == this.relationshipToOwner &&
+          other.isPrimary == this.isPrimary &&
+          other.isActive == this.isActive &&
+          other.photoPath == this.photoPath);
 }
 
 class ProfilesCompanion extends UpdateCompanion<Profile> {
@@ -644,6 +915,13 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
   final Value<String?> notes;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<String?> phone;
+  final Value<String?> email;
+  final Value<String?> address;
+  final Value<String?> relationshipToOwner;
+  final Value<bool> isPrimary;
+  final Value<bool> isActive;
+  final Value<String?> photoPath;
   const ProfilesCompanion({
     this.id = const Value.absent(),
     this.firstName = const Value.absent(),
@@ -659,6 +937,13 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.notes = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.email = const Value.absent(),
+    this.address = const Value.absent(),
+    this.relationshipToOwner = const Value.absent(),
+    this.isPrimary = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.photoPath = const Value.absent(),
   });
   ProfilesCompanion.insert({
     this.id = const Value.absent(),
@@ -675,6 +960,13 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.notes = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
+    this.phone = const Value.absent(),
+    this.email = const Value.absent(),
+    this.address = const Value.absent(),
+    this.relationshipToOwner = const Value.absent(),
+    this.isPrimary = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.photoPath = const Value.absent(),
   }) : firstName = Value(firstName),
        lastName = Value(lastName),
        createdAt = Value(createdAt),
@@ -694,6 +986,13 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Expression<String>? notes,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<String>? phone,
+    Expression<String>? email,
+    Expression<String>? address,
+    Expression<String>? relationshipToOwner,
+    Expression<bool>? isPrimary,
+    Expression<bool>? isActive,
+    Expression<String>? photoPath,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -712,6 +1011,14 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       if (notes != null) 'notes': notes,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (phone != null) 'phone': phone,
+      if (email != null) 'email': email,
+      if (address != null) 'address': address,
+      if (relationshipToOwner != null)
+        'relationship_to_owner': relationshipToOwner,
+      if (isPrimary != null) 'is_primary': isPrimary,
+      if (isActive != null) 'is_active': isActive,
+      if (photoPath != null) 'photo_path': photoPath,
     });
   }
 
@@ -730,6 +1037,13 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Value<String?>? notes,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<String?>? phone,
+    Value<String?>? email,
+    Value<String?>? address,
+    Value<String?>? relationshipToOwner,
+    Value<bool>? isPrimary,
+    Value<bool>? isActive,
+    Value<String?>? photoPath,
   }) {
     return ProfilesCompanion(
       id: id ?? this.id,
@@ -747,6 +1061,13 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      address: address ?? this.address,
+      relationshipToOwner: relationshipToOwner ?? this.relationshipToOwner,
+      isPrimary: isPrimary ?? this.isPrimary,
+      isActive: isActive ?? this.isActive,
+      photoPath: photoPath ?? this.photoPath,
     );
   }
 
@@ -799,6 +1120,29 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (address.present) {
+      map['address'] = Variable<String>(address.value);
+    }
+    if (relationshipToOwner.present) {
+      map['relationship_to_owner'] = Variable<String>(
+        relationshipToOwner.value,
+      );
+    }
+    if (isPrimary.present) {
+      map['is_primary'] = Variable<bool>(isPrimary.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (photoPath.present) {
+      map['photo_path'] = Variable<String>(photoPath.value);
+    }
     return map;
   }
 
@@ -818,7 +1162,14 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
           ..write('emergencyContactPhone: $emergencyContactPhone, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('phone: $phone, ')
+          ..write('email: $email, ')
+          ..write('address: $address, ')
+          ..write('relationshipToOwner: $relationshipToOwner, ')
+          ..write('isPrimary: $isPrimary, ')
+          ..write('isActive: $isActive, ')
+          ..write('photoPath: $photoPath')
           ..write(')'))
         .toString();
   }
@@ -13420,6 +13771,13 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       Value<String?> notes,
       required DateTime createdAt,
       required DateTime updatedAt,
+      Value<String?> phone,
+      Value<String?> email,
+      Value<String?> address,
+      Value<String?> relationshipToOwner,
+      Value<bool> isPrimary,
+      Value<bool> isActive,
+      Value<String?> photoPath,
     });
 typedef $$ProfilesTableUpdateCompanionBuilder =
     ProfilesCompanion Function({
@@ -13437,6 +13795,13 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<String?> notes,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<String?> phone,
+      Value<String?> email,
+      Value<String?> address,
+      Value<String?> relationshipToOwner,
+      Value<bool> isPrimary,
+      Value<bool> isActive,
+      Value<String?> photoPath,
     });
 
 final class $$ProfilesTableReferences
@@ -13762,6 +14127,41 @@ class $$ProfilesTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relationshipToOwner => $composableBuilder(
+    column: $table.relationshipToOwner,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isPrimary => $composableBuilder(
+    column: $table.isPrimary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -14145,6 +14545,41 @@ class $$ProfilesTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relationshipToOwner => $composableBuilder(
+    column: $table.relationshipToOwner,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isPrimary => $composableBuilder(
+    column: $table.isPrimary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ProfilesTableAnnotationComposer
@@ -14201,6 +14636,29 @@ class $$ProfilesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get address =>
+      $composableBuilder(column: $table.address, builder: (column) => column);
+
+  GeneratedColumn<String> get relationshipToOwner => $composableBuilder(
+    column: $table.relationshipToOwner,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isPrimary =>
+      $composableBuilder(column: $table.isPrimary, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<String> get photoPath =>
+      $composableBuilder(column: $table.photoPath, builder: (column) => column);
 
   Expression<T> medicationsRefs<T extends Object>(
     Expression<T> Function($$MedicationsTableAnnotationComposer a) f,
@@ -14562,6 +15020,13 @@ class $$ProfilesTableTableManager
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<String?> relationshipToOwner = const Value.absent(),
+                Value<bool> isPrimary = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
                 firstName: firstName,
@@ -14577,6 +15042,13 @@ class $$ProfilesTableTableManager
                 notes: notes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                phone: phone,
+                email: email,
+                address: address,
+                relationshipToOwner: relationshipToOwner,
+                isPrimary: isPrimary,
+                isActive: isActive,
+                photoPath: photoPath,
               ),
           createCompanionCallback:
               ({
@@ -14594,6 +15066,13 @@ class $$ProfilesTableTableManager
                 Value<String?> notes = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
+                Value<String?> phone = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<String?> relationshipToOwner = const Value.absent(),
+                Value<bool> isPrimary = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
                 firstName: firstName,
@@ -14609,6 +15088,13 @@ class $$ProfilesTableTableManager
                 notes: notes,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                phone: phone,
+                email: email,
+                address: address,
+                relationshipToOwner: relationshipToOwner,
+                isPrimary: isPrimary,
+                isActive: isActive,
+                photoPath: photoPath,
               ),
           withReferenceMapper: (p0) => p0
               .map(

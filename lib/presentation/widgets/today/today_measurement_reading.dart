@@ -28,7 +28,7 @@ class TodayMeasurementReading extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final typeKey = item.measurementTypeKey ?? '';
-    final profileId = ref.watch(activeProfileIdProvider);
+    final profileId = ref.watch(currentActiveProfileIdProvider);
 
     final effectiveRangesAsync = profileId != null
         ? ref.watch(effectiveRangesForCurrentProfileProvider(typeKey))

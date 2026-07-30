@@ -10,15 +10,15 @@ class ProfileRepositoryImpl implements ProfileRepository {
   ProfileRepositoryImpl(this._database);
 
   @override
-  Stream<Profile?> watchActiveProfile() {
-    return _database.profileDao.watchActiveProfile().map(
+  Stream<Profile?> watchActiveProfile(int profileId) {
+    return _database.profileDao.watchActiveProfile(profileId).map(
       (row) => row != null ? _toDomain(row) : null,
     );
   }
 
   @override
-  Future<Profile?> getActiveProfile() async {
-    final row = await _database.profileDao.getActiveProfile();
+  Future<Profile?> getActiveProfile(int profileId) async {
+    final row = await _database.profileDao.getActiveProfile(profileId);
     return row != null ? _toDomain(row) : null;
   }
 
@@ -39,6 +39,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
         notes: Value(profile.notes),
         createdAt: profile.createdAt,
         updatedAt: profile.updatedAt,
+        phone: Value(profile.phone),
+        email: Value(profile.email),
+        address: Value(profile.address),
+        relationshipToOwner: Value(profile.relationshipToOwner),
+        isPrimary: Value(profile.isPrimary),
+        isActive: Value(profile.isActive),
+        photoPath: Value(profile.photoPath),
       ),
     );
   }
@@ -61,6 +68,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
         notes: Value(profile.notes),
         createdAt: Value(profile.createdAt),
         updatedAt: Value(DateTime.now()),
+        phone: Value(profile.phone),
+        email: Value(profile.email),
+        address: Value(profile.address),
+        relationshipToOwner: Value(profile.relationshipToOwner),
+        isPrimary: Value(profile.isPrimary),
+        isActive: Value(profile.isActive),
+        photoPath: Value(profile.photoPath),
       ),
     );
   }
@@ -68,6 +82,29 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<void> deleteProfile(int id) async {
     await _database.profileDao.deleteProfile(id);
+  }
+
+  @override
+  Stream<List<Profile>> watchAllProfiles() {
+    return _database.profileDao.watchAllProfiles().map(
+      (rows) => rows.map(_toDomain).toList(),
+    );
+  }
+
+  @override
+  Future<List<Profile>> getAllProfiles() async {
+    final rows = await _database.profileDao.getAllProfiles();
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
+  Future<void> setPrimaryProfile(int profileId) async {
+    await _database.profileDao.setPrimaryProfile(profileId);
+  }
+
+  @override
+  Future<int> getProfileCount() async {
+    return _database.profileDao.getProfileCount();
   }
 
   Profile _toDomain(db.Profile row) {
@@ -86,6 +123,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
       notes: row.notes,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
+      phone: row.phone,
+      email: row.email,
+      address: row.address,
+      relationshipToOwner: row.relationshipToOwner,
+      isPrimary: row.isPrimary,
+      isActive: row.isActive,
+      photoPath: row.photoPath,
     );
   }
 }

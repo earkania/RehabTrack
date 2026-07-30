@@ -10,12 +10,37 @@ import 'package:rehab_track/presentation/widgets/today/today_agenda_item.dart';
 import 'package:rehab_track/presentation/widgets/today/today_next_item_card.dart';
 import 'package:rehab_track/presentation/widgets/today/today_summary_card.dart';
 
-class TodayScreen extends ConsumerWidget {
+class TodayScreen extends ConsumerStatefulWidget {
   const TodayScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TodayScreen> createState() => _TodayScreenState();
+}
+
+class _TodayScreenState extends ConsumerState<TodayScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(dailyAgendaProvider);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    ref.watch(todayAutoRefreshProvider);
     final agenda = ref.watch(dailyAgendaProvider);
     final selectedDate = ref.watch(selectedAgendaDateProvider);
     final now = DateTime.now();

@@ -234,7 +234,7 @@ class _MeasurementEntryScreenState
     setState(() => _isSaving = true);
 
     try {
-      final profileId = ref.read(activeProfileIdProvider);
+      final profileId = ref.read(currentActiveProfileIdProvider);
       if (profileId == null) return;
 
       final values = <MeasurementRecordValue>[];

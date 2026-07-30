@@ -4,8 +4,25 @@ import 'package:drift/drift.dart';
 import 'package:rehab_track/data/database/app_database.dart';
 
 Future<void> seedDatabase(AppDatabase db) async {
+  await _seedDefaultProfile(db);
   await _seedMeasurementTypes(db);
   await _seedHealthTemplates(db);
+}
+
+Future<void> _seedDefaultProfile(AppDatabase db) async {
+  final existing = await db.profileDao.getProfileCount();
+  if (existing > 0) return;
+  final now = DateTime.now();
+  await db.into(db.profiles).insert(
+    ProfilesCompanion.insert(
+      firstName: '',
+      lastName: '',
+      createdAt: now,
+      updatedAt: now,
+      isPrimary: const Value(true),
+      isActive: const Value(true),
+    ),
+  );
 }
 
 Future<void> _seedMeasurementTypes(AppDatabase db) async {

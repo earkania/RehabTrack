@@ -108,7 +108,7 @@ class _MeasurementScheduleScreenState
     setState(() => _saving = true);
 
     try {
-      final profileId = ref.read(activeProfileIdProvider) ?? 1;
+      final profileId = ref.read(currentActiveProfileIdProvider) ?? 1;
       final now = DateTime.now();
       final scheduleTypeName = _scheduleType == ScheduleType.daily
           ? 'daily'
@@ -125,9 +125,13 @@ class _MeasurementScheduleScreenState
           return;
         }
 
-        await scheduler.cancelNotification(
-          MeasurementNotificationHelper.baseNotificationId(existing.id!),
-        );
+        try {
+          await scheduler.cancelNotification(
+            MeasurementNotificationHelper.baseNotificationId(existing.id!),
+          );
+        } catch (_) {
+          // Notification cancellation is non-critical
+        }
 
         final updated = existing.copyWith(
           scheduleType: scheduleTypeName,
@@ -147,7 +151,7 @@ class _MeasurementScheduleScreenState
         await repo.updateSchedule(updated);
 
         if (_active) {
-          await _scheduleNotifications(
+          _scheduleNotifications(
             repo,
             scheduler,
             updated,
@@ -176,7 +180,7 @@ class _MeasurementScheduleScreenState
         final created = schedule.copyWith(id: id);
 
         if (_active) {
-          await _scheduleNotifications(
+          _scheduleNotifications(
             repo,
             scheduler,
             created,
@@ -207,51 +211,56 @@ class _MeasurementScheduleScreenState
     MeasurementSchedule schedule,
     int profileId,
   ) async {
-    final type = await repo.getMeasurementType(
-      schedule.measurementTypeId,
-    );
-    final typeName = type?.name ?? 'Measurement';
-
-    final notifPayload = MeasurementNotificationHelper.buildPayload(
-      scheduleId: schedule.id!,
-      measurementTypeId: schedule.measurementTypeId,
-      profileId: profileId,
-    );
-
-    final bodyParts = <String>[];
-    bodyParts.add('Please record your ${typeName.toLowerCase()}');
-    if (schedule.instructions != null &&
-        schedule.instructions!.isNotEmpty) {
-      bodyParts.add(schedule.instructions!);
-    }
-    final body = bodyParts.join(' — ');
-
-    final notificationId =
-        MeasurementNotificationHelper.computeNotificationId(
-      schedule.id!,
-    );
-
-    if (schedule.isIntervalDays && schedule.intervalDays != null) {
-      await scheduler.scheduleSingleIntervalNotification(
-        notificationId: notificationId,
-        title: 'Time to record $typeName',
-        body: body,
-        time: schedule.time,
-        intervalDays: schedule.intervalDays!,
-        channelType: NotificationChannelType.measurement,
-        payload: notifPayload,
-        includeActions: true,
+    try {
+      final type = await repo.getMeasurementType(
+        schedule.measurementTypeId,
       );
-    } else {
-      await scheduler.scheduleSingleNotification(
-        notificationId: notificationId,
-        title: 'Time to record $typeName',
-        body: body,
-        time: schedule.time,
-        channelType: NotificationChannelType.measurement,
-        payload: notifPayload,
-        includeActions: true,
+      final typeName = type?.name ?? 'Measurement';
+
+      final notifPayload = MeasurementNotificationHelper.buildPayload(
+        scheduleId: schedule.id!,
+        measurementTypeId: schedule.measurementTypeId,
+        profileId: profileId,
       );
+
+      final bodyParts = <String>[];
+      bodyParts.add('Please record your ${typeName.toLowerCase()}');
+      if (schedule.instructions != null &&
+          schedule.instructions!.isNotEmpty) {
+        bodyParts.add(schedule.instructions!);
+      }
+      final body = bodyParts.join(' — ');
+
+      final notificationId =
+          MeasurementNotificationHelper.computeNotificationId(
+        schedule.id!,
+      );
+
+      if (schedule.isIntervalDays && schedule.intervalDays != null) {
+        await scheduler.scheduleSingleIntervalNotification(
+          notificationId: notificationId,
+          title: 'Time to record $typeName',
+          body: body,
+          time: schedule.time,
+          intervalDays: schedule.intervalDays!,
+          channelType: NotificationChannelType.measurement,
+          payload: notifPayload,
+          includeActions: true,
+        );
+      } else {
+        await scheduler.scheduleSingleNotification(
+          notificationId: notificationId,
+          title: 'Time to record $typeName',
+          body: body,
+          time: schedule.time,
+          channelType: NotificationChannelType.measurement,
+          payload: notifPayload,
+          includeActions: true,
+        );
+      }
+    } catch (_) {
+      // Notification scheduling is non-critical — the schedule was saved.
+      // Do not report failure to the user.
     }
   }
 

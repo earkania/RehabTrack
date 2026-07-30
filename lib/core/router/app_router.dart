@@ -24,6 +24,8 @@ import 'package:rehab_track/presentation/screens/health/measurement_schedule_lis
 import 'package:rehab_track/presentation/screens/health/reference_range_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/patient_profile_view_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/patient_profile_edit_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -209,6 +211,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.measurementRanges,
         builder: (context, state) => const ReferenceRangeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.patientProfile,
+        builder: (context, state) => const PatientProfileViewScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.patientProfileEdit,
+        builder: (context, state) => const PatientProfileEditScreen(),
       ),
       GoRoute(
         path: '/measurements/ranges/:typeKey',

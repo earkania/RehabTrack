@@ -83,7 +83,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -208,6 +208,16 @@ class AppDatabase extends _$AppDatabase {
           measurementReminderLogs,
           measurementReminderLogs.measurementRecordId,
         );
+      }
+      if (from < 12) {
+        // Phase 7A: Patient Profiles - extend Profiles table
+        await m.addColumn(profiles, profiles.phone);
+        await m.addColumn(profiles, profiles.email);
+        await m.addColumn(profiles, profiles.address);
+        await m.addColumn(profiles, profiles.relationshipToOwner);
+        await m.addColumn(profiles, profiles.isPrimary);
+        await m.addColumn(profiles, profiles.isActive);
+        await m.addColumn(profiles, profiles.photoPath);
       }
     },
   );

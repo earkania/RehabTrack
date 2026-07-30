@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rehab_track/domain/entities/dosage_form.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
+import 'package:rehab_track/presentation/widgets/today/today_background.dart';
 
 void main() {
   group('TodayAgendaItem', () {
@@ -515,6 +516,347 @@ void main() {
         status: TodayAgendaItemStatus.due,
       );
       expect(item.isDue(now, const Duration(minutes: 30)), isTrue);
+    });
+
+    test('completed item background is past, not current', () {
+      final now = DateTime(2025, 7, 25, 12, 0);
+      final item = TodayAgendaItem(
+        id: '1',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime(2025, 7, 25, 12, 10),
+        title: 'Test',
+        status: TodayAgendaItemStatus.completed,
+      );
+      final bg = TodayBackground.forItem(item, now, const Duration(minutes: 15));
+      expect(bg.position, TodayItemTimePosition.past);
+    });
+
+    test('completed future item background is past', () {
+      final now = DateTime(2025, 7, 25, 11, 50);
+      final item = TodayAgendaItem(
+        id: '1',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime(2025, 7, 25, 12, 0),
+        title: 'Test',
+        status: TodayAgendaItemStatus.completed,
+      );
+      // scheduled at 12:00, now 11:50 — not past, not overdue, but completed
+      final bg = TodayBackground.forItem(item, now, const Duration(minutes: 15));
+      expect(bg.position, TodayItemTimePosition.past);
+    });
+
+    test('skipped item background is past', () {
+      final now = DateTime(2025, 7, 25, 12, 0);
+      final item = TodayAgendaItem(
+        id: '1',
+        type: TodayAgendaItemType.medication,
+        sourceScheduleId: 1,
+        scheduledDateTime: DateTime(2025, 7, 25, 12, 10),
+        title: 'Test',
+        status: TodayAgendaItemStatus.skipped,
+      );
+      final bg = TodayBackground.forItem(item, now, const Duration(minutes: 15));
+      expect(bg.position, TodayItemTimePosition.past);
+    });
+  });
+
+  group('nextItem grace period and equal-time', () {
+    TodayAgendaItem makeItem({
+      required String id,
+      required DateTime scheduledDateTime,
+      required TodayAgendaItemStatus status,
+      TodayAgendaItemType type = TodayAgendaItemType.medication,
+    }) {
+      return TodayAgendaItem(
+        id: id,
+        type: type,
+        sourceScheduleId: 1,
+        scheduledDateTime: scheduledDateTime,
+        title: 'Test',
+        status: status,
+      );
+    }
+
+    test('past item within 15-min grace is Next', () {
+      final now = DateTime(2025, 7, 25, 12, 10);
+      final items = [
+        makeItem(
+          id: 'past_grace',
+          scheduledDateTime: DateTime(2025, 7, 25, 12, 0),
+          status: TodayAgendaItemStatus.due,
+        ),
+        makeItem(
+          id: 'future',
+          scheduledDateTime: DateTime(2025, 7, 25, 15, 0),
+          status: TodayAgendaItemStatus.upcoming,
+        ),
+      ];
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      // 12:10 - 12:00 = 10 min ≤ 15 min grace → eligible
+      final next = agenda.nextItem(now: now);
+      expect(next, isNotNull);
+      expect(next!.id, 'past_grace');
+    });
+
+    test('past item beyond 15-min grace is not Next', () {
+      final now = DateTime(2025, 7, 25, 12, 20);
+      final items = [
+        makeItem(
+          id: 'past_expired',
+          scheduledDateTime: DateTime(2025, 7, 25, 12, 0),
+          status: TodayAgendaItemStatus.due,
+        ),
+        makeItem(
+          id: 'future',
+          scheduledDateTime: DateTime(2025, 7, 25, 15, 0),
+          status: TodayAgendaItemStatus.upcoming,
+        ),
+      ];
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      // 12:20 - 12:00 = 20 min > 15 min grace → not eligible
+      final next = agenda.nextItem(now: now);
+      expect(next, isNotNull);
+      expect(next!.id, 'future');
+    });
+
+    test('equal-time items picks first unresolved', () {
+      final now = DateTime(2025, 7, 25, 9, 50);
+      final items = [
+        makeItem(
+          id: 'meas_1_1000',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.upcoming,
+          type: TodayAgendaItemType.measurement,
+        ),
+        makeItem(
+          id: 'med_1_1000',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.upcoming,
+          type: TodayAgendaItemType.medication,
+        ),
+      ];
+      // Sort like the agenda service does
+      items.sort((a, b) {
+        final cmp = a.effectiveTime.compareTo(b.effectiveTime);
+        if (cmp != 0) return cmp;
+        return a.id.compareTo(b.id);
+      });
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      final next = agenda.nextItem(now: now);
+      expect(next, isNotNull);
+      // First by ID when times equal
+      expect(next!.id, 'meas_1_1000');
+    });
+
+    test('after completing one equal-time item, Next advances', () {
+      final now = DateTime(2025, 7, 25, 9, 50);
+      final items = [
+        makeItem(
+          id: 'completed_item',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.completed,
+          type: TodayAgendaItemType.measurement,
+        ),
+        makeItem(
+          id: 'remaining',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.upcoming,
+          type: TodayAgendaItemType.medication,
+        ),
+      ];
+      items.sort((a, b) {
+        final cmp = a.effectiveTime.compareTo(b.effectiveTime);
+        if (cmp != 0) return cmp;
+        return a.id.compareTo(b.id);
+      });
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      final next = agenda.nextItem(now: now);
+      expect(next, isNotNull);
+      expect(next!.id, 'remaining');
+    });
+
+    test('completed item is not shown as Next within grace period', () {
+      final now = DateTime(2025, 7, 25, 12, 10);
+      final items = [
+        makeItem(
+          id: 'completed',
+          scheduledDateTime: DateTime(2025, 7, 25, 12, 0),
+          status: TodayAgendaItemStatus.completed,
+        ),
+      ];
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      expect(agenda.nextItem(now: now), isNull);
+    });
+
+    test('at 10:10, a 10:00 unresolved item remains Next with 15-minute grace', () {
+      final now = DateTime(2025, 7, 25, 10, 10);
+      final items = [
+        makeItem(
+          id: 'item_1000',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.due,
+        ),
+      ];
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      final next = agenda.nextItem(now: now, graceWindow: const Duration(minutes: 15));
+      expect(next, isNotNull);
+      expect(next!.id, 'item_1000');
+    });
+
+    test('at 10:16, a 10:00 item is excluded with 15-minute grace', () {
+      final now = DateTime(2025, 7, 25, 10, 16);
+      final items = [
+        makeItem(
+          id: 'item_1000',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.due,
+        ),
+      ];
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      expect(agenda.nextItem(now: now, graceWindow: const Duration(minutes: 15)), isNull);
+    });
+
+    test('at 10:16, a 10:00 item remains Next with 30-minute grace', () {
+      final now = DateTime(2025, 7, 25, 10, 16);
+      final items = [
+        makeItem(
+          id: 'item_1000',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.due,
+        ),
+      ];
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      final next = agenda.nextItem(now: now, graceWindow: const Duration(minutes: 30));
+      expect(next, isNotNull);
+      expect(next!.id, 'item_1000');
+    });
+
+    test('completed item is excluded regardless of grace window', () {
+      final now = DateTime(2025, 7, 25, 10, 5);
+      final items = [
+        makeItem(
+          id: 'completed',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.completed,
+        ),
+      ];
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      expect(agenda.nextItem(now: now, graceWindow: const Duration(minutes: 60)), isNull);
+    });
+
+    test('skipped item is excluded regardless of grace window', () {
+      final now = DateTime(2025, 7, 25, 10, 5);
+      final items = [
+        makeItem(
+          id: 'skipped',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.skipped,
+        ),
+      ];
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      expect(agenda.nextItem(now: now, graceWindow: const Duration(minutes: 60)), isNull);
+    });
+
+    test('medication and measurement items behave the same with grace window', () {
+      final now = DateTime(2025, 7, 25, 10, 10);
+      final items = [
+        makeItem(
+          id: 'med_1',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.due,
+          type: TodayAgendaItemType.medication,
+        ),
+        makeItem(
+          id: 'meas_1',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 5),
+          status: TodayAgendaItemStatus.due,
+          type: TodayAgendaItemType.measurement,
+        ),
+      ];
+      items.sort((a, b) {
+        final cmp = a.effectiveTime.compareTo(b.effectiveTime);
+        if (cmp != 0) return cmp;
+        return a.id.compareTo(b.id);
+      });
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      final next = agenda.nextItem(now: now, graceWindow: const Duration(minutes: 15));
+      expect(next, isNotNull);
+      expect(next!.id, 'med_1');
+    });
+
+    test('equal-time unresolved items remain stable with grace window', () {
+      final now = DateTime(2025, 7, 25, 10, 5);
+      final items = [
+        makeItem(
+          id: 'b',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.due,
+        ),
+        makeItem(
+          id: 'a',
+          scheduledDateTime: DateTime(2025, 7, 25, 10, 0),
+          status: TodayAgendaItemStatus.due,
+        ),
+      ];
+      items.sort((a, b) {
+        final cmp = a.effectiveTime.compareTo(b.effectiveTime);
+        if (cmp != 0) return cmp;
+        return a.id.compareTo(b.id);
+      });
+      final agenda = TodayAgenda(
+        date: DateTime(2025, 7, 25),
+        items: items,
+        summary: const TodaySummary.empty(),
+      );
+      final next = agenda.nextItem(now: now, graceWindow: const Duration(minutes: 15));
+      expect(next, isNotNull);
+      expect(next!.id, 'a');
     });
   });
 }

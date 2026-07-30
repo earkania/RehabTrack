@@ -45,7 +45,7 @@ final notificationInitializerProvider = Provider<void>((ref) {
     measurementRepository: ref.watch(measurementRepositoryProvider),
   );
 
-  final profileId = ref.watch(activeProfileIdProvider) ?? 1;
+  final profileId = ref.watch(currentActiveProfileIdProvider) ?? 1;
 
   ref.onDispose(() {
     log('notificationInitializerProvider disposed');

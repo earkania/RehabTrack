@@ -20,7 +20,7 @@ final effectiveRangesProvider = FutureProvider.autoDispose
 
 final effectiveRangesForCurrentProfileProvider = FutureProvider.autoDispose
     .family<MeasurementRanges?, String>((ref, typeKey) async {
-  final profileId = ref.watch(activeProfileIdProvider);
+  final profileId = ref.watch(currentActiveProfileIdProvider);
   if (profileId == null) return null;
   final repo = ref.watch(referenceRangeRepositoryProvider);
   return repo.getEffectiveRanges(profileId, typeKey);

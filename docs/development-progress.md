@@ -2223,3 +2223,430 @@ void _onItemTapped(BuildContext context, int index) {
 - Start Date and End Date labels wrap correctly
 - Calendar icon remains fully visible
 - Medication Schedule editor behavior unchanged
+
+---
+
+## Phase 7A — Patient Profiles Foundation
+
+**Date:** 2026-07-28
+
+**Status:** Completed
+
+**What was done:**
+
+### Domain Layer
+
+**Profile Entity Extended:**
+- Added `Gender` enum: `male`, `female`, `other` with `fromString()` factory
+- Added `Relationship` enum: `self`, `spouse`, `parent`, `child`, `sibling`, `other` with `fromString()` factory
+- Profile entity extended with 7 new fields: `phone`, `email`, `address`, `relationshipToOwner`, `isPrimary`, `isActive`, `photoPath`
+- Added `fullName` getter: combines `firstName` and `lastName`
+- Added `parsedRelationship` getter: parses `relationshipToOwner` string to `Relationship` enum
+- All new fields have `copyWith` support
+
+**New Domain Entity:**
+- `PatientProfileSummary` — report-ready model for profile overview
+- Fields: `profile`, `activeMedicationCount`, `activeMeasurementScheduleCount`, `totalMeasurementsLast30Days`
+- Computed getters: `age` (years from birthDate), `medicationAdherenceRate` (0.0–1.0)
+- `copyWith` support for all fields
+
+### Database Layer
+
+**Profiles Table Extended (Schema v12):**
+- Added 7 new columns: `phone` (Text nullable), `email` (Text nullable), `address` (Text nullable), `relationshipToOwner` (Text nullable), `isPrimary` (Boolean default false), `isActive` (Boolean default true), `photoPath` (Text nullable)
+- Non-destructive migration: `if (from < 12)` adds all 7 columns
+- `build_runner` regenerated (192 outputs)
+
+**DAO Methods Added (`ProfileDao`):**
+- `watchActiveProfile(int id)` — Stream of single profile by id
+- `getActiveProfile(int id)` — Future of single profile by id
+- `watchAllProfiles()` — Stream of all profiles (ordered by `isPrimary DESC, firstName ASC`)
+- `getAllProfiles()` — Future of all profiles
+- `setPrimaryProfile(int profileId)` — Sets one profile as primary, clears others
+- `getProfileCount()` — Returns count of all profiles
+
+**Repository Interface Extended (`ProfileRepository`):**
+- Added: `watchActiveProfile`, `getActiveProfile`, `watchAllProfiles`, `getAllProfiles`, `setPrimaryProfile`, `getProfileCount`
+- `ProfileRepositoryImpl` implements all methods with domain mapping via `_toDomain()` mapper
+
+### Active Profile Provider (Replaced Hardcoded ID)
+
+- **Before:** `activeProfileIdProvider` was a simple `Provider<int?>` returning hardcoded `1`
+- **After:** Real `ActiveProfileIdNotifier` (AsyncNotifier) backed by `appSettings` table key `active_profile_id`
+- `build()`: reads setting → if null, defaults to first profile and persists
+- `setActiveProfileId(int)`: persists to settings and invalidates self for rebuild
+- **New convenience provider:** `currentActiveProfileIdProvider` — synchronous `Provider<int?>` extracting value from `AsyncValue`
+- **All 10+ callers updated** from `activeProfileIdProvider` to `currentActiveProfileIdProvider`
+
+### Patient Profile Summary Provider
+
+- `patientProfileSummaryProvider` — `FutureProvider.autoDispose<PatientProfileSummary?>`
+- Loads profile, active medications, active schedules, and recent measurements in one provider
+- Used by profile view screen and available for future dashboard integration
+
+### Profile Image Service
+
+- `ProfileImageService` in `lib/data/services/profile_image_service.dart`
+- Methods: `getProfilePhoto(photoPath)`, `importAndResizeProfilePhoto(sourcePath)`, `removeProfilePhoto(photoPath)`, `profilePhotoExists(photoPath)`
+- Uses `path_provider` for temp directory, `image` package for resize
+- Target: 512x512, JPEG quality 85, stored in app documents directory under `profile_images/`
+
+### Profile Avatar Widget
+
+- `ProfileAvatar` in `lib/presentation/widgets/profile/profile_avatar.dart`
+- Displays: profile photo (when available) or initials fallback
+- Features: configurable radius, background color derived from name hash, optional primary badge (star icon)
+- Used by patient profile view and list screens
+
+### Patient Profile View Screen
+
+- `PatientProfileViewScreen` — displays full profile details
+- Shows: avatar, name, phone, email, address, birth date, gender, height, weight, blood type, allergies, emergency contact, notes, relationship
+- Edit button in AppBar navigates to edit screen
+
+### Patient Profile Edit Screen
+
+- `PatientProfileEditScreen` — full profile editing form
+- Fields: firstName, lastName, phone, email, address, birth date, gender, height, weight, blood type, allergies, emergency contact name/phone, notes, relationship, photo
+- Photo: tap avatar to pick from gallery, crop, and store via `ProfileImageService`
+- Form validation: firstName required, email format, phone format, positive height/weight
+- Save persists to database and updates photo path
+
+### Routing
+
+- Routes added: `patientProfile` (`/settings/profile`), `patientProfileEdit` (`/settings/profile/edit`)
+- Routes placed outside ShellRoute (full-screen, no bottom nav)
+- Settings screen entry added: "Patient Profile" list tile navigating to profile view
+
+### Localization
+
+- **30+ new keys** added to both `app_en.arb` and `app_ka.arb`
+- Categories: profile fields (firstName, lastName, phone, email, address), profile actions (viewProfile, editProfile, saveProfile, changePhoto), profile display (patientProfile, gender, birthDate, height, weight, bloodType, allergies, emergencyContact, relationship), validation (firstNameRequired, invalidEmail, invalidPhone, heightRequired, weightRequired)
+- `flutter gen-l10n` run successfully
+
+### Tests (59 new tests, 6 total test files)
+
+**`test/profile_entity_test.dart` (10 tests):**
+- Profile constructor defaults: isPrimary defaults to false, isActive defaults to true, nullable fields default to null
+- Profile fullName: combines first+last, handles single-character names
+- Profile parsedRelationship: null when null, returns correct enum for self/child/spouse, null for unrecognized
+- Gender enum: all expected values
+- Relationship enum: all expected values
+
+**`test/patient_profile_summary_test.dart` (16 tests):**
+- Age: null when birthDate is null, correct when birthday passed/today/not yet, year-boundary edge cases
+- MedicationAdherenceRate: 0 when no medications, 1.0 when all completed, 0.5 when half, correct fractional rate
+- CopyWith: preserves all fields, overrides specified fields
+- Constructor defaults: zero counts default
+
+**`test/profile_avatar_test.dart` (11 tests):**
+- Initials display: first+last, single character names, empty strings, null names
+- Circle avatar: renders CircleAvatar, custom radius, background color from name hash
+- Primary badge: star icon when isPrimary true, hidden when false
+- Photo display: shows initials when photoPath null, when file nonexistent
+
+**`test/profile_image_service_test.dart` (6 tests):**
+- getProfilePhoto: null when photoPath null, null when file nonexistent
+- profilePhotoExists: false when null, false when nonexistent
+- removeProfilePhoto: no throw when nonexistent
+
+**`test/profile_dao_test.dart` (11 tests):**
+- Insert with all new fields (phone, email, address, relationship, isPrimary, isActive, photoPath)
+- Default values after insert (isPrimary false, isActive true, nullable fields null)
+- watchAllProfiles ordering: primary first, alphabetical within group (accounts for default seeded profile)
+- setPrimaryProfile: sets one, clears others
+- getProfileCount: accounts for default profile seeded by AppDatabase.test()
+- watchActiveProfile: returns correct profile by id, null for nonexistent
+
+**`test/active_profile_provider_test.dart` (6 tests):**
+- Creates default profile when no profiles and no setting
+- Reads active profile id from settings
+- Defaults to first profile when no setting exists
+- setActiveProfileId persists to settings and rebuilds
+- currentActiveProfileIdProvider: returns null when no profile, returns id when set
+
+### Production Code Fix
+
+- **Root cause:** `ActiveProfileIdNotifier.build()` called `setActiveProfileId()` when defaulting to first profile, which called `ref.invalidateSelf()`. This disposed the notifier mid-build, causing "disposed during loading state" errors.
+- **Fix:** `build()` now writes the setting directly (without invalidation) when establishing the default. Only explicit user calls to `setActiveProfileId()` trigger `ref.invalidateSelf()` for rebuild.
+
+### Files Created
+
+- `lib/domain/entities/patient_profile_summary.dart`
+- `lib/data/services/profile_image_service.dart`
+- `lib/presentation/widgets/profile/profile_avatar.dart`
+- `lib/presentation/screens/settings/patient_profile_view_screen.dart`
+- `lib/presentation/screens/settings/patient_profile_edit_screen.dart`
+- `test/profile_entity_test.dart`
+- `test/patient_profile_summary_test.dart`
+- `test/profile_avatar_test.dart`
+- `test/profile_image_service_test.dart`
+- `test/profile_dao_test.dart`
+- `test/active_profile_provider_test.dart`
+
+### Files Modified
+
+- `lib/domain/entities/profile.dart` — Gender/Relationship enums, 7 new fields, fullName, parsedRelationship
+- `lib/data/database/tables/profile_table.dart` — 7 new columns
+- `lib/data/database/app_database.dart` — schema v12, migration
+- `lib/data/database/seed_data.dart` — Added `_seedDefaultProfile()` for clean-install bootstrap
+- `lib/data/database/daos/profile_dao.dart` — 6 new methods
+- `lib/domain/repositories/profile_repository.dart` — interface extended
+- `lib/data/repositories/profile_repository_impl.dart` — implementation + _toDomain mapper
+- `lib/presentation/providers/profile_provider.dart` — real ActiveProfileIdNotifier, currentActiveProfileIdProvider, patientProfileSummaryProvider
+- `lib/presentation/providers/database_provider.dart` — all repository providers wired
+- `lib/presentation/screens/settings/settings_screen.dart` — Patient Profile entry
+- `lib/core/router/app_routes.dart` — patientProfile, patientProfileEdit constants
+- `lib/core/router/app_router.dart` — new routes + imports
+- `lib/l10n/app_en.arb` — 30+ new keys
+- `lib/l10n/app_ka.arb` — 30+ new Georgian translations
+- `lib/presentation/screens/today/today_screen.dart` — uses currentActiveProfileIdProvider
+- `lib/presentation/screens/activities/medication_list_screen.dart` — uses currentActiveProfileIdProvider
+- `lib/presentation/screens/activities/add_medication_screen.dart` — uses currentActiveProfileIdProvider
+- `lib/presentation/screens/health/measurement_schedule_screen.dart` — uses currentActiveProfileIdProvider
+- `lib/domain/services/today_agenda_service.dart` — uses currentActiveProfileIdProvider
+- `lib/presentation/providers/today_agenda_provider.dart` — uses currentActiveProfileIdProvider
+
+### Validation Results
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `build_runner` | 192 outputs written |
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (663/663) |
+
+### Phase 7A Correction — Clean-Install Bootstrap Fix
+
+**Date:** 2026-07-28
+
+**Status:** Completed
+
+**Root Causes Identified:**
+
+1. **No default profile on clean install.** `seedDatabase()` (called on `onCreate`) never created a default profile row, so `activeProfileIdProvider` returned `null` on a fresh database — no profile existed to select.
+2. **ActiveProfileIdNotifier bootstrap.** `build()` found no profiles and set `state = null`. No fallback to create a profile meant all profile-dependent screens received `null`.
+3. **Medications endless loading.** `medicationListProvider` returned `Stream.empty()` when `profileId` was `null`, causing the Medications tab to show an infinite loading spinner.
+4. **Today/Daily Agenda silently empty.** `dailyAgendaProvider` returned an empty agenda on `null` profileId — no visual indication to the user.
+5. **Patient Profile "No data yet".** `PatientProfileViewScreen` showed a generic "No data yet" message with no action button when profileId was null or the profile didn't exist.
+
+**Fixes Applied:**
+
+- `lib/data/database/seed_data.dart` — Added `_seedDefaultProfile(db)` that creates a default profile (firstName='', lastName='', isPrimary=true, isActive=true) when no profiles exist; called by `seedDatabase()` in `onCreate`
+- `lib/presentation/providers/profile_provider.dart` — `ActiveProfileIdNotifier.build()` now checks settings → finds existing profiles (prefers primary) → falls back to creating default profile with logging via `dart:developer`
+- `lib/presentation/providers/medication_provider.dart` — Changed `Stream.empty()` to `Stream.value(const <Medication>[])` when profileId is null (prevents endless loading)
+- `lib/presentation/screens/settings/patient_profile_view_screen.dart` — Rewritten: shows recovery state with "Add Profile Information" button when profileId is null or profile missing; shows editable empty state with "profileInformationNotEntered" message when profile has empty firstName/lastName; shows full profile details otherwise
+- `lib/presentation/screens/settings/patient_profile_edit_screen.dart` — Rewritten: supports creating new profile when profileId is null via `_buildCreateForm`; when saving with null profile.id, calls `repo.createProfile()` then `setActiveProfileId()`; uses shared `_buildFormBody` for both create and edit flows
+- `lib/l10n/app_en.arb` — 4 new keys: `profileNotSetUp`, `profileNotSetUpDescription`, `addProfileInformation`, `profileInformationNotEntered`
+- `lib/l10n/app_ka.arb` — 4 new Georgian translations matching above keys
+
+**Test Updates:**
+
+- `test/active_profile_provider_test.dart` — Updated test: "creates default profile when no profiles and no setting" (was "returns null when no profiles and no setting")
+- `test/profile_dao_test.dart` — 4 tests updated to account for default profile seeded by `AppDatabase.test()` (getProfileCount, watchAllProfiles ordering and filtering)
+
+### Validation Results (Post-Correction)
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `build_runner` | 242 outputs written |
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (682/682) |
+| Pixel 7 verification | App launches cleanly after `pm clear`, no logcat errors |
+
+### Phase 7A Correction 2 — Patient Profile Endless Loading Fix
+
+**Date:** 2026-07-28
+
+**Status:** Completed
+
+**Root Cause:**
+
+Both `PatientProfileViewScreen` and `PatientProfileEditScreen` created an **anonymous `StreamProvider` inside `build()`**:
+
+```dart
+final profileAsync = ref.watch(
+  StreamProvider(
+    (ref) => ref.watch(profileRepositoryProvider).watchActiveProfile(profileId),
+  ),
+);
+```
+
+Each `build()` call creates a new anonymous provider with a distinct identity. `ref.watch()` sees it as a brand-new provider, starts in `AsyncLoading`, and subscribes to the stream. If anything triggers a rebuild before the first emission (e.g., another watched provider changing), the old provider is discarded and a fresh one starts loading again — resulting in an infinite loading loop.
+
+**Fix:**
+
+- Created a stable top-level `StreamProvider.family` in `lib/presentation/providers/profile_provider.dart`:
+  ```dart
+  final watchProfileByIdProvider = StreamProvider.family<Profile?, int>(
+    (ref, profileId) {
+      final repo = ref.watch(profileRepositoryProvider);
+      return repo.watchActiveProfile(profileId);
+    },
+  );
+  ```
+- Updated `PatientProfileViewScreen` and `PatientProfileEditScreen` to use `ref.watch(watchProfileByIdProvider(profileId))` instead of the anonymous `StreamProvider`.
+- Provider identity is now stable (same family + same argument = same provider), so `ref.watch()` reuses the existing subscription across rebuilds.
+
+**Repository Query:**
+
+- `ProfileDao.watchActiveProfile(int profileId)` uses `watchSingleOrNull()` — correctly emits the profile row or `null` when absent. No change needed.
+
+**Empty-Profile UI Behaviour:**
+
+- A default profile with empty firstName/lastName is a valid profile — the screen displays avatar fallback + "Profile information has not been entered yet." message + edit action.
+- No special-casing of empty profiles as missing.
+
+**Tests Added:**
+
+- `test/profile_repository_watch_test.dart` (4 tests):
+  - `watchActiveProfile` emits profile when row exists
+  - `watchActiveProfile` emits null when row does not exist
+  - `watchActiveProfile` emits updates after profile is saved
+  - `watchActiveProfile` emits null for previously missing ID
+
+- `test/watch_profile_by_id_provider_test.dart` (5 tests):
+  - Resolves to profile when it exists
+  - Resolves to null when profile does not exist
+  - Empty profile fields are still a valid data state
+  - Does not remain in loading state
+  - Multiple IDs resolve independently
+
+- `test/patient_profile_view_screen_test.dart` (10 tests):
+  - Exits loading state and shows content
+  - Empty valid profile shows editable empty state
+  - Edit action is visible for empty profile
+  - Populated profile displays values
+  - Missing profile displays recovery UI
+  - No active profile ID displays recovery UI
+  - No infinite CircularProgressIndicator after provider settles
+  - AppBar edit icon is visible
+  - Personal information section shows unavailable for empty fields
+  - Profile sections are present
+
+### Validation Results (Post-Correction 2)
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (682/682) |
+| Pixel 7 verification | App launches cleanly after `pm clear`, no logcat errors |
+
+### Phase 7A — Photo Selection for Patient Profile
+
+**Date:** 2026-07-28
+
+**Status:** Completed
+
+**What was done:**
+
+- **`image_picker` integration:** Added `image_picker: ^1.1.2` to `pubspec.yaml` for gallery and camera photo selection
+- **Camera permission:** Added `<uses-permission android:name="android.permission.CAMERA"/>` to `AndroidManifest.xml`
+- **Provider wiring:** Created `profileImageServiceProvider` in `database_provider.dart`, connecting the existing `ProfileImageService` (previously dead code) to the provider system
+- **Edit screen photo UI:** Added tappable `ProfileAvatar` with camera overlay icon at top of `PatientProfileEditScreen`. Tapping shows a bottom sheet with three actions: Choose from Gallery, Take Photo, Remove Photo
+- **Photo processing flow:**
+  - Gallery: `ImagePicker.pickImage(source: ImageSource.gallery)` → `_resizeImageBytes()` → `ProfileImageService.importProfilePhoto()`
+  - Camera: `ImagePicker.pickImage(source: ImageSource.camera)` → same processing pipeline
+  - Remove: Sets `photoPath` to `null`, deletes managed file via `ProfileImageService.removeProfilePhoto()`
+- **Old photo cleanup:** Previous photo file only deleted after new photo successfully saved (prevents data loss on failure)
+- **`_pendingPhotoPath` state:** Tracks photo changes before form save — prevents intermediate saves from losing uncommitted photo selection
+- **l10n keys:** Added 10 new keys (English + Georgian): `profilePhoto`, `changeProfilePhoto`, `chooseFromGallery`, `takePhoto`, `removeProfilePhoto`, `photoSelectionCancelled`, `failedToLoadPhoto`, `failedToSavePhoto`, `cameraPermissionRequired`, `cameraPermissionDenied`
+
+**Tests Added:**
+
+- `test/patient_profile_edit_photo_test.dart` (9 tests):
+  - Tappable avatar with camera icon visible
+  - Camera icon overlay present
+  - Photo actions bottom sheet shows on tap
+  - Choose from gallery option visible
+  - Take photo option visible
+  - Remove photo option hidden when no photo exists
+  - Cancel button closes bottom sheet
+  - English layout renders without overflow
+  - Form fields still present below photo section
+
+- `test/profile_image_service_storage_test.dart` (10 tests):
+  - `importProfilePhoto` copies file to private storage directory
+  - `importProfilePhoto` does not delete external source file
+  - `removeProfilePhoto` deletes managed file
+  - `removeProfilePhoto` handles missing file gracefully
+  - `getProfilePhoto` returns null for null path
+  - `getProfilePhoto` returns null for nonexistent file
+  - `profilePhotoExists` returns false for null
+  - `profilePhotoExists` returns false for nonexistent file
+  - `profilePhotoExists` returns true for existing file
+  - Replacement photo removes old file after success
+
+### Validation Results (Post-Photo Feature)
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (701/701) |
+
+### Phase 7B — Measurement Schedule Save & Today Fixes (2026-07-28)
+
+Five logic bugs fixed:
+1. **False save failure**: Notification scheduling errors no longer mask DB success
+2. **Completed item remains current**: `TodayBackground.forItem()` checks `isCompleted` before `isDue`
+3. **Overdue grace period**: `nextItem()` grace window reduced from 30 min to 15 min
+4. **State recalculation**: Provider invalidation triggers immediate agenda regeneration
+5. **Equal-time ordering**: Stable sort by `effectiveTime` then `id`; Next advances after completion
+
+**Key change**: `lib/core/constants/app_constants.dart` created — `statusGraceWindow` (30 min) and `nextItemGraceWindow` (15 min) as single source of truth.
+
+**Tests**: 7 new tests (grace period, eq-time, background for completed/skipped) — 39 total in `today_agenda_test.dart`.
+
+**Validation**: `flutter analyze` — 0 issues. `flutter test` — 709/709 passing.
+
+### Phase 7C — Configurable Next Item Grace Period Setting (2026-07-28)
+
+**Feature**: User-configurable global setting for the Next Item overdue grace period.
+
+**Scope**: Settings only. No changes to medication/measurement schedules, patient profiles, or Next Item selection rules.
+
+**Implementation**:
+- **Settings storage**: Existing key-value `AppSettings` Drift table — key `next_item_grace_period_minutes`
+- **Provider**: `NextItemGracePeriodNotifier` (`StateNotifier<int>`) in `today_provider.dart` — reads from settings on init, persists on write
+- **Domain**: `TodayAgenda.nextItem()` accepts optional `graceWindow` parameter (defaults to `AppConstants.nextItemGraceWindow`)
+- **UI**: Settings screen tile under "Today" section — `Icons.timer_outlined`, subtitle shows current value in minutes, tap opens `SimpleDialog` with radio selection
+- **Reactivity**: `nextDailyItemProvider` watches `nextItemGracePeriodProvider` — changing the setting immediately recalculates Next Item without reloading agenda data
+
+**Default**: 15 minutes
+
+**Allowed values**: 5, 10, 15, 30, 60 minutes
+
+**Persistence**: Survives app restart. Clean install defaults to 15. Invalid/missing/zero/negative values fall back to 15.
+
+**Localization keys added**: `nextItemGracePeriod`, `nextItemGracePeriodDescription`, `minutesValue` (parameterised), `fiveMinutes`, `tenMinutes`, `fifteenMinutes`, `thirtyMinutes`, `sixtyMinutes` — en + ka.
+
+**Files modified**:
+- `lib/l10n/app_en.arb` — 10 new keys
+- `lib/l10n/app_ka.arb` — 10 new keys
+- `lib/core/constants/app_constants.dart` — added `nextItemGracePeriodSettingsKey`
+- `lib/domain/entities/today_agenda.dart` — `nextItem()` accepts optional `graceWindow`
+- `lib/presentation/providers/today_provider.dart` — `NextItemGracePeriodNotifier` + `nextItemGracePeriodProvider`
+- `lib/presentation/screens/settings/settings_screen.dart` — UI tile + selection dialog
+
+**New tests**:
+- `test/today_agenda_test.dart` — 7 domain tests: custom grace windows, completed/skipped exclusion, medication/measurement parity, equal-time stability
+- `test/next_item_grace_period_test.dart` — 20 tests: repository (default, save all values, persistence, invalid fallback), provider (default, read persisted, save, ignore invalid, reactive)
+- `test/settings_grace_period_test.dart` — 12 widget tests: English/Georgian labels, current value display, dialog opens with 5 options, selection updates tile, narrow-screen layout, radio icon states
+
+### Validation Results (Post-Grace Period Setting)
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | Passed (0 issues) |
+| `flutter test` | Passed (746/746) |
+| Pixel 7 verification | Pending user confirmation |
+
+### Known Limitations
+
+- Profile photo is stored locally only — no cloud sync
+- No profile deletion (multi-profile management deferred)
+- No profile switching UI (only programmatic via provider)
+- Profile list screen not yet created (only view + edit for single profile)
+- No accessibility testing performed on profile screens
+- Grace period setting is global — not per-patient-profile

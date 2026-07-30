@@ -11,7 +11,7 @@ import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
 final activeMeasurementTypesProvider =
     StreamProvider.autoDispose<List<MeasurementType>>((ref) {
-  final profileId = ref.watch(activeProfileIdProvider);
+  final profileId = ref.watch(currentActiveProfileIdProvider);
   final repo = ref.watch(measurementRepositoryProvider);
   return repo.watchActiveMeasurementTypes(profileId);
 });
@@ -43,7 +43,7 @@ final measurementTypeFieldsProvider =
 final measurementRecordsProvider = StreamProvider.autoDispose
     .family<List<MeasurementRecord>, ({int typeId, DateTime? from, DateTime? to})>(
       (ref, params) {
-        final profileId = ref.watch(activeProfileIdProvider);
+        final profileId = ref.watch(currentActiveProfileIdProvider);
         if (profileId == null) {
           return const Stream.empty();
         }
@@ -101,7 +101,7 @@ class TrendData {
 final trendDataProvider =
     FutureProvider.autoDispose.family<TrendData, TrendParams>(
       (ref, params) async {
-        final profileId = ref.watch(activeProfileIdProvider);
+        final profileId = ref.watch(currentActiveProfileIdProvider);
         if (profileId == null) return TrendData.empty;
 
         final repo = ref.watch(measurementRepositoryProvider);
@@ -198,7 +198,7 @@ final measurementScheduleProvider =
 
 final activeMeasurementSchedulesProvider =
     StreamProvider.autoDispose<List<MeasurementSchedule>>((ref) {
-      final profileId = ref.watch(activeProfileIdProvider);
+      final profileId = ref.watch(currentActiveProfileIdProvider);
       if (profileId == null) return const Stream.empty();
       final repo = ref.watch(measurementRepositoryProvider);
       return repo.watchActiveSchedules(profileId);
@@ -217,7 +217,7 @@ final measurementReminderLogsProvider =
 final todayMeasurementRemindersProvider =
     FutureProvider.autoDispose<List<_TodayMeasurementReminder>>(
       (ref) async {
-        final profileId = ref.watch(activeProfileIdProvider);
+        final profileId = ref.watch(currentActiveProfileIdProvider);
         if (profileId == null) return [];
 
         final repo = ref.watch(measurementRepositoryProvider);

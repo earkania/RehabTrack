@@ -13,7 +13,9 @@ Widget _wrapScreen({
   TodayAgenda? agenda,
   DateTime? selectedDate,
 }) {
-  final overrides = <Override>[];
+  final overrides = <Override>[
+    todayAutoRefreshProvider.overrideWith((ref) {}),
+  ];
   if (agenda != null) {
     overrides.add(dailyAgendaProvider.overrideWith((_) async => agenda));
   }
