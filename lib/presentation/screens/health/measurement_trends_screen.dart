@@ -125,9 +125,12 @@ class _MeasurementTrendsScreenState
         ),
         if (showChart)
           SliverToBoxAdapter(
-            child: MeasurementLineChart(
-              series: trendData.chartSeries,
-              typeKey: typeKey,
+            child: Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: MeasurementLineChart(
+                series: trendData.chartSeries,
+                typeKey: typeKey,
+              ),
             ),
           ),
         if (hasOneReading)

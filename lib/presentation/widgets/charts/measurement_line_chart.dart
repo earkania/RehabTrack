@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,9 +8,11 @@ import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/utils/reading_status_color.dart';
 
-class MeasurementLineChart extends StatelessWidget {
+class MeasurementLineChart extends StatefulWidget {
   final List<MeasurementChartSeries> series;
   final String typeKey;
+
+  static const Key tooltipKey = Key('measurement-chart-tooltip');
 
   const MeasurementLineChart({
     super.key,
@@ -17,16 +21,296 @@ class MeasurementLineChart extends StatelessWidget {
   });
 
   @override
+  State<MeasurementLineChart> createState() => _MeasurementLineChartState();
+}
+
+class _MeasurementLineChartState extends State<MeasurementLineChart> {
+  static const double _tooltipMargin = 8;
+  static const double _tooltipRadius = 8;
+  static const EdgeInsets _tooltipPadding =
+      EdgeInsets.symmetric(horizontal: 10, vertical: 8);
+  static const double _maxContentWidth = 200;
+  static const double _itemsGap = 4;
+
+  final GlobalKey _leafKey = GlobalKey();
+
+  OverlayEntry? _tooltipEntry;
+  List<LineBarSpot>? _tooltipSpots;
+  Size _tooltipSize = Size.zero;
+  Offset _tooltipPosition = Offset.zero;
+  ThemeData? _tooltipTheme;
+  AppLocalizations? _tooltipL10n;
+
+  @override
+  void didUpdateWidget(MeasurementLineChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.series, widget.series) ||
+        oldWidget.typeKey != widget.typeKey) {
+      _hideTooltip();
+    }
+  }
+
+  @override
+  void dispose() {
+    _hideTooltip();
+    super.dispose();
+  }
+
+  void _hideTooltip() {
+    _tooltipEntry?.remove();
+    _tooltipEntry = null;
+    _tooltipSpots = null;
+  }
+
+  void _handleTouch(FlTouchEvent event, LineTouchResponse? response) {
+    if (!mounted) {
+      return;
+    }
+    final spots = response?.lineBarSpots;
+    if (!event.isInterestedForInteractions || spots == null || spots.isEmpty) {
+      _hideTooltip();
+      return;
+    }
+    _showTooltip(spots);
+  }
+
+  void _showTooltip(List<LineBarSpot> rawSpots) {
+    final spots = List<LineBarSpot>.of(rawSpots)
+      ..sort((a, b) => b.y.compareTo(a.y));
+
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    _tooltipTheme = theme;
+    _tooltipL10n = l10n;
+    final spans = _tooltipItemSpans(spots, theme, l10n);
+    if (spans.isEmpty) {
+      _hideTooltip();
+      return;
+    }
+
+    final anchor = _anchorOffset(spots.first);
+    final size = _measureTooltip(spans);
+    final position = _clampedPosition(anchor, size);
+
+    _tooltipSpots = spots;
+    _tooltipSize = size;
+    _tooltipPosition = position;
+
+    final entry = _tooltipEntry;
+    if (entry == null) {
+      final overlay = Overlay.of(context);
+      final newEntry = OverlayEntry(builder: _buildOverlay);
+      _tooltipEntry = newEntry;
+      overlay.insert(newEntry);
+    } else {
+      entry.markNeedsBuild();
+    }
+  }
+
+  Offset _anchorOffset(LineBarSpot topSpot) {
+    final box = _leafKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) {
+      return Offset.zero;
+    }
+
+    final maxPoints = widget.series.fold<int>(
+      0,
+      (max, s) => s.points.length > max ? s.points.length : max,
+    );
+    if (maxPoints <= 1) {
+      return Offset.zero;
+    }
+
+    final values = widget.series
+        .expand((s) => s.points.map((p) => p.numericValue))
+        .toList();
+    if (values.isEmpty) {
+      return Offset.zero;
+    }
+    final minY = values.reduce(math.min);
+    final maxY = values.reduce(math.max);
+    final padding = (maxY - minY) * 0.15;
+    final adjustedMinY = (minY - padding).clamp(0.0, double.infinity);
+    final adjustedMaxY = maxY + padding;
+
+    final deltaX = (maxPoints - 1).toDouble();
+    final deltaY = adjustedMaxY - adjustedMinY;
+
+    final x = deltaX == 0 ? 0.0 : topSpot.x / deltaX * box.size.width;
+    final y = deltaY == 0
+        ? box.size.height
+        : box.size.height -
+            (topSpot.y - adjustedMinY) / deltaY * box.size.height;
+
+    return box.localToGlobal(Offset(x, y));
+  }
+
+  Size _measureTooltip(List<TextSpan> spans) {
+    if (spans.isEmpty) {
+      return Size(_tooltipPadding.horizontal, _tooltipPadding.vertical);
+    }
+    final direction = Directionality.of(context);
+    final textScaler = MediaQuery.textScalerOf(context);
+
+    var width = 0.0;
+    var height = 0.0;
+    for (var i = 0; i < spans.length; i++) {
+      final tp = TextPainter(
+        text: spans[i],
+        textDirection: direction,
+        textScaler: textScaler,
+      )..layout(maxWidth: _maxContentWidth);
+      width = math.max(width, tp.width);
+      height += tp.height;
+    }
+    height += (spans.length - 1) * _itemsGap;
+
+    return Size(
+      width + _tooltipPadding.horizontal,
+      height + _tooltipPadding.vertical,
+    );
+  }
+
+  Offset _clampedPosition(Offset anchor, Size size) {
+    final screen = MediaQuery.of(context).size;
+    final maxLeft = math.max(0.0, screen.width - size.width);
+    final maxTop = math.max(0.0, screen.height - size.height);
+
+    var left = anchor.dx - size.width / 2;
+    var top = anchor.dy - size.height - _tooltipMargin;
+
+    left = left.clamp(0.0, maxLeft);
+    if (top < 0) {
+      top = anchor.dy + _tooltipMargin;
+    }
+    top = top.clamp(0.0, maxTop);
+
+    return Offset(left, top);
+  }
+
+  Widget _buildOverlay(BuildContext overlayContext) {
+    final spots = _tooltipSpots;
+    if (spots == null) {
+      return const SizedBox.shrink();
+    }
+    final theme = _tooltipTheme;
+    final l10n = _tooltipL10n;
+    if (theme == null || l10n == null) {
+      return const SizedBox.shrink();
+    }
+    final spans = _tooltipItemSpans(spots, theme, l10n);
+
+    return Positioned(
+      left: _tooltipPosition.dx,
+      top: _tooltipPosition.dy,
+      child: IgnorePointer(
+        child: Semantics(
+          label: spans.map((s) => s.toPlainText()).join('\n'),
+          container: true,
+          excludeSemantics: true,
+          child: Material(
+            key: MeasurementLineChart.tooltipKey,
+            color: theme.colorScheme.surfaceContainerHighest,
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_tooltipRadius),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              width: _tooltipSize.width,
+              height: _tooltipSize.height,
+              child: Padding(
+                padding: _tooltipPadding,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var i = 0; i < spans.length; i++) ...[
+                      if (i > 0) const SizedBox(height: _itemsGap),
+                      Text.rich(spans[i]),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<TextSpan> _tooltipItemSpans(
+    List<LineBarSpot> spots,
+    ThemeData theme,
+    AppLocalizations l10n,
+  ) {
+    final colorScheme = theme.colorScheme;
+    final spans = <TextSpan>[];
+
+    for (final spot in spots) {
+      final s = spot.barIndex >= 0 && spot.barIndex < widget.series.length
+          ? widget.series[spot.barIndex]
+          : widget.series.first;
+      final pointIndex = spot.x.toInt();
+      if (pointIndex < 0 || pointIndex >= s.points.length) {
+        continue;
+      }
+      final point = s.points[pointIndex];
+      final statusText = _statusText(point.readingStatus, l10n);
+
+      spans.add(
+        TextSpan(
+          style: theme.textTheme.bodySmall,
+          children: [
+            TextSpan(
+              text: _formatFullDate(point.measuredAt),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const TextSpan(text: '\n'),
+            TextSpan(
+              text:
+                  '${s.label}: ${_formatValue(point.numericValue)} ${point.unit}',
+            ),
+            if (statusText.isNotEmpty) ...[
+              const TextSpan(text: '\n'),
+              TextSpan(
+                text: statusText,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: _statusColor(point.readingStatus, colorScheme),
+                ),
+              ),
+            ],
+            if (point.irregularHeartbeatDetected) ...[
+              const TextSpan(text: '\n'),
+              TextSpan(
+                text: l10n.irregularHeartbeat,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
+    return spans;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (series.isEmpty || series.every((s) => s.isEmpty)) {
+    if (widget.series.isEmpty ||
+        widget.series.every((s) => s.isEmpty)) {
       return const SizedBox.shrink();
     }
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final l10n = AppLocalizations.of(context)!;
 
-    final allPoints = series.expand((s) => s.points).toList();
+    final allPoints = widget.series.expand((s) => s.points).toList();
     if (allPoints.isEmpty) return const SizedBox.shrink();
 
     final allValues = allPoints.map((p) => p.numericValue).toList();
@@ -43,8 +327,8 @@ class MeasurementLineChart extends StatelessWidget {
     ];
 
     final lineBarsData = <LineChartBarData>[];
-    for (var i = 0; i < series.length; i++) {
-      final s = series[i];
+    for (var i = 0; i < widget.series.length; i++) {
+      final s = widget.series[i];
       if (s.isEmpty) continue;
 
       final spots = <FlSpot>[];
@@ -175,67 +459,18 @@ class MeasurementLineChart extends StatelessWidget {
             lineBarsData: lineBarsData,
             lineTouchData: LineTouchData(
               touchTooltipData: LineTouchTooltipData(
-                getTooltipColor: (_) =>
-                    colorScheme.surfaceContainerHighest,
-                getTooltipItems: (touchedSpots) {
-                  return touchedSpots.map((spot) {
-                    final seriesIndex = spot.barIndex;
-                    final s = seriesIndex >= 0 && seriesIndex < series.length
-                        ? series[seriesIndex]
-                        : series.first;
-                    final pointIndex = spot.x.toInt();
-                    if (pointIndex < 0 || pointIndex >= s.points.length) {
-                      return null;
-                    }
-                    final point = s.points[pointIndex];
-                    final statusText = _statusText(point.readingStatus, l10n);
-
-                    return LineTooltipItem(
-                      '',
-                      const TextStyle(),
-                      children: [
-                        TextSpan(
-                          text: _formatFullDate(point.measuredAt),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const TextSpan(text: '\n'),
-                        TextSpan(
-                          text:
-                              '${s.label}: ${_formatValue(point.numericValue)} ${point.unit}',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                        if (statusText.isNotEmpty) ...[
-                          const TextSpan(text: '\n'),
-                          TextSpan(
-                            text: statusText,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: _statusColor(
-                                point.readingStatus,
-                                colorScheme,
-                              ),
-                            ),
-                          ),
-                        ],
-                        if (point.irregularHeartbeatDetected) ...[
-                          const TextSpan(text: '\n'),
-                          TextSpan(
-                            text: l10n.irregularHeartbeat,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.error,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ],
-                    );
-                  }).toList();
-                },
+                getTooltipColor: (_) => colorScheme.surfaceContainerHighest,
+                tooltipRoundedRadius: _tooltipRadius,
+                tooltipMargin: _tooltipMargin,
+                tooltipPadding: _tooltipPadding,
+                getTooltipItems: (touchedSpots) =>
+                    List<LineTooltipItem?>.filled(touchedSpots.length, null),
               ),
               handleBuiltInTouches: true,
+              touchCallback: _handleTouch,
             ),
           ),
+          chartRendererKey: _leafKey,
         ),
       ),
     );
