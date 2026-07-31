@@ -1363,4 +1363,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get request => 'Request';
+
+  @override
+  String get inactiveMedications => 'Inactive';
+
+  @override
+  String get showDeactivated => 'Show deactivated';
+
+  @override
+  String get reactivate => 'Reactivate';
+
+  @override
+  String get confirmReactivate =>
+      'This medication will be reactivated. Its history will be preserved.';
+
+  @override
+  String get noInactiveMedications => 'No inactive medications';
 }

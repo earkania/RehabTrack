@@ -334,6 +334,11 @@ class _MeasurementEntryScreenState
           ),
         );
       }
+
+      await repo.cancelReminderNotification(
+        extra.reminderScheduleId,
+        extra.scheduledOccurrenceTime,
+      );
     } catch (_) {
       // Best-effort: measurement record was already saved.
     }

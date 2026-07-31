@@ -18,6 +18,18 @@ final medicationListProvider =
   return repo.watchActiveMedications(profileId);
 });
 
+final medicationInactiveListProvider =
+    StreamProvider.autoDispose<List<Medication>>((ref) {
+  final profileId = ref.watch(currentActiveProfileIdProvider);
+  if (profileId == null) {
+    return Stream.value(const <Medication>[]);
+  }
+  final repo = ref.watch(medicationRepositoryProvider);
+  return repo.watchMedications(profileId).map(
+    (medications) => medications.where((m) => !m.active).toList(),
+  );
+});
+
 final medicationProvider =
     FutureProvider.autoDispose.family<Medication?, int>((ref, id) async {
   final repo = ref.watch(medicationRepositoryProvider);

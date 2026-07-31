@@ -72,6 +72,7 @@ abstract class MeasurementRepository {
   Future<void> deleteSchedule(int id);
 
   // --- MeasurementReminderLogs ---
+  Future<void> cancelReminderNotification(int scheduleId, DateTime scheduledTime);
   Future<int> logReminder(MeasurementReminderLog log);
   Future<void> updateReminderLog(MeasurementReminderLog log);
   Future<MeasurementReminderLog?> getReminderLog(

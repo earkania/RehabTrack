@@ -126,6 +126,9 @@ class FakeMeasurementRepository implements MeasurementRepository {
   Future<List<MeasurementReminderLog>> getTodayReminderLogs(int profileId) async => [];
 
   @override
+  Future<void> cancelReminderNotification(int scheduleId, DateTime scheduledTime) async {}
+
+  @override
   Future<void> deleteReminderLogForOccurrence(
     int scheduleId,
     DateTime scheduledTime,
@@ -263,6 +266,9 @@ class FakeMedicationRepository implements MedicationRepository {
     int scheduleId,
     DateTime scheduledTime,
   ) async => null;
+
+  @override
+  Future<void> cancelReminderNotification(int scheduleId, DateTime scheduledTime) async {}
 
   @override
   Future<void> deleteLogForOccurrence(

@@ -1358,4 +1358,20 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get request => 'მოთხოვნა';
+
+  @override
+  String get inactiveMedications => 'არააქტიური';
+
+  @override
+  String get showDeactivated => 'დეაქტივირებულების ჩვენება';
+
+  @override
+  String get reactivate => 'ხელახლა გააქტიურება';
+
+  @override
+  String get confirmReactivate =>
+      'მედიკამენტი ხელახლა გააქტიურდება. მისი ისტორია შენარჩუნდება.';
+
+  @override
+  String get noInactiveMedications => 'არააქტიური მედიკამენტები არ არის';
 }

@@ -209,6 +209,18 @@ class MedicationDetailScreen extends ConsumerWidget {
                     style: TextStyle(color: colorScheme.error),
                   ),
                   onTap: () => _confirmDeactivate(context, ref, l10n),
+                )
+              else
+                ListTile(
+                  leading: Icon(
+                    Icons.restart_alt,
+                    color: colorScheme.primary,
+                  ),
+                  title: Text(
+                    l10n.reactivate,
+                    style: TextStyle(color: colorScheme.primary),
+                  ),
+                  onTap: () => _confirmReactivate(context, ref, l10n),
                 ),
             ],
           );
@@ -534,6 +546,70 @@ class MedicationDetailScreen extends ConsumerWidget {
       if (context.mounted) {
         ref.invalidate(medicationProvider(medicationId));
         ref.invalidate(medicationListProvider);
+        ref.invalidate(todayAgendaProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.medicationUpdated)),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.error)),
+        );
+      }
+    }
+  }
+
+  void _confirmReactivate(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.reactivate),
+        content: Text(l10n.confirmReactivate),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await _reactivateMedication(context, ref, l10n);
+            },
+            child: Text(l10n.confirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _reactivateMedication(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    final medicationAsync =
+        ref.read(medicationProvider(medicationId));
+    final current = medicationAsync.value;
+    if (current == null) return;
+
+    try {
+      final repo = ref.read(medicationRepositoryProvider);
+      final updated = current.copyWith(
+        active: true,
+        updatedAt: DateTime.now(),
+      );
+      await repo.updateMedication(updated);
+
+      if (context.mounted) {
+        ref.invalidate(medicationProvider(medicationId));
+        ref.invalidate(medicationListProvider);
+        ref.invalidate(medicationInactiveListProvider);
         ref.invalidate(todayAgendaProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.medicationUpdated)),

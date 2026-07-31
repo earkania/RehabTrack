@@ -508,5 +508,10 @@
   "healthReminderLockScreen": "გახსენით RehabTrack დეტალებისთვის",
   "remindersNotAvailable": "შეხსენებები მიუწვდომელია",
   "testReminderSent": "ტესტური შეხსენება გაიგზავნა! შეამოწმეთ შეტყობინებები.",
-  "request": "მოთხოვნა"
+  "request": "მოთხოვნა",
+  "inactiveMedications": "არააქტიური",
+  "showDeactivated": "დეაქტივირებულების ჩვენება",
+  "reactivate": "ხელახლა გააქტიურება",
+  "confirmReactivate": "მედიკამენტი ხელახლა გააქტიურდება. მისი ისტორია შენარჩუნდება.",
+  "noInactiveMedications": "არააქტიური მედიკამენტები არ არის"
 }

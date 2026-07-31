@@ -2665,6 +2665,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Request'**
   String get request;
+
+  /// No description provided for @inactiveMedications.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactiveMedications;
+
+  /// No description provided for @showDeactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Show deactivated'**
+  String get showDeactivated;
+
+  /// No description provided for @reactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate'**
+  String get reactivate;
+
+  /// No description provided for @confirmReactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'This medication will be reactivated. Its history will be preserved.'**
+  String get confirmReactivate;
+
+  /// No description provided for @noInactiveMedications.
+  ///
+  /// In en, this message translates to:
+  /// **'No inactive medications'**
+  String get noInactiveMedications;
 }
 
 class _AppLocalizationsDelegate

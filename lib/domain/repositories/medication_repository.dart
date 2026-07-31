@@ -38,6 +38,7 @@ abstract class MedicationRepository {
   );
   Future<int> logDose(MedicationLog log);
   Future<void> updateLog(MedicationLog log);
+  Future<void> cancelReminderNotification(int scheduleId, DateTime scheduledTime);
   Future<void> deleteLogForOccurrence(
     int scheduleId,
     DateTime scheduledTime,

@@ -121,6 +121,33 @@ class NotificationScheduler {
     return notificationId;
   }
 
+  /// Cancel a single occurrence notification for a specific scheduled time.
+  Future<void> cancelOccurrenceNotification({
+    required int scheduleId,
+    required DateTime occurrenceDate,
+    required DateTime scheduleStartDate,
+    bool isMeasurement = false,
+  }) async {
+    final dayIndex = occurrenceDate.difference(scheduleStartDate).inDays;
+    if (dayIndex < 0) return;
+
+    final notificationId = isMeasurement
+        ? NotificationService.measurementNotificationId(
+            scheduleId: scheduleId,
+            dayIndex: dayIndex,
+            slotIndex: 0,
+          )
+        : NotificationService.medicationNotificationId(
+            scheduleId: scheduleId,
+            dayIndex: dayIndex,
+            slotIndex: 0,
+          );
+
+    await _notificationService.cancelNotification(notificationId);
+    final snoozeId = NotificationService.snoozeNotificationId(notificationId);
+    await _notificationService.cancelNotification(snoozeId);
+  }
+
   /// Cancel all notifications in the given range.
   Future<void> cancelNotificationsInRange({
     required int scheduleId,

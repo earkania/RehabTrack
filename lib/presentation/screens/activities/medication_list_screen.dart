@@ -7,17 +7,32 @@ import 'package:rehab_track/presentation/providers/medication_provider.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_card.dart';
 
+final showInactiveMedicationsProvider = StateProvider<bool>((ref) => false);
+
 class MedicationListScreen extends ConsumerWidget {
   const MedicationListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final medicationsAsync = ref.watch(medicationListProvider);
+    final showInactive = ref.watch(showInactiveMedicationsProvider);
+    final medicationsAsync = showInactive
+        ? ref.watch(medicationInactiveListProvider)
+        : ref.watch(medicationListProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.medications),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              ref.read(showInactiveMedicationsProvider.notifier).state =
+                  !showInactive;
+            },
+            icon: Icon(showInactive ? Icons.medication : Icons.archive_outlined),
+            label: Text(showInactive ? l10n.medications : l10n.showDeactivated),
+          ),
+        ],
       ),
       body: medicationsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -42,6 +57,18 @@ class MedicationListScreen extends ConsumerWidget {
         ),
         data: (medications) {
           if (medications.isEmpty) {
+            if (showInactive) {
+              return EmptyState(
+                icon: Icons.archive_outlined,
+                title: l10n.noInactiveMedications,
+                subtitle: '',
+                actionLabel: l10n.medications,
+                onAction: () {
+                  ref.read(showInactiveMedicationsProvider.notifier).state =
+                      false;
+                },
+              );
+            }
             return EmptyState(
               icon: Icons.medication_outlined,
               title: l10n.noMedicationsYet,
@@ -66,10 +93,12 @@ class MedicationListScreen extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(AppRoutes.medicationAdd),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: showInactive
+          ? null
+          : FloatingActionButton(
+              onPressed: () => context.push(AppRoutes.medicationAdd),
+              child: const Icon(Icons.add),
+            ),
     );
   }
 }

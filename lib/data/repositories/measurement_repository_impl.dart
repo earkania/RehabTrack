@@ -487,6 +487,24 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
   // --- Reminder Logs ---
 
   @override
+  Future<void> cancelReminderNotification(int scheduleId, DateTime scheduledTime) async {
+    try {
+      final schedule = await getSchedule(scheduleId);
+      if (schedule == null) return;
+      final scheduler = _scheduler;
+      if (scheduler == null) return;
+      await scheduler.cancelOccurrenceNotification(
+        scheduleId: scheduleId,
+        occurrenceDate: scheduledTime,
+        scheduleStartDate: schedule.startDate ?? scheduledTime,
+        isMeasurement: true,
+      );
+    } catch (_) {
+      // Best-effort cancellation.
+    }
+  }
+
+  @override
   Future<int> logReminder(MeasurementReminderLog log) async {
     return _database.measurementDao.insertReminderLog(
       db.MeasurementReminderLogsCompanion.insert(

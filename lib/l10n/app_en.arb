@@ -508,5 +508,10 @@
   "healthReminderLockScreen": "Open RehabTrack for details",
   "remindersNotAvailable": "Reminders not available",
   "testReminderSent": "Test reminder sent! Check your notifications.",
-  "request": "Request"
+  "request": "Request",
+  "inactiveMedications": "Inactive",
+  "showDeactivated": "Show deactivated",
+  "reactivate": "Reactivate",
+  "confirmReactivate": "This medication will be reactivated. Its history will be preserved.",
+  "noInactiveMedications": "No inactive medications"
 }

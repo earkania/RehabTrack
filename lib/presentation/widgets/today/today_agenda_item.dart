@@ -592,6 +592,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
         snapshotCustomDosageForm: item.customDosageForm,
       );
       await repo.logDose(log);
+      await repo.cancelReminderNotification(item.sourceScheduleId, item.scheduledDateTime);
       if (!mounted) return;
       ref.invalidate(todayAgendaProvider);
     } catch (e) {
@@ -641,6 +642,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
           snapshotCustomDosageForm: item.customDosageForm,
         );
         await repo.logDose(log);
+        await repo.cancelReminderNotification(item.sourceScheduleId, item.scheduledDateTime);
       } else if (item.type == TodayAgendaItemType.measurement) {
         final repo = ref.read(measurementRepositoryProvider);
         final log = MeasurementReminderLog(
@@ -651,6 +653,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
           createdAt: DateTime.now(),
         );
         await repo.logReminder(log);
+        await repo.cancelReminderNotification(item.sourceScheduleId, item.scheduledDateTime);
       }
       if (!mounted) return;
       ref.invalidate(todayAgendaProvider);

@@ -247,6 +247,24 @@ class MedicationRepositoryImpl implements MedicationRepository {
   }
 
   @override
+  Future<void> cancelReminderNotification(int scheduleId, DateTime scheduledTime) async {
+    try {
+      final schedule = await getSchedule(scheduleId);
+      if (schedule == null) return;
+      final scheduler = _scheduler;
+      if (scheduler == null) return;
+      await scheduler.cancelOccurrenceNotification(
+        scheduleId: scheduleId,
+        occurrenceDate: scheduledTime,
+        scheduleStartDate: schedule.startDate ?? scheduledTime,
+        isMeasurement: false,
+      );
+    } catch (_) {
+      // Best-effort cancellation.
+    }
+  }
+
+  @override
   Future<MedicationLog?> getLogForOccurrence(
     int scheduleId,
     DateTime scheduledTime,
