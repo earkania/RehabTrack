@@ -253,14 +253,20 @@ class MedicationRepositoryImpl implements MedicationRepository {
       if (schedule == null) return;
       final scheduler = _scheduler;
       if (scheduler == null) return;
+      final slotIndex = NotificationScheduler.slotIndexForTime(
+        schedule.scheduleConfig.times,
+        scheduledTime,
+      );
       await scheduler.cancelOccurrenceNotification(
         scheduleId: scheduleId,
         occurrenceDate: scheduledTime,
         scheduleStartDate: schedule.startDate ?? scheduledTime,
         isMeasurement: false,
+        slotIndex: slotIndex,
       );
-    } catch (_) {
-      // Best-effort cancellation.
+    } catch (e) {
+      log('[MedicationRepositoryImpl] cancelReminderNotification '
+          'scheduleId=$scheduleId scheduledTime=$scheduledTime failed: $e');
     }
   }
 

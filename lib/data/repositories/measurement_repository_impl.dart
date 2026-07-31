@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/data/database/app_database.dart' as db;
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
@@ -499,8 +500,9 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
         scheduleStartDate: schedule.startDate ?? scheduledTime,
         isMeasurement: true,
       );
-    } catch (_) {
-      // Best-effort cancellation.
+    } catch (e) {
+      debugPrint('[MeasurementRepositoryImpl] cancelReminderNotification '
+          'scheduleId=$scheduleId scheduledTime=$scheduledTime failed: $e');
     }
   }
 

@@ -573,6 +573,13 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     }
   }
 
+  void _logOccurrenceAction(String action) {
+    debugPrint('[TodayAgendaItem] $action '
+        'agendaItemId=${item.id} scheduleId=${item.sourceScheduleId} '
+        'scheduledTime=${item.scheduledDateTime} '
+        'type=${item.type.name}');
+  }
+
   Future<void> _markTaken(BuildContext context, AppLocalizations l10n) async {
     if (item.medicationId == null || item.sourceScheduleId <= 0) return;
     if (_isProcessing) return;
@@ -580,6 +587,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
+      _logOccurrenceAction('markTaken');
       final repo = ref.read(medicationRepositoryProvider);
       final log = MedicationLog(
         medicationScheduleId: item.sourceScheduleId,
@@ -628,6 +636,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
+      _logOccurrenceAction('skip');
       if (item.type == TodayAgendaItemType.medication &&
           item.medicationId != null) {
         final repo = ref.read(medicationRepositoryProvider);
@@ -674,6 +683,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
+      _logOccurrenceAction('resetToPending');
       if (item.type == TodayAgendaItemType.medication) {
         final repo = ref.read(medicationRepositoryProvider);
         await repo.deleteLogForOccurrence(
@@ -710,6 +720,7 @@ class _AgendaItemMenuState extends ConsumerState<_AgendaItemMenu> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
+      _logOccurrenceAction('changeStatus:$newStatus');
       final repo = ref.read(medicationRepositoryProvider);
       final existing = await repo.getLogForOccurrence(
         item.sourceScheduleId,

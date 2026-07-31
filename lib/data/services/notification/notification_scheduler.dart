@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -52,7 +53,13 @@ class NotificationScheduler {
     final scheduledIds = <int>[];
 
     for (final occ in occurrences) {
-      final dayIndex = occ.dayIndex;
+      // dayIndex must be anchored to the schedule's canonical startDate so
+      // that scheduling and cancellation produce the same notification ID.
+      // Using max(now, startDate) as the anchor here would make the ID for a
+      // given calendar occurrence shift across days and break cancellation.
+      final dayIndex = startDate != null
+          ? dayIndexFromStartDate(occ.dateTime, startDate)
+          : occ.dayIndex;
       final slotIndex = occ.slotIndex;
 
       final notificationId = isMeasurement
@@ -122,30 +129,49 @@ class NotificationScheduler {
   }
 
   /// Cancel a single occurrence notification for a specific scheduled time.
+  ///
+  /// [scheduleStartDate] must be the schedule's canonical start date so the
+  /// computed [dayIndex] matches the one used when the notification was
+  /// scheduled. [slotIndex] identifies which daily slot of the schedule the
+  /// occurrence belongs to (0 for the first time of day, 1 for the second, ...).
   Future<void> cancelOccurrenceNotification({
     required int scheduleId,
     required DateTime occurrenceDate,
     required DateTime scheduleStartDate,
     bool isMeasurement = false,
+    int slotIndex = 0,
   }) async {
-    final dayIndex = occurrenceDate.difference(scheduleStartDate).inDays;
+    final dayIndex = dayIndexFromStartDate(occurrenceDate, scheduleStartDate);
     if (dayIndex < 0) return;
 
     final notificationId = isMeasurement
         ? NotificationService.measurementNotificationId(
             scheduleId: scheduleId,
             dayIndex: dayIndex,
-            slotIndex: 0,
+            slotIndex: slotIndex,
           )
         : NotificationService.medicationNotificationId(
             scheduleId: scheduleId,
             dayIndex: dayIndex,
-            slotIndex: 0,
+            slotIndex: slotIndex,
           );
 
-    await _notificationService.cancelNotification(notificationId);
-    final snoozeId = NotificationService.snoozeNotificationId(notificationId);
-    await _notificationService.cancelNotification(snoozeId);
+    debugPrint('[NotificationScheduler] cancelOccurrence '
+        'scheduleId=$scheduleId occurrence=$occurrenceDate '
+        'isMeasurement=$isMeasurement dayIndex=$dayIndex slotIndex=$slotIndex '
+        'notificationId=$notificationId');
+
+    try {
+      await _notificationService.cancelNotification(notificationId);
+      final snoozeId = NotificationService.snoozeNotificationId(notificationId);
+      await _notificationService.cancelNotification(snoozeId);
+      debugPrint('[NotificationScheduler] cancelled notificationId=$notificationId '
+          'snoozeId=$snoozeId result=success');
+    } catch (e) {
+      debugPrint('[NotificationScheduler] cancelled notificationId=$notificationId '
+          'result=failed error=$e');
+      rethrow;
+    }
   }
 
   /// Cancel all notifications in the given range.
@@ -173,6 +199,46 @@ class NotificationScheduler {
         } catch (_) {}
       }
     }
+  }
+
+  /// Day offset of [occurrenceDate] relative to [scheduleStartDate], using
+  /// date-only values so the result is stable regardless of the time-of-day
+  /// stored on either DateTime. This is the single source of truth for the
+  /// dayIndex used in occurrence notification IDs and must be identical for
+  /// both scheduling and cancellation.
+  @visibleForTesting
+  static int dayIndexFromStartDate(
+    DateTime occurrenceDate,
+    DateTime scheduleStartDate,
+  ) {
+    final occDate = DateTime(
+      occurrenceDate.year,
+      occurrenceDate.month,
+      occurrenceDate.day,
+    );
+    final startDate = DateTime(
+      scheduleStartDate.year,
+      scheduleStartDate.month,
+      scheduleStartDate.day,
+    );
+    return occDate.difference(startDate).inDays;
+  }
+
+  /// Index of the daily slot whose "HH:MM" time matches [occurrenceDate]'s
+  /// time-of-day. Slots are ordered as the times appear in the schedule config,
+  /// matching the order used by [scheduleOccurrences]. Returns 0 when no time
+  /// matches (callers should then skip relying on a specific slot).
+  static int slotIndexForTime(List<String> times, DateTime occurrenceDate) {
+    for (var i = 0; i < times.length; i++) {
+      final parts = times[i].split(':');
+      if (parts.length != 2) continue;
+      final hour = int.tryParse(parts[0]);
+      final minute = int.tryParse(parts[1]);
+      if (hour == occurrenceDate.hour && minute == occurrenceDate.minute) {
+        return i;
+      }
+    }
+    return 0;
   }
 
   tz.TZDateTime _effectiveStart(tz.TZDateTime now, DateTime? startDate) {
