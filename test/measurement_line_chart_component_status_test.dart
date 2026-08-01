@@ -234,6 +234,26 @@ String _tooltipText(WidgetTester tester) {
       .join(' | ');
 }
 
+List<({String text, TextStyle? style})> _tooltipSpans(WidgetTester tester) {
+  final texts = tester.widgetList<Text>(
+    find.descendant(of: _tooltip, matching: find.byType(Text)),
+  );
+  final spans = <({String text, TextStyle? style})>[];
+  void walk(InlineSpan? span) {
+    if (span is TextSpan) {
+      spans.add((text: span.text ?? '', style: span.style));
+      for (final child in span.children ?? const <InlineSpan>[]) {
+        walk(child);
+      }
+    }
+  }
+
+  for (final t in texts) {
+    walk(t.textSpan);
+  }
+  return spans;
+}
+
 void main() {
   setUpAll(_loadRobotoFonts);
 
@@ -434,6 +454,115 @@ void main() {
       await _release(tester, gesture);
     });
 
+    testWidgets('the reading timestamp appears exactly once for a '
+        'multi-component reading', (tester) async {
+      final series = _bloodPressureSeries();
+      await _pumpChart(tester, series: series);
+
+      final gesture = await _holdPoint(
+        tester,
+        values: systolicValues,
+        index: 0,
+      );
+
+      expect(tester.takeException(), isNull);
+      final text = _tooltipText(tester);
+      expect('01.07.2026 09:00'.allMatches(text).length, 1,
+          reason: 'the timestamp belongs to the reading, not to each '
+              'component, so it must not be repeated');
+      expect(text, contains('Systolic'),
+          reason: 'all components of the reading stay visible');
+      expect(text, contains('Diastolic'));
+      expect(text, contains('Pulse'));
+
+      await _release(tester, gesture);
+    });
+
+    testWidgets('multi-component tooltip groups components under a single '
+        'date/time header', (tester) async {
+      final series = _bloodPressureSeries();
+      await _pumpChart(tester, series: series);
+
+      final gesture = await _holdPoint(
+        tester,
+        values: systolicValues,
+        index: 0,
+      );
+
+      final text = _tooltipText(tester);
+      expect(text, contains('01.07.2026 09:00\n\nSystolic: 131 mmHg'),
+          reason: 'the single header is followed by the first component');
+      expect(text, contains('Above range\n\nDiastolic: 80 mmHg'),
+          reason: 'components are grouped with blank-line spacing');
+      expect(text, contains('Within range\n\nPulse: 58 bpm'));
+
+      await _release(tester, gesture);
+    });
+
+    testWidgets('tooltip statuses are colored per component', (tester) async {
+      final series = _bloodPressureSeries();
+      await _pumpChart(tester, series: series);
+
+      final gesture = await _holdPoint(
+        tester,
+        values: systolicValues,
+        index: 0,
+      );
+
+      final colorScheme = _colorScheme(tester);
+      final spans = _tooltipSpans(tester);
+      Color? colorOf(String needle) {
+        for (final s in spans) {
+          if (s.text.contains(needle)) {
+            return s.style?.color;
+          }
+        }
+        return null;
+      }
+
+      expect(
+        colorOf('Above range'),
+        ReadingStatusColor.forStatus(ReadingStatus.aboveRange, colorScheme),
+        reason: 'systolic status keeps its own red color',
+      );
+      expect(
+        colorOf('Within range'),
+        ReadingStatusColor.forStatus(ReadingStatus.inRange, colorScheme),
+        reason: 'diastolic status keeps its own green color',
+      );
+      expect(
+        colorOf('Below range'),
+        ReadingStatusColor.forStatus(ReadingStatus.belowRange, colorScheme),
+        reason: 'pulse status keeps its own blue color',
+      );
+
+      await _release(tester, gesture);
+    });
+
+    testWidgets('tooltip emphasizes the header and component names',
+        (tester) async {
+      final series = _bloodPressureSeries();
+      await _pumpChart(tester, series: series);
+
+      final gesture = await _holdPoint(
+        tester,
+        values: systolicValues,
+        index: 0,
+      );
+
+      final spans = _tooltipSpans(tester);
+      final header = spans.where((s) => s.text == '01.07.2026 09:00');
+      expect(header.length, 1);
+      expect(header.single.style?.fontWeight, FontWeight.w600,
+          reason: 'the single date/time header is emphasized');
+
+      final name = spans.where((s) => s.text == 'Systolic: ');
+      expect(name.single.style?.fontWeight, FontWeight.w500,
+          reason: 'component names are slightly bolder than the values');
+
+      await _release(tester, gesture);
+    });
+
     testWidgets('tooltip fits on screen for the three-component reading',
         (tester) async {
       final series = _bloodPressureSeries();
@@ -527,6 +656,9 @@ void main() {
       final text = _tooltipText(tester);
       expect(text, contains('Pulse'));
       expect(text, contains('Within range'));
+      expect(text, '01.07.2026 09:00\nPulse: 72 bpm\nWithin range',
+          reason: 'a single-component reading keeps the timestamp directly '
+              'above the value with no repeated header or extra spacing');
 
       await _release(tester, gesture);
     });
