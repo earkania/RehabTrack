@@ -290,6 +290,128 @@ void main() {
       expect(series[1].points.first.irregularHeartbeatDetected, isTrue);
     });
 
+    test('blood pressure points store their own component status', () {
+      final dp = MeasurementDataPoint(
+        record: _record(id: 1, timestamp: DateTime(2026)),
+        values: [
+          _value(fieldKey: 'systolic', numericValue: 131, unit: 'mmHg'),
+          _value(fieldKey: 'diastolic', numericValue: 80, unit: 'mmHg'),
+          _value(fieldKey: 'pulse', numericValue: 58, unit: 'bpm'),
+        ],
+      );
+      final series = MeasurementChartBuilder.buildSeries(
+        typeKey: 'blood_pressure',
+        dataPoints: [dp],
+        fields: [
+          _field(fieldKey: 'systolic', label: 'Systolic', displayOrder: 0),
+          _field(fieldKey: 'diastolic', label: 'Diastolic', displayOrder: 1),
+          _field(fieldKey: 'pulse', label: 'Pulse', displayOrder: 2),
+        ],
+        ranges: const MeasurementRanges(fieldRanges: {
+          'systolic': ReferenceRange(minValue: 90, maxValue: 120),
+          'diastolic': ReferenceRange(minValue: 60, maxValue: 80),
+          'pulse': ReferenceRange(minValue: 60, maxValue: 100),
+        }),
+      );
+
+      expect(series.length, 3);
+      expect(series[0].points.first.componentStatus, ReadingStatus.aboveRange);
+      expect(series[1].points.first.componentStatus, ReadingStatus.inRange);
+      expect(series[2].points.first.componentStatus, ReadingStatus.belowRange);
+    });
+
+    test('blood pressure overall reading status is preserved on each point',
+        () {
+      final dp = MeasurementDataPoint(
+        record: _record(id: 1, timestamp: DateTime(2026)),
+        values: [
+          _value(fieldKey: 'systolic', numericValue: 131, unit: 'mmHg'),
+          _value(fieldKey: 'diastolic', numericValue: 80, unit: 'mmHg'),
+          _value(fieldKey: 'pulse', numericValue: 58, unit: 'bpm'),
+        ],
+      );
+      final series = MeasurementChartBuilder.buildSeries(
+        typeKey: 'blood_pressure',
+        dataPoints: [dp],
+        fields: [
+          _field(fieldKey: 'systolic', label: 'Systolic', displayOrder: 0),
+          _field(fieldKey: 'diastolic', label: 'Diastolic', displayOrder: 1),
+          _field(fieldKey: 'pulse', label: 'Pulse', displayOrder: 2),
+        ],
+        ranges: const MeasurementRanges(fieldRanges: {
+          'systolic': ReferenceRange(minValue: 90, maxValue: 120),
+          'diastolic': ReferenceRange(minValue: 60, maxValue: 80),
+          'pulse': ReferenceRange(minValue: 60, maxValue: 100),
+        }),
+      );
+
+      for (final s in series) {
+        expect(
+          s.points.first.readingStatus,
+          ReadingStatus.aboveRange,
+          reason: 'the systolic value is above range so the overall reading '
+              'status is above range for every component point',
+        );
+      }
+    });
+
+    test('blood pressure without ranges yields unknown component status', () {
+      final dp = MeasurementDataPoint(
+        record: _record(id: 1, timestamp: DateTime(2026)),
+        values: [
+          _value(fieldKey: 'systolic', numericValue: 131, unit: 'mmHg'),
+          _value(fieldKey: 'diastolic', numericValue: 80, unit: 'mmHg'),
+          _value(fieldKey: 'pulse', numericValue: 58, unit: 'bpm'),
+        ],
+      );
+      final series = MeasurementChartBuilder.buildSeries(
+        typeKey: 'blood_pressure',
+        dataPoints: [dp],
+        fields: [
+          _field(fieldKey: 'systolic', label: 'Systolic', displayOrder: 0),
+          _field(fieldKey: 'diastolic', label: 'Diastolic', displayOrder: 1),
+          _field(fieldKey: 'pulse', label: 'Pulse', displayOrder: 2),
+        ],
+      );
+
+      for (final s in series) {
+        expect(s.points.first.readingStatus, ReadingStatus.unknown);
+        expect(s.points.first.componentStatus, ReadingStatus.unknown);
+        expect(s.points.first.effectiveStatus, ReadingStatus.unknown);
+      }
+    });
+
+    test('single-value types keep component status equal to reading status',
+        () {
+      final dp = MeasurementDataPoint(
+        record: _record(id: 1, timestamp: DateTime(2026)),
+        values: [
+          _value(fieldKey: 'spo2', numericValue: 92, unit: '%'),
+          _value(fieldKey: 'pulse', numericValue: 72, unit: 'bpm'),
+        ],
+      );
+      final series = MeasurementChartBuilder.buildSeries(
+        typeKey: 'spo2',
+        dataPoints: [dp],
+        fields: [
+          _field(fieldKey: 'spo2', label: 'SpO2', displayOrder: 0),
+          _field(fieldKey: 'pulse', label: 'Pulse', displayOrder: 1),
+        ],
+        ranges: const MeasurementRanges(fieldRanges: {
+          'spo2': ReferenceRange(minValue: 95, maxValue: 100),
+          'pulse': ReferenceRange(minValue: 60, maxValue: 100),
+        }),
+      );
+
+      expect(series.length, 2);
+      final spo2Point = series[0].points.first;
+      final pulsePoint = series[1].points.first;
+      expect(spo2Point.componentStatus, ReadingStatus.belowRange);
+      expect(spo2Point.readingStatus, ReadingStatus.belowRange);
+      expect(pulsePoint.componentStatus, ReadingStatus.inRange);
+      expect(pulsePoint.readingStatus, ReadingStatus.inRange);
+    });
+
     test('null values in series are skipped', () {
       final dp = MeasurementDataPoint(
         record: _record(id: 1, timestamp: DateTime(2026)),

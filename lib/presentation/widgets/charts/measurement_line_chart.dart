@@ -256,7 +256,7 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
         continue;
       }
       final point = s.points[pointIndex];
-      final statusText = _statusText(point.readingStatus, l10n);
+      final statusText = _statusText(point.effectiveStatus, l10n);
 
       spans.add(
         TextSpan(
@@ -278,7 +278,7 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
               TextSpan(
                 text: statusText,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: _statusColor(point.readingStatus, colorScheme),
+                  color: _statusColor(point.effectiveStatus, colorScheme),
                 ),
               ),
             ],
@@ -361,7 +361,7 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
                 );
               }
               final point = s.points[pointIndex];
-              final statusColor = _statusColor(point.readingStatus, colorScheme);
+              final statusColor = _statusColor(point.effectiveStatus, colorScheme);
 
               if (point.irregularHeartbeatDetected) {
                 return FlDotCirclePainter(
