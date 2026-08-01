@@ -2917,3 +2917,109 @@ Five logic bugs fixed:
 - Profile list screen not yet created (only view + edit for single profile)
 - No accessibility testing performed on profile screens
 - Grace period setting is global — not per-patient-profile
+
+### Phase 8 — Five-Section Navigation Refactor (2026-08-01)
+
+Reworked the app navigation into the approved five-section structure while
+keeping every existing screen, provider, repository, and route behavior intact.
+
+#### New Section Hierarchy
+
+- **Today** (existing screen, unchanged) — `/`
+- **Health** (new dashboard) — `/health`
+  - Medications — `/health/medications` (existing screen, unchanged)
+  - Measurements — `/health/measurements` (existing screen, unchanged)
+  - Activities — `/health/activities` (placeholder)
+  - Diet — `/health/diet` (placeholder)
+- **Records** (new dashboard) — `/records`
+  - Lab Analyses — `/records/lab-analyses` (placeholder)
+  - Doctor Visits — `/records/doctor-visits` (placeholder)
+  - Reports — `/records/reports` (placeholder)
+- **Profile** (new dashboard) — `/profile`
+  - Patient Profile — `/profile/patient` (existing screen, unchanged)
+  - Patient Profile Edit — `/profile/patient/edit` (existing screen, unchanged)
+  - Doctors — `/profile/doctors` (placeholder)
+  - Emergency Contacts — `/profile/emergency-contacts` (placeholder)
+  - Medical Notes — `/profile/medical-notes` (placeholder)
+- **Settings** (existing screen, unchanged, kept as bottom destination) — `/settings`
+
+#### Files Created
+
+- `lib/presentation/widgets/dashboard/module_grid_tile.dart` — reusable large-icon
+  grid tile (64px centered icon, centered 2-line label, Material 3
+  `surfaceContainerLow` + `primary`, no hardcoded colors, no overflow at large
+  text scales).
+- `lib/presentation/widgets/dashboard/module_grid.dart` — two-column,
+  vertically-scrolling `ListView.builder` grid; rows use `IntrinsicHeight` so
+  each pair shares an equal, content-derived height.
+- `lib/presentation/screens/common/module_placeholder_screen.dart` — shared
+  "module not available yet / coming soon" screen with back navigation.
+- `lib/presentation/screens/health/health_dashboard_screen.dart`
+- `lib/presentation/screens/records/records_dashboard_screen.dart`
+- `lib/presentation/screens/profile/profile_dashboard_screen.dart` — includes an
+  optional active-profile header (`_ActiveProfileHeader`) driven by
+  `currentActiveProfileIdProvider` / `watchProfileByIdProvider` / `ProfileAvatar`.
+- `test/navigation_test.dart` — five-tab / dashboard / placeholder / back-nav /
+  selected-tab behavior tests.
+
+#### Files Modified
+
+- `lib/core/router/app_routes.dart` — canonical route constants, `RecordNowExtra`
+  preserved, `_OldRoutes` + `RouteRedirector` legacy redirects updated
+  (`/measurements` → `/health/measurements`, `/medications` → `/health/medications`,
+  `/activities` → `/health/medications`, `/settings/patient-profile` → `/profile/patient`,
+  `/settings/patient-profile/edit` → `/profile/patient/edit`).
+- `lib/core/router/app_router.dart` — single `ShellRoute` hosting the five tabs
+  (Today/Health/Records/Profile/Settings) with pushed screens as flat routes,
+  `_calculateSelectedIndex` matching location prefixes, `_InvalidRouteScreen` for
+  bad path params, `_CenteredNavigationBar` (unselected outlined icons, 80px
+  selected-label layout) unchanged.
+- `lib/presentation/screens/health/health_screen.dart` → renamed to
+  `measurements_screen.dart` (`HealthScreen` → `MeasurementsScreen`).
+- `lib/presentation/screens/records/records_screen.dart` — deleted (was an empty
+  placeholder).
+- `lib/presentation/screens/settings/settings_screen.dart` — profile tile pushes
+  `AppRoutes.patientProfile`.
+- `lib/presentation/screens/settings/patient_profile_view_screen.dart` — edit
+  buttons push `AppRoutes.patientProfileEdit`.
+- `lib/l10n/app_en.arb` / `app_ka.arb` — added `profile`, `diet`, `labAnalyses`,
+  `doctorVisits`, `reports`, `doctors`, `emergencyContacts`, `medicalNotes`,
+  `moduleNotAvailableYet`, `comingSoon`.
+- Tests updated for the new tab set/icons: `test/widget_test.dart`,
+  `test/phase5a_correction_test.dart`, `test/popup_dismissal_test.dart`.
+
+#### Behavior Notes
+
+- Tapping the currently-selected tab returns to that tab's root dashboard;
+  independent tab stacks preserved via the shared `ShellRoute`.
+- Back navigation pops pushed screens to their dashboard; placeholders, Patient
+  Profile, Medications, and Measurements all verified.
+- Popup-dismissal logic in `ScaffoldWithNavBar._onItemTapped` unchanged.
+- Notification cold-start and Today deep-link entry still land on `/`.
+
+#### Validation Results (Post-Phase 8)
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | Passed (5 pre-existing `prefer_initializing_formals` info lints) |
+| `flutter test` | Passed (768/768) |
+| Pixel 7 build/install | `app-release.apk` built (67.7MB) and installed; app launches |
+| Today screen | Agenda (medications + measurements) renders, nav bar shows Today |
+| Health dashboard | Medications / Measurements / Activities / Diet tiles render |
+| Records dashboard | Lab Analyses / Doctor Visits / Reports tiles render |
+| Profile dashboard | Active-profile header + 4 tiles render; Patient Profile data intact |
+| Settings | Unchanged; Patient Profile tile opens `/profile/patient`; edit opens `/profile/patient/edit` |
+| Placeholders | "This module is not available yet / Coming soon" + back navigation works |
+| Georgian | All new dashboards/labels render in Georgian |
+| Dark theme | Dashboards render with dark background + Material 3 primary teal |
+| Overflow | No RenderFlex overflow exceptions observed on device |
+
+#### Known Limitation (pre-existing, unrelated to Phase 8)
+
+On the Pixel 7, `flutter_local_notifications` v18's `ScheduledNotificationBootReceiver`
+can throw `Missing type parameter` (Gson type-token issue under R8) when the
+device reboots with scheduled notifications stored, causing a one-time crash on
+the pending `BOOT_COMPLETED` delivery. The app then launches normally. This is
+unrelated to the navigation refactor (no notification code or build config was
+changed) and should be addressed separately (e.g. proguard keep rules).

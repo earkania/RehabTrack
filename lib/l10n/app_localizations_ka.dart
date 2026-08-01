@@ -30,6 +30,36 @@ class AppLocalizationsKa extends AppLocalizations {
   String get settings => 'პარამეტრები';
 
   @override
+  String get profile => 'პროფილი';
+
+  @override
+  String get diet => 'დიეტა';
+
+  @override
+  String get labAnalyses => 'ლაბორატორიული ანალიზები';
+
+  @override
+  String get doctorVisits => 'ექიმთან ვიზიტები';
+
+  @override
+  String get reports => 'ანგარიშები';
+
+  @override
+  String get doctors => 'ექიმები';
+
+  @override
+  String get emergencyContacts => 'საგანგებო კონტაქტები';
+
+  @override
+  String get medicalNotes => 'სამედიცინო ჩანაწერები';
+
+  @override
+  String get moduleNotAvailableYet => 'ეს მოდული ჯერ არ არის ხელმისაწვდომი';
+
+  @override
+  String get comingSoon => 'მალე იქნება';
+
+  @override
   String get language => 'ენა';
 
   @override

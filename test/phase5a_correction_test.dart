@@ -376,9 +376,9 @@ void main() {
       expect(find.text('Today'), findsAtLeastNWidgets(1));
       // All tab icons exist in the nav bar
       expect(find.byIcon(Icons.today), findsAtLeastNWidgets(1));
-      expect(find.byIcon(Icons.monitor_heart_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.medication_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.health_and_safety_outlined), findsOneWidget);
       expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.person_outlined), findsOneWidget);
       expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
     });
 
@@ -461,9 +461,9 @@ void main() {
 
       // All nav bar icons should exist (today also appears in empty state)
       expect(find.byIcon(Icons.today), findsAtLeastNWidgets(1));
-      expect(find.byIcon(Icons.monitor_heart_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.medication_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.health_and_safety_outlined), findsOneWidget);
       expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.person_outlined), findsOneWidget);
       expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
     });
   });
@@ -503,12 +503,9 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      // Render the full app — without database the Measurements screen
-      // shows EmptyState. The add_circle_outline IconButton exists in
-      // _MeasurementTypeCard (rendered when types exist) and in
-      // MeasurementHistoryScreen AppBar. This test verifies no overflow
-      // and the screen builds correctly with both screens sharing the
-      // same button code path.
+      // Render the full app — without database the Health dashboard
+      // renders its module grid. This test verifies no overflow
+      // and the screen builds correctly.
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
@@ -522,8 +519,8 @@ void main() {
       // No overflow
       expect(tester.takeException(), isNull);
 
-      // Navigate to Measurements tab — renders correctly
-      await tester.tap(find.byIcon(Icons.monitor_heart_outlined));
+      // Navigate to Health tab — renders correctly
+      await tester.tap(find.byIcon(Icons.health_and_safety_outlined));
       await tester.pump();
       await tester.pump();
 

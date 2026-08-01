@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/widgets/profile/profile_avatar.dart';
 
@@ -78,7 +79,7 @@ class PatientProfileViewScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () =>
-                  context.push('/settings/patient-profile/edit'),
+                  context.push(AppRoutes.patientProfileEdit),
               icon: const Icon(Icons.add),
               label: Text(l10n.addProfileInformation),
             ),
@@ -103,7 +104,7 @@ class PatientProfileViewScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => context.push('/settings/patient-profile/edit'),
+            onPressed: () => context.push(AppRoutes.patientProfileEdit),
           ),
         ],
       ),
@@ -133,7 +134,7 @@ class PatientProfileViewScreen extends ConsumerWidget {
             Center(
               child: FilledButton.tonalIcon(
                 onPressed: () =>
-                    context.push('/settings/patient-profile/edit'),
+                    context.push(AppRoutes.patientProfileEdit),
                 icon: const Icon(Icons.edit),
                 label: Text(l10n.addProfileInformation),
               ),

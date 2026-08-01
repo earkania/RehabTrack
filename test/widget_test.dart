@@ -32,9 +32,9 @@ void main() {
       // The selected tab (Today, index 0) should show its label
       expect(find.text('Today'), findsAtLeastNWidgets(1));
       // Unselected tabs do not render label Text widgets
-      expect(find.byIcon(Icons.monitor_heart_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.medication_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.health_and_safety_outlined), findsOneWidget);
       expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.person_outlined), findsOneWidget);
       expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
     });
 
@@ -50,14 +50,14 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      // Tap on Measurements tab
-      await tester.tap(find.byIcon(Icons.monitor_heart_outlined));
+      // Tap on Health tab
+      await tester.tap(find.byIcon(Icons.health_and_safety_outlined));
       await tester.pump();
       await tester.pump();
 
-      // After switching, Measurements label should be visible
+      // After switching, Health label should be visible
       // (appears as nav label + screen title)
-      expect(find.text('Measurements'), findsAtLeastNWidgets(1));
+      expect(find.text('Health'), findsAtLeastNWidgets(1));
       // Today is no longer selected — no Today Text in nav bar
       // (Today screen title also gone after switching away)
     });
@@ -200,14 +200,17 @@ void main() {
   });
 
   group('Medication list integration', () {
-    testWidgets('Medications tab renders', (WidgetTester tester) async {
+    testWidgets('Medications reachable via Health dashboard',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(child: RehabTrackApp()),
       );
       await tester.pump();
 
-      // Tap by icon since unselected labels are not rendered
-      await tester.tap(find.byIcon(Icons.medication_outlined));
+      // Open the Health tab, then the Medications tile.
+      await tester.tap(find.byIcon(Icons.health_and_safety_outlined));
+      await tester.pump();
+      await tester.tap(find.text('Medications'));
       await tester.pump();
 
       // The screen should render without crashing - it may show loading or empty state
@@ -221,8 +224,10 @@ void main() {
       );
       await tester.pump();
 
-      // Tap by icon since unselected labels are not rendered
-      await tester.tap(find.byIcon(Icons.medication_outlined));
+      // Open the Health tab, then the Medications tile.
+      await tester.tap(find.byIcon(Icons.health_and_safety_outlined));
+      await tester.pump();
+      await tester.tap(find.text('Medications'));
       await tester.pump();
 
       // Look for the FAB (may take a moment to appear with empty list)

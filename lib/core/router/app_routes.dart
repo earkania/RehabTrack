@@ -1,15 +1,32 @@
 class AppRoutes {
   AppRoutes._();
 
+  // Bottom-navigation destinations
   static const home = '/';
-  static const measurements = '/measurements';
-  static const medications = '/medications';
+  static const health = '/health';
   static const records = '/records';
+  static const profile = '/profile';
   static const settings = '/settings';
-  static const patientProfile = '/settings/patient-profile';
-  static const patientProfileEdit = '/settings/patient-profile/edit';
 
-  // Measurements
+  // Health
+  static const healthMedications = '/health/medications';
+  static const healthMeasurements = '/health/measurements';
+  static const healthActivities = '/health/activities';
+  static const healthDiet = '/health/diet';
+
+  // Records
+  static const recordsLabAnalyses = '/records/lab-analyses';
+  static const recordsDoctorVisits = '/records/doctor-visits';
+  static const recordsReports = '/records/reports';
+
+  // Profile
+  static const patientProfile = '/profile/patient';
+  static const patientProfileEdit = '/profile/patient/edit';
+  static const profileDoctors = '/profile/doctors';
+  static const profileEmergencyContacts = '/profile/emergency-contacts';
+  static const profileMedicalNotes = '/profile/medical-notes';
+
+  // Measurements (deep links)
   static String measurementAdd(int typeId) => '/measurements/measurement/$typeId/add';
   static String measurementHistory(int typeId) => '/measurements/measurement/$typeId/history';
   static String measurementEdit(int recordId) =>
@@ -23,7 +40,7 @@ class AppRoutes {
       '/measurements/measurement/$typeId/schedules';
   static String measurementScheduleEdit(int typeId, int scheduleId) =>
       '/measurements/measurement/$typeId/schedule/$scheduleId/edit';
-  // Medications
+  // Medications (deep links)
   static const medicationAdd = '/medications/medication/add';
   static String medicationDetail(int id) => '/medications/medication/$id';
   static String medicationEdit(int id) => '/medications/medication/$id/edit';
@@ -47,22 +64,34 @@ class RecordNowExtra {
 }
 
 class _OldRoutes {
-  static const health = '/health';
+  static const measurements = '/measurements';
+  static const medications = '/medications';
   static const activities = '/activities';
+  static const patientProfile = '/settings/patient-profile';
+  static const patientProfileEdit = '/settings/patient-profile/edit';
 
-  static bool isHealthRoute(String location) => location.startsWith(health);
-  static bool isActivitiesRoute(String location) => location.startsWith(activities);
+  static bool isTabPath(String location, String path) =>
+      location == path || location == '$path/';
 }
 
 class RouteRedirector {
   static String? redirect(String location) {
-    // /health → /measurements
-    if (_OldRoutes.isHealthRoute(location)) {
-      return location.replaceFirst(_OldRoutes.health, AppRoutes.measurements);
+    // Legacy bottom-navigation tab paths → new canonical destinations.
+    if (_OldRoutes.isTabPath(location, _OldRoutes.measurements)) {
+      return AppRoutes.healthMeasurements;
     }
-    // /activities → /medications
-    if (_OldRoutes.isActivitiesRoute(location)) {
-      return location.replaceFirst(_OldRoutes.activities, AppRoutes.medications);
+    if (_OldRoutes.isTabPath(location, _OldRoutes.medications)) {
+      return AppRoutes.healthMedications;
+    }
+    if (_OldRoutes.isTabPath(location, _OldRoutes.activities)) {
+      return AppRoutes.healthMedications;
+    }
+    // Legacy patient-profile paths → Profile dashboard.
+    if (_OldRoutes.isTabPath(location, _OldRoutes.patientProfile)) {
+      return AppRoutes.patientProfile;
+    }
+    if (_OldRoutes.isTabPath(location, _OldRoutes.patientProfileEdit)) {
+      return AppRoutes.patientProfileEdit;
     }
     return null;
   }

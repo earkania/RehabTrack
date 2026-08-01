@@ -4,8 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 
 import 'package:rehab_track/core/router/app_routes.dart';
+import 'package:rehab_track/presentation/screens/common/module_placeholder_screen.dart';
 import 'package:rehab_track/presentation/screens/today/today_screen.dart';
-import 'package:rehab_track/presentation/screens/health/health_screen.dart';
+import 'package:rehab_track/presentation/screens/health/health_dashboard_screen.dart';
+import 'package:rehab_track/presentation/screens/health/measurements_screen.dart';
+import 'package:rehab_track/presentation/screens/records/records_dashboard_screen.dart';
+import 'package:rehab_track/presentation/screens/profile/profile_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/medication_list_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/add_medication_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/edit_medication_screen.dart';
@@ -22,7 +26,6 @@ import 'package:rehab_track/presentation/screens/health/measurement_trends_scree
 import 'package:rehab_track/presentation/screens/health/measurement_schedule_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurement_schedule_list_screen.dart';
 import 'package:rehab_track/presentation/screens/health/reference_range_screen.dart';
-import 'package:rehab_track/presentation/screens/records/records_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_view_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_edit_screen.dart';
@@ -52,21 +55,21 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: AppRoutes.measurements,
+            path: AppRoutes.health,
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: HealthScreen(),
-            ),
-          ),
-          GoRoute(
-            path: AppRoutes.medications,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: MedicationListScreen(),
+              child: HealthDashboardScreen(),
             ),
           ),
           GoRoute(
             path: AppRoutes.records,
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: RecordsScreen(),
+              child: RecordsDashboardScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.profile,
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: ProfileDashboardScreen(),
             ),
           ),
           GoRoute(
@@ -76,6 +79,81 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+      // Health
+      GoRoute(
+        path: AppRoutes.healthMedications,
+        builder: (context, state) => const MedicationListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.healthMeasurements,
+        builder: (context, state) => const MeasurementsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.healthActivities,
+        builder: (context, state) => ModulePlaceholderScreen(
+          icon: Icons.directions_walk_outlined,
+          title: AppLocalizations.of(context)!.activities,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.healthDiet,
+        builder: (context, state) => ModulePlaceholderScreen(
+          icon: Icons.restaurant,
+          title: AppLocalizations.of(context)!.diet,
+        ),
+      ),
+      // Records
+      GoRoute(
+        path: AppRoutes.recordsLabAnalyses,
+        builder: (context, state) => ModulePlaceholderScreen(
+          icon: Icons.science_outlined,
+          title: AppLocalizations.of(context)!.labAnalyses,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.recordsDoctorVisits,
+        builder: (context, state) => ModulePlaceholderScreen(
+          icon: Icons.medical_services_outlined,
+          title: AppLocalizations.of(context)!.doctorVisits,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.recordsReports,
+        builder: (context, state) => ModulePlaceholderScreen(
+          icon: Icons.assessment_outlined,
+          title: AppLocalizations.of(context)!.reports,
+        ),
+      ),
+      // Profile
+      GoRoute(
+        path: AppRoutes.patientProfile,
+        builder: (context, state) => const PatientProfileViewScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.patientProfileEdit,
+        builder: (context, state) => const PatientProfileEditScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profileDoctors,
+        builder: (context, state) => ModulePlaceholderScreen(
+          icon: Icons.badge_outlined,
+          title: AppLocalizations.of(context)!.doctors,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.profileEmergencyContacts,
+        builder: (context, state) => ModulePlaceholderScreen(
+          icon: Icons.emergency_outlined,
+          title: AppLocalizations.of(context)!.emergencyContacts,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.profileMedicalNotes,
+        builder: (context, state) => ModulePlaceholderScreen(
+          icon: Icons.note_alt_outlined,
+          title: AppLocalizations.of(context)!.medicalNotes,
+        ),
       ),
       GoRoute(
         path: AppRoutes.medicationAdd,
@@ -214,14 +292,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ReferenceRangeScreen(),
       ),
       GoRoute(
-        path: AppRoutes.patientProfile,
-        builder: (context, state) => const PatientProfileViewScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.patientProfileEdit,
-        builder: (context, state) => const PatientProfileEditScreen(),
-      ),
-      GoRoute(
         path: '/settings/notification-diagnostics',
         builder: (context, state) => const NotificationDiagnosticsScreen(),
       ),
@@ -318,9 +388,9 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/measurements')) return 1;
-    if (location.startsWith('/medications')) return 2;
-    if (location.startsWith('/records')) return 3;
+    if (location.startsWith('/health')) return 1;
+    if (location.startsWith('/records')) return 2;
+    if (location.startsWith('/profile')) return 3;
     if (location.startsWith('/settings')) return 4;
     return 0;
   }
@@ -338,11 +408,11 @@ class ScaffoldWithNavBar extends StatelessWidget {
       case 0:
         context.go(AppRoutes.home);
       case 1:
-        context.go(AppRoutes.measurements);
+        context.go(AppRoutes.health);
       case 2:
-        context.go(AppRoutes.medications);
-      case 3:
         context.go(AppRoutes.records);
+      case 3:
+        context.go(AppRoutes.profile);
       case 4:
         context.go(AppRoutes.settings);
     }
@@ -364,19 +434,19 @@ class ScaffoldWithNavBar extends StatelessWidget {
             label: l10n.today,
           ),
           _NavItem(
-            icon: Icons.monitor_heart_outlined,
-            selectedIcon: Icons.monitor_heart,
-            label: l10n.measurements,
-          ),
-          _NavItem(
-            icon: Icons.medication_outlined,
-            selectedIcon: Icons.medication,
-            label: l10n.medications,
+            icon: Icons.health_and_safety_outlined,
+            selectedIcon: Icons.health_and_safety,
+            label: l10n.health,
           ),
           _NavItem(
             icon: Icons.folder_outlined,
             selectedIcon: Icons.folder,
             label: l10n.records,
+          ),
+          _NavItem(
+            icon: Icons.person_outlined,
+            selectedIcon: Icons.person,
+            label: l10n.profile,
           ),
           _NavItem(
             icon: Icons.settings_outlined,

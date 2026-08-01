@@ -6,6 +6,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/core/localization/app_locale.dart';
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
@@ -62,7 +63,7 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(displayName),
             subtitle: Text(l10n.activeProfile),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push('/settings/patient-profile'),
+            onTap: () => context.push(AppRoutes.patientProfile),
           ),
           const Divider(),
           _buildSectionHeader(context, l10n.language),
