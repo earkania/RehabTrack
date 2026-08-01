@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rehab_track/app.dart';
+import 'package:rehab_track/presentation/widgets/dashboard/module_grid_tile.dart';
 
 void main() {
   Future<void> pumpApp(WidgetTester tester) async {
@@ -55,6 +56,28 @@ void main() {
       expect(find.text('Doctors'), findsWidgets);
       expect(find.text('Emergency Contacts'), findsWidgets);
       expect(find.text('Medical Notes'), findsWidgets);
+    });
+
+    testWidgets('Profile Patient Profile tile opens the screen and back returns',
+        (tester) async {
+      await pumpApp(tester);
+      await goToTab(tester, Icons.person_outlined);
+
+      await tester.tap(
+        find.widgetWithText(ModuleGridTile, 'Patient Profile'),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // The Patient Profile screen (AppBar title) is shown.
+      expect(find.text('Patient Profile'), findsWidgets);
+
+      await tester.pageBack();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Back on the Profile dashboard.
+      expect(find.text('Doctors'), findsWidgets);
     });
 
     testWidgets('placeholder tile opens placeholder screen and back returns',

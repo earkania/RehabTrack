@@ -6,14 +6,11 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/core/localization/app_locale.dart';
-import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
-import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/providers/reminder_settings_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
-import 'package:rehab_track/presentation/widgets/profile/profile_avatar.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -22,12 +19,6 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
-
-    final profileId = ref.watch(currentActiveProfileIdProvider);
-    final profileAsync = profileId != null
-        ? ref.watch(watchProfileByIdProvider(profileId))
-        : null;
-    final profile = profileAsync?.valueOrNull;
 
     final gracePeriodMinutes = ref.watch(nextItemGracePeriodProvider);
 
@@ -39,33 +30,11 @@ class SettingsScreen extends ConsumerWidget {
     final showPatientName = ref.watch(showPatientNameInNotificationsProvider);
     final showLockScreenDetails = ref.watch(showDetailsOnLockScreenProvider);
 
-    final hasName =
-        profile != null &&
-        (profile.firstName.isNotEmpty || profile.lastName.isNotEmpty);
-    final displayName = hasName
-        ? '${profile.firstName} ${profile.lastName}'.trim()
-        : l10n.patientProfile;
-
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         children: [
           const SizedBox(height: 8),
-          _buildSectionHeader(context, l10n.patientProfile),
-          ListTile(
-            leading: ProfileAvatar(
-              photoPath: profile?.photoPath,
-              firstName: profile?.firstName,
-              lastName: profile?.lastName,
-              radius: 20,
-              isPrimary: profile?.isPrimary ?? false,
-            ),
-            title: Text(displayName),
-            subtitle: Text(l10n.activeProfile),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push(AppRoutes.patientProfile),
-          ),
-          const Divider(),
           _buildSectionHeader(context, l10n.language),
           _buildLanguageTile(
             context, ref,
