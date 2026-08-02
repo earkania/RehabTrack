@@ -147,6 +147,7 @@ class _MeasurementTrendsScreenState
               fieldStatistics: trendData.fieldStatistics,
               series: trendData.chartSeries,
               typeKey: typeKey,
+              ranges: trendData.ranges,
             ),
           ),
         ),
