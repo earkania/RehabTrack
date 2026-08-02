@@ -22,6 +22,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> with WidgetsBindingOb
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _syncToCurrentDay();
   }
 
   @override
@@ -30,9 +31,22 @@ class _TodayScreenState extends ConsumerState<TodayScreen> with WidgetsBindingOb
     super.dispose();
   }
 
+  void _syncToCurrentDay() {
+    final now = ref.read(todayClockProvider).now();
+    syncSelectedDateToCurrentDay(
+      now: now,
+      selectedDate: ref.read(selectedAgendaDateProvider),
+      lastToday: ref.read(lastKnownTodayProvider),
+      onAdvance: (d) => ref.read(selectedAgendaDateProvider.notifier).state = d,
+      onUpdateLastToday: (d) =>
+          ref.read(lastKnownTodayProvider.notifier).state = d,
+    );
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _syncToCurrentDay();
       ref.invalidate(dailyAgendaProvider);
     }
   }
@@ -43,7 +57,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> with WidgetsBindingOb
     ref.watch(todayAutoRefreshProvider);
     final agenda = ref.watch(dailyAgendaProvider);
     final selectedDate = ref.watch(selectedAgendaDateProvider);
-    final now = DateTime.now();
+    final now = ref.read(todayClockProvider).now();
     final today = DateTime(now.year, now.month, now.day);
     final isToday = selectedDate.isAtSameMomentAs(today);
 

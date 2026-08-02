@@ -9,7 +9,7 @@ class DateNavigationBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedDate = ref.watch(selectedAgendaDateProvider);
-    final now = DateTime.now();
+    final now = ref.watch(todayClockProvider).now();
     final today = DateTime(now.year, now.month, now.day);
     final isToday = selectedDate.isAtSameMomentAs(today);
 
@@ -35,7 +35,7 @@ class DateNavigationBar extends ConsumerWidget {
                   context: context,
                   initialDate: selectedDate,
                   firstDate: DateTime(2020),
-                  lastDate: DateTime.now().add(const Duration(days: 365)),
+                  lastDate: now.add(const Duration(days: 365)),
                 );
                 if (picked != null) {
                   ref.read(selectedAgendaDateProvider.notifier).state = picked;
