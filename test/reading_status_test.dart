@@ -417,4 +417,110 @@ void main() {
       expect(weightRanges!.fieldRanges.isEmpty, isTrue);
     });
   });
+
+  group('ReadingStatusCalculator.calculateFieldValue', () {
+    const bpRanges = MeasurementRanges(fieldRanges: {
+      'systolic': ReferenceRange(minValue: 90, maxValue: 120),
+      'diastolic': ReferenceRange(minValue: 60, maxValue: 80),
+      'pulse': ReferenceRange(minValue: 60, maxValue: 100),
+    });
+
+    test('in range within bounds', () {
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'systolic',
+          value: 110,
+          ranges: bpRanges,
+        ),
+        ReadingStatus.inRange,
+      );
+    });
+
+    test('above range above max', () {
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'systolic',
+          value: 131,
+          ranges: bpRanges,
+        ),
+        ReadingStatus.aboveRange,
+      );
+    });
+
+    test('below range below min', () {
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'pulse',
+          value: 58,
+          ranges: bpRanges,
+        ),
+        ReadingStatus.belowRange,
+      );
+    });
+
+    test('inclusive boundaries are in range', () {
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'diastolic',
+          value: 80,
+          ranges: bpRanges,
+        ),
+        ReadingStatus.inRange,
+      );
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'diastolic',
+          value: 60,
+          ranges: bpRanges,
+        ),
+        ReadingStatus.inRange,
+      );
+    });
+
+    test('null value is unknown', () {
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'systolic',
+          value: null,
+          ranges: bpRanges,
+        ),
+        ReadingStatus.unknown,
+      );
+    });
+
+    test('field without a range is unknown', () {
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'spo2',
+          value: 98,
+          ranges: bpRanges,
+        ),
+        ReadingStatus.unknown,
+      );
+    });
+
+    test('null ranges are unknown', () {
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'systolic',
+          value: 110,
+          ranges: null,
+        ),
+        ReadingStatus.unknown,
+      );
+    });
+
+    test('range without bounds is unknown', () {
+      expect(
+        ReadingStatusCalculator.calculateFieldValue(
+          fieldKey: 'weight',
+          value: 75,
+          ranges: const MeasurementRanges(fieldRanges: {
+            'weight': ReferenceRange(),
+          }),
+        ),
+        ReadingStatus.unknown,
+      );
+    });
+  });
 }

@@ -140,6 +140,66 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// No description provided for @diet.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet'**
+  String get diet;
+
+  /// No description provided for @labAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'Lab Analyses'**
+  String get labAnalyses;
+
+  /// No description provided for @doctorVisits.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Visits'**
+  String get doctorVisits;
+
+  /// No description provided for @reports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get reports;
+
+  /// No description provided for @doctors.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctors'**
+  String get doctors;
+
+  /// No description provided for @emergencyContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Contacts'**
+  String get emergencyContacts;
+
+  /// No description provided for @medicalNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical Notes'**
+  String get medicalNotes;
+
+  /// No description provided for @moduleNotAvailableYet.
+  ///
+  /// In en, this message translates to:
+  /// **'This module is not available yet'**
+  String get moduleNotAvailableYet;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get comingSoon;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:

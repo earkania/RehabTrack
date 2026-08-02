@@ -10,7 +10,7 @@ import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/widgets/today/today_agenda_item.dart';
 
 Widget _buildShellApp({required int initialIndex}) {
-  final locations = ['/', '/measurements', '/medications', '/records', '/settings'];
+  final locations = ['/', '/health', '/records', '/profile', '/settings'];
   final router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: locations[initialIndex],
@@ -26,21 +26,21 @@ Widget _buildShellApp({required int initialIndex}) {
             ),
           ),
           GoRoute(
-            path: '/measurements',
+            path: '/health',
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: _FakeScreen(label: 'Measurements'),
-            ),
-          ),
-          GoRoute(
-            path: '/medications',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: _FakeScreen(label: 'Medications'),
+              child: _FakeScreen(label: 'Health'),
             ),
           ),
           GoRoute(
             path: '/records',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: _FakeScreen(label: 'Records'),
+            ),
+          ),
+          GoRoute(
+            path: '/profile',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: _FakeScreen(label: 'Profile'),
             ),
           ),
           GoRoute(
@@ -120,7 +120,7 @@ Finder _navIcon(IconData icon) => find.byIcon(icon);
 
 void main() {
   group('Popup dismissal on tab switch', () {
-    testWidgets('popup closes when switching to Measurements', (tester) async {
+    testWidgets('popup closes when switching to Health', (tester) async {
       await tester.pumpWidget(_buildShellApp(initialIndex: 0));
       await tester.pumpAndSettle();
 
@@ -128,21 +128,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Mark as Taken'), findsOneWidget);
 
-      await tester.tap(_navIcon(Icons.monitor_heart_outlined));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Mark as Taken'), findsNothing);
-    });
-
-    testWidgets('popup closes when switching to Medications', (tester) async {
-      await tester.pumpWidget(_buildShellApp(initialIndex: 0));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(PopupMenuButton<String>).first);
-      await tester.pumpAndSettle();
-      expect(find.text('Mark as Taken'), findsOneWidget);
-
-      await tester.tap(_navIcon(Icons.medication_outlined));
+      await tester.tap(_navIcon(Icons.health_and_safety_outlined));
       await tester.pumpAndSettle();
 
       expect(find.text('Mark as Taken'), findsNothing);
@@ -157,6 +143,20 @@ void main() {
       expect(find.text('Mark as Taken'), findsOneWidget);
 
       await tester.tap(_navIcon(Icons.folder_outlined));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mark as Taken'), findsNothing);
+    });
+
+    testWidgets('popup closes when switching to Profile', (tester) async {
+      await tester.pumpWidget(_buildShellApp(initialIndex: 0));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(PopupMenuButton<String>).first);
+      await tester.pumpAndSettle();
+      expect(find.text('Mark as Taken'), findsOneWidget);
+
+      await tester.tap(_navIcon(Icons.person_outlined));
       await tester.pumpAndSettle();
 
       expect(find.text('Mark as Taken'), findsNothing);
@@ -180,13 +180,13 @@ void main() {
       await tester.pumpWidget(_buildShellApp(initialIndex: 0));
       await tester.pumpAndSettle();
 
-      await tester.tap(_navIcon(Icons.monitor_heart_outlined));
+      await tester.tap(_navIcon(Icons.health_and_safety_outlined));
       await tester.pumpAndSettle();
-      expect(find.text('Measurements'), findsWidgets);
+      expect(find.text('Health'), findsWidgets);
 
-      await tester.tap(_navIcon(Icons.medication_outlined));
+      await tester.tap(_navIcon(Icons.folder_outlined));
       await tester.pumpAndSettle();
-      expect(find.text('Medications'), findsWidgets);
+      expect(find.text('Records'), findsWidgets);
 
       await tester.tap(_navIcon(Icons.today_outlined));
       await tester.pumpAndSettle();
@@ -201,7 +201,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Mark as Taken'), findsOneWidget);
 
-      await tester.tap(_navIcon(Icons.monitor_heart_outlined));
+      await tester.tap(_navIcon(Icons.health_and_safety_outlined));
       await tester.pumpAndSettle();
       expect(find.text('Mark as Taken'), findsNothing);
 
@@ -248,7 +248,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Mark as Taken'), findsOneWidget);
 
-      await tester.tap(_navIcon(Icons.monitor_heart_outlined));
+      await tester.tap(_navIcon(Icons.health_and_safety_outlined));
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);

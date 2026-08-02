@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:rehab_track/domain/entities/measurement_statistics.dart';
+import 'package:rehab_track/domain/entities/reading_status.dart';
+import 'package:rehab_track/domain/services/reading_status_calculator.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/utils/measurement_formatter.dart';
+import 'package:rehab_track/presentation/utils/reading_status_color.dart';
 
 class SeriesColumn {
   final String label;
@@ -22,10 +25,12 @@ class SeriesColumn {
 
 class MeasurementStatisticsComparisonTable extends StatelessWidget {
   final List<SeriesColumn> columns;
+  final MeasurementRanges? ranges;
 
   const MeasurementStatisticsComparisonTable({
     super.key,
     required this.columns,
+    this.ranges,
   });
 
   @override
@@ -35,10 +40,26 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     final rows = [
-      (label: l10n.latest, extract: (MeasurementStatistics s) => s.latest),
-      (label: l10n.average, extract: (MeasurementStatistics s) => s.average),
-      (label: l10n.minimum, extract: (MeasurementStatistics s) => s.minimum),
-      (label: l10n.maximum, extract: (MeasurementStatistics s) => s.maximum),
+      (
+        label: l10n.latest,
+        extract: (MeasurementStatistics s) => s.latest,
+        derived: false,
+      ),
+      (
+        label: l10n.average,
+        extract: (MeasurementStatistics s) => s.average,
+        derived: true,
+      ),
+      (
+        label: l10n.minimum,
+        extract: (MeasurementStatistics s) => s.minimum,
+        derived: true,
+      ),
+      (
+        label: l10n.maximum,
+        extract: (MeasurementStatistics s) => s.maximum,
+        derived: true,
+      ),
     ];
 
     return SingleChildScrollView(
@@ -117,16 +138,24 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
                       label: _formatCellAccessibility(
                         col.statistics,
                         row.extract,
+                        row.derived,
                         row.label,
                         col.label,
                         l10n,
                         fieldKey: col.fieldKey,
+                        unit: col.unit,
+                        ranges: ranges,
                       ),
                       child: Text(
-                        _formatCell(col.statistics, row.extract, l10n,
-                            fieldKey: col.fieldKey),
+                        _formatCell(col, row.extract, row.derived),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w500,
+                          color: _cellColor(
+                            col,
+                            row.extract,
+                            row.derived,
+                            colorScheme,
+                          ),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -139,39 +168,91 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
     );
   }
 
-  String _formatCell(
-    MeasurementStatistics? stats,
+  StatisticsValue? _statisticsValue(
+    SeriesColumn col,
     double? Function(MeasurementStatistics) extract,
-    AppLocalizations l10n, {
-    String? fieldKey,
-  }) {
-    if (stats == null) return '\u2014';
+    bool derived,
+  ) {
+    final stats = col.statistics;
+    if (stats == null) return null;
     final value = extract(stats);
-    if (value == null) return '\u2014';
-    return MeasurementFormatter.formatStatisticsValue(value, fieldKey: fieldKey);
+    if (value == null) return null;
+    return MeasurementFormatter.statisticsValue(
+      value,
+      derived: derived,
+      fieldKey: col.fieldKey,
+    );
+  }
+
+  String _formatCell(
+    SeriesColumn col,
+    double? Function(MeasurementStatistics) extract,
+    bool derived,
+  ) {
+    final display = _statisticsValue(col, extract, derived);
+    if (display == null) return '\u2014';
+    return display.text;
   }
 
   String _formatCellAccessibility(
     MeasurementStatistics? stats,
     double? Function(MeasurementStatistics) extract,
+    bool derived,
     String rowLabel,
     String colLabel,
     AppLocalizations l10n, {
     String? fieldKey,
+    String? unit,
+    MeasurementRanges? ranges,
   }) {
     if (stats == null) return '$rowLabel $colLabel: ${l10n.unavailable}';
     final value = extract(stats);
     if (value == null) return '$rowLabel $colLabel: ${l10n.unavailable}';
-    final formatted = MeasurementFormatter.formatStatisticsValue(
+    final display = MeasurementFormatter.statisticsValue(
       value,
+      derived: derived,
       fieldKey: fieldKey,
     );
-    return '$rowLabel $colLabel: $formatted';
+    final status = ReadingStatusCalculator.calculateFieldValue(
+      fieldKey: fieldKey ?? '',
+      value: display.numericValue,
+      ranges: ranges,
+    );
+    final unitPart = (unit == null || unit.isEmpty) ? '' : '$unit, ';
+    return '$rowLabel $colLabel: ${display.text} $unitPart${_statusLabel(status, l10n)}';
+  }
+
+  Color? _cellColor(
+    SeriesColumn col,
+    double? Function(MeasurementStatistics) extract,
+    bool derived,
+    ColorScheme colorScheme,
+  ) {
+    if (col.fieldKey == null) return null;
+    final display = _statisticsValue(col, extract, derived);
+    if (display == null) return null;
+
+    final status = ReadingStatusCalculator.calculateFieldValue(
+      fieldKey: col.fieldKey!,
+      value: display.numericValue,
+      ranges: ranges,
+    );
+    return ReadingStatusColor.forStatus(status, colorScheme);
+  }
+
+  String _statusLabel(ReadingStatus status, AppLocalizations l10n) {
+    return switch (status) {
+      ReadingStatus.inRange => l10n.withinRange,
+      ReadingStatus.belowRange => l10n.belowRange,
+      ReadingStatus.aboveRange => l10n.aboveRange,
+      ReadingStatus.unknown => l10n.noReferenceRange,
+    };
   }
 
   static MeasurementStatisticsComparisonTable fromBloodPressure({
     required Map<String, MeasurementStatistics> fieldStatistics,
     required AppLocalizations l10n,
+    MeasurementRanges? ranges,
   }) {
     final columns = <SeriesColumn>[
       SeriesColumn(
@@ -197,6 +278,9 @@ class MeasurementStatisticsComparisonTable extends StatelessWidget {
       ),
     ];
 
-    return MeasurementStatisticsComparisonTable(columns: columns);
+    return MeasurementStatisticsComparisonTable(
+      columns: columns,
+      ranges: ranges,
+    );
   }
 }

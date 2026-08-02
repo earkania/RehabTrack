@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:rehab_track/domain/entities/measurement.dart';
 
 class MeasurementFormatter {
@@ -198,16 +200,53 @@ class MeasurementFormatter {
     };
   }
 
-  static String formatStatisticsValue(
+  /// The numeric value used for statistics display and the text shown to the
+  /// user.
+  ///
+  /// Range classification must use [numericValue] so the status color always
+  /// agrees with the [text] shown to the user.
+  ///
+  /// For derived statistics (average, minimum, maximum) the value is rounded to
+  /// the component's decimal precision before both formatting and
+  /// classification. For the latest recorded value the actual recorded value is
+  /// preserved for classification while still being formatted with the
+  /// component's precision.
+  static StatisticsValue statisticsValue(
     double value, {
+    required bool derived,
     String? typeKey,
     String? fieldKey,
   }) {
     final decimals =
         statisticsDecimalPlaces(typeKey: typeKey, fieldKey: fieldKey);
-    return formatNumber(value, decimals);
+    final numericValue = derived ? _roundTo(value, decimals) : value;
+    return StatisticsValue(
+      numericValue: numericValue,
+      text: _formatRounded(numericValue, decimals),
+    );
+  }
+
+  static double _roundTo(double value, int decimals) {
+    if (decimals == 0) return value.round().toDouble();
+    final factor = math.pow(10, decimals).toDouble();
+    return (value * factor).round() / factor;
+  }
+
+  static String _formatRounded(double value, int decimals) {
+    if (decimals == 0) return value.round().toInt().toString();
+    return value.toStringAsFixed(decimals);
   }
 
   static String _formatNumber(double value, int decimals) =>
       formatNumber(value, decimals);
+}
+
+class StatisticsValue {
+  final double numericValue;
+  final String text;
+
+  const StatisticsValue({
+    required this.numericValue,
+    required this.text,
+  });
 }

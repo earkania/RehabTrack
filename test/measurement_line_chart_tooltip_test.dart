@@ -352,6 +352,9 @@ void main() {
       expect(_tooltipText(tester), contains('Systolic'));
       expect(_tooltipText(tester), contains('Diastolic'));
       expect(_tooltipText(tester), contains('Pulse'));
+      expect('04.07.2026 09:00'.allMatches(_tooltipText(tester)).length, 1,
+          reason: 'the shared reading timestamp is shown once, not once per '
+              'series');
 
       final rect = tester.getRect(_tooltip);
       expect(rect.left, greaterThanOrEqualTo(0));

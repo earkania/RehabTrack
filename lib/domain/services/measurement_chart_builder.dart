@@ -4,6 +4,7 @@ import 'package:rehab_track/domain/entities/measurement_statistics.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/domain/entities/reading_status_summary.dart';
+import 'package:rehab_track/domain/services/blood_pressure_status_evaluator.dart';
 import 'package:rehab_track/domain/services/reading_status_calculator.dart';
 
 class MeasurementChartBuilder {
@@ -58,18 +59,20 @@ class MeasurementChartBuilder {
           pointFieldValues['pulse'] = dp.valueForKey('pulse')!;
         }
 
-        final status = ReadingStatusCalculator.calculate(
-          typeKey: 'blood_pressure',
-          fieldValues: pointFieldValues,
-          ranges: ranges,
-        );
+        final (readingStatus, componentStatus) =
+            _statusForBloodPressureField(
+              fieldKey: fieldKey,
+              fieldValues: pointFieldValues,
+              ranges: ranges,
+            );
 
         points.add(MeasurementChartPoint(
           recordId: dp.record.id!,
           measuredAt: dp.record.timestamp,
           numericValue: value,
           unit: unit,
-          readingStatus: status,
+          readingStatus: readingStatus,
+          componentStatus: componentStatus,
           irregularHeartbeatDetected:
               dp.record.irregularHeartbeatDetected ?? false,
         ));
@@ -117,6 +120,7 @@ class MeasurementChartBuilder {
           numericValue: value,
           unit: unit,
           readingStatus: status,
+          componentStatus: status,
         ));
       }
 
@@ -131,6 +135,30 @@ class MeasurementChartBuilder {
     }
 
     return series;
+  }
+
+  static (ReadingStatus, ReadingStatus) _statusForBloodPressureField({
+    required String fieldKey,
+    required Map<String, double> fieldValues,
+    required MeasurementRanges? ranges,
+  }) {
+    if (ranges == null) {
+      return (ReadingStatus.unknown, ReadingStatus.unknown);
+    }
+
+    final component = BloodPressureStatusEvaluator.evaluate(
+      fieldValues: fieldValues,
+      ranges: ranges,
+    );
+
+    final componentStatus = switch (fieldKey) {
+      'systolic' => component.systolicStatus,
+      'diastolic' => component.diastolicStatus,
+      'pulse' => component.pulseStatus ?? ReadingStatus.unknown,
+      _ => component.overallStatus,
+    };
+
+    return (component.overallStatus, componentStatus);
   }
 
   static Map<String, MeasurementStatistics> computeFieldStatistics({

@@ -147,5 +147,18 @@ void main() {
       expect(result.diastolicStatus, ReadingStatus.belowRange);
       expect(result.overallStatus, ReadingStatus.aboveRange);
     });
+
+    test('systolic 131 / diastolic 80 / pulse 58 classifies per component', () {
+      final result = BloodPressureStatusEvaluator.evaluate(
+        fieldValues: {'systolic': 131, 'diastolic': 80, 'pulse': 58},
+        ranges: defaultRanges,
+      );
+      expect(result.systolicStatus, ReadingStatus.aboveRange,
+          reason: '131 is above the systolic max of 120');
+      expect(result.diastolicStatus, ReadingStatus.inRange,
+          reason: '80 is within the diastolic range 60-80');
+      expect(result.pulseStatus, ReadingStatus.belowRange,
+          reason: '58 is below the pulse min of 60');
+    });
   });
 }

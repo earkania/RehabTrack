@@ -258,4 +258,48 @@ void main() {
       expect(emptyRadios, findsNWidgets(4));
     });
   });
+
+  group('Settings patient profile entry', () {
+    testWidgets('does not show Patient Profile tile in English', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await tester.pumpGracePeriod(settings: settings);
+
+      expect(find.text('Patient Profile'), findsNothing);
+    });
+
+    testWidgets('does not show Patient Profile tile in Georgian', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await tester.pumpGracePeriod(
+        settings: settings,
+        locale: const Locale('ka'),
+      );
+
+      expect(find.text('პაციენტის პროფილი'), findsNothing);
+    });
+
+    testWidgets('Language section is present with no leftover empty header', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await tester.pumpGracePeriod(settings: settings);
+
+      expect(find.text('Language'), findsOneWidget);
+    });
+
+    testWidgets('Georgian Language section header is present', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await tester.pumpGracePeriod(
+        settings: settings,
+        locale: const Locale('ka'),
+      );
+
+      expect(find.text('ენა'), findsOneWidget);
+    });
+  });
 }

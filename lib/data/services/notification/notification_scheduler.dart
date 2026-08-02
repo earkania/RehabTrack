@@ -7,11 +7,11 @@ import 'notification_service.dart';
 
 class NotificationScheduler {
   NotificationScheduler({
-    required NotificationService notificationService,
+    required this._notificationService,
     this.playSound = true,
     this.enableVibration = true,
     this.notificationVisibility = NotificationVisibility.public,
-  }) : _notificationService = notificationService;
+  });
 
   final NotificationService _notificationService;
   final bool playSound;

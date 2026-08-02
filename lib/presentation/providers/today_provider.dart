@@ -7,12 +7,60 @@ import 'package:rehab_track/domain/repositories/settings_repository.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
-final nowProvider = Provider<DateTime>((ref) => DateTime.now());
+/// Injectable clock so time-dependent Today behavior can be tested.
+abstract class TodayClock {
+  DateTime now();
+}
+
+class SystemTodayClock implements TodayClock {
+  @override
+  DateTime now() => DateTime.now();
+}
+
+final todayClockProvider = Provider<TodayClock>((ref) => SystemTodayClock());
+
+final nowProvider = Provider<DateTime>((ref) => ref.watch(todayClockProvider).now());
 
 final selectedAgendaDateProvider = StateProvider<DateTime>((ref) {
   final now = ref.watch(nowProvider);
   return DateTime(now.year, now.month, now.day);
 });
+
+/// The most recent local "current day" the app has synchronized to.
+///
+/// Used to detect a day change while Today is suspended or between tab
+/// switches, so the selected date only advances when it was tracking Today
+/// rather than a deliberately chosen historical or future date.
+final lastKnownTodayProvider = StateProvider<DateTime>((ref) {
+  final now = ref.watch(todayClockProvider).now();
+  return DateTime(now.year, now.month, now.day);
+});
+
+/// The next local midnight after [now], built from the device-local date
+/// components (never UTC, never a manual offset).
+DateTime nextLocalMidnight(DateTime now) {
+  final today = DateTime(now.year, now.month, now.day);
+  return DateTime(today.year, today.month, today.day + 1);
+}
+
+/// Advances [selectedDate] to the new current day when it was tracking the
+/// previously-known current day. A deliberately selected past or future date
+/// is preserved. Always records the newly observed current day in
+/// [onUpdateLastToday].
+void syncSelectedDateToCurrentDay({
+  required DateTime now,
+  required DateTime selectedDate,
+  required DateTime lastToday,
+  required void Function(DateTime) onAdvance,
+  required void Function(DateTime) onUpdateLastToday,
+}) {
+  final newToday = DateTime(now.year, now.month, now.day);
+  if (lastToday.isAtSameMomentAs(newToday)) return;
+  if (selectedDate.isAtSameMomentAs(lastToday)) {
+    onAdvance(newToday);
+  }
+  onUpdateLastToday(newToday);
+}
 
 final _todayAgendaServiceProvider = Provider<TodayAgendaService>((ref) {
   return TodayAgendaService(
@@ -97,7 +145,7 @@ final nextDailyItemProvider = Provider<TodayAgendaItem?>((ref) {
   final agenda = ref.watch(dailyAgendaProvider);
   final selectedDate = ref.watch(selectedAgendaDateProvider);
   final gracePeriodMinutes = ref.watch(nextItemGracePeriodProvider);
-  final now = ref.watch(nowProvider);
+  final now = ref.watch(todayClockProvider).now();
   final today = DateTime(now.year, now.month, now.day);
   if (!selectedDate.isAtSameMomentAs(today)) return null;
   return agenda.when(
@@ -121,7 +169,7 @@ final dailyItemsProvider = Provider<List<TodayAgendaItem>>((ref) {
 final todayItemsProvider = dailyItemsProvider;
 
 final todayAutoRefreshProvider = Provider.autoDispose<void>((ref) {
-  final now = DateTime.now();
+  final now = ref.read(todayClockProvider).now();
   final today = DateTime(now.year, now.month, now.day);
   final selectedDate = ref.watch(selectedAgendaDateProvider);
   if (!selectedDate.isAtSameMomentAs(today)) return;
@@ -129,22 +177,23 @@ final todayAutoRefreshProvider = Provider.autoDispose<void>((ref) {
   final agendaAsync = ref.watch(dailyAgendaProvider);
   final graceMinutes = ref.watch(nextItemGracePeriodProvider);
   final agenda = agendaAsync.valueOrNull;
-  if (agenda == null || agenda.items.isEmpty) return;
 
-  final gracePeriod = Duration(minutes: graceMinutes);
   final boundaries = <DateTime>[
-    today.add(const Duration(days: 1)),
+    nextLocalMidnight(now),
   ];
 
-  for (final item in agenda.items) {
-    if (item.isCompleted) continue;
-    final effective = item.effectiveTime;
-    if (effective.isAfter(now)) {
-      boundaries.add(effective);
-    }
-    final overdueAt = effective.add(gracePeriod);
-    if (overdueAt.isAfter(now)) {
-      boundaries.add(overdueAt);
+  final gracePeriod = Duration(minutes: graceMinutes);
+  if (agenda != null) {
+    for (final item in agenda.items) {
+      if (item.isCompleted) continue;
+      final effective = item.effectiveTime;
+      if (effective.isAfter(now)) {
+        boundaries.add(effective);
+      }
+      final overdueAt = effective.add(gracePeriod);
+      if (overdueAt.isAfter(now)) {
+        boundaries.add(overdueAt);
+      }
     }
   }
 
@@ -155,7 +204,17 @@ final todayAutoRefreshProvider = Provider.autoDispose<void>((ref) {
   if (delay <= Duration.zero) return;
 
   final timer = Timer(delay, () {
-    ref.read(todayRefreshTickProvider.notifier).state++;
+    final container = ref.container;
+    syncSelectedDateToCurrentDay(
+      now: container.read(todayClockProvider).now(),
+      selectedDate: container.read(selectedAgendaDateProvider),
+      lastToday: container.read(lastKnownTodayProvider),
+      onAdvance: (d) =>
+          container.read(selectedAgendaDateProvider.notifier).state = d,
+      onUpdateLastToday: (d) =>
+          container.read(lastKnownTodayProvider.notifier).state = d,
+    );
+    container.read(todayRefreshTickProvider.notifier).state++;
   });
 
   ref.onDispose(timer.cancel);

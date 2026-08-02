@@ -30,6 +30,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get profile => 'Profile';
+
+  @override
+  String get diet => 'Diet';
+
+  @override
+  String get labAnalyses => 'Lab Analyses';
+
+  @override
+  String get doctorVisits => 'Doctor Visits';
+
+  @override
+  String get reports => 'Reports';
+
+  @override
+  String get doctors => 'Doctors';
+
+  @override
+  String get emergencyContacts => 'Emergency Contacts';
+
+  @override
+  String get medicalNotes => 'Medical Notes';
+
+  @override
+  String get moduleNotAvailableYet => 'This module is not available yet';
+
+  @override
+  String get comingSoon => 'Coming soon';
+
+  @override
   String get language => 'Language';
 
   @override

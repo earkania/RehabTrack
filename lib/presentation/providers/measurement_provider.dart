@@ -4,6 +4,7 @@ import 'package:rehab_track/domain/entities/measurement_chart.dart';
 import 'package:rehab_track/domain/entities/measurement_data_point.dart';
 import 'package:rehab_track/domain/entities/measurement_period.dart';
 import 'package:rehab_track/domain/entities/measurement_statistics.dart';
+import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/domain/entities/reading_status_summary.dart';
 import 'package:rehab_track/domain/services/measurement_chart_builder.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
@@ -82,12 +83,14 @@ class TrendData {
   final List<MeasurementChartSeries> chartSeries;
   final Map<String, MeasurementStatistics> fieldStatistics;
   final ReadingStatusSummary statusSummary;
+  final MeasurementRanges? ranges;
 
   const TrendData({
     required this.dataPoints,
     required this.chartSeries,
     required this.fieldStatistics,
     required this.statusSummary,
+    this.ranges,
   });
 
   static const empty = TrendData(
@@ -166,6 +169,7 @@ final trendDataProvider =
           chartSeries: chartSeries,
           fieldStatistics: fieldStatistics,
           statusSummary: statusSummary,
+          ranges: ranges,
         );
       },
     );

@@ -49,15 +49,10 @@ class BloodPressureStatusEvaluator {
     required Map<String, double> fieldValues,
     required MeasurementRanges ranges,
   }) {
-    final range = ranges.rangeForField(fieldKey);
-    final value = fieldValues[fieldKey];
-
-    if (value == null || range == null || !range.hasRange) {
-      return ReadingStatus.unknown;
-    }
-
-    if (range.isAbove(value)) return ReadingStatus.aboveRange;
-    if (range.isBelow(value)) return ReadingStatus.belowRange;
-    return ReadingStatus.inRange;
+    return ReadingStatusCalculator.calculateFieldValue(
+      fieldKey: fieldKey,
+      value: fieldValues[fieldKey],
+      ranges: ranges,
+    );
   }
 }

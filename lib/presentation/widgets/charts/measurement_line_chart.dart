@@ -244,8 +244,8 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
     ThemeData theme,
     AppLocalizations l10n,
   ) {
-    final colorScheme = theme.colorScheme;
-    final spans = <TextSpan>[];
+    final readings = <int, _TooltipReading>{};
+    final readingOrder = <int>[];
 
     for (final spot in spots) {
       final s = spot.barIndex >= 0 && spot.barIndex < widget.series.length
@@ -256,48 +256,90 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
         continue;
       }
       final point = s.points[pointIndex];
-      final statusText = _statusText(point.readingStatus, l10n);
-
-      spans.add(
-        TextSpan(
-          style: theme.textTheme.bodySmall,
-          children: [
-            TextSpan(
-              text: _formatFullDate(point.measuredAt),
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const TextSpan(text: '\n'),
-            TextSpan(
-              text:
-                  '${s.label}: ${_formatValue(point.numericValue)} ${point.unit}',
-            ),
-            if (statusText.isNotEmpty) ...[
-              const TextSpan(text: '\n'),
-              TextSpan(
-                text: statusText,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: _statusColor(point.readingStatus, colorScheme),
-                ),
-              ),
-            ],
-            if (point.irregularHeartbeatDetected) ...[
-              const TextSpan(text: '\n'),
-              TextSpan(
-                text: l10n.irregularHeartbeat,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.error,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ],
+      final reading = readings.putIfAbsent(point.recordId, () {
+        readingOrder.add(point.recordId);
+        return _TooltipReading(measuredAt: point.measuredAt);
+      });
+      reading.components.add(
+        _TooltipComponent(
+          label: s.label,
+          value: point.numericValue,
+          unit: point.unit,
+          status: point.effectiveStatus,
+          irregularHeartbeatDetected: point.irregularHeartbeatDetected,
         ),
       );
     }
 
-    return spans;
+    return [
+      for (final key in readingOrder)
+        _buildReadingSpan(readings[key]!, theme, l10n),
+    ];
+  }
+
+  /// Renders one measurement reading as a single block: one date/time header
+  /// followed by its component entries. With a single component the header
+  /// stays directly above the value; with multiple components the groups are
+  /// separated so the timestamp is not repeated for every component.
+  TextSpan _buildReadingSpan(
+    _TooltipReading reading,
+    ThemeData theme,
+    AppLocalizations l10n,
+  ) {
+    final colorScheme = theme.colorScheme;
+    final bodyStyle = theme.textTheme.bodySmall;
+    final components = reading.components;
+
+    final children = <InlineSpan>[
+      TextSpan(
+        text: _formatFullDate(reading.measuredAt),
+        style: bodyStyle?.copyWith(fontWeight: FontWeight.w600),
+      ),
+    ];
+
+    final afterHeader = components.length > 1 ? '\n\n' : '\n';
+    for (var i = 0; i < components.length; i++) {
+      final component = components[i];
+      children.add(TextSpan(text: i == 0 ? afterHeader : '\n\n'));
+      children.add(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: '${component.label}: ',
+              style: bodyStyle?.copyWith(fontWeight: FontWeight.w500),
+            ),
+            TextSpan(
+              text: '${_formatValue(component.value)} ${component.unit}',
+            ),
+          ],
+        ),
+      );
+
+      final statusText = _statusText(component.status, l10n);
+      if (statusText.isNotEmpty) {
+        children.add(
+          TextSpan(
+            text: '\n$statusText',
+            style: bodyStyle?.copyWith(
+              color: _statusColor(component.status, colorScheme),
+            ),
+          ),
+        );
+      }
+      if (component.irregularHeartbeatDetected) {
+        children.add(
+          TextSpan(
+            text: '\n${l10n.irregularHeartbeat}',
+            style: bodyStyle?.copyWith(
+              color: colorScheme.error,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+      }
+    }
+
+    return TextSpan(style: bodyStyle, children: children);
   }
 
   @override
@@ -361,7 +403,7 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
                 );
               }
               final point = s.points[pointIndex];
-              final statusColor = _statusColor(point.readingStatus, colorScheme);
+              final statusColor = _statusColor(point.effectiveStatus, colorScheme);
 
               if (point.irregularHeartbeatDetected) {
                 return FlDotCirclePainter(
@@ -549,4 +591,27 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
     if (pointCount <= 30) return (pointCount / 7).ceilToDouble();
     return (pointCount / 6).ceilToDouble();
   }
+}
+
+class _TooltipReading {
+  _TooltipReading({required this.measuredAt});
+
+  final DateTime measuredAt;
+  final List<_TooltipComponent> components = [];
+}
+
+class _TooltipComponent {
+  const _TooltipComponent({
+    required this.label,
+    required this.value,
+    required this.unit,
+    required this.status,
+    required this.irregularHeartbeatDetected,
+  });
+
+  final String label;
+  final double value;
+  final String unit;
+  final ReadingStatus status;
+  final bool irregularHeartbeatDetected;
 }

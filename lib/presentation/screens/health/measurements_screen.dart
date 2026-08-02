@@ -9,8 +9,8 @@ import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 
-class HealthScreen extends ConsumerWidget {
-  const HealthScreen({super.key});
+class MeasurementsScreen extends ConsumerWidget {
+  const MeasurementsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

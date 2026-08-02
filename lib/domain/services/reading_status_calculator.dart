@@ -17,6 +17,22 @@ class ReadingStatusCalculator {
     };
   }
 
+  static ReadingStatus calculateFieldValue({
+    required String fieldKey,
+    required double? value,
+    required MeasurementRanges? ranges,
+  }) {
+    if (ranges == null) return ReadingStatus.unknown;
+    final range = ranges.rangeForField(fieldKey);
+    if (value == null || range == null || !range.hasRange) {
+      return ReadingStatus.unknown;
+    }
+
+    if (range.isAbove(value)) return ReadingStatus.aboveRange;
+    if (range.isBelow(value)) return ReadingStatus.belowRange;
+    return ReadingStatus.inRange;
+  }
+
   static ReadingStatus _calculateBloodPressure(
     Map<String, double> values,
     MeasurementRanges ranges,

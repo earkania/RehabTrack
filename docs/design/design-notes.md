@@ -564,4 +564,42 @@ All settings use `StateNotifierProvider` pattern over `SettingsRepository` (key-
 | `reminder_payload.dart` | Typed JSON payload for notification data |
 | `reminder_settings_provider.dart` | Configurable reminder preferences |
 | `notification_provider.dart` | Riverpod providers wiring all services |
-| `settings_screen.dart` | Reminder settings UI with permission tiles
+| `settings_screen.dart` | Reminder settings UI with permission tiles |
+
+## Navigation — Approved Five-Section Structure
+
+Adopted 2026-08-01. Bottom navigation hosts five root destinations, each with a
+large-icon dashboard grid for its modules.
+
+- **Today** `/` — existing screen
+- **Health** `/health` — Medications, Measurements, Activities, Diet
+- **Records** `/records` — Lab Analyses, Doctor Visits, Reports
+- **Profile** `/profile` — Patient Profile, Doctors, Emergency Contacts, Medical Notes
+- **Settings** `/settings` — existing screen
+
+### Grid tile design
+
+- One reusable tile widget (`ModuleGridTile`) + grid (`ModuleGrid`) for all three
+  dashboards: 64px centered icon, centered 2-line label, Material 3
+  `surfaceContainerLow` container with `primary` icon color.
+- Two-column, vertically scrolling; `IntrinsicHeight` rows keep the pair equal
+  height while allowing content-derived height so long Georgian labels and large
+  text scales never overflow. No hardcoded colors (light/dark safe).
+- Future modules (Activities, Diet, Lab Analyses, Doctor Visits, Reports,
+  Doctors, Emergency Contacts, Medical Notes) intentionally render a shared
+  "module not available yet / coming soon" placeholder — not implemented yet.
+
+### Router notes
+
+- One `ShellRoute` hosts the five tabs; detail screens are pushed flat routes.
+- Tapping the currently-selected tab returns to its root dashboard; independent
+  tab stacks are preserved by the ShellRoute.
+- Legacy paths are redirected: `/measurements`, `/medications`, `/activities`,
+  `/settings/patient-profile`, `/settings/patient-profile/edit`.
+
+### Known issue
+
+`flutter_local_notifications` v18 `ScheduledNotificationBootReceiver` can crash
+with `Missing type parameter` on reboot when scheduled notifications are stored
+(R8/Gson issue). Unrelated to navigation; needs a separate fix (proguard keep
+rules).

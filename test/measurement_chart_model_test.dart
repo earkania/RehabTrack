@@ -34,6 +34,86 @@ void main() {
       );
       expect(point.irregularHeartbeatDetected, isFalse);
     });
+
+    test('stores a component status independent of the reading status', () {
+      final point = MeasurementChartPoint(
+        recordId: 1,
+        measuredAt: DateTime(2026),
+        numericValue: 131,
+        unit: 'mmHg',
+        readingStatus: ReadingStatus.aboveRange,
+        componentStatus: ReadingStatus.inRange,
+      );
+
+      expect(point.readingStatus, ReadingStatus.aboveRange);
+      expect(point.componentStatus, ReadingStatus.inRange);
+      expect(point.effectiveStatus, ReadingStatus.inRange,
+          reason: 'the component status governs how the point is rendered');
+    });
+
+    test('systolic point stores above range component status', () {
+      final point = MeasurementChartPoint(
+        recordId: 1,
+        measuredAt: DateTime(2026),
+        numericValue: 131,
+        unit: 'mmHg',
+        readingStatus: ReadingStatus.aboveRange,
+        componentStatus: ReadingStatus.aboveRange,
+      );
+      expect(point.componentStatus, ReadingStatus.aboveRange);
+      expect(point.effectiveStatus, ReadingStatus.aboveRange);
+    });
+
+    test('diastolic point stores within range component status', () {
+      final point = MeasurementChartPoint(
+        recordId: 1,
+        measuredAt: DateTime(2026),
+        numericValue: 80,
+        unit: 'mmHg',
+        readingStatus: ReadingStatus.aboveRange,
+        componentStatus: ReadingStatus.inRange,
+      );
+      expect(point.componentStatus, ReadingStatus.inRange);
+      expect(point.effectiveStatus, ReadingStatus.inRange);
+    });
+
+    test('pulse point stores below range component status', () {
+      final point = MeasurementChartPoint(
+        recordId: 1,
+        measuredAt: DateTime(2026),
+        numericValue: 58,
+        unit: 'bpm',
+        readingStatus: ReadingStatus.aboveRange,
+        componentStatus: ReadingStatus.belowRange,
+      );
+      expect(point.componentStatus, ReadingStatus.belowRange);
+      expect(point.effectiveStatus, ReadingStatus.belowRange);
+    });
+
+    test('effectiveStatus falls back to the reading status', () {
+      final point = MeasurementChartPoint(
+        recordId: 1,
+        measuredAt: DateTime(2026),
+        numericValue: 120,
+        unit: 'mmHg',
+        readingStatus: ReadingStatus.inRange,
+      );
+      expect(point.componentStatus, isNull);
+      expect(point.effectiveStatus, ReadingStatus.inRange);
+    });
+
+    test('missing component status produces unknown', () {
+      final point = MeasurementChartPoint(
+        recordId: 1,
+        measuredAt: DateTime(2026),
+        numericValue: 131,
+        unit: 'mmHg',
+        readingStatus: ReadingStatus.unknown,
+        componentStatus: ReadingStatus.unknown,
+      );
+      expect(point.componentStatus, ReadingStatus.unknown);
+      expect(point.effectiveStatus, ReadingStatus.unknown);
+    });
   });
 
   group('MeasurementChartSeries', () {
