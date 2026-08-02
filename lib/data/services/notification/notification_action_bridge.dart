@@ -23,8 +23,8 @@ enum ActionResult { success, alreadyCompleted, invalidPayload, entityNotFound, d
 
 class NotificationActionBridge {
   NotificationActionBridge({
-    required NotificationService notificationService,
-    required NotificationScheduler notificationScheduler,
+    required this._notificationService,
+    required this._notificationScheduler,
     required this.scheduleRecoveryService,
     required this._medicationRepository,
     required this._measurementRepository,
@@ -33,8 +33,7 @@ class NotificationActionBridge {
     required this.showProfileName,
     required this.showDetailsOnLockScreen,
     this.onActionProcessed,
-  })  : _notificationService = notificationService,
-        _notificationScheduler = notificationScheduler;
+  });
 
   final NotificationService _notificationService;
   final NotificationScheduler _notificationScheduler;

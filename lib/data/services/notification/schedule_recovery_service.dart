@@ -6,10 +6,9 @@ import '../notification/notification_service.dart';
 
 class ScheduleRecoveryService {
   ScheduleRecoveryService({
-    required NotificationService notificationService,
-    required NotificationScheduler notificationScheduler,
-  })  : _notificationService = notificationService,
-        _notificationScheduler = notificationScheduler;
+    required this._notificationService,
+    required this._notificationScheduler,
+  });
 
   final NotificationService _notificationService;
   final NotificationScheduler _notificationScheduler;
