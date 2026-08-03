@@ -1404,4 +1404,222 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get noInactiveMedications => 'არააქტიური მედიკამენტები არ არის';
+
+  @override
+  String get careContacts => 'სამედიცინო კონტაქტები';
+
+  @override
+  String get addCareContact => 'კონტაქტის დამატება';
+
+  @override
+  String get editCareContact => 'კონტაქტის რედაქტირება';
+
+  @override
+  String get careContactDetails => 'კონტაქტის დეტალები';
+
+  @override
+  String get contactType => 'კონტაქტის ტიპი';
+
+  @override
+  String get doctorOrSpecialist => 'ექიმი ან სპეციალისტი';
+
+  @override
+  String get clinicOrHospital => 'კლინიკა ან საავადმყოფო';
+
+  @override
+  String get laboratory => 'ლაბორატორია';
+
+  @override
+  String get pharmacy => 'აფთიაქი';
+
+  @override
+  String get insuranceCompany => 'სადაზღვევო კომპანია';
+
+  @override
+  String get allContacts => 'ყველა კონტაქტი';
+
+  @override
+  String get organizations => 'ორგანიზაციები';
+
+  @override
+  String get insurance => 'დაზღვევა';
+
+  @override
+  String get favorites => 'რჩეულები';
+
+  @override
+  String get archivedContacts => 'არქივირებული კონტაქტები';
+
+  @override
+  String get noCareContacts => 'სამედიცინო კონტაქტები ჯერ არ არის';
+
+  @override
+  String get noCareContactsDescription =>
+      'დაამატეთ ექიმები, კლინიკები, ლაბორატორიები, აფთიაქები ან სადაზღვევო კონტაქტები.';
+
+  @override
+  String get noArchivedContacts => 'არქივირებული კონტაქტები არ არის';
+
+  @override
+  String get noArchivedContactsDescription =>
+      'არქივირებული კონტაქტები აქ გამოჩნდება და მათი აღდგენა იქნება შესაძლებელი.';
+
+  @override
+  String get displayName => 'საჩვენებელი სახელი';
+
+  @override
+  String get specialty => 'სპეციალობა';
+
+  @override
+  String get organization => 'ორგანიზაცია';
+
+  @override
+  String get organizationName => 'ორგანიზაციის სახელი';
+
+  @override
+  String get department => 'განყოფილება';
+
+  @override
+  String get contactPerson => 'საკონტაქტო პირი';
+
+  @override
+  String get primaryPhone => 'ძირითადი ტელეფონი';
+
+  @override
+  String get secondaryPhone => 'დამატებითი ტელეფონი';
+
+  @override
+  String get website => 'ვებგვერდი';
+
+  @override
+  String get workingHours => 'სამუშაო საათები';
+
+  @override
+  String get policyNumber => 'პოლისის ნომერი';
+
+  @override
+  String get memberNumber => 'წევრის ან კლიენტის ნომერი';
+
+  @override
+  String get policyNotes => 'პოლისის შენიშვნები';
+
+  @override
+  String get favorite => 'რჩეული';
+
+  @override
+  String get addToFavorites => 'რჩეულებში დამატება';
+
+  @override
+  String get removeFromFavorites => 'რჩეულებიდან ამოღება';
+
+  @override
+  String get archive => 'არქივში გადატანა';
+
+  @override
+  String get restore => 'აღდგენა';
+
+  @override
+  String get deletePermanently => 'სამუდამოდ წაშლა';
+
+  @override
+  String get call => 'დარეკვა';
+
+  @override
+  String get sendEmail => 'ელფოსტის გაგზავნა';
+
+  @override
+  String get openWebsite => 'ვებგვერდის გახსნა';
+
+  @override
+  String get openAddress => 'მისამართის გახსნა';
+
+  @override
+  String get selectContactType => 'კონტაქტის ტიპის არჩევა';
+
+  @override
+  String get contactSaved => 'კონტაქტი შენახულია';
+
+  @override
+  String get contactUpdated => 'კონტაქტი განახლდა';
+
+  @override
+  String get contactArchived => 'კონტაქტი არქივშია გადატანილი';
+
+  @override
+  String get contactRestored => 'კონტაქტი აღდგენილია';
+
+  @override
+  String get contactDeleted => 'კონტაქტი წაიშალა';
+
+  @override
+  String get invalidEmail => 'შეიყვანეთ მართებული ელფოსტის მისამართი';
+
+  @override
+  String get invalidWebsite => 'შეიყვანეთ მართებული ვებგვერდის მისამართი';
+
+  @override
+  String get confirmArchiveContact =>
+      'ეს კონტაქტი არქივში გადავიდეს? ის აქტიური სიიდან დაიმალება, მაგრამ უსაფრთხოდ შენარჩუნდება.';
+
+  @override
+  String get confirmDeleteContact =>
+      'ეს კონტაქტი სამუდამოდ წაიშალოს? ეს მოქმედება შეუქცევადია.';
+
+  @override
+  String get confirmRestoreContact => 'ეს კონტაქტი აღდგეს აქტიურ სიაში?';
+
+  @override
+  String get removePhoto => 'ფოტოს წაშლა';
+
+  @override
+  String get choosePhoto => 'ფოტოს არჩევა';
+
+  @override
+  String get changePhoto => 'ფოტოს შეცვლა';
+
+  @override
+  String get failedToSaveContactPhoto => 'ფოტოს შენახვა ვერ მოხერხდა';
+
+  @override
+  String get noContactsFound => 'კონტაქტები ვერ მოიძებნა';
+
+  @override
+  String get noContactsFoundDescription => 'სცადეთ ძებნის ან ფილტრების შეცვლა.';
+
+  @override
+  String get searchContacts => 'კონტაქტების ძებნა';
+
+  @override
+  String get all => 'ყველა';
+
+  @override
+  String get showArchived => 'არქივირებულების ჩვენება';
+
+  @override
+  String get showActive => 'აქტიურების ჩვენება';
+
+  @override
+  String get editCareContactFailed => 'კონტაქტის შენახვა ვერ მოხერხდა';
+
+  @override
+  String get deleteContactFailed => 'კონტაქტის წაშლა ვერ მოხერხდა';
+
+  @override
+  String get policyAndMemberDetails => 'პოლისის დეტალები';
+
+  @override
+  String get professionalInformation => 'პროფესიული ინფორმაცია';
+
+  @override
+  String get organizationInformation => 'ორგანიზაციის ინფორმაცია';
+
+  @override
+  String get personalInformationLabel => 'პირადი ინფორმაცია';
+
+  @override
+  String get careContactsSubtitle =>
+      'ექიმები, კლინიკები, ლაბორატორიები, აფთიაქები და სადაზღვევო კომპანიები';
+
+  @override
+  String get contactNotAvailable => 'კონტაქტი ვერ მოიძებნა';
 }

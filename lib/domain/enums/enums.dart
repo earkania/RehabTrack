@@ -126,3 +126,34 @@ enum MeasurementCategory {
     );
   }
 }
+
+/// Stable persisted values for care contact types. The enum `name` (e.g.
+/// `doctor`, `clinic`, `laboratory`, `pharmacy`, `insurance`, `other`) is
+/// stored in the database; localized labels are resolved in the UI layer.
+enum CareContactType {
+  doctor,
+  clinic,
+  laboratory,
+  pharmacy,
+  insurance,
+  other;
+
+  static CareContactType fromString(String value) {
+    return CareContactType.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => CareContactType.other,
+    );
+  }
+
+  /// Whether the type represents an organization-style contact rather than an
+  /// individual medical professional.
+  bool get isOrganization => switch (this) {
+        CareContactType.clinic ||
+        CareContactType.laboratory ||
+        CareContactType.pharmacy ||
+        CareContactType.insurance ||
+        CareContactType.other =>
+          true,
+        CareContactType.doctor => false,
+      };
+}

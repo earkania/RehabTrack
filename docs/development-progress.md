@@ -3023,3 +3023,225 @@ device reboots with scheduled notifications stored, causing a one-time crash on
 the pending `BOOT_COMPLETED` delivery. The app then launches normally. This is
 unrelated to the navigation refactor (no notification code or build config was
 changed) and should be addressed separately (e.g. proguard keep rules).
+
+### Phase 8A — Care Contacts Foundation (2026-08-02)
+
+Replaced the Profile dashboard "Doctors" placeholder with a scalable **Care
+Contacts** module: a shared, profile-scoped contact list for medical
+professionals and healthcare organizations (doctor, clinic, laboratory,
+pharmacy, insurance, other) with full CRUD, archiving/restoration, favorites,
+search, filters, and actions (call/email/website/address). Doctor Visits and Lab
+Analyses are NOT started; existing placeholder doctors/doctor-visits infra is
+untouched.
+
+#### Data Model (schema v13)
+
+- `lib/data/database/tables/care_contact_table.dart` — new `CareContacts` table:
+  `profileId` FK → Profiles, stable `contactType` string (`doctor`,
+  `clinic`, `laboratory`, `pharmacy`, `insurance`, `other`), `displayName`, and
+  nullable type-specific columns (`firstName`, `lastName`, `specialty`,
+  `organizationName`, `department`, `contactPerson`, `primaryPhone`,
+  `secondaryPhone`, `email`, `website`, `address`, `workingHours`,
+  `policyNumber`, `memberNumber`, `notes`, `photoPath`), `isFavorite`,
+  `isArchived`, `createdAt`, `updatedAt`. Indexes:
+  `care_contacts_profile_idx`, `care_contacts_type_idx`,
+  `care_contacts_archived_idx`, `care_contacts_favorite_idx`,
+  `care_contacts_display_name_idx`.
+- `lib/data/database/app_database.dart` — `schemaVersion` → 13; migration step
+  `if (from < 13) await m.createTable(careContacts);` (additive, preserves all
+  existing tables/data). Added `AppDatabase.forTesting(executor)` for file-backed
+  migration tests.
+- Sensitive insurance fields (`policyNumber`, `memberNumber`) live only in the
+  details/edit screens — never in list rows, logs, or search matching.
+
+#### Domain
+
+- `lib/domain/enums/enums.dart` — `CareContactType` enum with stable persisted
+  names + `fromString` fallback to `other` + `isOrganization` getter.
+- `lib/domain/entities/care_contact.dart` — `CareContact` entity,
+  `generateDisplayName`, `initials`, `effectiveDisplayName`, `copyWith`.
+- `lib/domain/repositories/care_contact_repository.dart` — repository interface;
+  `lib/data/repositories/care_contact_repository_impl.dart` — Drift
+  implementation (always profile-scoped).
+
+#### Data Layer
+
+- `lib/data/database/daos/care_contact_dao.dart` — watchers (active/archived/all/
+  by-id), CRUD, archive/restore, favorite toggle, permanent delete. All queries
+  scope by `profileId`.
+- `lib/data/services/care_contact_image_service.dart` — app-managed local photo
+  files (max 512px, resize on import), never raw bytes in the DB.
+
+#### Presentation
+
+- `lib/presentation/providers/database_provider.dart` —
+  `careContactRepositoryProvider`, `careContactImageServiceProvider`.
+- `lib/presentation/providers/care_contact_provider.dart` — `CareContactFilter`
+  (`all`/`doctors`/`organizations`/`insurance`/`favorites`),
+  `CareContactViewMode` (`active`/`archived`), `careContactsProvider`,
+  `archivedCareContactsProvider`, `careContactByIdProvider`,
+  `careContactSearchQueryProvider`, `careContactFilterProvider`,
+  `careContactViewModeProvider`, `filteredCareContactsProvider`,
+  `filteredArchivedCareContactsProvider`, `isCareContactFilterActive`.
+- `lib/presentation/screens/profile/care_contacts_screen.dart` — search field,
+  filter chips, active/archived toggle, FAB add, grouped-by-type list when
+  unfiltered, empty states, snackbars; no sensitive numbers in rows.
+- `lib/presentation/screens/profile/add_care_contact_screen.dart` — type
+  selector bottom sheet then the shared form.
+- `lib/presentation/screens/profile/edit_care_contact_screen.dart` — watch by
+  id + pre-filled form.
+- `lib/presentation/screens/profile/care_contact_details_screen.dart` —
+  avatar/name/type, Call/Email/Website/Address chips, favorite toggle,
+  archive/restore/delete with confirm dialogs, per-type info sections.
+- `lib/presentation/widgets/care_contacts/` — `care_contact_form.dart`
+  (type-aware, required-name validation, email/website format validation,
+  whitespace trimming, photo picker), `care_contact_avatar.dart`,
+  `care_contact_list_item.dart`, `contact_type_selector_sheet.dart`.
+- `lib/presentation/utils/care_contact_localizer.dart` — type label/icon
+  mapping; `lib/presentation/utils/care_contact_actions.dart` — tel:/mailto:,
+  website → https normalization + external browser, geo:/maps fallback.
+- `lib/presentation/screens/profile/profile_dashboard_screen.dart` — "Doctors"
+  placeholder tile replaced by "Care Contacts"
+  (`Icons.contact_phone_outlined`, pushes `/profile/contacts`).
+- `lib/core/router/app_routes.dart` / `app_router.dart` — routes
+  `/profile/contacts`, `/profile/contacts/new`,
+  `/profile/contacts/:id`, `/profile/contacts/:id/edit`,
+  `/profile/contacts/archived` (flat pushes; unknown ids → `_InvalidRouteScreen`).
+- `pubspec.yaml` — added `url_launcher`.
+
+#### Localization
+
+- `lib/l10n/app_en.arb` / `app_ka.arb` — added ~80 keys (care contacts labels,
+  contact types, filters, archive/restore/delete, favorite, validation,
+  call/email/website/address, empty states) with natural Georgian translations.
+  Generated files re-run via `flutter gen-l10n`.
+
+#### Tests (all new)
+
+- `test/care_contact_entity_test.dart` — enum round-trip/fallback, display-name
+  generation, initials, effective name, copyWith.
+- `test/care_contact_repository_test.dart` — create/update/delete, profile
+  scoping, archive/restore, favorite toggle, watch streams.
+- `test/care_contact_provider_test.dart` — active/archived/by-id providers,
+  filters, search (incl. exclusion of sensitive fields).
+- `test/care_contact_migration_test.dart` — v12→v13 upgrade preserves existing
+  data and recreates `care_contacts` + indexes; fresh-create table/index/column
+  verification; no destructive re-migration on reopen.
+- `test/care_contact_widget_test.dart` — list item (no sensitive fields in
+  rows), list screen (empty state, grouping, filters, search, favorites,
+  archived toggle), details routing via placeholder router.
+- `test/care_contact_routing_test.dart` — dashboard tile, open/back, FAB → type
+  selector.
+- `test/navigation_test.dart` — updated "Doctors" → "Care Contacts" tile
+  assertions.
+
+#### Validation Results (Post-Phase 8A)
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | No issues found |
+| `flutter test` | Passed (933/933, previously 856) |
+| `flutter build apk --debug` | Built successfully |
+| `flutter build apk --release` | Built successfully (68.4MB) |
+| Pixel 7 install | `app-release.apk` installed on `31140DLH2000KM`; app launches, no crashes |
+| List / empty state | Empty state + Add FAB render; contact appears after save |
+| Add flow | Type selector sheet (all 6 types) → type-aware form → save → list |
+| Doctor contact | First/Last/Display/Specialty/Organization/Phone fields; details + edit pre-filled |
+| Edit flow | Changes persist ("Contact updated"); Specialty corrected and saved |
+| Details + actions | Call launches dialer with correct number; Email/Website/Address chips present |
+| Favorite | Toggle works; favorites filter shows the favorited contact |
+| Search | Narrows by name; no-match shows empty state |
+| Filters | All/Doctor/Organizations/Insurance/Favorites chips scroll + filter correctly |
+| Archive / Restore | Confirm dialog; contact hidden from active, shown in archived view, restored intact |
+| Delete permanently | Confirm dialog; contact removed ("Contact deleted") |
+| Sensitive fields | Policy/Member numbers persist, shown only in details (not list rows) |
+| Georgian (ka) | In-app locale switch → dashboard, list, chips, empty state, type selector all Georgian |
+| Crash log | No FATAL exceptions / crash-buffer entries during whole manual session |
+| Migration | v12→v13 preserves profiles/modules; care_contacts + indexes created |
+
+#### Notes
+
+- Contacts are always scoped to the active patient profile; switching profile
+  shows that profile's own contacts.
+- Archived contacts remain fully preserved and restorable; permanent delete is
+  explicit and confirmed.
+- No device-contacts permission, no cloud sync, no notification changes, no
+  schema deletions/resets.
+- Future Doctor Visits may reference `doctorContactId`/`organizationContactId`
+  and Lab Analyses `laboratoryContactId`; no foreign keys were added for these
+  yet (future modules untouched).
+
+### Phase 8B — Care Contacts UX Fixes (2026-08-03)
+
+Follow-up on the Phase 8A manual review. Four issues fixed on branch
+`feature/care-contacts`:
+
+#### 1. Stale generated Display Name → presentation-time effective name
+
+- `lib/domain/entities/care_contact.dart` — added `fallbackName` (single source
+  of fallback rules: doctor first+last → organization name → empty),
+  `isExplicitDisplayName` (stored value differs from the derivable fallback),
+  and `effectiveDisplayName` (explicit alias → fallback). Fixed null
+  interpolation so a missing first/last name no longer yields "John null".
+- `lib/presentation/widgets/care_contacts/care_contact_form.dart` — the
+  Display Name field prefills only an explicit doctor alias; generated values
+  are cleared. `_buildContact` persists ONLY explicit aliases; a stored value
+  equal to the type-name fallback is treated as generated and cleared, so
+  editing an organization name immediately refreshes the effective name.
+- `lib/data/database/daos/care_contact_dao.dart` — removed raw
+  `display_name` ORDER BY (column may be empty for generated names);
+  `lib/data/repositories/care_contact_repository_impl.dart` — `_order` sorts
+  favorites-first then case-insensitive `effectiveDisplayName`; `_toDomain`
+  unchanged.
+- `lib/presentation/providers/care_contact_provider.dart` — search matches
+  `effectiveDisplayName` (plus firstName/lastName/specialty/org/phones/email),
+  never the stale raw column.
+- List item, avatar, and details already render `effectiveDisplayName`; avatar
+  `hasName`/initials use it. No DB migration: `displayName` stays a
+  non-nullable text column holding `''` for generated names.
+
+#### 2. Compact Add button
+
+- `care_contacts_screen.dart` — `FloatingActionButton.extended` replaced with a
+  plain plus-only `FloatingActionButton` (matches Medications), tooltip/semantic
+  label "Add Care Contact".
+
+#### 3. Icon-only filter bar
+
+- `care_contacts_screen.dart` — horizontal `ChoiceChip` list replaced with a
+  fixed row of five evenly-spaced circular icon buttons (All Contacts,
+  Doctor/Specialist, Organizations, Insurance, Favorites). Selected state uses
+  filled container + border + filled icon variant (never color alone); labels
+  live in tooltip + `Semantics` (label/button/selected). No horizontal scroll.
+
+#### 4. Single canonical favorite control
+
+- `care_contact_list_item.dart` — removed the static favorite indicator star;
+  one toggle remains (outlined "Add to favorites" / filled "Remove from
+  favorites"). Tapping toggles without navigating.
+
+#### Tests added/updated
+
+- `test/care_contact_entity_test.dart` — `generateDisplayName` group replaced
+  with `fallbackName` + `isExplicitDisplayName` groups.
+- `test/care_contact_form_test.dart` — new: org generated-name cleared on edit,
+  explicit org alias preserved, doctor display-name field empty for generated
+  name, doctor explicit alias prefilled.
+- `test/care_contact_repository_test.dart` — new: sorting by effective display
+  name when `displayName` is empty.
+- `test/care_contact_provider_test.dart` — new: search matches effective name
+  with empty display name.
+- `test/care_contact_widget_test.dart` — single-star assertions, outlined-star
+  for non-favorites, star-tap-does-not-navigate, five icon filter buttons,
+  compact plus-only FAB; filter taps via tooltip.
+- `test/care_contact_routing_test.dart` — unchanged (FAB asserted by type).
+
+#### Validation Results (Post-Phase 8B)
+
+| Check | Result |
+|---|---|
+| `flutter analyze` | No issues found |
+| `flutter test` | Passed (945/945) |
+| Docs | `docs/design/design-notes.md` Care Contacts rules updated |
+

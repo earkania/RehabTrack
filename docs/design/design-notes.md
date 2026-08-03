@@ -603,3 +603,87 @@ large-icon dashboard grid for its modules.
 with `Missing type parameter` on reboot when scheduled notifications are stored
 (R8/Gson issue). Unrelated to navigation; needs a separate fix (proguard keep
 rules).
+
+## Care Contacts — Design Rules (Approved 2026-08-02)
+
+Replaced the Profile "Doctors" placeholder with a shared, profile-scoped Care
+Contacts module (types: doctor, clinic, laboratory, pharmacy, insurance, other)
+that will also serve future modules (Doctor Visits, Lab Analyses).
+
+### Scope
+
+- CRUD, archive/restore (never silently lost), favorites, search, filters,
+  actions (call/email/website/address), photos, en/ka localization.
+- Always scoped to the active patient profile; switching profile shows that
+  profile's own contacts.
+- No device-contacts permission, no cloud sync, no notification changes, no
+  schema deletions/resets.
+
+### Data model
+
+- Single `CareContacts` table (schema v13), `contactType` persisted as a stable
+  string (`doctor`, `clinic`, `laboratory`, `pharmacy`, `insurance`, `other`);
+  `fromString` falls back to `other` for forward compatibility.
+- Type-specific nullable columns (names/specialty for doctors, organization
+  fields, insurance numbers, etc.); `isFavorite`, `isArchived`, `createdAt`,
+  `updatedAt`.
+- Sensitive insurance fields (`policyNumber`, `memberNumber`) live only in the
+  details/edit screens — never in list rows, logs, or search matching.
+
+### Behavior rules
+
+- List rows show display name, type, and primary phone only (sensitive numbers
+  hidden); tap opens details.
+- **Effective display name (presentation-time, never persisted):** the
+  `displayName` column stores ONLY explicit user-entered aliases. The canonical
+  `effectiveDisplayName` getter is computed at presentation from the entity:
+  explicit alias → doctor `firstName + lastName` → organization name → empty
+  fallback. Generated values are never written to the DB; a stored value that
+  equals the type-name fallback is treated as generated and cleared on save, so
+  editing an organization's name immediately updates its effective name.
+  Initials, list rows, details, search, and repository sorting all use the
+  effective name (favorites-first, then case-insensitive effective name).
+- **Add action:** compact plus-only `FloatingActionButton` (same as
+  Medications), tooltip/semantic label "Add Care Contact", never an extended
+  label.
+- **Filters:** a fixed row of five evenly-spaced icon buttons (All Contacts,
+  Doctor/Specialist, Organizations, Insurance, Favorites) with tooltips,
+  `Semantics` labels + `selected` state, and a selected style using a filled
+  container, border, AND a filled icon variant — never color alone. No
+  horizontal scroll.
+- **Favorites:** a single canonical toggle in each row (outlined star "Add to
+  favorites" / filled star "Remove from favorites"); tapping the star toggles
+  the flag without opening details. No duplicate favorite indicators.
+- Favorites sort first in the active list; archiving moves a contact to the
+  archived view where it is fully preserved and restorable. Delete is a
+  permanent, confirmed action.
+- Type-specific display names: doctors combine first/last name (or specialty),
+  organizations use their name (or contact person) with a sensible fallback.
+- Actions: `tel:` for calls, `mailto:` for email, https-normalized URL in an
+  external browser, address opens maps (geo:/fallback).
+- Photos stored as app-managed local files (max 512px, resized on import), not
+  raw DB bytes.
+
+### Future relations (not yet implemented)
+
+Doctor Visits may later reference `doctorContactId` / `organizationContactId`
+and Lab Analyses `laboratoryContactId`. No foreign keys were added yet so the
+future modules remain untouched; the single-table design leaves this open.
+
+### Key Files
+
+| File | Purpose |
+|---|---|
+| `lib/data/database/tables/care_contact_table.dart` | CareContacts table + indexes |
+| `lib/data/database/daos/care_contact_dao.dart` | Profile-scoped CRUD/watchers |
+| `lib/domain/entities/care_contact.dart` | Entity, display-name/initials helpers |
+| `lib/domain/repositories/care_contact_repository.dart` | Repository interface |
+| `lib/data/repositories/care_contact_repository_impl.dart` | Drift implementation |
+| `lib/data/services/care_contact_image_service.dart` | Local photo file storage |
+| `lib/presentation/providers/care_contact_provider.dart` | Providers, filters, view modes |
+| `lib/presentation/screens/profile/care_contacts_screen.dart` | List: search/filters/toggle/FAB |
+| `lib/presentation/screens/profile/care_contact_details_screen.dart` | Details + actions |
+| `lib/presentation/widgets/care_contacts/care_contact_form.dart` | Type-aware add/edit form |
+| `lib/presentation/utils/care_contact_localizer.dart` | Type label/icon mapping |
+| `lib/presentation/utils/care_contact_actions.dart` | tel/mailto/https/geo launchers |
+| `test/care_contact_*_test.dart` | Entity/repo/provider/migration/widget/routing tests |

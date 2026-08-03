@@ -2755,6 +2755,432 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No inactive medications'**
   String get noInactiveMedications;
+
+  /// No description provided for @careContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Care Contacts'**
+  String get careContacts;
+
+  /// No description provided for @addCareContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Care Contact'**
+  String get addCareContact;
+
+  /// No description provided for @editCareContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Care Contact'**
+  String get editCareContact;
+
+  /// No description provided for @careContactDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Details'**
+  String get careContactDetails;
+
+  /// No description provided for @contactType.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Type'**
+  String get contactType;
+
+  /// No description provided for @doctorOrSpecialist.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor or Specialist'**
+  String get doctorOrSpecialist;
+
+  /// No description provided for @clinicOrHospital.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinic or Hospital'**
+  String get clinicOrHospital;
+
+  /// No description provided for @laboratory.
+  ///
+  /// In en, this message translates to:
+  /// **'Laboratory'**
+  String get laboratory;
+
+  /// No description provided for @pharmacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharmacy'**
+  String get pharmacy;
+
+  /// No description provided for @insuranceCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance Company'**
+  String get insuranceCompany;
+
+  /// No description provided for @allContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'All Contacts'**
+  String get allContacts;
+
+  /// No description provided for @organizations.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizations'**
+  String get organizations;
+
+  /// No description provided for @insurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get insurance;
+
+  /// No description provided for @favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
+
+  /// No description provided for @archivedContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived Contacts'**
+  String get archivedContacts;
+
+  /// No description provided for @noCareContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'No care contacts yet'**
+  String get noCareContacts;
+
+  /// No description provided for @noCareContactsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add doctors, clinics, laboratories, pharmacies, or insurance contacts.'**
+  String get noCareContactsDescription;
+
+  /// No description provided for @noArchivedContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived contacts'**
+  String get noArchivedContacts;
+
+  /// No description provided for @noArchivedContactsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived contacts will appear here and can be restored.'**
+  String get noArchivedContactsDescription;
+
+  /// No description provided for @displayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get displayName;
+
+  /// No description provided for @specialty.
+  ///
+  /// In en, this message translates to:
+  /// **'Specialty'**
+  String get specialty;
+
+  /// No description provided for @organization.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization'**
+  String get organization;
+
+  /// No description provided for @organizationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization Name'**
+  String get organizationName;
+
+  /// No description provided for @department.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get department;
+
+  /// No description provided for @contactPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Person'**
+  String get contactPerson;
+
+  /// No description provided for @primaryPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Phone'**
+  String get primaryPhone;
+
+  /// No description provided for @secondaryPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary Phone'**
+  String get secondaryPhone;
+
+  /// No description provided for @website.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get website;
+
+  /// No description provided for @workingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Working Hours'**
+  String get workingHours;
+
+  /// No description provided for @policyNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy Number'**
+  String get policyNumber;
+
+  /// No description provided for @memberNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Member or Customer Number'**
+  String get memberNumber;
+
+  /// No description provided for @policyNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy Notes'**
+  String get policyNotes;
+
+  /// No description provided for @favorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite'**
+  String get favorite;
+
+  /// No description provided for @addToFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites'**
+  String get addToFavorites;
+
+  /// No description provided for @removeFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites'**
+  String get removeFromFavorites;
+
+  /// No description provided for @archive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archive;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @deletePermanently.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get deletePermanently;
+
+  /// No description provided for @call.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get call;
+
+  /// No description provided for @sendEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Send email'**
+  String get sendEmail;
+
+  /// No description provided for @openWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Open website'**
+  String get openWebsite;
+
+  /// No description provided for @openAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Open address'**
+  String get openAddress;
+
+  /// No description provided for @selectContactType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Contact Type'**
+  String get selectContactType;
+
+  /// No description provided for @contactSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact saved'**
+  String get contactSaved;
+
+  /// No description provided for @contactUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact updated'**
+  String get contactUpdated;
+
+  /// No description provided for @contactArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact archived'**
+  String get contactArchived;
+
+  /// No description provided for @contactRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact restored'**
+  String get contactRestored;
+
+  /// No description provided for @contactDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact deleted'**
+  String get contactDeleted;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address'**
+  String get invalidEmail;
+
+  /// No description provided for @invalidWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid website URL'**
+  String get invalidWebsite;
+
+  /// No description provided for @confirmArchiveContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this contact? It will be hidden from the active list but kept safely.'**
+  String get confirmArchiveContact;
+
+  /// No description provided for @confirmDeleteContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this contact permanently? This cannot be undone.'**
+  String get confirmDeleteContact;
+
+  /// No description provided for @confirmRestoreContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this contact to the active list?'**
+  String get confirmRestoreContact;
+
+  /// No description provided for @removePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get removePhoto;
+
+  /// No description provided for @choosePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose photo'**
+  String get choosePhoto;
+
+  /// No description provided for @changePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get changePhoto;
+
+  /// No description provided for @failedToSaveContactPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save photo'**
+  String get failedToSaveContactPhoto;
+
+  /// No description provided for @noContactsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No contacts found'**
+  String get noContactsFound;
+
+  /// No description provided for @noContactsFoundDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting your search or filters.'**
+  String get noContactsFoundDescription;
+
+  /// No description provided for @searchContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Search contacts'**
+  String get searchContacts;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @showArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Show archived'**
+  String get showArchived;
+
+  /// No description provided for @showActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Show active'**
+  String get showActive;
+
+  /// No description provided for @editCareContactFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save contact'**
+  String get editCareContactFailed;
+
+  /// No description provided for @deleteContactFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete contact'**
+  String get deleteContactFailed;
+
+  /// No description provided for @policyAndMemberDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy Details'**
+  String get policyAndMemberDetails;
+
+  /// No description provided for @professionalInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Professional Information'**
+  String get professionalInformation;
+
+  /// No description provided for @organizationInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization Information'**
+  String get organizationInformation;
+
+  /// No description provided for @personalInformationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Information'**
+  String get personalInformationLabel;
+
+  /// No description provided for @careContactsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctors, clinics, laboratories, pharmacies, and insurance companies'**
+  String get careContactsSubtitle;
+
+  /// No description provided for @contactNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact not found'**
+  String get contactNotAvailable;
 }
 
 class _AppLocalizationsDelegate

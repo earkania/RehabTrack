@@ -11178,6 +11178,1350 @@ class DoctorVisitsCompanion extends UpdateCompanion<DoctorVisit> {
   }
 }
 
+class $CareContactsTable extends CareContacts
+    with TableInfo<$CareContactsTable, CareContact> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CareContactsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _contactTypeMeta = const VerificationMeta(
+    'contactType',
+  );
+  @override
+  late final GeneratedColumn<String> contactType = GeneratedColumn<String>(
+    'contact_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+    'display_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firstNameMeta = const VerificationMeta(
+    'firstName',
+  );
+  @override
+  late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
+    'first_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastNameMeta = const VerificationMeta(
+    'lastName',
+  );
+  @override
+  late final GeneratedColumn<String> lastName = GeneratedColumn<String>(
+    'last_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _specialtyMeta = const VerificationMeta(
+    'specialty',
+  );
+  @override
+  late final GeneratedColumn<String> specialty = GeneratedColumn<String>(
+    'specialty',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _organizationNameMeta = const VerificationMeta(
+    'organizationName',
+  );
+  @override
+  late final GeneratedColumn<String> organizationName = GeneratedColumn<String>(
+    'organization_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _departmentMeta = const VerificationMeta(
+    'department',
+  );
+  @override
+  late final GeneratedColumn<String> department = GeneratedColumn<String>(
+    'department',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contactPersonMeta = const VerificationMeta(
+    'contactPerson',
+  );
+  @override
+  late final GeneratedColumn<String> contactPerson = GeneratedColumn<String>(
+    'contact_person',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _primaryPhoneMeta = const VerificationMeta(
+    'primaryPhone',
+  );
+  @override
+  late final GeneratedColumn<String> primaryPhone = GeneratedColumn<String>(
+    'primary_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _secondaryPhoneMeta = const VerificationMeta(
+    'secondaryPhone',
+  );
+  @override
+  late final GeneratedColumn<String> secondaryPhone = GeneratedColumn<String>(
+    'secondary_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _websiteMeta = const VerificationMeta(
+    'website',
+  );
+  @override
+  late final GeneratedColumn<String> website = GeneratedColumn<String>(
+    'website',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _addressMeta = const VerificationMeta(
+    'address',
+  );
+  @override
+  late final GeneratedColumn<String> address = GeneratedColumn<String>(
+    'address',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _workingHoursMeta = const VerificationMeta(
+    'workingHours',
+  );
+  @override
+  late final GeneratedColumn<String> workingHours = GeneratedColumn<String>(
+    'working_hours',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _policyNumberMeta = const VerificationMeta(
+    'policyNumber',
+  );
+  @override
+  late final GeneratedColumn<String> policyNumber = GeneratedColumn<String>(
+    'policy_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _memberNumberMeta = const VerificationMeta(
+    'memberNumber',
+  );
+  @override
+  late final GeneratedColumn<String> memberNumber = GeneratedColumn<String>(
+    'member_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _photoPathMeta = const VerificationMeta(
+    'photoPath',
+  );
+  @override
+  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
+    'photo_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
+    'isFavorite',
+  );
+  @override
+  late final GeneratedColumn<bool> isFavorite = GeneratedColumn<bool>(
+    'is_favorite',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_favorite" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    contactType,
+    displayName,
+    firstName,
+    lastName,
+    specialty,
+    organizationName,
+    department,
+    contactPerson,
+    primaryPhone,
+    secondaryPhone,
+    email,
+    website,
+    address,
+    workingHours,
+    policyNumber,
+    memberNumber,
+    notes,
+    photoPath,
+    isFavorite,
+    isArchived,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'care_contacts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CareContact> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('contact_type')) {
+      context.handle(
+        _contactTypeMeta,
+        contactType.isAcceptableOrUnknown(
+          data['contact_type']!,
+          _contactTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_contactTypeMeta);
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_displayNameMeta);
+    }
+    if (data.containsKey('first_name')) {
+      context.handle(
+        _firstNameMeta,
+        firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta),
+      );
+    }
+    if (data.containsKey('last_name')) {
+      context.handle(
+        _lastNameMeta,
+        lastName.isAcceptableOrUnknown(data['last_name']!, _lastNameMeta),
+      );
+    }
+    if (data.containsKey('specialty')) {
+      context.handle(
+        _specialtyMeta,
+        specialty.isAcceptableOrUnknown(data['specialty']!, _specialtyMeta),
+      );
+    }
+    if (data.containsKey('organization_name')) {
+      context.handle(
+        _organizationNameMeta,
+        organizationName.isAcceptableOrUnknown(
+          data['organization_name']!,
+          _organizationNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('department')) {
+      context.handle(
+        _departmentMeta,
+        department.isAcceptableOrUnknown(data['department']!, _departmentMeta),
+      );
+    }
+    if (data.containsKey('contact_person')) {
+      context.handle(
+        _contactPersonMeta,
+        contactPerson.isAcceptableOrUnknown(
+          data['contact_person']!,
+          _contactPersonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('primary_phone')) {
+      context.handle(
+        _primaryPhoneMeta,
+        primaryPhone.isAcceptableOrUnknown(
+          data['primary_phone']!,
+          _primaryPhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('secondary_phone')) {
+      context.handle(
+        _secondaryPhoneMeta,
+        secondaryPhone.isAcceptableOrUnknown(
+          data['secondary_phone']!,
+          _secondaryPhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    }
+    if (data.containsKey('website')) {
+      context.handle(
+        _websiteMeta,
+        website.isAcceptableOrUnknown(data['website']!, _websiteMeta),
+      );
+    }
+    if (data.containsKey('address')) {
+      context.handle(
+        _addressMeta,
+        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+      );
+    }
+    if (data.containsKey('working_hours')) {
+      context.handle(
+        _workingHoursMeta,
+        workingHours.isAcceptableOrUnknown(
+          data['working_hours']!,
+          _workingHoursMeta,
+        ),
+      );
+    }
+    if (data.containsKey('policy_number')) {
+      context.handle(
+        _policyNumberMeta,
+        policyNumber.isAcceptableOrUnknown(
+          data['policy_number']!,
+          _policyNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('member_number')) {
+      context.handle(
+        _memberNumberMeta,
+        memberNumber.isAcceptableOrUnknown(
+          data['member_number']!,
+          _memberNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('photo_path')) {
+      context.handle(
+        _photoPathMeta,
+        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+      );
+    }
+    if (data.containsKey('is_favorite')) {
+      context.handle(
+        _isFavoriteMeta,
+        isFavorite.isAcceptableOrUnknown(data['is_favorite']!, _isFavoriteMeta),
+      );
+    }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CareContact map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CareContact(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      contactType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_type'],
+      )!,
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      )!,
+      firstName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}first_name'],
+      ),
+      lastName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_name'],
+      ),
+      specialty: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}specialty'],
+      ),
+      organizationName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}organization_name'],
+      ),
+      department: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}department'],
+      ),
+      contactPerson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_person'],
+      ),
+      primaryPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}primary_phone'],
+      ),
+      secondaryPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}secondary_phone'],
+      ),
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      ),
+      website: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}website'],
+      ),
+      address: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address'],
+      ),
+      workingHours: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}working_hours'],
+      ),
+      policyNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}policy_number'],
+      ),
+      memberNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}member_number'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      photoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_path'],
+      ),
+      isFavorite: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_favorite'],
+      )!,
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CareContactsTable createAlias(String alias) {
+    return $CareContactsTable(attachedDatabase, alias);
+  }
+}
+
+class CareContact extends DataClass implements Insertable<CareContact> {
+  final int id;
+  final int profileId;
+  final String contactType;
+  final String displayName;
+  final String? firstName;
+  final String? lastName;
+  final String? specialty;
+  final String? organizationName;
+  final String? department;
+  final String? contactPerson;
+  final String? primaryPhone;
+  final String? secondaryPhone;
+  final String? email;
+  final String? website;
+  final String? address;
+  final String? workingHours;
+  final String? policyNumber;
+  final String? memberNumber;
+  final String? notes;
+  final String? photoPath;
+  final bool isFavorite;
+  final bool isArchived;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const CareContact({
+    required this.id,
+    required this.profileId,
+    required this.contactType,
+    required this.displayName,
+    this.firstName,
+    this.lastName,
+    this.specialty,
+    this.organizationName,
+    this.department,
+    this.contactPerson,
+    this.primaryPhone,
+    this.secondaryPhone,
+    this.email,
+    this.website,
+    this.address,
+    this.workingHours,
+    this.policyNumber,
+    this.memberNumber,
+    this.notes,
+    this.photoPath,
+    required this.isFavorite,
+    required this.isArchived,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['contact_type'] = Variable<String>(contactType);
+    map['display_name'] = Variable<String>(displayName);
+    if (!nullToAbsent || firstName != null) {
+      map['first_name'] = Variable<String>(firstName);
+    }
+    if (!nullToAbsent || lastName != null) {
+      map['last_name'] = Variable<String>(lastName);
+    }
+    if (!nullToAbsent || specialty != null) {
+      map['specialty'] = Variable<String>(specialty);
+    }
+    if (!nullToAbsent || organizationName != null) {
+      map['organization_name'] = Variable<String>(organizationName);
+    }
+    if (!nullToAbsent || department != null) {
+      map['department'] = Variable<String>(department);
+    }
+    if (!nullToAbsent || contactPerson != null) {
+      map['contact_person'] = Variable<String>(contactPerson);
+    }
+    if (!nullToAbsent || primaryPhone != null) {
+      map['primary_phone'] = Variable<String>(primaryPhone);
+    }
+    if (!nullToAbsent || secondaryPhone != null) {
+      map['secondary_phone'] = Variable<String>(secondaryPhone);
+    }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
+    if (!nullToAbsent || website != null) {
+      map['website'] = Variable<String>(website);
+    }
+    if (!nullToAbsent || address != null) {
+      map['address'] = Variable<String>(address);
+    }
+    if (!nullToAbsent || workingHours != null) {
+      map['working_hours'] = Variable<String>(workingHours);
+    }
+    if (!nullToAbsent || policyNumber != null) {
+      map['policy_number'] = Variable<String>(policyNumber);
+    }
+    if (!nullToAbsent || memberNumber != null) {
+      map['member_number'] = Variable<String>(memberNumber);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || photoPath != null) {
+      map['photo_path'] = Variable<String>(photoPath);
+    }
+    map['is_favorite'] = Variable<bool>(isFavorite);
+    map['is_archived'] = Variable<bool>(isArchived);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CareContactsCompanion toCompanion(bool nullToAbsent) {
+    return CareContactsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      contactType: Value(contactType),
+      displayName: Value(displayName),
+      firstName: firstName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firstName),
+      lastName: lastName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastName),
+      specialty: specialty == null && nullToAbsent
+          ? const Value.absent()
+          : Value(specialty),
+      organizationName: organizationName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(organizationName),
+      department: department == null && nullToAbsent
+          ? const Value.absent()
+          : Value(department),
+      contactPerson: contactPerson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactPerson),
+      primaryPhone: primaryPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(primaryPhone),
+      secondaryPhone: secondaryPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(secondaryPhone),
+      email: email == null && nullToAbsent
+          ? const Value.absent()
+          : Value(email),
+      website: website == null && nullToAbsent
+          ? const Value.absent()
+          : Value(website),
+      address: address == null && nullToAbsent
+          ? const Value.absent()
+          : Value(address),
+      workingHours: workingHours == null && nullToAbsent
+          ? const Value.absent()
+          : Value(workingHours),
+      policyNumber: policyNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(policyNumber),
+      memberNumber: memberNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(memberNumber),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      photoPath: photoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoPath),
+      isFavorite: Value(isFavorite),
+      isArchived: Value(isArchived),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CareContact.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CareContact(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      contactType: serializer.fromJson<String>(json['contactType']),
+      displayName: serializer.fromJson<String>(json['displayName']),
+      firstName: serializer.fromJson<String?>(json['firstName']),
+      lastName: serializer.fromJson<String?>(json['lastName']),
+      specialty: serializer.fromJson<String?>(json['specialty']),
+      organizationName: serializer.fromJson<String?>(json['organizationName']),
+      department: serializer.fromJson<String?>(json['department']),
+      contactPerson: serializer.fromJson<String?>(json['contactPerson']),
+      primaryPhone: serializer.fromJson<String?>(json['primaryPhone']),
+      secondaryPhone: serializer.fromJson<String?>(json['secondaryPhone']),
+      email: serializer.fromJson<String?>(json['email']),
+      website: serializer.fromJson<String?>(json['website']),
+      address: serializer.fromJson<String?>(json['address']),
+      workingHours: serializer.fromJson<String?>(json['workingHours']),
+      policyNumber: serializer.fromJson<String?>(json['policyNumber']),
+      memberNumber: serializer.fromJson<String?>(json['memberNumber']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      photoPath: serializer.fromJson<String?>(json['photoPath']),
+      isFavorite: serializer.fromJson<bool>(json['isFavorite']),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'contactType': serializer.toJson<String>(contactType),
+      'displayName': serializer.toJson<String>(displayName),
+      'firstName': serializer.toJson<String?>(firstName),
+      'lastName': serializer.toJson<String?>(lastName),
+      'specialty': serializer.toJson<String?>(specialty),
+      'organizationName': serializer.toJson<String?>(organizationName),
+      'department': serializer.toJson<String?>(department),
+      'contactPerson': serializer.toJson<String?>(contactPerson),
+      'primaryPhone': serializer.toJson<String?>(primaryPhone),
+      'secondaryPhone': serializer.toJson<String?>(secondaryPhone),
+      'email': serializer.toJson<String?>(email),
+      'website': serializer.toJson<String?>(website),
+      'address': serializer.toJson<String?>(address),
+      'workingHours': serializer.toJson<String?>(workingHours),
+      'policyNumber': serializer.toJson<String?>(policyNumber),
+      'memberNumber': serializer.toJson<String?>(memberNumber),
+      'notes': serializer.toJson<String?>(notes),
+      'photoPath': serializer.toJson<String?>(photoPath),
+      'isFavorite': serializer.toJson<bool>(isFavorite),
+      'isArchived': serializer.toJson<bool>(isArchived),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CareContact copyWith({
+    int? id,
+    int? profileId,
+    String? contactType,
+    String? displayName,
+    Value<String?> firstName = const Value.absent(),
+    Value<String?> lastName = const Value.absent(),
+    Value<String?> specialty = const Value.absent(),
+    Value<String?> organizationName = const Value.absent(),
+    Value<String?> department = const Value.absent(),
+    Value<String?> contactPerson = const Value.absent(),
+    Value<String?> primaryPhone = const Value.absent(),
+    Value<String?> secondaryPhone = const Value.absent(),
+    Value<String?> email = const Value.absent(),
+    Value<String?> website = const Value.absent(),
+    Value<String?> address = const Value.absent(),
+    Value<String?> workingHours = const Value.absent(),
+    Value<String?> policyNumber = const Value.absent(),
+    Value<String?> memberNumber = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    Value<String?> photoPath = const Value.absent(),
+    bool? isFavorite,
+    bool? isArchived,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => CareContact(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    contactType: contactType ?? this.contactType,
+    displayName: displayName ?? this.displayName,
+    firstName: firstName.present ? firstName.value : this.firstName,
+    lastName: lastName.present ? lastName.value : this.lastName,
+    specialty: specialty.present ? specialty.value : this.specialty,
+    organizationName: organizationName.present
+        ? organizationName.value
+        : this.organizationName,
+    department: department.present ? department.value : this.department,
+    contactPerson: contactPerson.present
+        ? contactPerson.value
+        : this.contactPerson,
+    primaryPhone: primaryPhone.present ? primaryPhone.value : this.primaryPhone,
+    secondaryPhone: secondaryPhone.present
+        ? secondaryPhone.value
+        : this.secondaryPhone,
+    email: email.present ? email.value : this.email,
+    website: website.present ? website.value : this.website,
+    address: address.present ? address.value : this.address,
+    workingHours: workingHours.present ? workingHours.value : this.workingHours,
+    policyNumber: policyNumber.present ? policyNumber.value : this.policyNumber,
+    memberNumber: memberNumber.present ? memberNumber.value : this.memberNumber,
+    notes: notes.present ? notes.value : this.notes,
+    photoPath: photoPath.present ? photoPath.value : this.photoPath,
+    isFavorite: isFavorite ?? this.isFavorite,
+    isArchived: isArchived ?? this.isArchived,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  CareContact copyWithCompanion(CareContactsCompanion data) {
+    return CareContact(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      contactType: data.contactType.present
+          ? data.contactType.value
+          : this.contactType,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
+      firstName: data.firstName.present ? data.firstName.value : this.firstName,
+      lastName: data.lastName.present ? data.lastName.value : this.lastName,
+      specialty: data.specialty.present ? data.specialty.value : this.specialty,
+      organizationName: data.organizationName.present
+          ? data.organizationName.value
+          : this.organizationName,
+      department: data.department.present
+          ? data.department.value
+          : this.department,
+      contactPerson: data.contactPerson.present
+          ? data.contactPerson.value
+          : this.contactPerson,
+      primaryPhone: data.primaryPhone.present
+          ? data.primaryPhone.value
+          : this.primaryPhone,
+      secondaryPhone: data.secondaryPhone.present
+          ? data.secondaryPhone.value
+          : this.secondaryPhone,
+      email: data.email.present ? data.email.value : this.email,
+      website: data.website.present ? data.website.value : this.website,
+      address: data.address.present ? data.address.value : this.address,
+      workingHours: data.workingHours.present
+          ? data.workingHours.value
+          : this.workingHours,
+      policyNumber: data.policyNumber.present
+          ? data.policyNumber.value
+          : this.policyNumber,
+      memberNumber: data.memberNumber.present
+          ? data.memberNumber.value
+          : this.memberNumber,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
+      isFavorite: data.isFavorite.present
+          ? data.isFavorite.value
+          : this.isFavorite,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CareContact(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('contactType: $contactType, ')
+          ..write('displayName: $displayName, ')
+          ..write('firstName: $firstName, ')
+          ..write('lastName: $lastName, ')
+          ..write('specialty: $specialty, ')
+          ..write('organizationName: $organizationName, ')
+          ..write('department: $department, ')
+          ..write('contactPerson: $contactPerson, ')
+          ..write('primaryPhone: $primaryPhone, ')
+          ..write('secondaryPhone: $secondaryPhone, ')
+          ..write('email: $email, ')
+          ..write('website: $website, ')
+          ..write('address: $address, ')
+          ..write('workingHours: $workingHours, ')
+          ..write('policyNumber: $policyNumber, ')
+          ..write('memberNumber: $memberNumber, ')
+          ..write('notes: $notes, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('isFavorite: $isFavorite, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    profileId,
+    contactType,
+    displayName,
+    firstName,
+    lastName,
+    specialty,
+    organizationName,
+    department,
+    contactPerson,
+    primaryPhone,
+    secondaryPhone,
+    email,
+    website,
+    address,
+    workingHours,
+    policyNumber,
+    memberNumber,
+    notes,
+    photoPath,
+    isFavorite,
+    isArchived,
+    createdAt,
+    updatedAt,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CareContact &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.contactType == this.contactType &&
+          other.displayName == this.displayName &&
+          other.firstName == this.firstName &&
+          other.lastName == this.lastName &&
+          other.specialty == this.specialty &&
+          other.organizationName == this.organizationName &&
+          other.department == this.department &&
+          other.contactPerson == this.contactPerson &&
+          other.primaryPhone == this.primaryPhone &&
+          other.secondaryPhone == this.secondaryPhone &&
+          other.email == this.email &&
+          other.website == this.website &&
+          other.address == this.address &&
+          other.workingHours == this.workingHours &&
+          other.policyNumber == this.policyNumber &&
+          other.memberNumber == this.memberNumber &&
+          other.notes == this.notes &&
+          other.photoPath == this.photoPath &&
+          other.isFavorite == this.isFavorite &&
+          other.isArchived == this.isArchived &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CareContactsCompanion extends UpdateCompanion<CareContact> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> contactType;
+  final Value<String> displayName;
+  final Value<String?> firstName;
+  final Value<String?> lastName;
+  final Value<String?> specialty;
+  final Value<String?> organizationName;
+  final Value<String?> department;
+  final Value<String?> contactPerson;
+  final Value<String?> primaryPhone;
+  final Value<String?> secondaryPhone;
+  final Value<String?> email;
+  final Value<String?> website;
+  final Value<String?> address;
+  final Value<String?> workingHours;
+  final Value<String?> policyNumber;
+  final Value<String?> memberNumber;
+  final Value<String?> notes;
+  final Value<String?> photoPath;
+  final Value<bool> isFavorite;
+  final Value<bool> isArchived;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const CareContactsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.contactType = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.firstName = const Value.absent(),
+    this.lastName = const Value.absent(),
+    this.specialty = const Value.absent(),
+    this.organizationName = const Value.absent(),
+    this.department = const Value.absent(),
+    this.contactPerson = const Value.absent(),
+    this.primaryPhone = const Value.absent(),
+    this.secondaryPhone = const Value.absent(),
+    this.email = const Value.absent(),
+    this.website = const Value.absent(),
+    this.address = const Value.absent(),
+    this.workingHours = const Value.absent(),
+    this.policyNumber = const Value.absent(),
+    this.memberNumber = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.photoPath = const Value.absent(),
+    this.isFavorite = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  CareContactsCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String contactType,
+    required String displayName,
+    this.firstName = const Value.absent(),
+    this.lastName = const Value.absent(),
+    this.specialty = const Value.absent(),
+    this.organizationName = const Value.absent(),
+    this.department = const Value.absent(),
+    this.contactPerson = const Value.absent(),
+    this.primaryPhone = const Value.absent(),
+    this.secondaryPhone = const Value.absent(),
+    this.email = const Value.absent(),
+    this.website = const Value.absent(),
+    this.address = const Value.absent(),
+    this.workingHours = const Value.absent(),
+    this.policyNumber = const Value.absent(),
+    this.memberNumber = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.photoPath = const Value.absent(),
+    this.isFavorite = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : profileId = Value(profileId),
+       contactType = Value(contactType),
+       displayName = Value(displayName),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<CareContact> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? contactType,
+    Expression<String>? displayName,
+    Expression<String>? firstName,
+    Expression<String>? lastName,
+    Expression<String>? specialty,
+    Expression<String>? organizationName,
+    Expression<String>? department,
+    Expression<String>? contactPerson,
+    Expression<String>? primaryPhone,
+    Expression<String>? secondaryPhone,
+    Expression<String>? email,
+    Expression<String>? website,
+    Expression<String>? address,
+    Expression<String>? workingHours,
+    Expression<String>? policyNumber,
+    Expression<String>? memberNumber,
+    Expression<String>? notes,
+    Expression<String>? photoPath,
+    Expression<bool>? isFavorite,
+    Expression<bool>? isArchived,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (contactType != null) 'contact_type': contactType,
+      if (displayName != null) 'display_name': displayName,
+      if (firstName != null) 'first_name': firstName,
+      if (lastName != null) 'last_name': lastName,
+      if (specialty != null) 'specialty': specialty,
+      if (organizationName != null) 'organization_name': organizationName,
+      if (department != null) 'department': department,
+      if (contactPerson != null) 'contact_person': contactPerson,
+      if (primaryPhone != null) 'primary_phone': primaryPhone,
+      if (secondaryPhone != null) 'secondary_phone': secondaryPhone,
+      if (email != null) 'email': email,
+      if (website != null) 'website': website,
+      if (address != null) 'address': address,
+      if (workingHours != null) 'working_hours': workingHours,
+      if (policyNumber != null) 'policy_number': policyNumber,
+      if (memberNumber != null) 'member_number': memberNumber,
+      if (notes != null) 'notes': notes,
+      if (photoPath != null) 'photo_path': photoPath,
+      if (isFavorite != null) 'is_favorite': isFavorite,
+      if (isArchived != null) 'is_archived': isArchived,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  CareContactsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? profileId,
+    Value<String>? contactType,
+    Value<String>? displayName,
+    Value<String?>? firstName,
+    Value<String?>? lastName,
+    Value<String?>? specialty,
+    Value<String?>? organizationName,
+    Value<String?>? department,
+    Value<String?>? contactPerson,
+    Value<String?>? primaryPhone,
+    Value<String?>? secondaryPhone,
+    Value<String?>? email,
+    Value<String?>? website,
+    Value<String?>? address,
+    Value<String?>? workingHours,
+    Value<String?>? policyNumber,
+    Value<String?>? memberNumber,
+    Value<String?>? notes,
+    Value<String?>? photoPath,
+    Value<bool>? isFavorite,
+    Value<bool>? isArchived,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return CareContactsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      contactType: contactType ?? this.contactType,
+      displayName: displayName ?? this.displayName,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      specialty: specialty ?? this.specialty,
+      organizationName: organizationName ?? this.organizationName,
+      department: department ?? this.department,
+      contactPerson: contactPerson ?? this.contactPerson,
+      primaryPhone: primaryPhone ?? this.primaryPhone,
+      secondaryPhone: secondaryPhone ?? this.secondaryPhone,
+      email: email ?? this.email,
+      website: website ?? this.website,
+      address: address ?? this.address,
+      workingHours: workingHours ?? this.workingHours,
+      policyNumber: policyNumber ?? this.policyNumber,
+      memberNumber: memberNumber ?? this.memberNumber,
+      notes: notes ?? this.notes,
+      photoPath: photoPath ?? this.photoPath,
+      isFavorite: isFavorite ?? this.isFavorite,
+      isArchived: isArchived ?? this.isArchived,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (contactType.present) {
+      map['contact_type'] = Variable<String>(contactType.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (firstName.present) {
+      map['first_name'] = Variable<String>(firstName.value);
+    }
+    if (lastName.present) {
+      map['last_name'] = Variable<String>(lastName.value);
+    }
+    if (specialty.present) {
+      map['specialty'] = Variable<String>(specialty.value);
+    }
+    if (organizationName.present) {
+      map['organization_name'] = Variable<String>(organizationName.value);
+    }
+    if (department.present) {
+      map['department'] = Variable<String>(department.value);
+    }
+    if (contactPerson.present) {
+      map['contact_person'] = Variable<String>(contactPerson.value);
+    }
+    if (primaryPhone.present) {
+      map['primary_phone'] = Variable<String>(primaryPhone.value);
+    }
+    if (secondaryPhone.present) {
+      map['secondary_phone'] = Variable<String>(secondaryPhone.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (website.present) {
+      map['website'] = Variable<String>(website.value);
+    }
+    if (address.present) {
+      map['address'] = Variable<String>(address.value);
+    }
+    if (workingHours.present) {
+      map['working_hours'] = Variable<String>(workingHours.value);
+    }
+    if (policyNumber.present) {
+      map['policy_number'] = Variable<String>(policyNumber.value);
+    }
+    if (memberNumber.present) {
+      map['member_number'] = Variable<String>(memberNumber.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (photoPath.present) {
+      map['photo_path'] = Variable<String>(photoPath.value);
+    }
+    if (isFavorite.present) {
+      map['is_favorite'] = Variable<bool>(isFavorite.value);
+    }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CareContactsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('contactType: $contactType, ')
+          ..write('displayName: $displayName, ')
+          ..write('firstName: $firstName, ')
+          ..write('lastName: $lastName, ')
+          ..write('specialty: $specialty, ')
+          ..write('organizationName: $organizationName, ')
+          ..write('department: $department, ')
+          ..write('contactPerson: $contactPerson, ')
+          ..write('primaryPhone: $primaryPhone, ')
+          ..write('secondaryPhone: $secondaryPhone, ')
+          ..write('email: $email, ')
+          ..write('website: $website, ')
+          ..write('address: $address, ')
+          ..write('workingHours: $workingHours, ')
+          ..write('policyNumber: $policyNumber, ')
+          ..write('memberNumber: $memberNumber, ')
+          ..write('notes: $notes, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('isFavorite: $isFavorite, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $DocumentAttachmentsTable extends DocumentAttachments
     with TableInfo<$DocumentAttachmentsTable, DocumentAttachment> {
   @override
@@ -13713,6 +15057,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ExerciseLogsTable exerciseLogs = $ExerciseLogsTable(this);
   late final $DoctorsTable doctors = $DoctorsTable(this);
   late final $DoctorVisitsTable doctorVisits = $DoctorVisitsTable(this);
+  late final $CareContactsTable careContacts = $CareContactsTable(this);
   late final $DocumentAttachmentsTable documentAttachments =
       $DocumentAttachmentsTable(this);
   late final $DietPlansTable dietPlans = $DietPlansTable(this);
@@ -13723,6 +15068,26 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $ProfileReferenceRangesTable profileReferenceRanges =
       $ProfileReferenceRangesTable(this);
+  late final Index careContactsProfileIdx = Index(
+    'care_contacts_profile_idx',
+    'CREATE INDEX care_contacts_profile_idx ON care_contacts (profile_id)',
+  );
+  late final Index careContactsTypeIdx = Index(
+    'care_contacts_type_idx',
+    'CREATE INDEX care_contacts_type_idx ON care_contacts (contact_type)',
+  );
+  late final Index careContactsArchivedIdx = Index(
+    'care_contacts_archived_idx',
+    'CREATE INDEX care_contacts_archived_idx ON care_contacts (is_archived)',
+  );
+  late final Index careContactsFavoriteIdx = Index(
+    'care_contacts_favorite_idx',
+    'CREATE INDEX care_contacts_favorite_idx ON care_contacts (is_favorite)',
+  );
+  late final Index careContactsDisplayNameIdx = Index(
+    'care_contacts_display_name_idx',
+    'CREATE INDEX care_contacts_display_name_idx ON care_contacts (display_name)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -13746,12 +15111,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     exerciseLogs,
     doctors,
     doctorVisits,
+    careContacts,
     documentAttachments,
     dietPlans,
     dietItems,
     healthTemplates,
     appSettings,
     profileReferenceRanges,
+    careContactsProfileIdx,
+    careContactsTypeIdx,
+    careContactsArchivedIdx,
+    careContactsFavoriteIdx,
+    careContactsDisplayNameIdx,
   ];
 }
 
@@ -13978,6 +15349,24 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_doctorVisitsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CareContactsTable, List<CareContact>>
+  _careContactsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.careContacts,
+    aliasName: 'profiles__id__care_contacts__profile_id',
+  );
+
+  $$CareContactsTableProcessedTableManager get careContactsRefs {
+    final manager = $$CareContactsTableTableManager(
+      $_db,
+      $_db.careContacts,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_careContactsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -14381,6 +15770,31 @@ class $$ProfilesTableFilterComposer
           }) => $$DoctorVisitsTableFilterComposer(
             $db: $db,
             $table: $db.doctorVisits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> careContactsRefs(
+    Expression<bool> Function($$CareContactsTableFilterComposer f) f,
+  ) {
+    final $$CareContactsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableFilterComposer(
+            $db: $db,
+            $table: $db.careContacts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -14887,6 +16301,31 @@ class $$ProfilesTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> careContactsRefs<T extends Object>(
+    Expression<T> Function($$CareContactsTableAnnotationComposer a) f,
+  ) {
+    final $$CareContactsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> documentAttachmentsRefs<T extends Object>(
     Expression<T> Function($$DocumentAttachmentsTableAnnotationComposer a) f,
   ) {
@@ -14988,6 +16427,7 @@ class $$ProfilesTableTableManager
             bool exerciseLogsRefs,
             bool doctorsRefs,
             bool doctorVisitsRefs,
+            bool careContactsRefs,
             bool documentAttachmentsRefs,
             bool dietPlansRefs,
             bool profileReferenceRangesRefs,
@@ -15115,6 +16555,7 @@ class $$ProfilesTableTableManager
                 exerciseLogsRefs = false,
                 doctorsRefs = false,
                 doctorVisitsRefs = false,
+                careContactsRefs = false,
                 documentAttachmentsRefs = false,
                 dietPlansRefs = false,
                 profileReferenceRangesRefs = false,
@@ -15131,6 +16572,7 @@ class $$ProfilesTableTableManager
                     if (exerciseLogsRefs) db.exerciseLogs,
                     if (doctorsRefs) db.doctors,
                     if (doctorVisitsRefs) db.doctorVisits,
+                    if (careContactsRefs) db.careContacts,
                     if (documentAttachmentsRefs) db.documentAttachments,
                     if (dietPlansRefs) db.dietPlans,
                     if (profileReferenceRangesRefs) db.profileReferenceRanges,
@@ -15327,6 +16769,27 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (careContactsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          CareContact
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._careContactsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).careContactsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (documentAttachmentsRefs)
                         await $_getPrefetchedData<
                           Profile,
@@ -15420,6 +16883,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool exerciseLogsRefs,
         bool doctorsRefs,
         bool doctorVisitsRefs,
+        bool careContactsRefs,
         bool documentAttachmentsRefs,
         bool dietPlansRefs,
         bool profileReferenceRangesRefs,
@@ -24252,6 +25716,702 @@ typedef $$DoctorVisitsTableProcessedTableManager =
       DoctorVisit,
       PrefetchHooks Function({bool profileId, bool doctorId})
     >;
+typedef $$CareContactsTableCreateCompanionBuilder =
+    CareContactsCompanion Function({
+      Value<int> id,
+      required int profileId,
+      required String contactType,
+      required String displayName,
+      Value<String?> firstName,
+      Value<String?> lastName,
+      Value<String?> specialty,
+      Value<String?> organizationName,
+      Value<String?> department,
+      Value<String?> contactPerson,
+      Value<String?> primaryPhone,
+      Value<String?> secondaryPhone,
+      Value<String?> email,
+      Value<String?> website,
+      Value<String?> address,
+      Value<String?> workingHours,
+      Value<String?> policyNumber,
+      Value<String?> memberNumber,
+      Value<String?> notes,
+      Value<String?> photoPath,
+      Value<bool> isFavorite,
+      Value<bool> isArchived,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$CareContactsTableUpdateCompanionBuilder =
+    CareContactsCompanion Function({
+      Value<int> id,
+      Value<int> profileId,
+      Value<String> contactType,
+      Value<String> displayName,
+      Value<String?> firstName,
+      Value<String?> lastName,
+      Value<String?> specialty,
+      Value<String?> organizationName,
+      Value<String?> department,
+      Value<String?> contactPerson,
+      Value<String?> primaryPhone,
+      Value<String?> secondaryPhone,
+      Value<String?> email,
+      Value<String?> website,
+      Value<String?> address,
+      Value<String?> workingHours,
+      Value<String?> policyNumber,
+      Value<String?> memberNumber,
+      Value<String?> notes,
+      Value<String?> photoPath,
+      Value<bool> isFavorite,
+      Value<bool> isArchived,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$CareContactsTableReferences
+    extends BaseReferences<_$AppDatabase, $CareContactsTable, CareContact> {
+  $$CareContactsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('care_contacts__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CareContactsTableFilterComposer
+    extends Composer<_$AppDatabase, $CareContactsTable> {
+  $$CareContactsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactType => $composableBuilder(
+    column: $table.contactType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get firstName => $composableBuilder(
+    column: $table.firstName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastName => $composableBuilder(
+    column: $table.lastName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get specialty => $composableBuilder(
+    column: $table.specialty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get organizationName => $composableBuilder(
+    column: $table.organizationName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get department => $composableBuilder(
+    column: $table.department,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactPerson => $composableBuilder(
+    column: $table.contactPerson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get primaryPhone => $composableBuilder(
+    column: $table.primaryPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get secondaryPhone => $composableBuilder(
+    column: $table.secondaryPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get website => $composableBuilder(
+    column: $table.website,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get workingHours => $composableBuilder(
+    column: $table.workingHours,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get policyNumber => $composableBuilder(
+    column: $table.policyNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get memberNumber => $composableBuilder(
+    column: $table.memberNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CareContactsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CareContactsTable> {
+  $$CareContactsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactType => $composableBuilder(
+    column: $table.contactType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get firstName => $composableBuilder(
+    column: $table.firstName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastName => $composableBuilder(
+    column: $table.lastName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get specialty => $composableBuilder(
+    column: $table.specialty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get organizationName => $composableBuilder(
+    column: $table.organizationName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get department => $composableBuilder(
+    column: $table.department,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactPerson => $composableBuilder(
+    column: $table.contactPerson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get primaryPhone => $composableBuilder(
+    column: $table.primaryPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get secondaryPhone => $composableBuilder(
+    column: $table.secondaryPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get website => $composableBuilder(
+    column: $table.website,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get address => $composableBuilder(
+    column: $table.address,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get workingHours => $composableBuilder(
+    column: $table.workingHours,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get policyNumber => $composableBuilder(
+    column: $table.policyNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get memberNumber => $composableBuilder(
+    column: $table.memberNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CareContactsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CareContactsTable> {
+  $$CareContactsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get contactType => $composableBuilder(
+    column: $table.contactType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get firstName =>
+      $composableBuilder(column: $table.firstName, builder: (column) => column);
+
+  GeneratedColumn<String> get lastName =>
+      $composableBuilder(column: $table.lastName, builder: (column) => column);
+
+  GeneratedColumn<String> get specialty =>
+      $composableBuilder(column: $table.specialty, builder: (column) => column);
+
+  GeneratedColumn<String> get organizationName => $composableBuilder(
+    column: $table.organizationName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get department => $composableBuilder(
+    column: $table.department,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contactPerson => $composableBuilder(
+    column: $table.contactPerson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get primaryPhone => $composableBuilder(
+    column: $table.primaryPhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get secondaryPhone => $composableBuilder(
+    column: $table.secondaryPhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get website =>
+      $composableBuilder(column: $table.website, builder: (column) => column);
+
+  GeneratedColumn<String> get address =>
+      $composableBuilder(column: $table.address, builder: (column) => column);
+
+  GeneratedColumn<String> get workingHours => $composableBuilder(
+    column: $table.workingHours,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get policyNumber => $composableBuilder(
+    column: $table.policyNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get memberNumber => $composableBuilder(
+    column: $table.memberNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get photoPath =>
+      $composableBuilder(column: $table.photoPath, builder: (column) => column);
+
+  GeneratedColumn<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CareContactsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CareContactsTable,
+          CareContact,
+          $$CareContactsTableFilterComposer,
+          $$CareContactsTableOrderingComposer,
+          $$CareContactsTableAnnotationComposer,
+          $$CareContactsTableCreateCompanionBuilder,
+          $$CareContactsTableUpdateCompanionBuilder,
+          (CareContact, $$CareContactsTableReferences),
+          CareContact,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$CareContactsTableTableManager(_$AppDatabase db, $CareContactsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CareContactsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CareContactsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CareContactsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<String> contactType = const Value.absent(),
+                Value<String> displayName = const Value.absent(),
+                Value<String?> firstName = const Value.absent(),
+                Value<String?> lastName = const Value.absent(),
+                Value<String?> specialty = const Value.absent(),
+                Value<String?> organizationName = const Value.absent(),
+                Value<String?> department = const Value.absent(),
+                Value<String?> contactPerson = const Value.absent(),
+                Value<String?> primaryPhone = const Value.absent(),
+                Value<String?> secondaryPhone = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<String?> website = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<String?> workingHours = const Value.absent(),
+                Value<String?> policyNumber = const Value.absent(),
+                Value<String?> memberNumber = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
+                Value<bool> isFavorite = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => CareContactsCompanion(
+                id: id,
+                profileId: profileId,
+                contactType: contactType,
+                displayName: displayName,
+                firstName: firstName,
+                lastName: lastName,
+                specialty: specialty,
+                organizationName: organizationName,
+                department: department,
+                contactPerson: contactPerson,
+                primaryPhone: primaryPhone,
+                secondaryPhone: secondaryPhone,
+                email: email,
+                website: website,
+                address: address,
+                workingHours: workingHours,
+                policyNumber: policyNumber,
+                memberNumber: memberNumber,
+                notes: notes,
+                photoPath: photoPath,
+                isFavorite: isFavorite,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int profileId,
+                required String contactType,
+                required String displayName,
+                Value<String?> firstName = const Value.absent(),
+                Value<String?> lastName = const Value.absent(),
+                Value<String?> specialty = const Value.absent(),
+                Value<String?> organizationName = const Value.absent(),
+                Value<String?> department = const Value.absent(),
+                Value<String?> contactPerson = const Value.absent(),
+                Value<String?> primaryPhone = const Value.absent(),
+                Value<String?> secondaryPhone = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<String?> website = const Value.absent(),
+                Value<String?> address = const Value.absent(),
+                Value<String?> workingHours = const Value.absent(),
+                Value<String?> policyNumber = const Value.absent(),
+                Value<String?> memberNumber = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
+                Value<bool> isFavorite = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => CareContactsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                contactType: contactType,
+                displayName: displayName,
+                firstName: firstName,
+                lastName: lastName,
+                specialty: specialty,
+                organizationName: organizationName,
+                department: department,
+                contactPerson: contactPerson,
+                primaryPhone: primaryPhone,
+                secondaryPhone: secondaryPhone,
+                email: email,
+                website: website,
+                address: address,
+                workingHours: workingHours,
+                policyNumber: policyNumber,
+                memberNumber: memberNumber,
+                notes: notes,
+                photoPath: photoPath,
+                isFavorite: isFavorite,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CareContactsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable: $$CareContactsTableReferences
+                                    ._profileIdTable(db),
+                                referencedColumn: $$CareContactsTableReferences
+                                    ._profileIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CareContactsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CareContactsTable,
+      CareContact,
+      $$CareContactsTableFilterComposer,
+      $$CareContactsTableOrderingComposer,
+      $$CareContactsTableAnnotationComposer,
+      $$CareContactsTableCreateCompanionBuilder,
+      $$CareContactsTableUpdateCompanionBuilder,
+      (CareContact, $$CareContactsTableReferences),
+      CareContact,
+      PrefetchHooks Function({bool profileId})
+    >;
 typedef $$DocumentAttachmentsTableCreateCompanionBuilder =
     DocumentAttachmentsCompanion Function({
       Value<int> id,
@@ -26215,6 +28375,8 @@ class $AppDatabaseManager {
       $$DoctorsTableTableManager(_db, _db.doctors);
   $$DoctorVisitsTableTableManager get doctorVisits =>
       $$DoctorVisitsTableTableManager(_db, _db.doctorVisits);
+  $$CareContactsTableTableManager get careContacts =>
+      $$CareContactsTableTableManager(_db, _db.careContacts);
   $$DocumentAttachmentsTableTableManager get documentAttachments =>
       $$DocumentAttachmentsTableTableManager(_db, _db.documentAttachments);
   $$DietPlansTableTableManager get dietPlans =>
