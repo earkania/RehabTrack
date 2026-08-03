@@ -53,7 +53,7 @@ void main() {
       await goToTab(tester, Icons.person_outlined);
 
       expect(find.text('Patient Profile'), findsWidgets);
-      expect(find.text('Doctors'), findsWidgets);
+      expect(find.text('Care Contacts'), findsWidgets);
       expect(find.text('Emergency Contacts'), findsWidgets);
       expect(find.text('Medical Notes'), findsWidgets);
     });
@@ -77,7 +77,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       // Back on the Profile dashboard.
-      expect(find.text('Doctors'), findsWidgets);
+      expect(find.text('Care Contacts'), findsWidgets);
     });
 
     testWidgets('placeholder tile opens placeholder screen and back returns',

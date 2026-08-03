@@ -26,6 +26,13 @@ class AppRoutes {
   static const profileEmergencyContacts = '/profile/emergency-contacts';
   static const profileMedicalNotes = '/profile/medical-notes';
 
+  // Care Contacts
+  static const profileCareContacts = '/profile/contacts';
+  static const careContactArchived = '/profile/contacts/archived';
+  static const careContactAdd = '/profile/contacts/new';
+  static String careContactDetails(int id) => '/profile/contacts/$id';
+  static String careContactEdit(int id) => '/profile/contacts/$id/edit';
+
   // Measurements (deep links)
   static String measurementAdd(int typeId) => '/measurements/measurement/$typeId/add';
   static String measurementHistory(int typeId) => '/measurements/measurement/$typeId/history';

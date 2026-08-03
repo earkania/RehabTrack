@@ -10,6 +10,10 @@ import 'package:rehab_track/presentation/screens/health/health_dashboard_screen.
 import 'package:rehab_track/presentation/screens/health/measurements_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/profile/profile_dashboard_screen.dart';
+import 'package:rehab_track/presentation/screens/profile/care_contacts_screen.dart';
+import 'package:rehab_track/presentation/screens/profile/add_care_contact_screen.dart';
+import 'package:rehab_track/presentation/screens/profile/edit_care_contact_screen.dart';
+import 'package:rehab_track/presentation/screens/profile/care_contact_details_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/medication_list_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/add_medication_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/edit_medication_screen.dart';
@@ -133,6 +137,39 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.patientProfileEdit,
         builder: (context, state) => const PatientProfileEditScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profileCareContacts,
+        builder: (context, state) => const CareContactsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.careContactArchived,
+        builder: (context, state) =>
+            const CareContactsScreen(startArchived: true),
+      ),
+      GoRoute(
+        path: AppRoutes.careContactAdd,
+        builder: (context, state) => const AddCareContactScreen(),
+      ),
+      GoRoute(
+        path: '/profile/contacts/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return CareContactDetailsScreen(contactId: id);
+        },
+      ),
+      GoRoute(
+        path: '/profile/contacts/:id/edit',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return EditCareContactScreen(contactId: id);
+        },
       ),
       GoRoute(
         path: AppRoutes.profileDoctors,

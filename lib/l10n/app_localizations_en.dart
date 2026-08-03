@@ -1409,4 +1409,224 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noInactiveMedications => 'No inactive medications';
+
+  @override
+  String get careContacts => 'Care Contacts';
+
+  @override
+  String get addCareContact => 'Add Care Contact';
+
+  @override
+  String get editCareContact => 'Edit Care Contact';
+
+  @override
+  String get careContactDetails => 'Contact Details';
+
+  @override
+  String get contactType => 'Contact Type';
+
+  @override
+  String get doctorOrSpecialist => 'Doctor or Specialist';
+
+  @override
+  String get clinicOrHospital => 'Clinic or Hospital';
+
+  @override
+  String get laboratory => 'Laboratory';
+
+  @override
+  String get pharmacy => 'Pharmacy';
+
+  @override
+  String get insuranceCompany => 'Insurance Company';
+
+  @override
+  String get allContacts => 'All Contacts';
+
+  @override
+  String get organizations => 'Organizations';
+
+  @override
+  String get insurance => 'Insurance';
+
+  @override
+  String get favorites => 'Favorites';
+
+  @override
+  String get archivedContacts => 'Archived Contacts';
+
+  @override
+  String get noCareContacts => 'No care contacts yet';
+
+  @override
+  String get noCareContactsDescription =>
+      'Add doctors, clinics, laboratories, pharmacies, or insurance contacts.';
+
+  @override
+  String get noArchivedContacts => 'No archived contacts';
+
+  @override
+  String get noArchivedContactsDescription =>
+      'Archived contacts will appear here and can be restored.';
+
+  @override
+  String get displayName => 'Display Name';
+
+  @override
+  String get specialty => 'Specialty';
+
+  @override
+  String get organization => 'Organization';
+
+  @override
+  String get organizationName => 'Organization Name';
+
+  @override
+  String get department => 'Department';
+
+  @override
+  String get contactPerson => 'Contact Person';
+
+  @override
+  String get primaryPhone => 'Primary Phone';
+
+  @override
+  String get secondaryPhone => 'Secondary Phone';
+
+  @override
+  String get website => 'Website';
+
+  @override
+  String get workingHours => 'Working Hours';
+
+  @override
+  String get policyNumber => 'Policy Number';
+
+  @override
+  String get memberNumber => 'Member or Customer Number';
+
+  @override
+  String get policyNotes => 'Policy Notes';
+
+  @override
+  String get favorite => 'Favorite';
+
+  @override
+  String get addToFavorites => 'Add to favorites';
+
+  @override
+  String get removeFromFavorites => 'Remove from favorites';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get deletePermanently => 'Delete permanently';
+
+  @override
+  String get call => 'Call';
+
+  @override
+  String get sendEmail => 'Send email';
+
+  @override
+  String get openWebsite => 'Open website';
+
+  @override
+  String get openAddress => 'Open address';
+
+  @override
+  String get selectContactType => 'Select Contact Type';
+
+  @override
+  String get contactSaved => 'Contact saved';
+
+  @override
+  String get contactUpdated => 'Contact updated';
+
+  @override
+  String get contactArchived => 'Contact archived';
+
+  @override
+  String get contactRestored => 'Contact restored';
+
+  @override
+  String get contactDeleted => 'Contact deleted';
+
+  @override
+  String get invalidEmail => 'Enter a valid email address';
+
+  @override
+  String get invalidWebsite => 'Enter a valid website URL';
+
+  @override
+  String get confirmArchiveContact =>
+      'Archive this contact? It will be hidden from the active list but kept safely.';
+
+  @override
+  String get confirmDeleteContact =>
+      'Delete this contact permanently? This cannot be undone.';
+
+  @override
+  String get confirmRestoreContact =>
+      'Restore this contact to the active list?';
+
+  @override
+  String get removePhoto => 'Remove photo';
+
+  @override
+  String get choosePhoto => 'Choose photo';
+
+  @override
+  String get changePhoto => 'Change photo';
+
+  @override
+  String get failedToSaveContactPhoto => 'Failed to save photo';
+
+  @override
+  String get noContactsFound => 'No contacts found';
+
+  @override
+  String get noContactsFoundDescription =>
+      'Try adjusting your search or filters.';
+
+  @override
+  String get searchContacts => 'Search contacts';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get showArchived => 'Show archived';
+
+  @override
+  String get showActive => 'Show active';
+
+  @override
+  String get editCareContactFailed => 'Could not save contact';
+
+  @override
+  String get deleteContactFailed => 'Could not delete contact';
+
+  @override
+  String get policyAndMemberDetails => 'Policy Details';
+
+  @override
+  String get professionalInformation => 'Professional Information';
+
+  @override
+  String get organizationInformation => 'Organization Information';
+
+  @override
+  String get personalInformationLabel => 'Personal Information';
+
+  @override
+  String get careContactsSubtitle =>
+      'Doctors, clinics, laboratories, pharmacies, and insurance companies';
+
+  @override
+  String get contactNotAvailable => 'Contact not found';
 }

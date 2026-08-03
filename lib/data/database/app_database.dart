@@ -10,6 +10,7 @@ import 'package:rehab_track/data/database/tables/medication_tables.dart';
 import 'package:rehab_track/data/database/tables/measurement_tables.dart';
 import 'package:rehab_track/data/database/tables/exercise_tables.dart';
 import 'package:rehab_track/data/database/tables/doctor_tables.dart';
+import 'package:rehab_track/data/database/tables/care_contact_table.dart';
 import 'package:rehab_track/data/database/tables/document_table.dart';
 import 'package:rehab_track/data/database/tables/diet_tables.dart';
 import 'package:rehab_track/data/database/tables/health_template_table.dart';
@@ -21,6 +22,7 @@ import 'package:rehab_track/data/database/daos/medication_dao.dart';
 import 'package:rehab_track/data/database/daos/measurement_dao.dart';
 import 'package:rehab_track/data/database/daos/exercise_dao.dart';
 import 'package:rehab_track/data/database/daos/doctor_dao.dart';
+import 'package:rehab_track/data/database/daos/care_contact_dao.dart';
 import 'package:rehab_track/data/database/daos/document_dao.dart';
 import 'package:rehab_track/data/database/daos/diet_dao.dart';
 import 'package:rehab_track/data/database/daos/health_template_dao.dart';
@@ -51,6 +53,7 @@ part 'app_database.g.dart';
     ExerciseLogs,
     Doctors,
     DoctorVisits,
+    CareContacts,
     DocumentAttachments,
     DietPlans,
     DietItems,
@@ -64,6 +67,10 @@ class AppDatabase extends _$AppDatabase {
 
   AppDatabase.test() : super(NativeDatabase.memory());
 
+  /// Connects to an arbitrary executor; used by migration and data-integrity
+  /// tests that need a file-backed database.
+  AppDatabase.forTesting(super.executor);
+
   ProfileDao get profileDao => ProfileDao(this);
   MedicationDao get medicationDao => MedicationDao(this);
   MedicationAlternativesDao get medicationAlternativesDao =>
@@ -76,6 +83,7 @@ class AppDatabase extends _$AppDatabase {
   MeasurementDao get measurementDao => MeasurementDao(this);
   ExerciseDao get exerciseDao => ExerciseDao(this);
   DoctorDao get doctorDao => DoctorDao(this);
+  CareContactDao get careContactDao => CareContactDao(this);
   DocumentDao get documentDao => DocumentDao(this);
   DietDao get dietDao => DietDao(this);
   HealthTemplateDao get healthTemplateDao =>
@@ -83,7 +91,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -218,6 +226,11 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(profiles, profiles.isPrimary);
         await m.addColumn(profiles, profiles.isActive);
         await m.addColumn(profiles, profiles.photoPath);
+      }
+      if (from < 13) {
+        // Phase 8A: Care Contacts - shared table for medical professionals
+        // and healthcare organizations
+        await m.createTable(careContacts);
       }
     },
   );

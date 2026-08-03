@@ -26,9 +26,9 @@ class ProfileDashboardScreen extends ConsumerWidget {
             onTap: () => context.push(AppRoutes.patientProfile),
           ),
           ModuleGridTile(
-            icon: const Icon(Icons.badge_outlined),
-            label: l10n.doctors,
-            onTap: () => context.push(AppRoutes.profileDoctors),
+            icon: const Icon(Icons.contact_phone_outlined),
+            label: l10n.careContacts,
+            onTap: () => context.push(AppRoutes.profileCareContacts),
           ),
           ModuleGridTile(
             icon: const Icon(Icons.emergency_outlined),
