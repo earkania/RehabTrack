@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-enum ReminderType { medication, measurement }
+enum ReminderType { medication, measurement, doctorVisit }
 
 class ReminderPayload {
   ReminderPayload({
@@ -13,6 +13,7 @@ class ReminderPayload {
     this.medicationLogId,
     this.measurementReminderLogId,
     this.measurementRecordId,
+    this.visitId,
     this.snoozeSourceOccurrence,
     this.notificationId,
     this.version = _currentVersion,
@@ -30,6 +31,7 @@ class ReminderPayload {
   final int? medicationLogId;
   final int? measurementReminderLogId;
   final int? measurementRecordId;
+  final int? visitId;
   final String? snoozeSourceOccurrence;
   final int? notificationId;
 
@@ -46,6 +48,7 @@ class ReminderPayload {
         if (medicationLogId != null) 'ml': medicationLogId,
         if (measurementReminderLogId != null) 'rl': measurementReminderLogId,
         if (measurementRecordId != null) 'rr': measurementRecordId,
+        if (visitId != null) 'vi': visitId,
         if (snoozeSourceOccurrence != null) 'so': snoozeSourceOccurrence,
         if (notificationId != null) 'ni': notificationId,
       };
@@ -87,6 +90,7 @@ class ReminderPayload {
       medicationLogId: json['ml'] as int?,
       measurementReminderLogId: json['rl'] as int?,
       measurementRecordId: json['rr'] as int?,
+      visitId: json['vi'] as int?,
       snoozeSourceOccurrence: json['so'] as String?,
       notificationId: json['ni'] as int?,
     );

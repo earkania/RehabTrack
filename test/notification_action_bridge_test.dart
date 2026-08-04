@@ -19,6 +19,11 @@ import 'package:rehab_track/domain/entities/medication_alternative_component.dar
 import 'package:rehab_track/domain/entities/medication_component.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/entities/care_contact.dart';
+import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
+import 'package:rehab_track/domain/enums/enums.dart';
+import 'package:rehab_track/domain/repositories/care_contact_repository.dart';
+import 'package:rehab_track/domain/repositories/doctor_visit_repository.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/domain/repositories/profile_repository.dart';
@@ -52,6 +57,114 @@ class FakeProfileRepository implements ProfileRepository {
 
   @override
   Future<int> getProfileCount() async => 1;
+}
+
+class FakeDoctorVisitRepository implements DoctorVisitRepository {
+  final Map<int, DoctorVisitRecord> visits = {};
+
+  @override
+  Future<int> createVisit(DoctorVisitRecord visit) async {
+    final id = visit.id ?? visits.length + 1;
+    visits[id] = visit.copyWith(id: id);
+    return id;
+  }
+
+  @override
+  Future<void> updateVisit(DoctorVisitRecord visit) async {
+    if (visit.id != null) visits[visit.id!] = visit;
+  }
+
+  @override
+  Future<DoctorVisitRecord?> getVisitById(int profileId, int visitId) async =>
+      visits[visitId];
+
+  @override
+  Stream<DoctorVisitRecord?> watchVisitById(int profileId, int visitId) =>
+      Stream.value(visits[visitId]);
+
+  @override
+  Stream<List<DoctorVisitRecord>> watchUpcomingVisits(int profileId) =>
+      Stream.value(
+        visits.values
+            .where((v) => v.status == DoctorVisitStatus.scheduled)
+            .toList(),
+      );
+
+  @override
+  Stream<List<DoctorVisitRecord>> watchVisitHistory(int profileId) =>
+      Stream.value([]);
+
+  @override
+  Future<List<DoctorVisitRecord>> getUpcomingVisits(int profileId) async =>
+      visits.values
+          .where((v) => v.status == DoctorVisitStatus.scheduled)
+          .toList();
+
+  @override
+  Future<void> setVisitStatus(
+    int profileId,
+    int visitId,
+    DoctorVisitStatus status,
+  ) async {}
+
+  @override
+  Future<void> archiveVisit(int profileId, int visitId) async {}
+
+  @override
+  Future<void> deleteVisit(int profileId, int visitId) async {
+    visits.remove(visitId);
+  }
+
+  @override
+  Future<bool> isContactReferencedByVisits(int contactId) async => false;
+
+  @override
+  Future<int> countOpenVisitsReferencingContact(
+    int profileId,
+    int contactId,
+  ) async =>
+      0;
+}
+
+class FakeCareContactRepository implements CareContactRepository {
+  @override
+  Stream<List<CareContact>> watchActiveContacts(int profileId) =>
+      Stream.value([]);
+
+  @override
+  Stream<List<CareContact>> watchArchivedContacts(int profileId) =>
+      Stream.value([]);
+
+  @override
+  Stream<List<CareContact>> watchAllContacts(int profileId) =>
+      Stream.value([]);
+
+  @override
+  Stream<CareContact?> watchContactById(int profileId, int contactId) =>
+      Stream.value(null);
+
+  @override
+  Future<CareContact?> getContactById(int profileId, int contactId) async =>
+      null;
+
+  @override
+  Future<int> createContact(CareContact contact) async => 1;
+
+  @override
+  Future<void> updateContact(CareContact contact) async {}
+
+  @override
+  Future<void> archiveContact(int profileId, int contactId) async {}
+
+  @override
+  Future<void> restoreContact(int profileId, int contactId) async {}
+
+  @override
+  Future<void> deleteContact(int profileId, int contactId) async {}
+
+  @override
+  Future<void> setFavorite(int profileId, int contactId, bool favorite) async {
+  }
 }
 
 class FakeMeasurementRepository implements MeasurementRepository {
@@ -307,6 +420,7 @@ class FakeNotificationService extends NotificationService {
     required String channelId,
     bool includeActions = false,
     bool isMeasurement = false,
+    bool isDoctorVisit = false,
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
@@ -320,6 +434,7 @@ class FakeNotificationService extends NotificationService {
       'payload': payload,
       'includeActions': includeActions,
       'isMeasurement': isMeasurement,
+      'isDoctorVisit': isDoctorVisit,
     });
   }
 
@@ -332,6 +447,7 @@ class FakeNotificationService extends NotificationService {
     required String channelId,
     bool includeActions = false,
     bool isMeasurement = false,
+    bool isDoctorVisit = false,
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
@@ -621,6 +737,8 @@ void main() {
         scheduleRecoveryService: recoveryService,
         medicationRepository: repo,
         measurementRepository: measurementRepo,
+        doctorVisitRepository: FakeDoctorVisitRepository(),
+        careContactRepository: FakeCareContactRepository(),
         profileRepository: FakeProfileRepository(),
         getSnoozeDuration: () => const Duration(minutes: 10),
         showProfileName: () => true,
@@ -757,6 +875,137 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(repo.loggedDoses, isEmpty);
+    });
+  });
+
+  group('Doctor visit actions', () {
+    late FakeDoctorVisitRepository visitRepo;
+    late FakeCareContactRepository careContactRepo;
+    late FakeNotificationService notificationService;
+    late NotificationActionBridge bridge;
+    late NotificationActionType? lastProcessed;
+    late ReminderPayload? lastProcessedPayload;
+
+    setUp(() {
+      visitRepo = FakeDoctorVisitRepository();
+      careContactRepo = FakeCareContactRepository();
+      notificationService = FakeNotificationService();
+      final scheduler = FakeNotificationScheduler(
+        notificationService: notificationService,
+      );
+      final recoveryService = ScheduleRecoveryService(
+        notificationService: notificationService,
+        notificationScheduler: scheduler,
+      );
+      lastProcessed = null;
+      lastProcessedPayload = null;
+      bridge = NotificationActionBridge(
+        notificationService: notificationService,
+        notificationScheduler: scheduler,
+        scheduleRecoveryService: recoveryService,
+        medicationRepository: FakeMedicationRepository(),
+        measurementRepository: FakeMeasurementRepository(),
+        doctorVisitRepository: visitRepo,
+        careContactRepository: careContactRepo,
+        profileRepository: FakeProfileRepository(),
+        getSnoozeDuration: () => const Duration(minutes: 10),
+        showProfileName: () => true,
+        showDetailsOnLockScreen: () => true,
+        onActionProcessed: (type, payload) {
+          lastProcessed = type;
+          lastProcessedPayload = payload;
+        },
+      );
+    });
+
+    DoctorVisitRecord makeVisit({int id = 1}) {
+      return DoctorVisitRecord(
+        id: id,
+        profileId: 1,
+        visitType: DoctorVisitType.planned,
+        status: DoctorVisitStatus.scheduled,
+        scheduledDateTime: DateTime.now().add(const Duration(days: 2)),
+        reason: 'Follow-up',
+        createdAt: DateTime(2026),
+        updatedAt: DateTime(2026),
+      );
+    }
+
+    ReminderPayload visitPayload({int visitId = 1}) => ReminderPayload(
+          type: ReminderType.doctorVisit,
+          profileId: 1,
+          scheduleId: visitId,
+          occurrenceTime: DateTime.now().toIso8601String(),
+          visitId: visitId,
+          notificationId: NotificationService.doctorVisitNotificationId(visitId),
+        );
+
+    test('open action validates the visit exists', () async {
+      visitRepo.visits[1] = makeVisit();
+      await bridge.initialize();
+
+      final response = NotificationActionResponse(
+        notificationId: NotificationService.doctorVisitNotificationId(1),
+        actionId: 'doctor_visit_open',
+        actionType: NotificationActionType.doctorVisitOpen,
+        payload: visitPayload().toJsonString(),
+      );
+
+      notificationService.actionCallback!(response);
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(lastProcessed, NotificationActionType.doctorVisitOpen);
+      expect(lastProcessedPayload!.visitId, 1);
+    });
+
+    test('open action for a missing visit reports entityNotFound', () async {
+      await bridge.initialize();
+
+      final response = NotificationActionResponse(
+        notificationId: NotificationService.doctorVisitNotificationId(99),
+        actionId: 'doctor_visit_open',
+        actionType: NotificationActionType.doctorVisitOpen,
+        payload: visitPayload(visitId: 99).toJsonString(),
+      );
+
+      notificationService.actionCallback!(response);
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(lastProcessed, NotificationActionType.doctorVisitOpen);
+      expect(lastProcessedPayload!.visitId, 99);
+    });
+
+    test('snooze action reschedules the reminder later', () async {
+      visitRepo.visits[1] = makeVisit();
+      await bridge.initialize();
+
+      final notificationId = NotificationService.doctorVisitNotificationId(1);
+      final response = NotificationActionResponse(
+        notificationId: notificationId,
+        actionId: 'doctor_visit_snooze',
+        actionType: NotificationActionType.doctorVisitSnooze,
+        payload: visitPayload().toJsonString(),
+      );
+
+      notificationService.actionCallback!(response);
+
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(lastProcessed, NotificationActionType.doctorVisitSnooze);
+      expect(notificationService.scheduledNotifications, hasLength(1));
+      expect(
+        notificationService.scheduledNotifications.first['id'],
+        NotificationService.snoozeNotificationId(notificationId),
+      );
+      expect(
+        notificationService.scheduledNotifications.first['isDoctorVisit'],
+        isTrue,
+      );
     });
   });
 }

@@ -24,10 +24,10 @@ void main() {
     return db.AppDatabase.forTesting(NativeDatabase(dbFile()));
   }
 
-  test('schema version is 13', () {
+  test('schema version is 14', () {
     final database = db.AppDatabase.test();
     addTearDown(database.close);
-    expect(database.schemaVersion, 13);
+    expect(database.schemaVersion, 14);
   });
 
   test('care_contacts table and indexes exist after fresh create', () async {
@@ -81,6 +81,55 @@ void main() {
       'notes',
       'photo_path',
       'is_favorite',
+      'is_archived',
+      'created_at',
+      'updated_at',
+    ]));
+  });
+
+  test('doctor_visit_records table and indexes exist after fresh create',
+      () async {
+    final database = db.AppDatabase.test();
+    addTearDown(database.close);
+
+    final tables = await database
+        .customSelect('SELECT name FROM sqlite_master WHERE type = \'table\'')
+        .get();
+    final tableNames = tables.map((r) => r.read<String>('name')).toSet();
+    expect(tableNames, contains('doctor_visit_records'));
+
+    final indexes = await database
+        .customSelect(
+          'SELECT name FROM sqlite_master WHERE type = \'index\' '
+          'AND tbl_name = \'doctor_visit_records\'',
+        )
+        .get();
+    final indexNames = indexes.map((r) => r.read<String>('name')).toSet();
+    expect(indexNames, containsAll([
+      'doctor_visit_records_profile_idx',
+      'doctor_visit_records_scheduled_idx',
+      'doctor_visit_records_status_idx',
+      'doctor_visit_records_doctor_idx',
+      'doctor_visit_records_org_idx',
+      'doctor_visit_records_archived_idx',
+    ]));
+
+    final columns = await database
+        .customSelect('PRAGMA table_info(doctor_visit_records)')
+        .get();
+    final columnNames = columns.map((r) => r.read<String>('name')).toList();
+    expect(columnNames, containsAll([
+      'id',
+      'profile_id',
+      'doctor_contact_id',
+      'organization_contact_id',
+      'visit_type',
+      'status',
+      'scheduled_date_time',
+      'reason',
+      'notes',
+      'reminder_enabled',
+      'reminder_minutes_before',
       'is_archived',
       'created_at',
       'updated_at',
@@ -171,10 +220,79 @@ void main() {
       'app_settings',
       'profile_reference_ranges',
       'care_contacts',
+      'doctor_visit_records',
     ];
     for (final table in expectedTables) {
       expect(tableNames, contains(table), reason: 'missing table $table');
     }
+  });
+
+  test('upgrading from version 13 creates doctor_visit_records and preserves '
+      'data', () async {
+    // 1. Open a fresh file DB at the current schema (14) and seed data.
+    var database = await openFileDb();
+    final profileId = await database.into(database.profiles).insert(
+      db.ProfilesCompanion.insert(
+        firstName: 'Existing',
+        lastName: 'User',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+        isPrimary: const Value(true),
+        isActive: const Value(true),
+      ),
+    );
+    final contactId = await database.careContactDao.insertContact(
+      db.CareContactsCompanion.insert(
+        profileId: profileId,
+        contactType: 'doctor',
+        displayName: 'Dr. Migrated',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+
+    // 2. Simulate a v13 database: drop the doctor_visit_records table and mark
+    //    user_version as 13 so reopening runs the real onUpgrade path.
+    await database.customStatement('DROP TABLE doctor_visit_records');
+    await database.customStatement('PRAGMA user_version = 13');
+    await database.close();
+
+    // 3. Reopen — drift detects 13 < 14 and applies the migration.
+    database = await openFileDb();
+    addTearDown(database.close);
+
+    // 4. Existing data is preserved.
+    final profiles = await (database.select(database.profiles)
+          ..where((t) => t.id.equals(profileId)))
+        .get();
+    expect(profiles, hasLength(1));
+    expect(profiles.single.firstName, 'Existing');
+    final contact = await database.careContactDao
+        .getContactById(profileId, contactId);
+    expect(contact!.displayName, 'Dr. Migrated');
+
+    // 5. The doctor_visit_records table exists again after migration.
+    final tables = await database
+        .customSelect('SELECT name FROM sqlite_master WHERE type = \'table\'')
+        .get();
+    final tableNames = tables.map((r) => r.read<String>('name')).toSet();
+    expect(tableNames, contains('doctor_visit_records'));
+
+    // 6. A visit can be written through the DAO after migration.
+    final visitId = await database.doctorVisitDao.insertVisit(
+      db.DoctorVisitRecordsCompanion.insert(
+        profileId: profileId,
+        doctorContactId: Value(contactId),
+        visitType: 'planned',
+        status: 'scheduled',
+        scheduledDateTime: DateTime.now().add(const Duration(days: 1)),
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+    expect(visitId, greaterThan(0));
+    final saved = await database.doctorVisitDao.getVisitById(profileId, visitId);
+    expect(saved!.doctorContactId, contactId);
   });
 
   test('reopening at the current version runs no destructive migration', () async {

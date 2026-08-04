@@ -1,3 +1,4 @@
+import 'package:rehab_track/domain/entities/care_contact.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
@@ -91,6 +92,48 @@ class ReminderContentFormatter {
     final timeStr =
         '${scheduledTime.hour.toString().padLeft(2, '0')}:${scheduledTime.minute.toString().padLeft(2, '0')}';
     parts.add('Scheduled for $timeStr');
+
+    return parts.join(' \u2014 ');
+  }
+
+  /// Notification title for a doctor visit reminder. Never includes clinical
+  /// notes, diagnosis, phone numbers, or addresses.
+  static String doctorVisitTitle() => 'Doctor visit reminder';
+
+  /// Notification body for a doctor visit reminder. Composed only of the
+  /// doctor's and organization's effective names plus the scheduled time and
+  /// (optionally) the reason. [scheduledDateTime] is formatted as local
+  /// "HH:MM" only when it is within a few days; otherwise the body stays
+  /// compact.
+  static String doctorVisitBody({
+    required CareContact? doctor,
+    required CareContact? organization,
+    required DateTime scheduledDateTime,
+    String? reason,
+    bool showProfileName = true,
+    Profile? profile,
+  }) {
+    final parts = <String>[];
+
+    final doctorName = doctor?.effectiveDisplayName.trim();
+    final orgName = organization?.effectiveDisplayName.trim();
+    if (doctorName != null && doctorName.isNotEmpty) {
+      parts.add(doctorName);
+    }
+    if (orgName != null && orgName.isNotEmpty) {
+      parts.add(orgName);
+    }
+    if (doctorName == null && orgName == null) {
+      parts.add('Doctor visit');
+    }
+
+    final timeStr = '${scheduledDateTime.hour.toString().padLeft(2, '0')}:'
+        '${scheduledDateTime.minute.toString().padLeft(2, '0')}';
+    parts.add('Scheduled for $timeStr');
+
+    if (reason != null && reason.trim().isNotEmpty) {
+      parts.add(reason.trim());
+    }
 
     return parts.join(' \u2014 ');
   }

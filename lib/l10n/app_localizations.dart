@@ -2609,7 +2609,7 @@ abstract class AppLocalizations {
   /// No description provided for @reminderSchedulingFailed.
   ///
   /// In en, this message translates to:
-  /// **'Reminder scheduling failed'**
+  /// **'Could not schedule reminder'**
   String get reminderSchedulingFailed;
 
   /// No description provided for @reminderDetails.
@@ -3181,6 +3181,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Contact not found'**
   String get contactNotAvailable;
+
+  /// No description provided for @enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get enabled;
+
+  /// No description provided for @scheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get scheduled;
+
+  /// No description provided for @cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
+
+  /// No description provided for @doctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor'**
+  String get doctor;
+
+  /// No description provided for @plannedVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get plannedVisit;
+
+  /// No description provided for @onDemandVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'On demand'**
+  String get onDemandVisit;
+
+  /// No description provided for @oneWeekBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'1 week before'**
+  String get oneWeekBefore;
+
+  /// No description provided for @twoDaysBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'2 days before'**
+  String get twoDaysBefore;
+
+  /// No description provided for @oneDayBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day before'**
+  String get oneDayBefore;
+
+  /// No description provided for @twoHoursBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'2 hours before'**
+  String get twoHoursBefore;
+
+  /// No description provided for @oneHourBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'1 hour before'**
+  String get oneHourBefore;
+
+  /// No description provided for @thirtyMinutesBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'30 minutes before'**
+  String get thirtyMinutesBefore;
+
+  /// No description provided for @fifteenMinutesBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'15 minutes before'**
+  String get fifteenMinutesBefore;
+
+  /// No description provided for @addDoctorVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Doctor Visit'**
+  String get addDoctorVisit;
+
+  /// No description provided for @editDoctorVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Doctor Visit'**
+  String get editDoctorVisit;
+
+  /// No description provided for @upcomingVisits.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcomingVisits;
+
+  /// No description provided for @doctorVisitsUpcomingBadgeSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Visits, {count, plural, =1{1 upcoming visit} other{{count} upcoming visits}}'**
+  String doctorVisitsUpcomingBadgeSemantics(int count);
+
+  /// No description provided for @visitHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get visitHistory;
+
+  /// No description provided for @noUpcomingVisits.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming visits'**
+  String get noUpcomingVisits;
+
+  /// No description provided for @noVisitHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No visit history'**
+  String get noVisitHistory;
+
+  /// No description provided for @noUpcomingVisitsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned visits will appear here.'**
+  String get noUpcomingVisitsDescription;
+
+  /// No description provided for @noVisitHistoryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed, cancelled, and missed visits will appear here.'**
+  String get noVisitHistoryDescription;
+
+  /// No description provided for @contactNotSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not selected'**
+  String get contactNotSelected;
+
+  /// No description provided for @visitReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason for visit'**
+  String get visitReason;
+
+  /// No description provided for @remindMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get remindMe;
+
+  /// No description provided for @remindBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind before'**
+  String get remindBefore;
+
+  /// No description provided for @saveVisitFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save visit'**
+  String get saveVisitFailed;
+
+  /// No description provided for @visitUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit updated'**
+  String get visitUpdated;
+
+  /// No description provided for @visitSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit saved'**
+  String get visitSaved;
+
+  /// No description provided for @doctorVisitDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Details'**
+  String get doctorVisitDetails;
+
+  /// No description provided for @visitNeedsAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'This visit is past due — mark it completed, cancelled, or missed.'**
+  String get visitNeedsAttention;
+
+  /// No description provided for @markCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark completed'**
+  String get markCompleted;
+
+  /// No description provided for @markMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark missed'**
+  String get markMissed;
+
+  /// No description provided for @reschedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Reschedule'**
+  String get reschedule;
+
+  /// No description provided for @cancelVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel visit'**
+  String get cancelVisit;
+
+  /// No description provided for @visitCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit marked as completed'**
+  String get visitCompleted;
+
+  /// No description provided for @visitCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit cancelled'**
+  String get visitCancelled;
+
+  /// No description provided for @visitMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit marked as missed'**
+  String get visitMissed;
+
+  /// No description provided for @confirmDeleteVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this visit permanently? This cannot be undone.'**
+  String get confirmDeleteVisit;
+
+  /// No description provided for @visitDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit deleted'**
+  String get visitDeleted;
+
+  /// No description provided for @saveAsScheduledLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as scheduled later'**
+  String get saveAsScheduledLater;
+
+  /// No description provided for @onDemandRecordedCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'On-demand visits are recorded as completed right away. Enable this to schedule it in the future instead.'**
+  String get onDemandRecordedCompleted;
+
+  /// No description provided for @scheduledDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled date and time'**
+  String get scheduledDateTime;
+
+  /// No description provided for @visitType.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit type'**
+  String get visitType;
+
+  /// No description provided for @selectDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select doctor'**
+  String get selectDoctor;
+
+  /// No description provided for @selectClinicOrHospital.
+  ///
+  /// In en, this message translates to:
+  /// **'Select clinic or hospital'**
+  String get selectClinicOrHospital;
+
+  /// No description provided for @noEligibleContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'No eligible contacts. Add a care contact first.'**
+  String get noEligibleContacts;
+
+  /// No description provided for @contactReferencedByVisits.
+  ///
+  /// In en, this message translates to:
+  /// **'This contact is used by a doctor visit and cannot be permanently deleted.'**
+  String get contactReferencedByVisits;
 }
 
 class _AppLocalizationsDelegate

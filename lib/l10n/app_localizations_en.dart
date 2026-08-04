@@ -1327,7 +1327,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Schedule saved, but reminder could not be scheduled';
 
   @override
-  String get reminderSchedulingFailed => 'Reminder scheduling failed';
+  String get reminderSchedulingFailed => 'Could not schedule reminder';
 
   @override
   String get reminderDetails => 'Reminder Details';
@@ -1629,4 +1629,162 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactNotAvailable => 'Contact not found';
+
+  @override
+  String get enabled => 'Enabled';
+
+  @override
+  String get scheduled => 'Scheduled';
+
+  @override
+  String get cancelled => 'Cancelled';
+
+  @override
+  String get doctor => 'Doctor';
+
+  @override
+  String get plannedVisit => 'Planned';
+
+  @override
+  String get onDemandVisit => 'On demand';
+
+  @override
+  String get oneWeekBefore => '1 week before';
+
+  @override
+  String get twoDaysBefore => '2 days before';
+
+  @override
+  String get oneDayBefore => '1 day before';
+
+  @override
+  String get twoHoursBefore => '2 hours before';
+
+  @override
+  String get oneHourBefore => '1 hour before';
+
+  @override
+  String get thirtyMinutesBefore => '30 minutes before';
+
+  @override
+  String get fifteenMinutesBefore => '15 minutes before';
+
+  @override
+  String get addDoctorVisit => 'Add Doctor Visit';
+
+  @override
+  String get editDoctorVisit => 'Edit Doctor Visit';
+
+  @override
+  String get upcomingVisits => 'Upcoming';
+
+  @override
+  String doctorVisitsUpcomingBadgeSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count upcoming visits',
+      one: '1 upcoming visit',
+    );
+    return 'Doctor Visits, $_temp0';
+  }
+
+  @override
+  String get visitHistory => 'History';
+
+  @override
+  String get noUpcomingVisits => 'No upcoming visits';
+
+  @override
+  String get noVisitHistory => 'No visit history';
+
+  @override
+  String get noUpcomingVisitsDescription => 'Planned visits will appear here.';
+
+  @override
+  String get noVisitHistoryDescription =>
+      'Completed, cancelled, and missed visits will appear here.';
+
+  @override
+  String get contactNotSelected => 'Not selected';
+
+  @override
+  String get visitReason => 'Reason for visit';
+
+  @override
+  String get remindMe => 'Remind me';
+
+  @override
+  String get remindBefore => 'Remind before';
+
+  @override
+  String get saveVisitFailed => 'Could not save visit';
+
+  @override
+  String get visitUpdated => 'Visit updated';
+
+  @override
+  String get visitSaved => 'Visit saved';
+
+  @override
+  String get doctorVisitDetails => 'Visit Details';
+
+  @override
+  String get visitNeedsAttention =>
+      'This visit is past due — mark it completed, cancelled, or missed.';
+
+  @override
+  String get markCompleted => 'Mark completed';
+
+  @override
+  String get markMissed => 'Mark missed';
+
+  @override
+  String get reschedule => 'Reschedule';
+
+  @override
+  String get cancelVisit => 'Cancel visit';
+
+  @override
+  String get visitCompleted => 'Visit marked as completed';
+
+  @override
+  String get visitCancelled => 'Visit cancelled';
+
+  @override
+  String get visitMissed => 'Visit marked as missed';
+
+  @override
+  String get confirmDeleteVisit =>
+      'Delete this visit permanently? This cannot be undone.';
+
+  @override
+  String get visitDeleted => 'Visit deleted';
+
+  @override
+  String get saveAsScheduledLater => 'Save as scheduled later';
+
+  @override
+  String get onDemandRecordedCompleted =>
+      'On-demand visits are recorded as completed right away. Enable this to schedule it in the future instead.';
+
+  @override
+  String get scheduledDateTime => 'Scheduled date and time';
+
+  @override
+  String get visitType => 'Visit type';
+
+  @override
+  String get selectDoctor => 'Select doctor';
+
+  @override
+  String get selectClinicOrHospital => 'Select clinic or hospital';
+
+  @override
+  String get noEligibleContacts =>
+      'No eligible contacts. Add a care contact first.';
+
+  @override
+  String get contactReferencedByVisits =>
+      'This contact is used by a doctor visit and cannot be permanently deleted.';
 }
