@@ -4,6 +4,13 @@ class AppConstants {
   static const String appName = 'RehabTrack';
   static const String defaultLanguage = 'en';
 
+  /// Settings key for the user-selected app language.
+  ///
+  /// Persisted values are the storage codes defined in [AppLocale]'s
+  /// `storageValue` mapping (`en`, `ka`, or `system`). Absence of the key is
+  /// equivalent to `system`.
+  static const String languageKey = 'app_language';
+
   /// Default grace period for the "Next" card and time-state classification.
   static const Duration nextItemGraceWindow = Duration(minutes: 15);
 

@@ -302,5 +302,33 @@ void main() {
 
       expect(find.text('ენა'), findsOneWidget);
     });
+
+    testWidgets('selecting Georgian persists the language choice', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await tester.pumpGracePeriod(settings: settings);
+
+      await tester.tap(find.text('ქართული'));
+      await tester.pumpAndSettle();
+
+      expect(await settings.getValue('app_language'), 'ka');
+      final kaRadio = tester.widget<Icon>(find.byIcon(
+        Icons.radio_button_checked,
+      ));
+      expect(kaRadio, isNotNull);
+    });
+
+    testWidgets('selecting English persists the language choice', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await tester.pumpGracePeriod(settings: settings);
+
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+
+      expect(await settings.getValue('app_language'), 'en');
+    });
   });
 }
