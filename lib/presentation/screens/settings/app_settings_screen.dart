@@ -12,8 +12,14 @@ import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/reminder_settings_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 
-class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({super.key});
+/// The full application settings screen, now reached from the Settings
+/// dashboard via "App Settings".
+///
+/// This preserves all previous settings content and behavior exactly; only the
+/// app bar title was changed to match its new location under the Settings
+/// dashboard.
+class AppSettingsScreen extends ConsumerWidget {
+  const AppSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,7 +37,7 @@ class SettingsScreen extends ConsumerWidget {
     final showLockScreenDetails = ref.watch(showDetailsOnLockScreenProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.settings)),
+      appBar: AppBar(title: Text(l10n.appSettings)),
       body: ListView(
         children: [
           const SizedBox(height: 8),

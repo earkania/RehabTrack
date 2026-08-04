@@ -30,6 +30,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get appSettings => 'App Settings';
+
+  @override
+  String get backupAndRestore => 'Backup & Restore';
+
+  @override
+  String get backupRestoreComingSoon =>
+      'Backup and restore functionality will be available soon.';
+
+  @override
+  String get createBackup => 'Create backup';
+
+  @override
+  String get restoreBackup => 'Restore backup';
+
+  @override
+  String get backupInformation => 'Backup information';
+
+  @override
   String get profile => 'Profile';
 
   @override

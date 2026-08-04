@@ -8,6 +8,10 @@ class AppRoutes {
   static const profile = '/profile';
   static const settings = '/settings';
 
+  // Settings
+  static const settingsApp = '/settings/app';
+  static const settingsBackupRestore = '/settings/backup-restore';
+
   // Health
   static const healthMedications = '/health/medications';
   static const healthMeasurements = '/health/measurements';

@@ -760,3 +760,24 @@ Activities / Diet / attachments / cloud / spoken reminders are out of scope.
 | `lib/presentation/screens/records/doctor_visit_details_screen.dart` | Details + status actions |
 | `lib/presentation/utils/doctor_visit_localizer.dart` | Type/status/offset labels |
 | `test/doctor_visit_*_test.dart` | Entity/repo/reminder/routing tests |
+## Settings Navigation
+
+- Settings is a dashboard reached from the bottom navigation (label remains
+  "Settings"). It uses the shared two-column large-icon module grid
+  (`ModuleGrid` / `ModuleGridTile`) exactly like Health, Records, and Profile.
+- Destinations: **App Settings** (the full settings screen) and **Backup &
+  Restore** (deferred placeholder). No `ListTile`-based dashboard.
+- The full settings content lives in `AppSettingsScreen`; it was not redesigned.
+  Only its title changed to "App Settings". All reminder settings, notification
+  permission/exact-alarm tiles, test actions, language, appearance, grace
+  period, and security controls are unchanged and use the same providers.
+- Backup & Restore is a static placeholder: icon + localized coming-soon copy +
+  a non-interactive list of planned features (create backup, restore backup,
+  backup information). No buttons, no database export, no ZIP/file picker/SAF,
+  no encryption, no cloud sync, no restore validation.
+- Routing: `/settings` (shell tab) → `/settings/app` (push) →
+  `/settings/backup-restore` (push). Back from either child returns to the
+  Settings dashboard. Unknown routes fall back to a safe `_InvalidRouteScreen`.
+- Notification-regression rule: Settings navigation must never recreate the
+  ProviderScope, notification services, or navigator keys; the dashboard and
+  its children only read existing providers.
