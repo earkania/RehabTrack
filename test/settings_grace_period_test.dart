@@ -10,7 +10,7 @@ import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
-import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/app_settings_screen.dart';
 
 class FakeNotificationServiceForSettings extends NotificationService {
   FakeNotificationServiceForSettings() : super();
@@ -93,7 +93,7 @@ Widget _buildApp({
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
-      home: const SettingsScreen(),
+      home: const AppSettingsScreen(),
     ),
   );
 }
@@ -301,6 +301,34 @@ void main() {
       );
 
       expect(find.text('ენა'), findsOneWidget);
+    });
+
+    testWidgets('selecting Georgian persists the language choice', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await tester.pumpGracePeriod(settings: settings);
+
+      await tester.tap(find.text('ქართული'));
+      await tester.pumpAndSettle();
+
+      expect(await settings.getValue('app_language'), 'ka');
+      final kaRadio = tester.widget<Icon>(find.byIcon(
+        Icons.radio_button_checked,
+      ));
+      expect(kaRadio, isNotNull);
+    });
+
+    testWidgets('selecting English persists the language choice', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await tester.pumpGracePeriod(settings: settings);
+
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+
+      expect(await settings.getValue('app_language'), 'en');
     });
   });
 }

@@ -140,6 +140,42 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @appSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'App Settings'**
+  String get appSettings;
+
+  /// No description provided for @backupAndRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Restore'**
+  String get backupAndRestore;
+
+  /// No description provided for @backupRestoreComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup and restore functionality will be available soon.'**
+  String get backupRestoreComingSoon;
+
+  /// No description provided for @createBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create backup'**
+  String get createBackup;
+
+  /// No description provided for @restoreBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get restoreBackup;
+
+  /// No description provided for @backupInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup information'**
+  String get backupInformation;
+
   /// No description provided for @profile.
   ///
   /// In en, this message translates to:

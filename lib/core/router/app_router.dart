@@ -33,7 +33,9 @@ import 'package:rehab_track/presentation/screens/health/measurement_trends_scree
 import 'package:rehab_track/presentation/screens/health/measurement_schedule_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurement_schedule_list_screen.dart';
 import 'package:rehab_track/presentation/screens/health/reference_range_screen.dart';
-import 'package:rehab_track/presentation/screens/settings/settings_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/settings_dashboard_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/app_settings_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/backup_and_restore_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_view_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_edit_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/notification_diagnostics_screen.dart';
@@ -48,6 +50,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       return RouteRedirector.redirect(state.uri.toString());
     },
+    errorBuilder: (context, state) => const _InvalidRouteScreen(),
     routes: [
       ShellRoute(
         navigatorKey: shellNavigatorKey,
@@ -82,7 +85,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.settings,
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: SettingsScreen(),
+              child: SettingsDashboardScreen(),
             ),
           ),
         ],
@@ -351,6 +354,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.measurementRanges,
         builder: (context, state) => const ReferenceRangeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsApp,
+        builder: (context, state) => const AppSettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsBackupRestore,
+        builder: (context, state) => const BackupAndRestoreScreen(),
       ),
       GoRoute(
         path: '/settings/notification-diagnostics',

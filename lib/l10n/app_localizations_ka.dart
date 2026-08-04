@@ -30,6 +30,25 @@ class AppLocalizationsKa extends AppLocalizations {
   String get settings => 'პარამეტრები';
 
   @override
+  String get appSettings => 'აპლიკაციის პარამეტრები';
+
+  @override
+  String get backupAndRestore => 'სარეზერვო ასლი და აღდგენა';
+
+  @override
+  String get backupRestoreComingSoon =>
+      'სარეზერვო ასლის შექმნისა და აღდგენის ფუნქცია მალე ხელმისაწვდომი იქნება.';
+
+  @override
+  String get createBackup => 'სარეზერვო ასლის შექმნა';
+
+  @override
+  String get restoreBackup => 'სარეზერვო ასლიდან აღდგენა';
+
+  @override
+  String get backupInformation => 'ინფორმაცია სარეზერვო ასლის შესახებ';
+
+  @override
   String get profile => 'პროფილი';
 
   @override

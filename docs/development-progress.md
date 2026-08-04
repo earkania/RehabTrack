@@ -3435,3 +3435,72 @@ uses `DoctorVisitRecords` (table `doctor_visit_records`) and
 - Today integration for doctor visits is deferred (kept minimal); the provider
   layer and data layer are ready for a future Today agenda entry.
 
+
+## Phase 9A — Settings Navigation Refactor
+
+**Goal:** Turn Settings into a dashboard with two destinations (App Settings and
+Backup & Restore) without touching settings behavior, notification services, or
+storage.
+
+### Navigation
+
+| Route | Screen |
+|---|---|
+| `/settings` | `SettingsDashboardScreen` (bottom-nav destination) |
+| `/settings/app` | `AppSettingsScreen` (was `SettingsScreen`) |
+| `/settings/backup-restore` | `BackupAndRestoreScreen` (placeholder) |
+| `/settings/notification-diagnostics` | unchanged |
+
+- The bottom navigation Settings destination now opens the Settings dashboard.
+- `AppSettingsScreen` holds all previous settings content unchanged; only its
+  AppBar title changed from "Settings" to "App Settings" (localized).
+- `BackupAndRestoreScreen` is a clean placeholder (icon + coming-soon text +
+  non-interactive planned-item list). No backup/restore functionality.
+- Unknown/unmatched routes fall back to `_InvalidRouteScreen` via the GoRouter
+  `errorBuilder` (previously GoRouter's default red error screen).
+
+### Design
+
+- Settings dashboard reuses the shared `ModuleGrid` + `ModuleGridTile`
+  two-column large-icon layout (same as Health / Records / Profile). No new
+  visual style and no `ListTile` dashboard.
+- Icons: App Settings → `settings_outlined`; Backup & Restore →
+  `settings_backup_restore`.
+
+### Notification regression
+
+- The dashboard and child screens are pure `StatelessWidget`s / `ConsumerWidget`s;
+  no new `ProviderScope`, no recreated notification services, no stored
+  `BuildContext`, and the root navigator keys are untouched. Notification
+  initialization, reminder scheduling, permission handling, and Android
+  notification settings all remain application-scoped as before.
+
+### Localization (en + ka)
+
+Added `appSettings`, `backupAndRestore`, `backupRestoreComingSoon`,
+`createBackup`, `restoreBackup`, `backupInformation`; regenerated via
+`flutter gen-l10n`.
+
+### Tests
+
+- `test/settings_navigation_test.dart` (19 tests): 5-tab nav, Settings opens
+  dashboard, two-column module grid + equal tile sizes, no reminder controls on
+  the dashboard, App Settings opens full settings content, Backup & Restore
+  opens placeholder, placeholder has no active actions, back navigation from
+  both child screens, tab switching keeps valid state, route-level tests
+  (`/settings`, `/settings/app`, `/settings/backup-restore`, unknown child →
+  safe fallback), light/dark themes, Georgian, narrow Pixel size, large text.
+- `test/settings_grace_period_test.dart` updated for the renamed
+  `AppSettingsScreen`.
+- Renamed `SettingsScreen` → `AppSettingsScreen`
+  (`lib/presentation/screens/settings/app_settings_screen.dart`).
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1022/1022 passed |
+| Pixel 7 manual | See below |
+
