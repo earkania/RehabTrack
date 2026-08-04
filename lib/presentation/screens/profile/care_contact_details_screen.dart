@@ -392,6 +392,16 @@ class _ContactDetailsView extends ConsumerWidget {
       ),
     );
     if (confirmed != true) return;
+    final visitRepo = ref.read(doctorVisitRepositoryProvider);
+    final referenced =
+        await visitRepo.isContactReferencedByVisits(contact.id!);
+    if (!context.mounted) return;
+    if (referenced) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.contactReferencedByVisits)),
+      );
+      return;
+    }
     final repo = ref.read(careContactRepositoryProvider);
     await repo.deleteContact(contact.profileId, contact.id!);
     if (context.mounted) {

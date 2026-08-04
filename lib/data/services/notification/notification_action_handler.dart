@@ -5,6 +5,8 @@ enum NotificationActionType {
   measurementRecordNow,
   measurementSnooze,
   measurementSkip,
+  doctorVisitOpen,
+  doctorVisitSnooze,
   tap,
   dismiss,
 }
@@ -26,3 +28,7 @@ class NotificationActionResponse {
 typedef NotificationActionCallback = void Function(
   NotificationActionResponse response,
 );
+
+/// Invoked when a notification body is tapped (no action button pressed). The
+/// payload allows routing doctor-visit notifications to the matching visit.
+typedef NotificationTapCallback = void Function(String? payload);

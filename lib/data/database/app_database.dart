@@ -11,6 +11,7 @@ import 'package:rehab_track/data/database/tables/measurement_tables.dart';
 import 'package:rehab_track/data/database/tables/exercise_tables.dart';
 import 'package:rehab_track/data/database/tables/doctor_tables.dart';
 import 'package:rehab_track/data/database/tables/care_contact_table.dart';
+import 'package:rehab_track/data/database/tables/doctor_visit_records_table.dart';
 import 'package:rehab_track/data/database/tables/document_table.dart';
 import 'package:rehab_track/data/database/tables/diet_tables.dart';
 import 'package:rehab_track/data/database/tables/health_template_table.dart';
@@ -30,6 +31,7 @@ import 'package:rehab_track/data/database/daos/app_setting_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_alternatives_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_components_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_alternative_components_dao.dart';
+import 'package:rehab_track/data/database/daos/doctor_visit_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -54,6 +56,7 @@ part 'app_database.g.dart';
     Doctors,
     DoctorVisits,
     CareContacts,
+    DoctorVisitRecords,
     DocumentAttachments,
     DietPlans,
     DietItems,
@@ -84,6 +87,7 @@ class AppDatabase extends _$AppDatabase {
   ExerciseDao get exerciseDao => ExerciseDao(this);
   DoctorDao get doctorDao => DoctorDao(this);
   CareContactDao get careContactDao => CareContactDao(this);
+  DoctorVisitDao get doctorVisitDao => DoctorVisitDao(this);
   DocumentDao get documentDao => DocumentDao(this);
   DietDao get dietDao => DietDao(this);
   HealthTemplateDao get healthTemplateDao =>
@@ -91,7 +95,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -231,6 +235,11 @@ class AppDatabase extends _$AppDatabase {
         // Phase 8A: Care Contacts - shared table for medical professionals
         // and healthcare organizations
         await m.createTable(careContacts);
+      }
+      if (from < 14) {
+        // Phase 8C: Doctor Visits - Records module backed by optional Care
+        // Contact references (doctor + clinic/hospital)
+        await m.createTable(doctorVisitRecords);
       }
     },
   );

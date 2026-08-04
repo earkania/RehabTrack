@@ -157,3 +157,44 @@ enum CareContactType {
         CareContactType.doctor => false,
       };
 }
+
+/// Stable persisted values for how a doctor visit was created. The enum
+/// `name` (`planned` | `onDemand`) is stored in the database; localized labels
+/// are resolved in the UI layer.
+enum DoctorVisitType {
+  planned,
+  onDemand;
+
+  static DoctorVisitType fromString(String value) {
+    return DoctorVisitType.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => DoctorVisitType.planned,
+    );
+  }
+}
+
+/// Stable persisted lifecycle states for a doctor visit. The enum `name`
+/// (`scheduled` | `completed` | `cancelled` | `missed`) is stored in the
+/// database; localized labels are resolved in the UI layer.
+enum DoctorVisitStatus {
+  scheduled,
+  completed,
+  cancelled,
+  missed;
+
+  static DoctorVisitStatus fromString(String value) {
+    return DoctorVisitStatus.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => DoctorVisitStatus.scheduled,
+    );
+  }
+
+  /// Terminal states that are shown in the visit History list.
+  bool get isTerminal => switch (this) {
+        DoctorVisitStatus.completed ||
+        DoctorVisitStatus.cancelled ||
+        DoctorVisitStatus.missed =>
+          true,
+        DoctorVisitStatus.scheduled => false,
+      };
+}

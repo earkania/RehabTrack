@@ -3245,3 +3245,193 @@ Follow-up on the Phase 8A manual review. Four issues fixed on branch
 | `flutter test` | Passed (945/945) |
 | Docs | `docs/design/design-notes.md` Care Contacts rules updated |
 
+### Phase 8C — Doctor Visits Module (2026-08-03)
+
+Replaced the Records dashboard "Doctor Visits" placeholder with a complete
+**Doctor Visits** module on branch `feature/doctor-visits`: upcoming/history
+lists, add/edit/details flows, planned & on-demand visit types, Care Contact
+integration (doctor / clinic-hosp / both / neither), and reminders built on the
+existing notification infrastructure. The legacy placeholder `DoctorVisits`
+table and `DoctorVisit` entity remain untouched; the new module deliberately
+uses `DoctorVisitRecords` (table `doctor_visit_records`) and
+`DoctorVisitRecord` (entity) to avoid the name clash.
+
+#### Data Model (schema v14)
+
+- `lib/data/database/tables/doctor_visit_records_table.dart` — new
+  `DoctorVisitRecords` table: `profileId` FK → Profiles,
+  `doctorContactId` / `organizationContactId` FKs → Care Contacts (both
+  nullable, with `@ReferenceName('doctor')` / `@ReferenceName('organization')`
+  to silence the drift duplicate-reference warning), stable `visitType`
+  (`planned` | `onDemand`), stable `status`
+  (`scheduled` | `completed` | `cancelled` | `missed`), `scheduledDateTime`,
+  nullable `reason`/`notes`, `reminderEnabled` (default false),
+  `reminderMinutesBefore` (default 1440), `isArchived`, `createdAt`,
+  `updatedAt`. Six indexes (profile / scheduled / status / doctor / org /
+  archived).
+- `lib/data/database/app_database.dart` — `schemaVersion` → 14; additive
+  migration `if (from < 14) await m.createTable(doctorVisitRecords);` after the
+  v13 careContacts step. Migration is non-destructive (v12 and v13 databases
+  upgrade cleanly, verified in tests).
+- Name-clash resolution: legacy `DoctorVisit` entity (`doctor.dart`) and legacy
+  `DoctorVisits` table (`doctor_tables.dart`) are untouched; the Drift-generated
+  row class is `DoctorVisitRecord`, companion is `DoctorVisitRecordsCompanion`.
+
+#### Domain
+
+- `lib/domain/enums/enums.dart` — `DoctorVisitType` (planned/onDemand,
+  `fromString` fallback planned) and `DoctorVisitStatus`
+  (scheduled/completed/cancelled/missed, `fromString` fallback scheduled,
+  `isTerminal` getter). Stable enum names are persisted; localized labels are
+  resolved only in the UI.
+- `lib/domain/entities/doctor_visit_record.dart` — `DoctorVisitRecord` entity
+  with `isOpen` / `isFutureScheduled` getters and a `copyWith` that supports
+  explicit `clearDoctorContactId` / `clearOrganizationContactId` /
+  `clearReason` / `clearNotes` flags.
+- `lib/domain/repositories/doctor_visit_repository.dart` +
+  `lib/data/repositories/doctor_visit_repository_impl.dart` — profile-scoped
+  watchers (upcoming/history/by-id), one-shot fetches, CRUD, status set,
+  archive, delete, plus Care Contact reference guards.
+
+#### Data Layer
+
+- `lib/data/database/daos/doctor_visit_dao.dart` — `watchUpcomingVisits`
+  (status `scheduled`, ascending), `watchVisitHistory` (terminal statuses,
+  descending), `watchVisitById`, `getVisitById`, `getUpcomingVisits` (reminder
+  recovery), `countOpenVisitsReferencingContact` (open-only, used to warn before
+  deleting/archiving a contact with upcoming visits), `countAllVisitsReferencingContact`
+  (any reference — the Care Contact permanent-deletion guard),
+  `insertVisit`, `updateVisit` (in-place `replace`, never duplicates),
+  `setStatus` (plain `String` status), `setArchived`, `deleteVisit`.
+- Past-scheduled open visits stay in the upcoming list under an "attention"
+  state; they are **never auto-marked missed** this phase (documented decision)
+  and must be resolved by the user (complete / cancel / reschedule / mark
+  missed).
+
+#### Reminders (existing notification infra)
+
+- `lib/data/services/notification/notification_service.dart` — new
+  `rehabtrack_doctor_visits` channel (importance high, vibration), Open
+  (`doctor_visit_open`) + Snooze (`doctor_visit_snooze`) actions,
+  `doctorVisitNotificationId(id) = 5000000 + id`, `isDoctorVisit` threaded
+  through `showNotification`/`scheduleNotification`.
+- `lib/data/services/notification/reminder_payload.dart` — `ReminderType
+  .doctorVisit` + `visitId` (JSON key `'vi'`); `notification_action_handler.dart`
+  — `NotificationActionType.doctorVisitOpen`/`doctorVisitSnooze` and tap
+  callback signature changed from `VoidCallback` to
+  `typedef NotificationTapCallback = void Function(String? payload);`.
+- `lib/data/services/notification/doctor_visit_reminder_service.dart` — new
+  service: `scheduleReminder` (scheduled + enabled + not-in-the-past only,
+  timezone-aware via `tz.TZDateTime(tz.local, ...)`, payload carries visitId),
+  `cancelReminder` (cancels the id and its snooze variant).
+- `lib/data/services/notification/notification_action_bridge.dart` — requires
+  `doctorVisitRepository` + `careContactRepository` (constructor breaking change
+  for tests); `recoverAll` recovers doctor visit schedules;
+  `_handleDoctorVisitOpen` (validates the visit exists) and
+  `_handleDoctorVisitSnooze` (reschedules via `getSnoozeDuration()`, cancels the
+  original).
+- Notification content (title "Doctor visit reminder", body) includes only the
+  doctor's / clinic's effective names, the scheduled time, and the reason —
+  never notes/diagnosis/symptoms/prescriptions/policy/phones/addresses.
+- Tap / Open routes to Visit Details via `onActionProcessed`; navigation wired
+  in `notification_provider.dart` (`router.push(AppRoutes.doctorVisitDetails(id))`).
+
+#### Presentation
+
+- `lib/presentation/providers/doctor_visit_provider.dart` —
+  `doctorVisitUpcomingProvider`, `doctorVisitHistoryProvider` (autoDispose
+  StreamProviders gated on the active profile), `doctorVisitByIdProvider`
+  (family), `upcomingDoctorVisitCountProvider` (dashboard badge),
+  `doctorVisitReminderServiceProvider`, and `careContactLookupProvider`
+  (combined active + archived map keyed by id so deleted contacts render a
+  localized "Contact not available" without crashing).
+- `lib/presentation/utils/doctor_visit_localizer.dart` — type/status labels,
+  status icons, reminder-offset labels (15m/30m/1h/2h/1d/2d/1w).
+- `lib/presentation/screens/records/doctor_visits_screen.dart` — segmented
+  Upcoming/History lists, attention state for past open visits, status chips in
+  History, empty states, add FAB.
+- `lib/presentation/screens/records/doctor_visit_form_screen.dart` — shared
+  Add/Edit form: planned/on-demand toggle (on-demand defaults to completed
+  unless "save as scheduled later"), date+time pickers, doctor / clinic-hosp
+  contact pickers (bottom sheets filtered by type), reason, notes, reminder
+  switch + offset dropdown, save + cancel.
+- `lib/presentation/screens/records/doctor_visit_details_screen.dart` — contact
+  cards (with "Contact not available" fallback), reminder summary, open-visit
+  actions (Mark completed / Mark missed / Reschedule / Cancel), edit + delete
+  with confirmation. Terminal states are preserved in History and never
+  auto-reopened.
+- `lib/presentation/screens/records/records_dashboard_screen.dart` — Doctor
+  Visits tile shows an open-visit count badge (hidden when zero).
+- `lib/core/router/app_routes.dart` / `app_router.dart` — `recordsDoctorVisits`
+  now maps to the real list screen; added
+  `/records/doctor-visits/add`, `/records/doctor-visits/:id`,
+  `/records/doctor-visits/:id/edit` (unknown ids → `_InvalidRouteScreen`).
+- `lib/presentation/screens/profile/care_contact_details_screen.dart` — delete
+  guard: refuses permanent deletion when any visit references the contact
+  (`contactReferencedByVisits` snackbar).
+
+#### Localization
+
+- `lib/l10n/app_en.arb` / `app_ka.arb` — added ~50 keys (visit types, statuses,
+  list/detail/form labels, reminder offsets, empty states, delete guard) with
+  natural Georgian translations; `flutter gen-l10n` re-run.
+
+#### Tests (new + updated)
+
+- `test/doctor_visit_entity_test.dart` — entity defaults, `isOpen`,
+  `isFutureScheduled`, copyWith incl. clear-contact flags, enum fallbacks.
+- `test/doctor_visit_repository_test.dart` — CRUD (no duplicates on update),
+  status transitions, archive hides from upcoming, delete, watch streams,
+  contact reference guards (incl. open-only counts and archived references).
+- `test/doctor_visit_reminder_content_test.dart` — title, body composition
+  (doctor/clinic/time/reason, fallback, no profile name), payload round-trip.
+- `test/doctor_visit_reminder_service_test.dart` — schedules on the doctor
+  visit channel with `isDoctorVisit`, skips disabled/non-scheduled/past
+  reminders, cancel cancels main + snooze ids.
+- `test/doctor_visit_routing_test.dart` — dashboard tile, open/back, FAB → add.
+- `test/notification_action_bridge_test.dart` — updated fakes for the new
+  constructor deps + `isDoctorVisit`; new doctor-visit open/snooze action tests.
+- `test/care_contact_migration_test.dart` — schema assertion 13 → 14; fresh-create
+  doctor_visit_records table/index/column checks; new v13→v14 upgrade test;
+  doctor_visit_records added to the surviving-tables list.
+- `test/notification_scheduler_cancel_test.dart`,
+  `test/settings_grace_period_test.dart` — fakes updated for `isDoctorVisit`.
+
+#### Validation Results (Post-Phase 8C)
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed successfully |
+| `flutter analyze` | No issues found |
+| `flutter test` | Passed (991/991) |
+| `dart run build_runner build` | Success; no drift warnings (ReferenceName applied) |
+| Pixel 7 manual | Verified — full flows below |
+
+#### Notes
+
+- **Pixel 7 manual validation (adb/uiautomator)**: Records dashboard tile +
+  dashboard badge (shows "1" when an upcoming visit exists, hidden at zero);
+  list with Upcoming/History segmented toggle, empty state, Add FAB; Add form
+  (visit-type toggle, save-as-scheduled-later switch for on-demand, date/time
+  pickers, doctor bottom-sheet selector, clinic empty-eligible snackbar,
+  reminder switch + offset); Planned save → "Visit saved" snackbar + tile +
+  `zonedSchedule id=5000001 channelId=rehabtrack_doctor_visits`; Details screen
+  sections + actions; Mark completed → "Completed · History" with snackbar;
+  on-demand default records straight to History as Completed; Reschedule (Edit)
+  pre-fills fields, date change Aug 10→Aug 12 updated the SAME record and
+  re-scheduled the reminder `id=5000003` to Aug 11 (no duplicate); Cancel visit →
+  "Cancelled · History", pending notification removed (dumpsys count 0); Delete →
+  confirmation dialog → "Visit deleted"; no FATAL/exception in logcat.
+- Doctor Visits reference Care Contacts optionally and by live FK reference;
+  archived contacts stay visible in history; deleted/missing references show a
+  localized fallback without crashing.
+- Reminders default to enabled, 24h before, with 15m/30m/1h/2h/1d/2d/1w options;
+  no past reminders are scheduled.
+- Missed-rule decision: past scheduled visits are **not** auto-marked missed in
+  this phase; they remain visible under an "attention" state until the user
+  completes/cancels/reschedules/marks them missed.
+- Lab Analyses, Reports, Activities, Diet, attachments, cloud sync, and spoken
+  reminders are out of scope this phase.
+- Today integration for doctor visits is deferred (kept minimal); the provider
+  layer and data layer are ready for a future Today agenda entry.
+

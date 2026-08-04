@@ -13,8 +13,11 @@ import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/data/services/notification/schedule_recovery_service.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/domain/enums/enums.dart';
 
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/repositories/care_contact_repository.dart';
+import 'package:rehab_track/domain/repositories/doctor_visit_repository.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/domain/repositories/profile_repository.dart';
@@ -29,6 +32,8 @@ class NotificationActionBridge {
     required this._medicationRepository,
     required this._measurementRepository,
     required this._profileRepository,
+    required this._doctorVisitRepository,
+    required this._careContactRepository,
     required this.getSnoozeDuration,
     required this.showProfileName,
     required this.showDetailsOnLockScreen,
@@ -41,6 +46,8 @@ class NotificationActionBridge {
   final MedicationRepository _medicationRepository;
   final MeasurementRepository _measurementRepository;
   final ProfileRepository _profileRepository;
+  final DoctorVisitRepository _doctorVisitRepository;
+  final CareContactRepository _careContactRepository;
   final Duration Function() getSnoozeDuration;
   final bool Function() showProfileName;
   final bool Function() showDetailsOnLockScreen;
@@ -55,6 +62,7 @@ class NotificationActionBridge {
   Future<void> recoverAll(int profileId) async {
     await recoverMedicationSchedules(profileId);
     await recoverMeasurementSchedules(profileId);
+    await recoverDoctorVisitSchedules(profileId);
   }
 
   Future<void> recoverMedicationSchedules(int profileId) =>
@@ -62,6 +70,9 @@ class NotificationActionBridge {
 
   Future<void> recoverMeasurementSchedules(int profileId) =>
       _recoverMeasurementSchedules(profileId);
+
+  Future<void> recoverDoctorVisitSchedules(int profileId) =>
+      _recoverDoctorVisitSchedules(profileId);
 
   Future<void> processPendingActions() async {
     final entries = await PendingActionStore.instance.consumeAll();
@@ -121,6 +132,8 @@ class NotificationActionBridge {
       'measurement_record_now' => 'measurementRecordNow',
       'measurement_snooze' => 'measurementSnooze',
       'measurement_skip' => 'measurementSkip',
+      'doctor_visit_open' => 'doctorVisitOpen',
+      'doctor_visit_snooze' => 'doctorVisitSnooze',
       _ => actionId,
     };
   }
@@ -149,6 +162,10 @@ class NotificationActionBridge {
         result = await _handleMeasurementSnooze(response, payload);
       case NotificationActionType.measurementSkip:
         result = await _handleMeasurementSkip(payload);
+      case NotificationActionType.doctorVisitOpen:
+        result = await _handleDoctorVisitOpen(payload);
+      case NotificationActionType.doctorVisitSnooze:
+        result = await _handleDoctorVisitSnooze(response, payload);
       case NotificationActionType.tap:
         result = ActionResult.success;
       case NotificationActionType.dismiss:
@@ -162,7 +179,11 @@ class NotificationActionBridge {
     await _executeAction(response);
   }
 
-  void _onNotificationTap() {
+  void _onNotificationTap(String? payload) {
+    final reminder = ReminderPayload.parse(payload);
+    if (reminder != null && reminder.type == ReminderType.doctorVisit) {
+      onActionProcessed?.call(NotificationActionType.doctorVisitOpen, reminder);
+    }
     debugPrint('[NotificationActionBridge] notification tap');
   }
 
@@ -488,6 +509,114 @@ class NotificationActionBridge {
     }
   }
 
+  // --- Doctor Visit: Open ---
+
+  Future<ActionResult> _handleDoctorVisitOpen(ReminderPayload payload) async {
+    final visitId = payload.visitId ?? payload.scheduleId;
+    if (visitId <= 0) return ActionResult.invalidPayload;
+    try {
+      final visit = await _doctorVisitRepository.getVisitById(
+        payload.profileId,
+        visitId,
+      );
+      if (visit == null) {
+        debugPrint('[NotificationActionBridge] visit $visitId not found for open');
+        return ActionResult.entityNotFound;
+      }
+      // Navigation to the visit details happens via the onActionProcessed
+      // callback using payload.visitId.
+      return ActionResult.success;
+    } catch (e) {
+      debugPrint('[NotificationActionBridge] doctor visit open FAILED: $e');
+      return ActionResult.databaseError;
+    }
+  }
+
+  // --- Doctor Visit: Snooze ---
+
+  Future<ActionResult> _handleDoctorVisitSnooze(
+    NotificationActionResponse response,
+    ReminderPayload payload,
+  ) async {
+    final visitId = payload.visitId ?? payload.scheduleId;
+    try {
+      final visit = await _doctorVisitRepository.getVisitById(
+        payload.profileId,
+        visitId,
+      );
+      if (visit == null || visit.id == null) {
+        debugPrint('[NotificationActionBridge] visit $visitId not found for snooze');
+        return ActionResult.entityNotFound;
+      }
+
+      final doctor = visit.doctorContactId != null
+          ? await _careContactRepository.getContactById(
+              visit.profileId,
+              visit.doctorContactId!,
+            )
+          : null;
+      final organization = visit.organizationContactId != null
+          ? await _careContactRepository.getContactById(
+              visit.profileId,
+              visit.organizationContactId!,
+            )
+          : null;
+
+      final now = DateTime.now();
+      final snoozeDuration = getSnoozeDuration();
+      final snoozeTime = now.add(snoozeDuration);
+      final tzLocation = tz.local;
+      final scheduledDate = tz.TZDateTime(
+        tzLocation,
+        snoozeTime.year,
+        snoozeTime.month,
+        snoozeTime.day,
+        snoozeTime.hour,
+        snoozeTime.minute,
+      );
+
+      final snoozePayload = ReminderPayload(
+        type: ReminderType.doctorVisit,
+        profileId: payload.profileId,
+        scheduleId: visit.id!,
+        occurrenceTime: visit.scheduledDateTime.toIso8601String(),
+        visitId: visit.id,
+        snoozeSourceOccurrence: payload.occurrenceTime,
+        notificationId: NotificationService.snoozeNotificationId(
+          response.notificationId,
+        ),
+      );
+
+      final snoozeId = NotificationService.snoozeNotificationId(
+        response.notificationId,
+      );
+
+      await _notificationScheduler.scheduleSingleOccurrence(
+        notificationId: snoozeId,
+        title: ReminderContentFormatter.doctorVisitTitle(),
+        body: ReminderContentFormatter.doctorVisitBody(
+          doctor: doctor,
+          organization: organization,
+          scheduledDateTime: visit.scheduledDateTime,
+          reason: visit.reason,
+        ),
+        scheduledDate: scheduledDate,
+        channelId: NotificationService.doctorVisitChannelId,
+        payload: snoozePayload.toJsonString(),
+        includeActions: true,
+        isDoctorVisit: true,
+      );
+
+      await _notificationService.cancelNotification(response.notificationId);
+
+      debugPrint('[NotificationActionBridge] snoozed doctor visit $snoozeId for $snoozeTime');
+      return ActionResult.success;
+    } catch (e) {
+      debugPrint('[NotificationActionBridge] doctor visit snooze FAILED: $e');
+      return ActionResult.unexpectedError;
+    }
+  }
+
   // --- Notification cancellation ---
 
   Future<void> _cancelOccurrenceNotifications(ReminderPayload payload) async {
@@ -623,6 +752,83 @@ class NotificationActionBridge {
           '${entries.length} schedule entries processed');
     } catch (e) {
       debugPrint('[NotificationActionBridge] measurement recovery FAILED: $e');
+    }
+  }
+
+  /// Re-schedules single reminders for open doctor visits whose reminder time
+  /// is still in the future. Runs after app restart so reminders survive
+  /// reboots (alongside the plugin's own persistence when available).
+  Future<void> _recoverDoctorVisitSchedules(int profileId) async {
+    try {
+      final visits = await _doctorVisitRepository.getUpcomingVisits(profileId);
+      var restoredCount = 0;
+
+      for (final visit in visits) {
+        if (visit.id == null) continue;
+        if (!visit.reminderEnabled) continue;
+        if (visit.status != DoctorVisitStatus.scheduled) continue;
+
+        final reminderAt = visit.scheduledDateTime
+            .subtract(Duration(minutes: visit.reminderMinutesBefore));
+        if (!reminderAt.isAfter(DateTime.now())) continue;
+
+        final doctor = visit.doctorContactId != null
+            ? await _careContactRepository.getContactById(
+                profileId,
+                visit.doctorContactId!,
+              )
+            : null;
+        final organization = visit.organizationContactId != null
+            ? await _careContactRepository.getContactById(
+                profileId,
+                visit.organizationContactId!,
+              )
+            : null;
+
+        final payload = ReminderPayload(
+          type: ReminderType.doctorVisit,
+          profileId: profileId,
+          scheduleId: visit.id!,
+          occurrenceTime: visit.scheduledDateTime.toIso8601String(),
+          visitId: visit.id,
+          notificationId:
+              NotificationService.doctorVisitNotificationId(visit.id!),
+        );
+
+        final tzLocation = tz.local;
+        final scheduledDate = tz.TZDateTime(
+          tzLocation,
+          reminderAt.year,
+          reminderAt.month,
+          reminderAt.day,
+          reminderAt.hour,
+          reminderAt.minute,
+        );
+
+        await _notificationScheduler.scheduleSingleOccurrence(
+          notificationId: NotificationService.doctorVisitNotificationId(
+            visit.id!,
+          ),
+          title: ReminderContentFormatter.doctorVisitTitle(),
+          body: ReminderContentFormatter.doctorVisitBody(
+            doctor: doctor,
+            organization: organization,
+            scheduledDateTime: visit.scheduledDateTime,
+            reason: visit.reason,
+          ),
+          scheduledDate: scheduledDate,
+          channelId: NotificationService.doctorVisitChannelId,
+          payload: payload.toJsonString(),
+          includeActions: true,
+          isDoctorVisit: true,
+        );
+        restoredCount++;
+      }
+
+      debugPrint('[NotificationActionBridge] doctor visit recovery complete, '
+          '$restoredCount reminders scheduled');
+    } catch (e) {
+      debugPrint('[NotificationActionBridge] doctor visit recovery FAILED: $e');
     }
   }
 

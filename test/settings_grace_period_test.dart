@@ -40,6 +40,7 @@ class FakeNotificationServiceForSettings extends NotificationService {
     required String channelId,
     bool includeActions = false,
     bool isMeasurement = false,
+    bool isDoctorVisit = false,
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,

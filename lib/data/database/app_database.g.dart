@@ -12522,6 +12522,848 @@ class CareContactsCompanion extends UpdateCompanion<CareContact> {
   }
 }
 
+class $DoctorVisitRecordsTable extends DoctorVisitRecords
+    with TableInfo<$DoctorVisitRecordsTable, DoctorVisitRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DoctorVisitRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _doctorContactIdMeta = const VerificationMeta(
+    'doctorContactId',
+  );
+  @override
+  late final GeneratedColumn<int> doctorContactId = GeneratedColumn<int>(
+    'doctor_contact_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES care_contacts (id)',
+    ),
+  );
+  static const VerificationMeta _organizationContactIdMeta =
+      const VerificationMeta('organizationContactId');
+  @override
+  late final GeneratedColumn<int> organizationContactId = GeneratedColumn<int>(
+    'organization_contact_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES care_contacts (id)',
+    ),
+  );
+  static const VerificationMeta _visitTypeMeta = const VerificationMeta(
+    'visitType',
+  );
+  @override
+  late final GeneratedColumn<String> visitType = GeneratedColumn<String>(
+    'visit_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scheduledDateTimeMeta = const VerificationMeta(
+    'scheduledDateTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> scheduledDateTime =
+      GeneratedColumn<DateTime>(
+        'scheduled_date_time',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reminderEnabledMeta = const VerificationMeta(
+    'reminderEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> reminderEnabled = GeneratedColumn<bool>(
+    'reminder_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reminder_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _reminderMinutesBeforeMeta =
+      const VerificationMeta('reminderMinutesBefore');
+  @override
+  late final GeneratedColumn<int> reminderMinutesBefore = GeneratedColumn<int>(
+    'reminder_minutes_before',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1440),
+  );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    doctorContactId,
+    organizationContactId,
+    visitType,
+    status,
+    scheduledDateTime,
+    reason,
+    notes,
+    reminderEnabled,
+    reminderMinutesBefore,
+    isArchived,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'doctor_visit_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DoctorVisitRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('doctor_contact_id')) {
+      context.handle(
+        _doctorContactIdMeta,
+        doctorContactId.isAcceptableOrUnknown(
+          data['doctor_contact_id']!,
+          _doctorContactIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('organization_contact_id')) {
+      context.handle(
+        _organizationContactIdMeta,
+        organizationContactId.isAcceptableOrUnknown(
+          data['organization_contact_id']!,
+          _organizationContactIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('visit_type')) {
+      context.handle(
+        _visitTypeMeta,
+        visitType.isAcceptableOrUnknown(data['visit_type']!, _visitTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_visitTypeMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('scheduled_date_time')) {
+      context.handle(
+        _scheduledDateTimeMeta,
+        scheduledDateTime.isAcceptableOrUnknown(
+          data['scheduled_date_time']!,
+          _scheduledDateTimeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_scheduledDateTimeMeta);
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('reminder_enabled')) {
+      context.handle(
+        _reminderEnabledMeta,
+        reminderEnabled.isAcceptableOrUnknown(
+          data['reminder_enabled']!,
+          _reminderEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reminder_minutes_before')) {
+      context.handle(
+        _reminderMinutesBeforeMeta,
+        reminderMinutesBefore.isAcceptableOrUnknown(
+          data['reminder_minutes_before']!,
+          _reminderMinutesBeforeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DoctorVisitRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DoctorVisitRecord(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      doctorContactId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}doctor_contact_id'],
+      ),
+      organizationContactId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}organization_contact_id'],
+      ),
+      visitType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}visit_type'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      scheduledDateTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}scheduled_date_time'],
+      )!,
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      reminderEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reminder_enabled'],
+      )!,
+      reminderMinutesBefore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminder_minutes_before'],
+      )!,
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DoctorVisitRecordsTable createAlias(String alias) {
+    return $DoctorVisitRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class DoctorVisitRecord extends DataClass
+    implements Insertable<DoctorVisitRecord> {
+  final int id;
+  final int profileId;
+  final int? doctorContactId;
+  final int? organizationContactId;
+  final String visitType;
+  final String status;
+  final DateTime scheduledDateTime;
+  final String? reason;
+  final String? notes;
+  final bool reminderEnabled;
+  final int reminderMinutesBefore;
+  final bool isArchived;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const DoctorVisitRecord({
+    required this.id,
+    required this.profileId,
+    this.doctorContactId,
+    this.organizationContactId,
+    required this.visitType,
+    required this.status,
+    required this.scheduledDateTime,
+    this.reason,
+    this.notes,
+    required this.reminderEnabled,
+    required this.reminderMinutesBefore,
+    required this.isArchived,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    if (!nullToAbsent || doctorContactId != null) {
+      map['doctor_contact_id'] = Variable<int>(doctorContactId);
+    }
+    if (!nullToAbsent || organizationContactId != null) {
+      map['organization_contact_id'] = Variable<int>(organizationContactId);
+    }
+    map['visit_type'] = Variable<String>(visitType);
+    map['status'] = Variable<String>(status);
+    map['scheduled_date_time'] = Variable<DateTime>(scheduledDateTime);
+    if (!nullToAbsent || reason != null) {
+      map['reason'] = Variable<String>(reason);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['reminder_enabled'] = Variable<bool>(reminderEnabled);
+    map['reminder_minutes_before'] = Variable<int>(reminderMinutesBefore);
+    map['is_archived'] = Variable<bool>(isArchived);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  DoctorVisitRecordsCompanion toCompanion(bool nullToAbsent) {
+    return DoctorVisitRecordsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      doctorContactId: doctorContactId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(doctorContactId),
+      organizationContactId: organizationContactId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(organizationContactId),
+      visitType: Value(visitType),
+      status: Value(status),
+      scheduledDateTime: Value(scheduledDateTime),
+      reason: reason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reason),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      reminderEnabled: Value(reminderEnabled),
+      reminderMinutesBefore: Value(reminderMinutesBefore),
+      isArchived: Value(isArchived),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory DoctorVisitRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DoctorVisitRecord(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      doctorContactId: serializer.fromJson<int?>(json['doctorContactId']),
+      organizationContactId: serializer.fromJson<int?>(
+        json['organizationContactId'],
+      ),
+      visitType: serializer.fromJson<String>(json['visitType']),
+      status: serializer.fromJson<String>(json['status']),
+      scheduledDateTime: serializer.fromJson<DateTime>(
+        json['scheduledDateTime'],
+      ),
+      reason: serializer.fromJson<String?>(json['reason']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      reminderEnabled: serializer.fromJson<bool>(json['reminderEnabled']),
+      reminderMinutesBefore: serializer.fromJson<int>(
+        json['reminderMinutesBefore'],
+      ),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'doctorContactId': serializer.toJson<int?>(doctorContactId),
+      'organizationContactId': serializer.toJson<int?>(organizationContactId),
+      'visitType': serializer.toJson<String>(visitType),
+      'status': serializer.toJson<String>(status),
+      'scheduledDateTime': serializer.toJson<DateTime>(scheduledDateTime),
+      'reason': serializer.toJson<String?>(reason),
+      'notes': serializer.toJson<String?>(notes),
+      'reminderEnabled': serializer.toJson<bool>(reminderEnabled),
+      'reminderMinutesBefore': serializer.toJson<int>(reminderMinutesBefore),
+      'isArchived': serializer.toJson<bool>(isArchived),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  DoctorVisitRecord copyWith({
+    int? id,
+    int? profileId,
+    Value<int?> doctorContactId = const Value.absent(),
+    Value<int?> organizationContactId = const Value.absent(),
+    String? visitType,
+    String? status,
+    DateTime? scheduledDateTime,
+    Value<String?> reason = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    bool? reminderEnabled,
+    int? reminderMinutesBefore,
+    bool? isArchived,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => DoctorVisitRecord(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    doctorContactId: doctorContactId.present
+        ? doctorContactId.value
+        : this.doctorContactId,
+    organizationContactId: organizationContactId.present
+        ? organizationContactId.value
+        : this.organizationContactId,
+    visitType: visitType ?? this.visitType,
+    status: status ?? this.status,
+    scheduledDateTime: scheduledDateTime ?? this.scheduledDateTime,
+    reason: reason.present ? reason.value : this.reason,
+    notes: notes.present ? notes.value : this.notes,
+    reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+    reminderMinutesBefore: reminderMinutesBefore ?? this.reminderMinutesBefore,
+    isArchived: isArchived ?? this.isArchived,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  DoctorVisitRecord copyWithCompanion(DoctorVisitRecordsCompanion data) {
+    return DoctorVisitRecord(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      doctorContactId: data.doctorContactId.present
+          ? data.doctorContactId.value
+          : this.doctorContactId,
+      organizationContactId: data.organizationContactId.present
+          ? data.organizationContactId.value
+          : this.organizationContactId,
+      visitType: data.visitType.present ? data.visitType.value : this.visitType,
+      status: data.status.present ? data.status.value : this.status,
+      scheduledDateTime: data.scheduledDateTime.present
+          ? data.scheduledDateTime.value
+          : this.scheduledDateTime,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      reminderEnabled: data.reminderEnabled.present
+          ? data.reminderEnabled.value
+          : this.reminderEnabled,
+      reminderMinutesBefore: data.reminderMinutesBefore.present
+          ? data.reminderMinutesBefore.value
+          : this.reminderMinutesBefore,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DoctorVisitRecord(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('doctorContactId: $doctorContactId, ')
+          ..write('organizationContactId: $organizationContactId, ')
+          ..write('visitType: $visitType, ')
+          ..write('status: $status, ')
+          ..write('scheduledDateTime: $scheduledDateTime, ')
+          ..write('reason: $reason, ')
+          ..write('notes: $notes, ')
+          ..write('reminderEnabled: $reminderEnabled, ')
+          ..write('reminderMinutesBefore: $reminderMinutesBefore, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    doctorContactId,
+    organizationContactId,
+    visitType,
+    status,
+    scheduledDateTime,
+    reason,
+    notes,
+    reminderEnabled,
+    reminderMinutesBefore,
+    isArchived,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DoctorVisitRecord &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.doctorContactId == this.doctorContactId &&
+          other.organizationContactId == this.organizationContactId &&
+          other.visitType == this.visitType &&
+          other.status == this.status &&
+          other.scheduledDateTime == this.scheduledDateTime &&
+          other.reason == this.reason &&
+          other.notes == this.notes &&
+          other.reminderEnabled == this.reminderEnabled &&
+          other.reminderMinutesBefore == this.reminderMinutesBefore &&
+          other.isArchived == this.isArchived &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DoctorVisitRecordsCompanion extends UpdateCompanion<DoctorVisitRecord> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<int?> doctorContactId;
+  final Value<int?> organizationContactId;
+  final Value<String> visitType;
+  final Value<String> status;
+  final Value<DateTime> scheduledDateTime;
+  final Value<String?> reason;
+  final Value<String?> notes;
+  final Value<bool> reminderEnabled;
+  final Value<int> reminderMinutesBefore;
+  final Value<bool> isArchived;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const DoctorVisitRecordsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.doctorContactId = const Value.absent(),
+    this.organizationContactId = const Value.absent(),
+    this.visitType = const Value.absent(),
+    this.status = const Value.absent(),
+    this.scheduledDateTime = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.reminderEnabled = const Value.absent(),
+    this.reminderMinutesBefore = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  DoctorVisitRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    this.doctorContactId = const Value.absent(),
+    this.organizationContactId = const Value.absent(),
+    required String visitType,
+    required String status,
+    required DateTime scheduledDateTime,
+    this.reason = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.reminderEnabled = const Value.absent(),
+    this.reminderMinutesBefore = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : profileId = Value(profileId),
+       visitType = Value(visitType),
+       status = Value(status),
+       scheduledDateTime = Value(scheduledDateTime),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<DoctorVisitRecord> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<int>? doctorContactId,
+    Expression<int>? organizationContactId,
+    Expression<String>? visitType,
+    Expression<String>? status,
+    Expression<DateTime>? scheduledDateTime,
+    Expression<String>? reason,
+    Expression<String>? notes,
+    Expression<bool>? reminderEnabled,
+    Expression<int>? reminderMinutesBefore,
+    Expression<bool>? isArchived,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (doctorContactId != null) 'doctor_contact_id': doctorContactId,
+      if (organizationContactId != null)
+        'organization_contact_id': organizationContactId,
+      if (visitType != null) 'visit_type': visitType,
+      if (status != null) 'status': status,
+      if (scheduledDateTime != null) 'scheduled_date_time': scheduledDateTime,
+      if (reason != null) 'reason': reason,
+      if (notes != null) 'notes': notes,
+      if (reminderEnabled != null) 'reminder_enabled': reminderEnabled,
+      if (reminderMinutesBefore != null)
+        'reminder_minutes_before': reminderMinutesBefore,
+      if (isArchived != null) 'is_archived': isArchived,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  DoctorVisitRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? profileId,
+    Value<int?>? doctorContactId,
+    Value<int?>? organizationContactId,
+    Value<String>? visitType,
+    Value<String>? status,
+    Value<DateTime>? scheduledDateTime,
+    Value<String?>? reason,
+    Value<String?>? notes,
+    Value<bool>? reminderEnabled,
+    Value<int>? reminderMinutesBefore,
+    Value<bool>? isArchived,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return DoctorVisitRecordsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      doctorContactId: doctorContactId ?? this.doctorContactId,
+      organizationContactId:
+          organizationContactId ?? this.organizationContactId,
+      visitType: visitType ?? this.visitType,
+      status: status ?? this.status,
+      scheduledDateTime: scheduledDateTime ?? this.scheduledDateTime,
+      reason: reason ?? this.reason,
+      notes: notes ?? this.notes,
+      reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+      reminderMinutesBefore:
+          reminderMinutesBefore ?? this.reminderMinutesBefore,
+      isArchived: isArchived ?? this.isArchived,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (doctorContactId.present) {
+      map['doctor_contact_id'] = Variable<int>(doctorContactId.value);
+    }
+    if (organizationContactId.present) {
+      map['organization_contact_id'] = Variable<int>(
+        organizationContactId.value,
+      );
+    }
+    if (visitType.present) {
+      map['visit_type'] = Variable<String>(visitType.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (scheduledDateTime.present) {
+      map['scheduled_date_time'] = Variable<DateTime>(scheduledDateTime.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (reminderEnabled.present) {
+      map['reminder_enabled'] = Variable<bool>(reminderEnabled.value);
+    }
+    if (reminderMinutesBefore.present) {
+      map['reminder_minutes_before'] = Variable<int>(
+        reminderMinutesBefore.value,
+      );
+    }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DoctorVisitRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('doctorContactId: $doctorContactId, ')
+          ..write('organizationContactId: $organizationContactId, ')
+          ..write('visitType: $visitType, ')
+          ..write('status: $status, ')
+          ..write('scheduledDateTime: $scheduledDateTime, ')
+          ..write('reason: $reason, ')
+          ..write('notes: $notes, ')
+          ..write('reminderEnabled: $reminderEnabled, ')
+          ..write('reminderMinutesBefore: $reminderMinutesBefore, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $DocumentAttachmentsTable extends DocumentAttachments
     with TableInfo<$DocumentAttachmentsTable, DocumentAttachment> {
   @override
@@ -15058,6 +15900,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DoctorsTable doctors = $DoctorsTable(this);
   late final $DoctorVisitsTable doctorVisits = $DoctorVisitsTable(this);
   late final $CareContactsTable careContacts = $CareContactsTable(this);
+  late final $DoctorVisitRecordsTable doctorVisitRecords =
+      $DoctorVisitRecordsTable(this);
   late final $DocumentAttachmentsTable documentAttachments =
       $DocumentAttachmentsTable(this);
   late final $DietPlansTable dietPlans = $DietPlansTable(this);
@@ -15088,6 +15932,30 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'care_contacts_display_name_idx',
     'CREATE INDEX care_contacts_display_name_idx ON care_contacts (display_name)',
   );
+  late final Index doctorVisitRecordsProfileIdx = Index(
+    'doctor_visit_records_profile_idx',
+    'CREATE INDEX doctor_visit_records_profile_idx ON doctor_visit_records (profile_id)',
+  );
+  late final Index doctorVisitRecordsScheduledIdx = Index(
+    'doctor_visit_records_scheduled_idx',
+    'CREATE INDEX doctor_visit_records_scheduled_idx ON doctor_visit_records (scheduled_date_time)',
+  );
+  late final Index doctorVisitRecordsStatusIdx = Index(
+    'doctor_visit_records_status_idx',
+    'CREATE INDEX doctor_visit_records_status_idx ON doctor_visit_records (status)',
+  );
+  late final Index doctorVisitRecordsDoctorIdx = Index(
+    'doctor_visit_records_doctor_idx',
+    'CREATE INDEX doctor_visit_records_doctor_idx ON doctor_visit_records (doctor_contact_id)',
+  );
+  late final Index doctorVisitRecordsOrgIdx = Index(
+    'doctor_visit_records_org_idx',
+    'CREATE INDEX doctor_visit_records_org_idx ON doctor_visit_records (organization_contact_id)',
+  );
+  late final Index doctorVisitRecordsArchivedIdx = Index(
+    'doctor_visit_records_archived_idx',
+    'CREATE INDEX doctor_visit_records_archived_idx ON doctor_visit_records (is_archived)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -15112,6 +15980,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     doctors,
     doctorVisits,
     careContacts,
+    doctorVisitRecords,
     documentAttachments,
     dietPlans,
     dietItems,
@@ -15123,6 +15992,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     careContactsArchivedIdx,
     careContactsFavoriteIdx,
     careContactsDisplayNameIdx,
+    doctorVisitRecordsProfileIdx,
+    doctorVisitRecordsScheduledIdx,
+    doctorVisitRecordsStatusIdx,
+    doctorVisitRecordsDoctorIdx,
+    doctorVisitRecordsOrgIdx,
+    doctorVisitRecordsArchivedIdx,
   ];
 }
 
@@ -15367,6 +16242,27 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_careContactsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$DoctorVisitRecordsTable, List<DoctorVisitRecord>>
+  _doctorVisitRecordsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.doctorVisitRecords,
+        aliasName: 'profiles__id__doctor_visit_records__profile_id',
+      );
+
+  $$DoctorVisitRecordsTableProcessedTableManager get doctorVisitRecordsRefs {
+    final manager = $$DoctorVisitRecordsTableTableManager(
+      $_db,
+      $_db.doctorVisitRecords,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _doctorVisitRecordsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -15795,6 +16691,31 @@ class $$ProfilesTableFilterComposer
           }) => $$CareContactsTableFilterComposer(
             $db: $db,
             $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> doctorVisitRecordsRefs(
+    Expression<bool> Function($$DoctorVisitRecordsTableFilterComposer f) f,
+  ) {
+    final $$DoctorVisitRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.doctorVisitRecords,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DoctorVisitRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.doctorVisitRecords,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -16326,6 +17247,32 @@ class $$ProfilesTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> doctorVisitRecordsRefs<T extends Object>(
+    Expression<T> Function($$DoctorVisitRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$DoctorVisitRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.doctorVisitRecords,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DoctorVisitRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.doctorVisitRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<T> documentAttachmentsRefs<T extends Object>(
     Expression<T> Function($$DocumentAttachmentsTableAnnotationComposer a) f,
   ) {
@@ -16428,6 +17375,7 @@ class $$ProfilesTableTableManager
             bool doctorsRefs,
             bool doctorVisitsRefs,
             bool careContactsRefs,
+            bool doctorVisitRecordsRefs,
             bool documentAttachmentsRefs,
             bool dietPlansRefs,
             bool profileReferenceRangesRefs,
@@ -16556,6 +17504,7 @@ class $$ProfilesTableTableManager
                 doctorsRefs = false,
                 doctorVisitsRefs = false,
                 careContactsRefs = false,
+                doctorVisitRecordsRefs = false,
                 documentAttachmentsRefs = false,
                 dietPlansRefs = false,
                 profileReferenceRangesRefs = false,
@@ -16573,6 +17522,7 @@ class $$ProfilesTableTableManager
                     if (doctorsRefs) db.doctors,
                     if (doctorVisitsRefs) db.doctorVisits,
                     if (careContactsRefs) db.careContacts,
+                    if (doctorVisitRecordsRefs) db.doctorVisitRecords,
                     if (documentAttachmentsRefs) db.documentAttachments,
                     if (dietPlansRefs) db.dietPlans,
                     if (profileReferenceRangesRefs) db.profileReferenceRanges,
@@ -16790,6 +17740,27 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (doctorVisitRecordsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          DoctorVisitRecord
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._doctorVisitRecordsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).doctorVisitRecordsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (documentAttachmentsRefs)
                         await $_getPrefetchedData<
                           Profile,
@@ -16884,6 +17855,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool doctorsRefs,
         bool doctorVisitsRefs,
         bool careContactsRefs,
+        bool doctorVisitRecordsRefs,
         bool documentAttachmentsRefs,
         bool dietPlansRefs,
         bool profileReferenceRangesRefs,
@@ -25791,6 +26763,46 @@ final class $$CareContactsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$DoctorVisitRecordsTable, List<DoctorVisitRecord>>
+  _doctorTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.doctorVisitRecords,
+    aliasName: 'care_contacts__id__doctor_visit_records__doctor_contact_id',
+  );
+
+  $$DoctorVisitRecordsTableProcessedTableManager get doctor {
+    final manager = $$DoctorVisitRecordsTableTableManager(
+      $_db,
+      $_db.doctorVisitRecords,
+    ).filter((f) => f.doctorContactId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_doctorTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$DoctorVisitRecordsTable, List<DoctorVisitRecord>>
+  _organizationTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.doctorVisitRecords,
+    aliasName:
+        'care_contacts__id__doctor_visit_records__organization_contact_id',
+  );
+
+  $$DoctorVisitRecordsTableProcessedTableManager get organization {
+    final manager =
+        $$DoctorVisitRecordsTableTableManager(
+          $_db,
+          $_db.doctorVisitRecords,
+        ).filter(
+          (f) => f.organizationContactId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_organizationTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$CareContactsTableFilterComposer
@@ -25938,6 +26950,56 @@ class $$CareContactsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> doctor(
+    Expression<bool> Function($$DoctorVisitRecordsTableFilterComposer f) f,
+  ) {
+    final $$DoctorVisitRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.doctorVisitRecords,
+      getReferencedColumn: (t) => t.doctorContactId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DoctorVisitRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.doctorVisitRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> organization(
+    Expression<bool> Function($$DoctorVisitRecordsTableFilterComposer f) f,
+  ) {
+    final $$DoctorVisitRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.doctorVisitRecords,
+      getReferencedColumn: (t) => t.organizationContactId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DoctorVisitRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.doctorVisitRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -26213,6 +27275,58 @@ class $$CareContactsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> doctor<T extends Object>(
+    Expression<T> Function($$DoctorVisitRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$DoctorVisitRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.doctorVisitRecords,
+          getReferencedColumn: (t) => t.doctorContactId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DoctorVisitRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.doctorVisitRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> organization<T extends Object>(
+    Expression<T> Function($$DoctorVisitRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$DoctorVisitRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.doctorVisitRecords,
+          getReferencedColumn: (t) => t.organizationContactId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DoctorVisitRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.doctorVisitRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$CareContactsTableTableManager
@@ -26228,7 +27342,11 @@ class $$CareContactsTableTableManager
           $$CareContactsTableUpdateCompanionBuilder,
           (CareContact, $$CareContactsTableReferences),
           CareContact,
-          PrefetchHooks Function({bool profileId})
+          PrefetchHooks Function({
+            bool profileId,
+            bool doctor,
+            bool organization,
+          })
         > {
   $$CareContactsTableTableManager(_$AppDatabase db, $CareContactsTable table)
     : super(
@@ -26353,47 +27471,96 @@ class $$CareContactsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({profileId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (profileId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.profileId,
-                                referencedTable: $$CareContactsTableReferences
-                                    ._profileIdTable(db),
-                                referencedColumn: $$CareContactsTableReferences
-                                    ._profileIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({profileId = false, doctor = false, organization = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (doctor) db.doctorVisitRecords,
+                    if (organization) db.doctorVisitRecords,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$CareContactsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$CareContactsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (doctor)
+                        await $_getPrefetchedData<
+                          CareContact,
+                          $CareContactsTable,
+                          DoctorVisitRecord
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CareContactsTableReferences
+                              ._doctorTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CareContactsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).doctor,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.doctorContactId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (organization)
+                        await $_getPrefetchedData<
+                          CareContact,
+                          $CareContactsTable,
+                          DoctorVisitRecord
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CareContactsTableReferences
+                              ._organizationTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CareContactsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).organization,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.organizationContactId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -26410,7 +27577,708 @@ typedef $$CareContactsTableProcessedTableManager =
       $$CareContactsTableUpdateCompanionBuilder,
       (CareContact, $$CareContactsTableReferences),
       CareContact,
-      PrefetchHooks Function({bool profileId})
+      PrefetchHooks Function({bool profileId, bool doctor, bool organization})
+    >;
+typedef $$DoctorVisitRecordsTableCreateCompanionBuilder =
+    DoctorVisitRecordsCompanion Function({
+      Value<int> id,
+      required int profileId,
+      Value<int?> doctorContactId,
+      Value<int?> organizationContactId,
+      required String visitType,
+      required String status,
+      required DateTime scheduledDateTime,
+      Value<String?> reason,
+      Value<String?> notes,
+      Value<bool> reminderEnabled,
+      Value<int> reminderMinutesBefore,
+      Value<bool> isArchived,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$DoctorVisitRecordsTableUpdateCompanionBuilder =
+    DoctorVisitRecordsCompanion Function({
+      Value<int> id,
+      Value<int> profileId,
+      Value<int?> doctorContactId,
+      Value<int?> organizationContactId,
+      Value<String> visitType,
+      Value<String> status,
+      Value<DateTime> scheduledDateTime,
+      Value<String?> reason,
+      Value<String?> notes,
+      Value<bool> reminderEnabled,
+      Value<int> reminderMinutesBefore,
+      Value<bool> isArchived,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$DoctorVisitRecordsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $DoctorVisitRecordsTable,
+          DoctorVisitRecord
+        > {
+  $$DoctorVisitRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('doctor_visit_records__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CareContactsTable _doctorContactIdTable(_$AppDatabase db) =>
+      db.careContacts.createAlias(
+        'doctor_visit_records__doctor_contact_id__care_contacts__id',
+      );
+
+  $$CareContactsTableProcessedTableManager? get doctorContactId {
+    final $_column = $_itemColumn<int>('doctor_contact_id');
+    if ($_column == null) return null;
+    final manager = $$CareContactsTableTableManager(
+      $_db,
+      $_db.careContacts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_doctorContactIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CareContactsTable _organizationContactIdTable(_$AppDatabase db) =>
+      db.careContacts.createAlias(
+        'doctor_visit_records__organization_contact_id__care_contacts__id',
+      );
+
+  $$CareContactsTableProcessedTableManager? get organizationContactId {
+    final $_column = $_itemColumn<int>('organization_contact_id');
+    if ($_column == null) return null;
+    final manager = $$CareContactsTableTableManager(
+      $_db,
+      $_db.careContacts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _organizationContactIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DoctorVisitRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $DoctorVisitRecordsTable> {
+  $$DoctorVisitRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get visitType => $composableBuilder(
+    column: $table.visitType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get scheduledDateTime => $composableBuilder(
+    column: $table.scheduledDateTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get reminderEnabled => $composableBuilder(
+    column: $table.reminderEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reminderMinutesBefore => $composableBuilder(
+    column: $table.reminderMinutesBefore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableFilterComposer get doctorContactId {
+    final $$CareContactsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.doctorContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableFilterComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableFilterComposer get organizationContactId {
+    final $$CareContactsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.organizationContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableFilterComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DoctorVisitRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DoctorVisitRecordsTable> {
+  $$DoctorVisitRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get visitType => $composableBuilder(
+    column: $table.visitType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get scheduledDateTime => $composableBuilder(
+    column: $table.scheduledDateTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get reminderEnabled => $composableBuilder(
+    column: $table.reminderEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reminderMinutesBefore => $composableBuilder(
+    column: $table.reminderMinutesBefore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableOrderingComposer get doctorContactId {
+    final $$CareContactsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.doctorContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableOrderingComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableOrderingComposer get organizationContactId {
+    final $$CareContactsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.organizationContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableOrderingComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DoctorVisitRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DoctorVisitRecordsTable> {
+  $$DoctorVisitRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get visitType =>
+      $composableBuilder(column: $table.visitType, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get scheduledDateTime => $composableBuilder(
+    column: $table.scheduledDateTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get reminderEnabled => $composableBuilder(
+    column: $table.reminderEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get reminderMinutesBefore => $composableBuilder(
+    column: $table.reminderMinutesBefore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableAnnotationComposer get doctorContactId {
+    final $$CareContactsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.doctorContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableAnnotationComposer get organizationContactId {
+    final $$CareContactsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.organizationContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DoctorVisitRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DoctorVisitRecordsTable,
+          DoctorVisitRecord,
+          $$DoctorVisitRecordsTableFilterComposer,
+          $$DoctorVisitRecordsTableOrderingComposer,
+          $$DoctorVisitRecordsTableAnnotationComposer,
+          $$DoctorVisitRecordsTableCreateCompanionBuilder,
+          $$DoctorVisitRecordsTableUpdateCompanionBuilder,
+          (DoctorVisitRecord, $$DoctorVisitRecordsTableReferences),
+          DoctorVisitRecord,
+          PrefetchHooks Function({
+            bool profileId,
+            bool doctorContactId,
+            bool organizationContactId,
+          })
+        > {
+  $$DoctorVisitRecordsTableTableManager(
+    _$AppDatabase db,
+    $DoctorVisitRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DoctorVisitRecordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DoctorVisitRecordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DoctorVisitRecordsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<int?> doctorContactId = const Value.absent(),
+                Value<int?> organizationContactId = const Value.absent(),
+                Value<String> visitType = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> scheduledDateTime = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> reminderEnabled = const Value.absent(),
+                Value<int> reminderMinutesBefore = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => DoctorVisitRecordsCompanion(
+                id: id,
+                profileId: profileId,
+                doctorContactId: doctorContactId,
+                organizationContactId: organizationContactId,
+                visitType: visitType,
+                status: status,
+                scheduledDateTime: scheduledDateTime,
+                reason: reason,
+                notes: notes,
+                reminderEnabled: reminderEnabled,
+                reminderMinutesBefore: reminderMinutesBefore,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int profileId,
+                Value<int?> doctorContactId = const Value.absent(),
+                Value<int?> organizationContactId = const Value.absent(),
+                required String visitType,
+                required String status,
+                required DateTime scheduledDateTime,
+                Value<String?> reason = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> reminderEnabled = const Value.absent(),
+                Value<int> reminderMinutesBefore = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => DoctorVisitRecordsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                doctorContactId: doctorContactId,
+                organizationContactId: organizationContactId,
+                visitType: visitType,
+                status: status,
+                scheduledDateTime: scheduledDateTime,
+                reason: reason,
+                notes: notes,
+                reminderEnabled: reminderEnabled,
+                reminderMinutesBefore: reminderMinutesBefore,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$DoctorVisitRecordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                profileId = false,
+                doctorContactId = false,
+                organizationContactId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$DoctorVisitRecordsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$DoctorVisitRecordsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (doctorContactId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.doctorContactId,
+                                    referencedTable:
+                                        $$DoctorVisitRecordsTableReferences
+                                            ._doctorContactIdTable(db),
+                                    referencedColumn:
+                                        $$DoctorVisitRecordsTableReferences
+                                            ._doctorContactIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (organizationContactId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.organizationContactId,
+                                    referencedTable:
+                                        $$DoctorVisitRecordsTableReferences
+                                            ._organizationContactIdTable(db),
+                                    referencedColumn:
+                                        $$DoctorVisitRecordsTableReferences
+                                            ._organizationContactIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$DoctorVisitRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DoctorVisitRecordsTable,
+      DoctorVisitRecord,
+      $$DoctorVisitRecordsTableFilterComposer,
+      $$DoctorVisitRecordsTableOrderingComposer,
+      $$DoctorVisitRecordsTableAnnotationComposer,
+      $$DoctorVisitRecordsTableCreateCompanionBuilder,
+      $$DoctorVisitRecordsTableUpdateCompanionBuilder,
+      (DoctorVisitRecord, $$DoctorVisitRecordsTableReferences),
+      DoctorVisitRecord,
+      PrefetchHooks Function({
+        bool profileId,
+        bool doctorContactId,
+        bool organizationContactId,
+      })
     >;
 typedef $$DocumentAttachmentsTableCreateCompanionBuilder =
     DocumentAttachmentsCompanion Function({
@@ -28377,6 +30245,8 @@ class $AppDatabaseManager {
       $$DoctorVisitsTableTableManager(_db, _db.doctorVisits);
   $$CareContactsTableTableManager get careContacts =>
       $$CareContactsTableTableManager(_db, _db.careContacts);
+  $$DoctorVisitRecordsTableTableManager get doctorVisitRecords =>
+      $$DoctorVisitRecordsTableTableManager(_db, _db.doctorVisitRecords);
   $$DocumentAttachmentsTableTableManager get documentAttachments =>
       $$DocumentAttachmentsTableTableManager(_db, _db.documentAttachments);
   $$DietPlansTableTableManager get dietPlans =>

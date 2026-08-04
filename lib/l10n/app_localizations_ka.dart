@@ -1622,4 +1622,156 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get contactNotAvailable => 'კონტაქტი ვერ მოიძებნა';
+
+  @override
+  String get enabled => 'ჩართული';
+
+  @override
+  String get scheduled => 'დაგეგმილი';
+
+  @override
+  String get cancelled => 'გაუქმებული';
+
+  @override
+  String get doctor => 'ექიმი';
+
+  @override
+  String get plannedVisit => 'დაგეგმილი';
+
+  @override
+  String get onDemandVisit => 'მოთხოვნისამებრ';
+
+  @override
+  String get oneWeekBefore => '1 კვირით ადრე';
+
+  @override
+  String get twoDaysBefore => '2 დღით ადრე';
+
+  @override
+  String get oneDayBefore => '1 დღით ადრე';
+
+  @override
+  String get twoHoursBefore => '2 საათით ადრე';
+
+  @override
+  String get oneHourBefore => '1 საათით ადრე';
+
+  @override
+  String get thirtyMinutesBefore => '30 წუთით ადრე';
+
+  @override
+  String get fifteenMinutesBefore => '15 წუთით ადრე';
+
+  @override
+  String get addDoctorVisit => 'ექიმთან ვიზიტის დამატება';
+
+  @override
+  String get editDoctorVisit => 'ექიმთან ვიზიტის რედაქტირება';
+
+  @override
+  String get upcomingVisits => 'მომავალი';
+
+  @override
+  String doctorVisitsUpcomingBadgeSemantics(int count) {
+    return 'ექიმთან ვიზიტები, $count მომავალი ვიზიტი';
+  }
+
+  @override
+  String get visitHistory => 'ისტორია';
+
+  @override
+  String get noUpcomingVisits => 'მომავალი ვიზიტები არ არის';
+
+  @override
+  String get noVisitHistory => 'ვიზიტების ისტორია არ არის';
+
+  @override
+  String get noUpcomingVisitsDescription => 'დაგეგმილი ვიზიტები აქ გამოჩნდება.';
+
+  @override
+  String get noVisitHistoryDescription =>
+      'დასრულებული, გაუქმებული და გამოტოვებული ვიზიტები აქ გამოჩნდება.';
+
+  @override
+  String get contactNotSelected => 'არჩეული არ არის';
+
+  @override
+  String get visitReason => 'ვიზიტის მიზეზი';
+
+  @override
+  String get remindMe => 'შემახსენე';
+
+  @override
+  String get remindBefore => 'შეხსენება მანამდე';
+
+  @override
+  String get saveVisitFailed => 'ვიზიტის შენახვა ვერ მოხერხდა';
+
+  @override
+  String get visitUpdated => 'ვიზიტი განახლდა';
+
+  @override
+  String get visitSaved => 'ვიზიტი შეინახა';
+
+  @override
+  String get doctorVisitDetails => 'ვიზიტის დეტალები';
+
+  @override
+  String get visitNeedsAttention =>
+      'ვიზიტის ვადა გავიდა — მონიშნეთ დასრულებულად, გააუქმეთ ან მონიშნეთ გამოტოვებულად.';
+
+  @override
+  String get markCompleted => 'დასრულებულად მონიშვნა';
+
+  @override
+  String get markMissed => 'გამოტოვებულად მონიშვნა';
+
+  @override
+  String get reschedule => 'გადადება';
+
+  @override
+  String get cancelVisit => 'ვიზიტის გაუქმება';
+
+  @override
+  String get visitCompleted => 'ვიზიტი დასრულებულად მოინიშნა';
+
+  @override
+  String get visitCancelled => 'ვიზიტი გაუქმდა';
+
+  @override
+  String get visitMissed => 'ვიზიტი გამოტოვებულად მოინიშნა';
+
+  @override
+  String get confirmDeleteVisit =>
+      'წავშალოთ ეს ვიზიტი სამუდამოდ? ეს მოქმედება შეუქცევადია.';
+
+  @override
+  String get visitDeleted => 'ვიზიტი წაიშალა';
+
+  @override
+  String get saveAsScheduledLater => 'შეინახე დაგეგმილად';
+
+  @override
+  String get onDemandRecordedCompleted =>
+      'მოთხოვნისამებრ ვიზიტები მაშინვე დასრულებულად აღირიცხება. ჩართეთ ეს პარამეტრი მომავალი თარიღის დასაგეგმად.';
+
+  @override
+  String get scheduledDateTime => 'დაგეგმილი თარიღი და დრო';
+
+  @override
+  String get visitType => 'ვიზიტის ტიპი';
+
+  @override
+  String get selectDoctor => 'აირჩიეთ ექიმი';
+
+  @override
+  String get selectClinicOrHospital => 'აირჩიეთ კლინიკა ან საავადმყოფო';
+
+  @override
+  String get noEligibleContacts =>
+      'შესაფერისი კონტაქტი არ არის. ჯერ დაამატეთ კონტაქტი.';
+
+  @override
+  String get contactReferencedByVisits =>
+      'ეს კონტაქტი გამოიყენება ექიმთან ვიზიტში და მისი სამუდამოდ წაშლა შეუძლებელია.';
 }

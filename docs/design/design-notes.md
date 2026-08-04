@@ -687,3 +687,76 @@ future modules remain untouched; the single-table design leaves this open.
 | `lib/presentation/utils/care_contact_localizer.dart` | Type label/icon mapping |
 | `lib/presentation/utils/care_contact_actions.dart` | tel/mailto/https/geo launchers |
 | `test/care_contact_*_test.dart` | Entity/repo/provider/migration/widget/routing tests |
+
+## Doctor Visits — Design Rules (Approved 2026-08-03)
+
+### Scope
+
+Records → Doctor Visits: upcoming/history lists, add/edit/details, planned and
+on-demand visits, Care Contact integration, and reminders on the existing
+notification infrastructure. Replaces the placeholder. Lab Analyses / Reports /
+Activities / Diet / attachments / cloud / spoken reminders are out of scope.
+
+### Data model
+
+- Table `doctor_visit_records` (class `DoctorVisitRecords`) — distinct from the
+  legacy placeholder `DoctorVisits` table; entity `DoctorVisitRecord` distinct
+  from the legacy `DoctorVisit` entity. Schema v13 → v14, additive migration.
+- Columns: `profileId`, `doctorContactId` / `organizationContactId` (nullable
+  FKs → Care Contacts), `visitType`, `status`, `scheduledDateTime`,
+  `reason`/`notes` (nullable), `reminderEnabled`, `reminderMinutesBefore`,
+  `isArchived`, `createdAt`, `updatedAt`. Six indexes.
+- Stable persisted enum names: `visitType` = `planned` | `onDemand`;
+  `status` = `scheduled` | `completed` | `cancelled` | `missed`. Localized
+  labels are UI-only (see `DoctorVisitLocalizer`).
+
+### Behavior rules
+
+- New planned visit → `scheduled`. New on-demand visit → `completed` by default
+  unless saved as scheduled-for-later. Rescheduling updates the SAME record
+  (in-place `replace`, never a duplicate row).
+- Open visit can become completed / cancelled / missed; terminal states stay in
+  History and are never auto-reopened. Cancelled/missed are preserved, never
+  silently deleted.
+- Missed rule (this phase): past scheduled visits are NOT auto-marked missed;
+  they stay in Upcoming under an "attention" state until the user acts
+  (complete / cancel / reschedule / mark missed).
+- Visits reference Care Contacts optionally (doctor / clinic / both / neither);
+  `doctorContactId` must be type `doctor`, `organizationContactId` prefers
+  clinic/hospital. References are live; archived contacts stay visible in
+  history; deleted/missing refs show "Contact not available" without crashing.
+- Care Contact permanent deletion is refused while any visit references it
+  (`countAllVisitsReferencingContact`); `countOpenVisitsReferencingContact`
+  (open-only) exists to warn before deleting/archiving a contact that has
+  upcoming visits. Visits are never cascade-deleted.
+
+### Reminders
+
+- Default enabled, 24h before; options 15m/30m/1h/2h/1d/2d/1w; persist numeric
+  minutes. Scheduled on create/edit/reschedule/enable; cancelled on
+  complete/cancel/missed/disable/delete/archive. No past reminders (skip +
+  debugPrint). Timezone-aware via `tz.TZDateTime(tz.local, ...)`.
+- Channel `rehabtrack_doctor_visits` (high importance, vibration); actions Open
+  (`doctor_visit_open`) + Snooze (`doctor_visit_snooze`);
+  `doctorVisitNotificationId(id) = 5000000 + id`; snooze id offset 2000000.
+- Notification content: title "Doctor visit reminder"; body = doctor/clinic
+  effective names + scheduled time + reason only. Never notes / diagnosis /
+  symptoms / prescriptions / policy / phones / addresses.
+- Tap / Open → Visit Details via `onActionProcessed` with `payload.visitId`.
+
+### Key Files
+
+| File | Purpose |
+|---|---|
+| `lib/data/database/tables/doctor_visit_records_table.dart` | DoctorVisitRecords table + indexes |
+| `lib/data/database/daos/doctor_visit_dao.dart` | Profile-scoped watchers/CRUD + reference guards |
+| `lib/domain/entities/doctor_visit_record.dart` | Entity (`isOpen`, `isFutureScheduled`, clear-flags copyWith) |
+| `lib/domain/repositories/doctor_visit_repository.dart` | Repository interface |
+| `lib/data/repositories/doctor_visit_repository_impl.dart` | Drift implementation |
+| `lib/data/services/notification/doctor_visit_reminder_service.dart` | Schedule/cancel visit reminders |
+| `lib/presentation/providers/doctor_visit_provider.dart` | Upcoming/history/by-id/count/lookup providers |
+| `lib/presentation/screens/records/doctor_visits_screen.dart` | Upcoming/History lists |
+| `lib/presentation/screens/records/doctor_visit_form_screen.dart` | Add/Edit form |
+| `lib/presentation/screens/records/doctor_visit_details_screen.dart` | Details + status actions |
+| `lib/presentation/utils/doctor_visit_localizer.dart` | Type/status/offset labels |
+| `test/doctor_visit_*_test.dart` | Entity/repo/reminder/routing tests |

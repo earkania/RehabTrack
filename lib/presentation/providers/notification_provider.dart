@@ -58,6 +58,8 @@ final notificationActionBridgeProvider =
     medicationRepository: ref.watch(medicationRepositoryProvider),
     measurementRepository: ref.watch(measurementRepositoryProvider),
     profileRepository: ref.watch(profileRepositoryProvider),
+    doctorVisitRepository: ref.watch(doctorVisitRepositoryProvider),
+    careContactRepository: ref.watch(careContactRepositoryProvider),
     getSnoozeDuration: () {
       final minutes = ref.read(defaultSnoozeDurationProvider);
       return Duration(minutes: minutes);
@@ -87,6 +89,14 @@ final notificationActionBridgeProvider =
             AppRoutes.measurementAdd(payload.measurementTypeId!),
             extra: extra,
           );
+        } else if (actionType == NotificationActionType.doctorVisitOpen) {
+          final visitId = payload.visitId ?? payload.scheduleId;
+          if (visitId > 0) {
+            ref.read(routerProvider).go(AppRoutes.home);
+            ref.read(routerProvider).push(
+              AppRoutes.doctorVisitDetails(visitId),
+            );
+          }
         } else {
           ref.read(routerProvider).go(AppRoutes.home);
         }

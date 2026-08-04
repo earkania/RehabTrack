@@ -11,7 +11,7 @@ import 'notification_action_handler.dart';
 import 'pending_action_store.dart';
 
 NotificationActionCallback? _notificationActionCallback;
-VoidCallback? _notificationTapCallback;
+NotificationTapCallback? _notificationTapCallback;
 
 @pragma('vm:entry-point')
 void _onBackgroundNotificationResponse(NotificationResponse response) {
@@ -41,7 +41,7 @@ void _handleNotificationResponse(NotificationResponse response) {
   if (response.actionId == null || response.actionId!.isEmpty) {
     final tapCallback = _notificationTapCallback;
     if (tapCallback != null) {
-      tapCallback();
+      tapCallback(response.payload);
     }
     return;
   }
@@ -70,6 +70,8 @@ NotificationActionType? _parseActionType(String? actionId) {
     'measurement_record_now' => NotificationActionType.measurementRecordNow,
     'measurement_snooze' => NotificationActionType.measurementSnooze,
     'measurement_skip' => NotificationActionType.measurementSkip,
+    'doctor_visit_open' => NotificationActionType.doctorVisitOpen,
+    'doctor_visit_snooze' => NotificationActionType.doctorVisitSnooze,
     _ => null,
   };
 }
@@ -84,6 +86,7 @@ class NotificationService {
 
   static const medicationChannelId = 'rehabtrack_medications';
   static const measurementChannelId = 'rehabtrack_measurements';
+  static const doctorVisitChannelId = 'rehabtrack_doctor_visits';
 
   static const _medicationChannelName = 'Medication Reminders';
   static const _medicationChannelDesc =
@@ -91,10 +94,14 @@ class NotificationService {
   static const _measurementChannelName = 'Measurement Reminders';
   static const _measurementChannelDesc =
       'Reminders to record your health measurements';
+  static const _doctorVisitChannelName = 'Doctor Visit Reminders';
+  static const _doctorVisitChannelDesc =
+      'Reminders about your upcoming doctor visits';
 
   static const _medicationNotificationIdOffset = 100000;
   static const _measurementNotificationIdOffset = 1000000;
   static const _snoozeNotificationIdOffset = 2000000;
+  static const _doctorVisitNotificationIdOffset = 5000000;
 
   static final _vibrationPattern = Int64List.fromList([0, 250, 200, 250]);
 
@@ -110,7 +117,7 @@ class NotificationService {
     _notificationActionCallback = callback;
   }
 
-  void setNotificationTapCallback(VoidCallback callback) {
+  void setNotificationTapCallback(NotificationTapCallback callback) {
     _notificationTapCallback = callback;
   }
 
@@ -192,6 +199,17 @@ class NotificationService {
         measurementChannelId,
         _measurementChannelName,
         description: _measurementChannelDesc,
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+        vibrationPattern: _vibrationPattern,
+      ),
+    );
+    await androidPlugin.createNotificationChannel(
+      AndroidNotificationChannel(
+        doctorVisitChannelId,
+        _doctorVisitChannelName,
+        description: _doctorVisitChannelDesc,
         importance: Importance.high,
         playSound: true,
         enableVibration: true,
@@ -343,6 +361,19 @@ class NotificationService {
     ),
   ];
 
+  static const _doctorVisitActions = [
+    AndroidNotificationAction(
+      'doctor_visit_open',
+      'Open',
+      showsUserInterface: true,
+    ),
+    AndroidNotificationAction(
+      'doctor_visit_snooze',
+      'Snooze',
+      showsUserInterface: true,
+    ),
+  ];
+
   Future<void> showNotification({
     required int id,
     required String title,
@@ -351,6 +382,7 @@ class NotificationService {
     required String channelId,
     bool includeActions = false,
     bool isMeasurement = false,
+    bool isDoctorVisit = false,
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
@@ -363,7 +395,7 @@ class NotificationService {
     final channelDesc = _channelDescForId(channelId);
     final channelName = _channelNameForId(channelId);
     final actions = includeActions
-        ? (isMeasurement ? _measurementActions : _medicationActions)
+        ? _actionsFor(isMeasurement: isMeasurement, isDoctorVisit: isDoctorVisit)
         : null;
 
     final details = _detailsForChannel(
@@ -396,6 +428,7 @@ class NotificationService {
     required String channelId,
     bool includeActions = false,
     bool isMeasurement = false,
+    bool isDoctorVisit = false,
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
@@ -408,7 +441,7 @@ class NotificationService {
     final channelDesc = _channelDescForId(channelId);
     final channelName = _channelNameForId(channelId);
     final actions = includeActions
-        ? (isMeasurement ? _measurementActions : _medicationActions)
+        ? _actionsFor(isMeasurement: isMeasurement, isDoctorVisit: isDoctorVisit)
         : null;
 
     final details = _detailsForChannel(
@@ -494,15 +527,30 @@ class NotificationService {
     return _snoozeNotificationIdOffset + originalId;
   }
 
+  static int doctorVisitNotificationId(int visitId) {
+    return _doctorVisitNotificationIdOffset + visitId;
+  }
+
+  List<AndroidNotificationAction>? _actionsFor({
+    required bool isMeasurement,
+    required bool isDoctorVisit,
+  }) {
+    if (isDoctorVisit) return _doctorVisitActions;
+    if (isMeasurement) return _measurementActions;
+    return _medicationActions;
+  }
+
   String _channelNameForId(String channelId) => switch (channelId) {
         medicationChannelId => _medicationChannelName,
         measurementChannelId => _measurementChannelName,
+        doctorVisitChannelId => _doctorVisitChannelName,
         _ => _medicationChannelName,
       };
 
   String _channelDescForId(String channelId) => switch (channelId) {
         medicationChannelId => _medicationChannelDesc,
         measurementChannelId => _measurementChannelDesc,
+        doctorVisitChannelId => _doctorVisitChannelDesc,
         _ => _medicationChannelDesc,
       };
 }
