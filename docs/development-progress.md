@@ -3504,3 +3504,108 @@ Added `appSettings`, `backupAndRestore`, `backupRestoreComingSoon`,
 | `flutter test` | 1022/1022 passed |
 | Pixel 7 manual | See below |
 
+
+## Phase 9B — Backup & Restore: Manual Backup (2026-08-04)
+
+**Goal:** Implement Phase 1 of Backup & Restore — a manual backup that produces
+a single `.rtb` archive (database + app-managed photos + settings) and saves it
+to a user-chosen location via the system file picker. Restore is deliberately
+out of scope and shown as coming soon.
+
+### Archive format (`.rtb`, format version 1)
+
+A `.rtb` file is a standard ZIP archive with these entries, in order:
+
+| Entry | Contents |
+|---|---|
+| `manifest.json` | Backup metadata (see below) |
+| `database.sqlite` | Consistent SQLite snapshot via `VACUUM INTO` |
+| `preferences.json` | Allowlisted user settings (`{key: storedValue}`) |
+| `files/profile_images/…` | Profile photos (streamed from disk) |
+| `files/care_contact_images/…` | Care contact photos (streamed from disk) |
+
+`manifest.json` fields: `backupFormatVersion` (1), `appVersion`, `databaseSchemaVersion`,
+`createdAt` (UTC ISO 8601), `platform`, `databaseFileName`, `preferencesFileName`,
+`fileCount`, `totalUncompressedSize`, `checksums` (SHA-256 per entry, keyed by
+archive path). The format version is independent of the database schema version.
+
+### Key decisions
+
+- **Consistent snapshot:** `VACUUM INTO '<path>'` produces a consistent DB copy
+  while the live connection stays open. Validated in a scratch test; the device
+  DB uses `journal_mode=delete` (no WAL sidecar today). Drift 2.34.2 has no
+  built-in backup API.
+- **Destination:** `file_picker.saveFile` drives Android SAF
+  `ACTION_CREATE_DOCUMENT` (no broad storage permission). Passing `bytes` lets
+  the picker write the archive during document creation. Suggested filename:
+  `RehabTrack-Backup-yyyy-MM-dd_HH-mm.rtb`.
+- **Preferences:** only user-facing settings are exported (language, grace
+  period, reminders, snooze, notification content). Operational metadata such as
+  `last_backup_at` is excluded.
+- **Managed files:** all files under `profile_images/` and
+  `care_contact_images/` are scanned; archive paths mirror the on-disk directory
+  names so restore can place them back without renaming. DB-referenced photos
+  missing on disk are tolerated and reported as a non-sensitive warning.
+- **Path safety:** every archive entry name is validated (no absolute paths, no
+  `..`, no backslashes, root entries restricted to the three known files).
+- **Last-backup metadata:** `last_backup_at` (ISO 8601) is written to app
+  settings only after the archive is successfully stored at the destination.
+- **Results:** structured enum (`success`, `cancelled`, `storageFailure`,
+  `databaseFailure`, `archiveFailure`, `permissionDenied`, `notEnoughStorage`,
+  `operationAlreadyInProgress`, `unexpectedFailure`) mapped to localized UI
+  messages.
+
+### Implementation
+
+- `lib/domain/backup/` — `backup_manifest.dart`, `backup_result.dart`,
+  `backup_phase.dart`, `backup_operation_state.dart`.
+- `lib/data/services/backup/` — `backup_archive_writer.dart`
+  (`ZipFileEncoder`, streams files from disk), `backup_storage_gateway.dart`
+  (file picker + error mapping), `preferences_exporter.dart` (allowlist),
+  `managed_file_collector.dart` (scan + missing-file warnings),
+  `backup_service.dart` (orchestration: collect → snapshot → manifest → archive
+  → save).
+- `lib/presentation/providers/backup_provider.dart` —
+  `backupServiceProvider`, `backupOperationProvider`
+  (`BackupOperationController`), `lastBackupAtProvider`.
+- `lib/presentation/screens/settings/backup_and_restore_screen.dart` — replaced
+  the placeholder with the functional backup screen (description, last-backup,
+  what's-included, Create backup button with progress, coming-soon restore).
+- `lib/core/constants/app_constants.dart` — added `appVersion` and
+  `lastSuccessfulBackupKey`.
+- Dependencies: added `archive`, `file_picker`, `crypto`.
+
+### Localization (en + ka)
+
+Added backup keys (description, what's-included, progress, success/cancel/fail
+dialogs, missing-files note, last-backup labels) and regenerated via
+`flutter gen-l10n`.
+
+### Tests
+
+- `test/backup_manifest_test.dart` — JSON round-trip, format-version/validation
+  checks, checksum completeness.
+- `test/backup_archive_writer_test.dart` — valid ZIP, entry order, path-traversal
+  rejection.
+- `test/backup_preferences_exporter_test.dart` — allowlist filtering, metadata
+  exclusion.
+- `test/backup_managed_file_collector_test.dart` — directory scans, missing-file
+  warnings, orphan inclusion.
+- `test/backup_service_test.dart` — end-to-end archive with verified manifest +
+  checksums + restored snapshot; cancel/storage-failure/unexpected mapping;
+  injected clock filename.
+- `test/backup_provider_test.dart` — controller state transitions, metadata
+  write policy, `operationAlreadyInProgress`, `lastBackupAtProvider`.
+- `test/backup_screen_test.dart` — renders, progress while running, success /
+  cancel / failure dialogs, last-backup display.
+- `test/settings_navigation_test.dart` — updated the two placeholder tests to
+  assert the functional screen.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1082/1082 passed |
+| Pixel 7 manual | Pending — device disconnected from adb mid-session |

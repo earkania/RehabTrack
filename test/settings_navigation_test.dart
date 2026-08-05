@@ -145,7 +145,7 @@ void main() {
       expect(find.text('Test measurement reminder'), findsOneWidget);
     });
 
-    testWidgets('Backup & Restore tile opens the placeholder', (tester) async {
+    testWidgets('Backup & Restore tile opens the backup screen', (tester) async {
       await pumpApp(tester);
       await tapSettingsTab(tester);
 
@@ -155,12 +155,12 @@ void main() {
 
       expect(find.byType(BackupAndRestoreScreen), findsOneWidget);
       expect(
-        find.text('Backup and restore functionality will be available soon.'),
+        find.textContaining('Create a copy of all your data'),
         findsOneWidget,
       );
     });
 
-    testWidgets('placeholder lists planned items without active actions',
+    testWidgets('backup screen offers creation and shows restore as coming soon',
         (tester) async {
       await pumpApp(tester);
       await tapSettingsTab(tester);
@@ -170,25 +170,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Create backup'), findsOneWidget);
-      expect(find.text('Restore backup'), findsOneWidget);
+      expect(find.byType(FilledButton), findsOneWidget);
       expect(find.text('Backup information'), findsOneWidget);
-
-      // None of the planned items are interactive, and no action buttons
-      // (Filled/Outlined/Elevated/Text) are present. The AppBar back button
-      // (an IconButton) is the only control on screen.
-      for (final label in ['Create backup', 'Restore backup', 'Backup information']) {
-        expect(
-          find.ancestor(
-            of: find.text(label),
-            matching: find.byType(InkWell),
-          ),
-          findsNothing,
-        );
-      }
-      expect(find.byType(FilledButton), findsNothing);
-      expect(find.byType(OutlinedButton), findsNothing);
-      expect(find.byType(ElevatedButton), findsNothing);
-      expect(find.byType(TextButton), findsNothing);
+      expect(
+        find.text('Restore will be available in a future update.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('back from App Settings returns to the Settings dashboard',
@@ -264,7 +251,7 @@ void main() {
       expect(find.text('Medication reminders'), findsOneWidget);
     });
 
-    testWidgets('/settings/backup-restore opens the placeholder',
+    testWidgets('/settings/backup-restore opens the backup screen',
         (tester) async {
       await pumpApp(tester);
       routerOf(tester).go('/settings/backup-restore');

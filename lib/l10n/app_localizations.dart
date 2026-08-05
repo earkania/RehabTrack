@@ -176,6 +176,138 @@ abstract class AppLocalizations {
   /// **'Backup information'**
   String get backupInformation;
 
+  /// No description provided for @backupScreenDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a copy of all your data and save it as a file you control. Your photos and app settings are included.'**
+  String get backupScreenDescription;
+
+  /// No description provided for @backupIncludes.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s included'**
+  String get backupIncludes;
+
+  /// No description provided for @backupIncludesDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'All your health records and history'**
+  String get backupIncludesDatabase;
+
+  /// No description provided for @backupIncludesPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile and care contact photos'**
+  String get backupIncludesPhotos;
+
+  /// No description provided for @backupIncludesSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'App settings and preferences'**
+  String get backupIncludesSettings;
+
+  /// No description provided for @backupRestoreNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore will be available in a future update.'**
+  String get backupRestoreNotAvailable;
+
+  /// No description provided for @backupLastSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Last successful backup: {time}'**
+  String backupLastSuccessful(Object time);
+
+  /// No description provided for @backupLastNever.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup created yet'**
+  String get backupLastNever;
+
+  /// No description provided for @backupInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating backup…'**
+  String get backupInProgress;
+
+  /// No description provided for @backupSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup created'**
+  String get backupSuccessTitle;
+
+  /// No description provided for @backupSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your backup file has been saved to the chosen location.'**
+  String get backupSuccessMessage;
+
+  /// No description provided for @backupMissingFilesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Some photos referenced by your data were missing and are not included in this backup.'**
+  String get backupMissingFilesMessage;
+
+  /// No description provided for @backupCancelledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup cancelled'**
+  String get backupCancelledTitle;
+
+  /// No description provided for @backupCancelledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup was created.'**
+  String get backupCancelledMessage;
+
+  /// No description provided for @backupFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed'**
+  String get backupFailedTitle;
+
+  /// No description provided for @backupStorageFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not write the backup to the selected location. Try again or choose a different location.'**
+  String get backupStorageFailure;
+
+  /// No description provided for @backupDatabaseFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the app database. Try again.'**
+  String get backupDatabaseFailure;
+
+  /// No description provided for @backupArchiveFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the backup file. Try again.'**
+  String get backupArchiveFailure;
+
+  /// No description provided for @backupPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission to save the backup was denied.'**
+  String get backupPermissionDenied;
+
+  /// No description provided for @backupNotEnoughStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough free space on the selected location.'**
+  String get backupNotEnoughStorage;
+
+  /// No description provided for @backupOperationInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'A backup is already in progress. Please wait.'**
+  String get backupOperationInProgress;
+
+  /// No description provided for @backupUnexpectedFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get backupUnexpectedFailure;
+
   /// No description provided for @profile.
   ///
   /// In en, this message translates to:

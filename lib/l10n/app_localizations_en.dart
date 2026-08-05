@@ -49,6 +49,85 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupInformation => 'Backup information';
 
   @override
+  String get backupScreenDescription =>
+      'Create a copy of all your data and save it as a file you control. Your photos and app settings are included.';
+
+  @override
+  String get backupIncludes => 'What\'s included';
+
+  @override
+  String get backupIncludesDatabase => 'All your health records and history';
+
+  @override
+  String get backupIncludesPhotos => 'Profile and care contact photos';
+
+  @override
+  String get backupIncludesSettings => 'App settings and preferences';
+
+  @override
+  String get backupRestoreNotAvailable =>
+      'Restore will be available in a future update.';
+
+  @override
+  String backupLastSuccessful(Object time) {
+    return 'Last successful backup: $time';
+  }
+
+  @override
+  String get backupLastNever => 'No backup created yet';
+
+  @override
+  String get backupInProgress => 'Creating backup…';
+
+  @override
+  String get backupSuccessTitle => 'Backup created';
+
+  @override
+  String get backupSuccessMessage =>
+      'Your backup file has been saved to the chosen location.';
+
+  @override
+  String get backupMissingFilesMessage =>
+      'Some photos referenced by your data were missing and are not included in this backup.';
+
+  @override
+  String get backupCancelledTitle => 'Backup cancelled';
+
+  @override
+  String get backupCancelledMessage => 'No backup was created.';
+
+  @override
+  String get backupFailedTitle => 'Backup failed';
+
+  @override
+  String get backupStorageFailure =>
+      'Could not write the backup to the selected location. Try again or choose a different location.';
+
+  @override
+  String get backupDatabaseFailure =>
+      'Could not read the app database. Try again.';
+
+  @override
+  String get backupArchiveFailure =>
+      'Could not create the backup file. Try again.';
+
+  @override
+  String get backupPermissionDenied =>
+      'Permission to save the backup was denied.';
+
+  @override
+  String get backupNotEnoughStorage =>
+      'Not enough free space on the selected location.';
+
+  @override
+  String get backupOperationInProgress =>
+      'A backup is already in progress. Please wait.';
+
+  @override
+  String get backupUnexpectedFailure =>
+      'Something went wrong. Please try again.';
+
+  @override
   String get profile => 'Profile';
 
   @override

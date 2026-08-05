@@ -781,3 +781,67 @@ Activities / Diet / attachments / cloud / spoken reminders are out of scope.
 - Notification-regression rule: Settings navigation must never recreate the
   ProviderScope, notification services, or navigator keys; the dashboard and
   its children only read existing providers.
+
+## Backup & Restore — Approved Design (2026-08-04)
+
+Phase 1 implements **manual backup only**. Restore is deferred; the screen shows
+it as coming soon.
+
+### Archive format (`.rtb`, format version 1)
+
+A `.rtb` file is a standard ZIP archive (readable by any unzip tool) with a
+versioned layout:
+
+- `manifest.json` — `backupFormatVersion` (1), `appVersion`,
+  `databaseSchemaVersion`, `createdAt` (UTC ISO 8601), `platform`,
+  `databaseFileName`, `preferencesFileName`, `fileCount`,
+  `totalUncompressedSize`, `checksums` (SHA-256 per entry keyed by archive path).
+- `database.sqlite` — consistent SQLite snapshot.
+- `preferences.json` — allowlisted user settings (`{key: storedValue}`).
+- `files/profile_images/…` and `files/care_contact_images/…` — managed photos.
+
+Format version is independent of the database schema version. The manifest is
+validated on parse (unknown format version, empty app version, non-positive
+schema version, unsafe checksum paths, empty digests).
+
+### Approved decisions
+
+- **Snapshot strategy:** `VACUUM INTO '<temp path>'` while the live Drift
+  connection stays open (validated in a scratch test against this project's
+  drift version). Fallback consideration documented: checkpoint + copy + reopen.
+  Current device `journal_mode` is `delete` (no WAL sidecar), but `VACUUM INTO`
+  is safe regardless.
+- **Destination:** SAF `ACTION_CREATE_DOCUMENT` via `file_picker.saveFile`
+  (`FileType.custom`, allowed extensions `['rtb']`). No broad storage
+  permission. Passing `bytes` writes the archive during document creation.
+  Suggested filename `RehabTrack-Backup-yyyy-MM-dd_HH-mm.rtb`; no patient names
+  in the filename. The user is asked for a destination every time (destinations
+  are never remembered).
+- **Preferences export:** only user-facing settings (language, grace period,
+  reminders on/off, sound, vibration, snooze, notification content). Raw stored
+  values are exported verbatim (`en|ka|system`, integer minutes, `true|false`).
+  Operational metadata (`last_backup_at`, plugin/internal keys) is excluded via
+  an explicit allowlist.
+- **Managed files:** scan the whole `profile_images/` and `care_contact_images/`
+  directories under the app documents directory (includes orphans). Archive
+  paths mirror on-disk directory names (`files/profile_images/…`) so restore
+  needs no renaming. DB-referenced photos missing on disk are tolerated and
+  surfaced as non-sensitive warnings (count only — never patient data).
+- **Path safety:** archive entry names must not be absolute, must not traverse
+  (`..`, `.`), must not contain backslashes, and must be one of
+  `manifest.json`/`database.sqlite`/`preferences.json` or under `files/`.
+- **Last-backup metadata:** `last_backup_at` (ISO 8601) is written to app
+  settings only after the archive is successfully stored. The backup screen
+  shows the last successful backup time.
+- **Results:** a structured enum drives the UI:
+  `success`, `cancelled`, `storageFailure`, `databaseFailure`, `archiveFailure`,
+  `permissionDenied`, `notEnoughStorage`, `operationAlreadyInProgress`,
+  `unexpectedFailure`.
+- **Operation state:** the controller exposes a `BackupPhase`
+  (collecting → snapshotting → archiving → writing → done) so the screen can
+  show progress and disable the button while running.
+- **Exclusions:** cache/temp/logs, Android notification state, permissions,
+  channels, and plugin preferences are not included in the backup.
+- **Memory:** the database and managed files are streamed from disk by
+  `ZipFileEncoder`; the archive is read as bytes only when handing it to
+  `file_picker` for the SAF write.

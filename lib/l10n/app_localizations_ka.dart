@@ -49,6 +49,86 @@ class AppLocalizationsKa extends AppLocalizations {
   String get backupInformation => 'ინფორმაცია სარეზერვო ასლის შესახებ';
 
   @override
+  String get backupScreenDescription =>
+      'შექმენით თქვენი მონაცემების ასლი და შეინახეთ ფაილად, რომელსაც თქვენ ფლობთ. შედის ფოტოებიც და აპლიკაციის პარამეტრებიც.';
+
+  @override
+  String get backupIncludes => 'რა შედის';
+
+  @override
+  String get backupIncludesDatabase =>
+      'ყველა თქვენი ჯანმრთელობის ჩანაწერი და ისტორია';
+
+  @override
+  String get backupIncludesPhotos => 'პროფილისა და კონტაქტის ფოტოები';
+
+  @override
+  String get backupIncludesSettings => 'აპლიკაციის პარამეტრები და არჩევნები';
+
+  @override
+  String get backupRestoreNotAvailable =>
+      'აღდგენა ხელმისაწვდომი იქნება მომავალ განახლებაში.';
+
+  @override
+  String backupLastSuccessful(Object time) {
+    return 'ბოლო წარმატებული სარეზერვო ასლი: $time';
+  }
+
+  @override
+  String get backupLastNever => 'სარეზერვო ასლი ჯერ არ არის შექმნილი';
+
+  @override
+  String get backupInProgress => 'სარეზერვო ასლის შექმნა…';
+
+  @override
+  String get backupSuccessTitle => 'სარეზერვო ასლი შეიქმნა';
+
+  @override
+  String get backupSuccessMessage =>
+      'თქვენი სარეზერვო ფაილი შენახულია არჩეულ ადგილას.';
+
+  @override
+  String get backupMissingFilesMessage =>
+      'ზოგიერთი ფოტო, რომელზეც მონაცემები მიუთითებს, აკლია და ამ ასლში არ შედის.';
+
+  @override
+  String get backupCancelledTitle => 'სარეზერვო ასლი გაუქმდა';
+
+  @override
+  String get backupCancelledMessage => 'სარეზერვო ასლი არ შექმნილა.';
+
+  @override
+  String get backupFailedTitle => 'შეცდომა სარეზერვო ასლის შექმნისას';
+
+  @override
+  String get backupStorageFailure =>
+      'ვერ მოხერხდა სარეზერვო ასლის ჩაწერა არჩეულ ადგილას. სცადეთ თავიდან ან აირჩიეთ სხვა ადგილი.';
+
+  @override
+  String get backupDatabaseFailure =>
+      'აპლიკაციის მონაცემთა ბაზის წაკითხვა ვერ მოხერხდა. სცადეთ თავიდან.';
+
+  @override
+  String get backupArchiveFailure =>
+      'სარეზერვო ფაილის შექმნა ვერ მოხერხდა. სცადეთ თავიდან.';
+
+  @override
+  String get backupPermissionDenied =>
+      'უარი ეთქვა სარეზერვო ასლის შენახვის ნებართვაზე.';
+
+  @override
+  String get backupNotEnoughStorage =>
+      'არჩეულ ადგილას საკმარისი თავისუფალი ადგილი არ არის.';
+
+  @override
+  String get backupOperationInProgress =>
+      'სარეზერვო ასლი უკვე მიმდინარეობს. გთხოვთ, დაელოდოთ.';
+
+  @override
+  String get backupUnexpectedFailure =>
+      'რაღაც არასწორად წარიმართა. გთხოვთ, სცადოთ თავიდან.';
+
+  @override
   String get profile => 'პროფილი';
 
   @override
