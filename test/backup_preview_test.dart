@@ -80,29 +80,48 @@ void main() {
     );
   });
 
-  testWidgets('confirming does not modify data and returns', (tester) async {
+  testWidgets('confirming without a backup file shows an invalid-file notice',
+      (tester) async {
     await tester.pumpWidget(_wrap(_preview()));
 
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Restoring this backup will replace the current RehabTrack '
-        'data on this device. This operation cannot be completed in this phase.'),
-        findsOneWidget);
-
-    await tester.tap(find.text('Continue').last);
-    await tester.pumpAndSettle();
-
+    // Confirmation dialog explains the data replacement.
+    expect(find.text('Backup preview'), findsWidgets);
     expect(
-      find.text('Backup validation completed successfully. Restore is not '
-          'available yet.'),
+      find.text('Restoring this backup will replace the current RehabTrack '
+          'data on this device with the backup contents. Photos, settings and '
+          'all records will be overwritten.'),
       findsOneWidget,
     );
 
-    await tester.tap(find.text('OK'));
+    // Without a persisted backup file the restore cannot start.
+    await tester.tap(find.text('Continue').last);
     await tester.pumpAndSettle();
 
-    // The preview screen has been popped back.
-    expect(find.text('Backup preview'), findsNothing);
+    expect(find.text('This file is not a valid RehabTrack backup.'),
+        findsOneWidget);
+
+    // The preview screen is still shown.
+    expect(find.text('Backup preview'), findsWidgets);
+  });
+
+  testWidgets('migration-required backups show the migration gate', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(
+      _preview(
+        compatibility: BackupCompatibility.compatibleMigrationRequired,
+        migrationRequired: true,
+      ),
+    ));
+
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Migration required'), findsOneWidget);
+    // The restore engine never starts (no "Restoring your data" progress).
+    expect(find.text('Restoring your data'), findsNothing);
   });
 }

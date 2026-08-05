@@ -12,6 +12,11 @@ class RestoreOperationState {
   /// Validated preview, set only when [phase] is [RestorePhase.readyForPreview].
   final BackupPreview? preview;
 
+  /// Path of the selected backup copy that produced [preview]. The file is an
+  /// app-owned copy kept until the restore is applied or a new backup is
+  /// selected.
+  final String? backupFilePath;
+
   /// Non-sensitive warnings surfaced during validation.
   final List<BackupWarning> warnings;
 
@@ -19,6 +24,7 @@ class RestoreOperationState {
     this.phase = RestorePhase.idle,
     this.result,
     this.preview,
+    this.backupFilePath,
     this.warnings = const [],
   });
 
@@ -26,6 +32,7 @@ class RestoreOperationState {
     RestorePhase? phase,
     BackupValidationResult? result,
     BackupPreview? preview,
+    String? backupFilePath,
     List<BackupWarning>? warnings,
     bool clearResult = false,
   }) {
@@ -33,6 +40,7 @@ class RestoreOperationState {
       phase: phase ?? this.phase,
       result: clearResult ? null : (result ?? this.result),
       preview: preview ?? this.preview,
+      backupFilePath: backupFilePath ?? this.backupFilePath,
       warnings: warnings ?? this.warnings,
     );
   }

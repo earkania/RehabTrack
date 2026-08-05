@@ -203,7 +203,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restoreWillReplaceData =>
-      'Restoring this backup will replace the current RehabTrack data on this device. This operation cannot be completed in this phase.';
+      'Restoring this backup will replace the current RehabTrack data on this device with the backup contents. Photos, settings and all records will be overwritten.';
 
   @override
   String get continueRestore => 'Continue';
@@ -214,6 +214,124 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get restoreNotImplementedYet =>
       'Backup validation completed successfully. Restore is not available yet.';
+
+  @override
+  String get restoreCompletedTitle => 'Restore completed';
+
+  @override
+  String get restoreFailedTitle => 'Restore failed';
+
+  @override
+  String get restoreCancelledTitle => 'Restore cancelled';
+
+  @override
+  String get restoreInProgressTitle => 'Restoring your data';
+
+  @override
+  String restoreCompletedMessage(String date) {
+    return 'Your data was restored from the backup from $date.';
+  }
+
+  @override
+  String get originalDataRecovered => 'Your original data was recovered.';
+
+  @override
+  String criticalRestoreRecoveryRequired(String code) {
+    return 'Automatic recovery could not complete. Do not close the app — contact support with this code: $code.';
+  }
+
+  @override
+  String get restoreInterrupted => 'A previous restore was interrupted.';
+
+  @override
+  String get recoveringInterruptedRestore => 'Recovering your previous data…';
+
+  @override
+  String get restoreMigrationRequired => 'Migration required';
+
+  @override
+  String get restoreMigrationNotAvailableYet =>
+      'This backup uses an older database format. Restoring it requires a migration that is not available yet. No data was changed.';
+
+  @override
+  String get remindersNeedRebuilding =>
+      'Scheduled reminders were cancelled. They will be rebuilt in a later version.';
+
+  @override
+  String get cannotCancelRestoreNow => 'Restore cannot be cancelled now.';
+
+  @override
+  String get restoreOperationAlreadyInProgress =>
+      'A restore is already in progress.';
+
+  @override
+  String get restoreSafetySnapshotFailed =>
+      'A safety snapshot of your data could not be created. The restore was stopped and your data was not changed.';
+
+  @override
+  String get restoreDatabaseReplacementFailed =>
+      'The database could not be replaced.';
+
+  @override
+  String get restoreFilesFailed => 'The restored files could not be placed.';
+
+  @override
+  String get restorePreferencesFailed =>
+      'The restored settings could not be applied.';
+
+  @override
+  String get restoreReinitializationFailed =>
+      'The application could not be reinitialized after the restore.';
+
+  @override
+  String get restoreVerificationFailed =>
+      'The restored data could not be verified.';
+
+  @override
+  String get restoreFailedGeneric => 'The restore could not be completed.';
+
+  @override
+  String get restoreCancelled =>
+      'The restore was cancelled. No data was changed.';
+
+  @override
+  String get preparingRestore => 'Preparing to restore';
+
+  @override
+  String get creatingSafetySnapshot => 'Creating a safety snapshot';
+
+  @override
+  String get preparingRestoredDatabase => 'Preparing the restored database';
+
+  @override
+  String get preparingRestoredFiles => 'Preparing restored files';
+
+  @override
+  String get preparingRestoredPreferences => 'Preparing restored settings';
+
+  @override
+  String get pausingApplicationServices => 'Pausing application services';
+
+  @override
+  String get replacingDatabase => 'Replacing the database';
+
+  @override
+  String get restoringFiles => 'Restoring files';
+
+  @override
+  String get restoringPreferences => 'Restoring settings';
+
+  @override
+  String get reinitializingApplication => 'Reinitializing the application';
+
+  @override
+  String get verifyingRestoredData => 'Verifying restored data';
+
+  @override
+  String get rollingBackRestore => 'Rolling back the restore';
+
+  @override
+  String get finalizingRestore => 'Finalizing the restore';
 
   @override
   String get invalidBackupFile => 'This file is not a valid RehabTrack backup.';

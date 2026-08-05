@@ -6,6 +6,7 @@ import 'package:rehab_track/app.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/reminder_settings_provider.dart';
+import 'package:rehab_track/presentation/providers/restore_apply_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 
 Future<void> main() async {
@@ -17,6 +18,10 @@ Future<void> main() async {
   ]);
 
   final container = ProviderContainer();
+
+  // Detect and recover an interrupted restore from a previous launch before
+  // anything opens the database, so the app never reads a half-restored file.
+  await runStartupRestoreRecovery(container);
 
   // Initialize notification actions and schedule recovery at startup.
   // This must happen before runApp so that the callback is registered

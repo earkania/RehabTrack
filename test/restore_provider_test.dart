@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
 
 import 'package:rehab_track/data/services/backup/backup_archive_reader.dart';
 import 'package:rehab_track/data/services/backup/backup_document_gateway.dart';
@@ -177,7 +178,8 @@ void main() {
     await first;
   });
 
-  test('cleans up the temporary work directory afterwards', () async {
+  test('persists a validated backup copy and cleans up the temp work dir',
+      () async {
     final selection = FakeSelectionService()
       ..next = BackupSelectionOutcome.success(
         File('${baseDir.path}/unused.rtb'),
@@ -190,6 +192,16 @@ void main() {
     );
     await controller.restoreBackup();
 
-    expect(baseDir.listSync(), isEmpty);
+    // The validated archive is persisted so the restore-apply flow can reuse it.
+    expect(controller.state.backupFilePath, isNotNull);
+    expect(
+      File(p.join(baseDir.path, 'pending-restore', 'selected.rtb')).existsSync(),
+      isTrue,
+    );
+    // Only the pending-restore copy remains; ephemeral work dirs are removed.
+    expect(
+      baseDir.listSync().map((e) => p.basename(e.path)).toList(),
+      ['pending-restore'],
+    );
   });
 }

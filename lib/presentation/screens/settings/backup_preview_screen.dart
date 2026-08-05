@@ -1,21 +1,43 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:rehab_track/domain/backup/backup_compatibility.dart';
 import 'package:rehab_track/domain/backup/backup_preview.dart';
+import 'package:rehab_track/domain/restore/restore_apply_phase.dart';
+import 'package:rehab_track/domain/restore/restore_failure.dart';
+import 'package:rehab_track/domain/restore/restore_result.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/providers/restore_apply_provider.dart';
 import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 /// Shows the safe metadata of a validated backup and lets the user confirm or
 /// cancel before restore.
 ///
-/// In this phase, confirming does **not** modify any data — it only shows an
-/// informational message that the restore engine is not implemented yet.
-/// The screen never exposes patient, clinical, or personal data.
-class BackupPreviewScreen extends StatelessWidget {
+/// Confirming starts the real restore engine: a progress dialog shows the
+/// current phase (with cancellation allowed only in safe phases), followed by
+/// a completion or failure dialog. The screen never exposes patient, clinical
+/// or personal data.
+class BackupPreviewScreen extends ConsumerStatefulWidget {
   final BackupPreview preview;
 
-  const BackupPreviewScreen({super.key, required this.preview});
+  /// Path of the validated app-owned backup copy; null when unavailable.
+  final String? backupFilePath;
 
+  const BackupPreviewScreen({
+    super.key,
+    required this.preview,
+    this.backupFilePath,
+  });
+
+  @override
+  ConsumerState<BackupPreviewScreen> createState() =>
+      _BackupPreviewScreenState();
+}
+
+class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -26,10 +48,10 @@ class BackupPreviewScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           _CompatibilityBanner(
-            compatibility: preview.compatibility,
+            compatibility: widget.preview.compatibility,
             compatibilityLabel: _compatibilityLabel(l10n),
           ),
-          if (preview.migrationRequired) ...[
+          if (widget.preview.migrationRequired) ...[
             const SizedBox(height: 12),
             _InfoRow(
               icon: Icons.upgrade,
@@ -42,37 +64,47 @@ class BackupPreviewScreen extends StatelessWidget {
           const SizedBox(height: 8),
           _DetailRow(
             label: l10n.backupDate(
-              LocalizedDateFormat.fullMonthDayYear(context, preview.backupCreatedAt),
+              LocalizedDateFormat.fullMonthDayYear(
+                context,
+                widget.preview.backupCreatedAt,
+              ),
             ),
           ),
           const SizedBox(height: 4),
-          _DetailRow(label: l10n.backupAppVersion(preview.appVersion)),
+          _DetailRow(label: l10n.backupAppVersion(widget.preview.appVersion)),
           const SizedBox(height: 4),
           _DetailRow(
-            label: l10n.backupFormatVersion(preview.backupFormatVersion.toString()),
+            label: l10n.backupFormatVersion(
+              widget.preview.backupFormatVersion.toString(),
+            ),
           ),
           const SizedBox(height: 4),
           _DetailRow(
-            label: l10n.databaseVersion(preview.databaseSchemaVersion.toString()),
+            label: l10n.databaseVersion(
+              widget.preview.databaseSchemaVersion.toString(),
+            ),
           ),
           const SizedBox(height: 4),
           _DetailRow(
             label: l10n.currentDatabaseVersion(
-              preview.currentDatabaseSchemaVersion.toString(),
+              widget.preview.currentDatabaseSchemaVersion.toString(),
             ),
           ),
           const SizedBox(height: 4),
-          if (preview.profileCount != null)
+          if (widget.preview.profileCount != null)
             _DetailRow(
-              label: l10n.profilesCount(preview.profileCount!),
+              label: l10n.profilesCount(widget.preview.profileCount!),
             ),
           const SizedBox(height: 4),
-          _DetailRow(label: l10n.filesCount(preview.managedFileCount)),
+          _DetailRow(label: l10n.filesCount(widget.preview.managedFileCount)),
           const SizedBox(height: 4),
-          _DetailRow(label: '${l10n.backupSize}: ${_formatBytes(preview.backupFileSize)}'),
-          if (preview.warnings.isNotEmpty) ...[
+          _DetailRow(
+            label: '${l10n.backupSize}: ${_formatBytes(widget.preview.backupFileSize)}',
+          ),
+          if (widget.preview.warnings.isNotEmpty) ...[
             const SizedBox(height: 16),
-            for (final warning in preview.warnings) _WarningRow(label: _warningLabel(l10n, warning)),
+            for (final warning in widget.preview.warnings)
+              _WarningRow(label: _warningLabel(l10n, warning)),
           ],
         ],
       ),
@@ -102,7 +134,7 @@ class BackupPreviewScreen extends StatelessWidget {
   }
 
   String _compatibilityLabel(AppLocalizations l10n) {
-    return switch (preview.compatibility) {
+    return switch (widget.preview.compatibility) {
       BackupCompatibility.compatible => l10n.compatibleBackup,
       BackupCompatibility.compatibleMigrationRequired =>
         l10n.compatibleMigrationRequired,
@@ -118,13 +150,23 @@ class BackupPreviewScreen extends StatelessWidget {
   }
 
   Future<void> _continueRestore(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (widget.preview.migrationRequired) {
+      await _showAlertDialog(
+        title: l10n.restoreMigrationRequired,
+        message: l10n.restoreMigrationNotAvailableYet,
+      );
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) {
         final dialogL10n = AppLocalizations.of(ctx)!;
         return AlertDialog(
-          title: Text(dialogL10n.restoreWillReplaceData),
-          content: Text(dialogL10n.backupPreview),
+          title: Text(dialogL10n.backupPreview),
+          content: Text(dialogL10n.restoreWillReplaceData),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
@@ -141,24 +183,159 @@ class BackupPreviewScreen extends StatelessWidget {
     if (confirmed != true) return;
     if (!context.mounted) return;
 
-    await showDialog<void>(
+    await _runRestore(context);
+  }
+
+  Future<void> _runRestore(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final filePath = widget.backupFilePath;
+    if (filePath == null || filePath.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.invalidBackupFile)),
+      );
+      return;
+    }
+
+    final controller = ref.read(restoreApplyProvider.notifier);
+    if (ref.read(restoreApplyProvider).isRunning) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.restoreOperationAlreadyInProgress)),
+      );
+      return;
+    }
+
+    unawaited(showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const RestoreProgressDialog(),
+    ));
+
+    final failure = await controller.apply(
+      backupFile: File(filePath),
+      preview: widget.preview,
+    );
+
+    if (!context.mounted) return;
+    // Close the progress dialog, then present the outcome.
+    Navigator.of(context).pop();
+    final outcome = failure ?? ref.read(restoreApplyProvider).failure;
+    await _showOutcome(context, outcome);
+    if (!context.mounted) return;
+    Navigator.of(context).pop();
+  }
+
+  Future<void> _showOutcome(
+    BuildContext context,
+    RestoreFailure? failure,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (failure == null) {
+      await _showAlertDialog(
+        title: l10n.restoreFailedTitle,
+        message: l10n.restoreFailedGeneric,
+      );
+      return;
+    }
+
+    if (failure.succeeded) {
+      final date = LocalizedDateFormat.fullMonthDayYear(
+        context,
+        widget.preview.backupCreatedAt,
+      );
+      await _showAlertDialog(
+        title: l10n.restoreCompletedTitle,
+        message: l10n.restoreCompletedMessage(date),
+        extra: l10n.remindersNeedRebuilding,
+      );
+      return;
+    }
+
+    if (failure.result == RestoreResult.cancelled) {
+      await _showAlertDialog(
+        title: l10n.restoreCancelledTitle,
+        message: l10n.restoreCancelled,
+      );
+      return;
+    }
+
+    if (failure.result == RestoreResult.migrationNotSupported) {
+      await _showAlertDialog(
+        title: l10n.restoreMigrationRequired,
+        message: l10n.restoreMigrationNotAvailableYet,
+      );
+      return;
+    }
+
+    if (failure.rollbackFailed) {
+      await _showAlertDialog(
+        title: l10n.restoreFailedTitle,
+        message: l10n.criticalRestoreRecoveryRequired(failure.recoveryId),
+      );
+      return;
+    }
+
+    if (failure.originalDataRecovered) {
+      await _showAlertDialog(
+        title: l10n.restoreFailedTitle,
+        message: l10n.originalDataRecovered,
+        extra: _categoryMessage(l10n, failure),
+      );
+      return;
+    }
+
+    await _showAlertDialog(
+      title: l10n.restoreFailedTitle,
+      message: _categoryMessage(l10n, failure),
+    );
+  }
+
+  String _categoryMessage(AppLocalizations l10n, RestoreFailure failure) {
+    return switch (failure.result) {
+      RestoreResult.validationFailure => l10n.invalidBackupFile,
+      RestoreResult.safetySnapshotFailure => l10n.restoreSafetySnapshotFailed,
+      RestoreResult.databasePreparationFailure ||
+      RestoreResult.databaseReplacementFailure =>
+        l10n.restoreDatabaseReplacementFailed,
+      RestoreResult.managedFileRestoreFailure => l10n.restoreFilesFailed,
+      RestoreResult.preferencesRestoreFailure => l10n.restorePreferencesFailed,
+      RestoreResult.reinitializationFailure =>
+        l10n.restoreReinitializationFailed,
+      RestoreResult.verificationFailure => l10n.restoreVerificationFailed,
+      _ => l10n.restoreFailedGeneric,
+    };
+  }
+
+  Future<void> _showAlertDialog({
+    required String title,
+    required String message,
+    String? extra,
+  }) {
+    return showDialog<void>(
       context: context,
       builder: (ctx) {
-        final dialogL10n = AppLocalizations.of(ctx)!;
+        final l10n = AppLocalizations.of(ctx)!;
         return AlertDialog(
-          title: Text(dialogL10n.continueRestore),
-          content: Text(dialogL10n.restoreNotImplementedYet),
+          title: Text(title),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(message),
+              if (extra != null) ...[
+                const SizedBox(height: 12),
+                Text(extra),
+              ],
+            ],
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(dialogL10n.ok),
+              child: Text(l10n.ok),
             ),
           ],
         );
       },
     );
-    if (!context.mounted) return;
-    Navigator.of(context).pop();
   }
 
   static String _formatBytes(int bytes) {
@@ -168,6 +345,78 @@ class BackupPreviewScreen extends StatelessWidget {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+}
+
+/// A phase-label mapping shared by the progress dialog.
+String restoreApplyPhaseLabel(
+  AppLocalizations l10n,
+  RestoreApplyPhase phase,
+) {
+  return switch (phase) {
+    RestoreApplyPhase.preparingRestore => l10n.preparingRestore,
+    RestoreApplyPhase.creatingSafetySnapshot => l10n.creatingSafetySnapshot,
+    RestoreApplyPhase.preparingDatabase => l10n.preparingRestoredDatabase,
+    RestoreApplyPhase.preparingFiles => l10n.preparingRestoredFiles,
+    RestoreApplyPhase.preparingPreferences => l10n.preparingRestoredPreferences,
+    RestoreApplyPhase.pausingServices => l10n.pausingApplicationServices,
+    RestoreApplyPhase.replacingDatabase => l10n.replacingDatabase,
+    RestoreApplyPhase.restoringFiles => l10n.restoringFiles,
+    RestoreApplyPhase.restoringPreferences => l10n.restoringPreferences,
+    RestoreApplyPhase.reinitializing => l10n.reinitializingApplication,
+    RestoreApplyPhase.verifyingData => l10n.verifyingRestoredData,
+    RestoreApplyPhase.rollingBack => l10n.rollingBackRestore,
+    RestoreApplyPhase.finalizing => l10n.finalizingRestore,
+  };
+}
+
+/// Non-dismissable progress dialog that reflects the running restore apply
+/// phase and allows cancellation only while it is still safe.
+class RestoreProgressDialog extends ConsumerStatefulWidget {
+  const RestoreProgressDialog({super.key});
+
+  @override
+  ConsumerState<RestoreProgressDialog> createState() =>
+      _RestoreProgressDialogState();
+}
+
+class _RestoreProgressDialogState extends ConsumerState<RestoreProgressDialog> {
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(restoreApplyProvider);
+    final l10n = AppLocalizations.of(context)!;
+    final controller = ref.read(restoreApplyProvider.notifier);
+
+    return PopScope(
+      canPop: false,
+      child: AlertDialog(
+        title: Text(l10n.restoreInProgressTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const LinearProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              state.applyPhase == null
+                  ? l10n.preparingRestore
+                  : restoreApplyPhaseLabel(l10n, state.applyPhase!),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            if (controller.canCancel) ...[
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: controller.requestCancel,
+                  child: Text(l10n.cancelRestore),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }
 

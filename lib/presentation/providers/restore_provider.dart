@@ -104,11 +104,31 @@ class RestoreOperationController extends StateNotifier<RestoreOperationState> {
         return outcome.result;
       }
 
+      // Persist an app-owned copy of the selected backup so the restore-apply
+      // flow can reuse the exact validated file (the ephemeral work directory
+      // is removed below).
+      final String pendingPath;
+      try {
+        final pendingDir =
+            Directory(p.join(_tempBaseDir.path, 'pending-restore'));
+        await pendingDir.create(recursive: true);
+        final pendingFile = File(p.join(pendingDir.path, 'selected.rtb'));
+        if (await pendingFile.exists()) {
+          await pendingFile.delete();
+        }
+        await selection.file!.copy(pendingFile.path);
+        pendingPath = pendingFile.path;
+      } catch (_) {
+        _finishFailure(BackupValidationResult.storageFailure);
+        return BackupValidationResult.storageFailure;
+      }
+
       state = RestoreOperationState(
         phase: RestorePhase.readyForPreview,
         result: BackupValidationResult.valid,
         preview: outcome.preview,
         warnings: outcome.warnings,
+        backupFilePath: pendingPath,
       );
       return BackupValidationResult.valid;
     } catch (_) {
@@ -151,6 +171,16 @@ class RestoreOperationController extends StateNotifier<RestoreOperationState> {
   /// Resets the operation state so the screen shows its initial content.
   void reset() {
     if (!state.isRunning) {
+      try {
+        final pendingFile = File(
+          p.join(_tempBaseDir.path, 'pending-restore', 'selected.rtb'),
+        );
+        if (pendingFile.existsSync()) {
+          pendingFile.deleteSync();
+        }
+      } catch (_) {
+        // Best-effort cleanup.
+      }
       state = const RestoreOperationState();
     }
   }

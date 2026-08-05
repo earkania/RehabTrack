@@ -878,3 +878,59 @@ safe preview. **It does not modify any data** — the restore engine is deferred
   No migrations, no table-content exposure.
 - **No data change in this phase:** no DB replacement, no preferences/files
   restore, no notification rebuild, no rollback, no auto commit/push.
+
+## Backup & Restore — Restore Engine — Approved Design (2026-08-05)
+
+Phase 3 (Restore Engine) applies a validated backup: replace-style, all-or-nothing,
+with a private safety snapshot, staged preparation, an atomic-ish live swap,
+reinitialization, verification, full rollback on failure, and startup recovery
+for interrupted operations.
+
+### Approved decisions
+
+- **Replace-style only:** live state (DB + managed files + preferences) mirrors
+  the backup exactly. No merge, no selective/partial restore. Old content that
+  is absent from the backup is removed.
+- **Safety snapshot before the first live change:** the live `rehabtrack.sqlite`,
+  allowlisted preferences and managed image roots are copied into the workspace
+  (`safety-snapshot/`). It is the ground truth for rollback and interrupted-
+  operation recovery, retained until verification succeeds and only then deleted.
+- **Re-validation immediately before swap:** the prepared database is checked
+  again (SQLite header, `user_version`, core tables, read-only count query) and
+  every managed file's SHA-256 is re-verified against the manifest during
+  extraction. Cached Phase 2 validation is never trusted.
+- **Rename-based swap with sidecars:** the live DB and its `-wal`/`-shm`/`-journal`
+  sidecars move aside into the rollback workspace; the prepared DB is renamed
+  into place. Partial-move failures move already-aside items back before rethrowing.
+- **Standalone preference writes:** restored preferences are upserted/removed in
+  the live `app_settings` table by `AppSettingsWriter` (a plain read-write
+  sqlite3 session), decoupled from the app connection lifecycle so it works
+  during swap, rollback and recovery. Allowlist-only, same policy as the exporter.
+- **Portable photo paths:** `profiles.photoPath` / `care_contacts.photoPath` are
+  rewritten to `<liveDocumentsDir>/<root>/<basename>` on the prepared database.
+- **Rollback contract:** post-swap failures restore DB, files and preferences
+  from the safety snapshot, reopen/reinitialize and verify. `rollbackSucceeded`
+  → workspace + metadata deleted; `rollbackFailed` → both retained for recovery.
+  Pre-swap failures never touch live data and report `rollbackSucceeded`.
+- **Migration gate:** backups requiring migration (older schema) never start the
+  engine; the UI shows a "migration not available yet" message (Phase 4 adds
+  migrations). Newer schemas remain rejected in Phase 2.
+- **Notifications:** on success, scheduled notifications are cancelled (best-effort,
+  does not fail the restore) and the user is told reminders must be rebuilt in a
+  later version. Permission state is untouched.
+- **Interrupted recovery:** minimal non-sensitive metadata (operation id, phase,
+  workspace path, swap flags) is persisted before the critical section. On
+  startup `runStartupRestoreRecovery` rolls a non-finalized operation back to the
+  safety snapshot, reopens and verifies; a missing workspace/snapshot or failed
+  verification keeps the metadata for the next attempt.
+- **Cancellation only pre-swap:** Cancel is offered only from `preparingRestore`
+  through `preparingPreferences`; once the live replacement begins the restore
+  either succeeds or rolls back.
+- **Privacy:** UI/logs expose only the operation/recovery id, phase, format/schema
+  versions, counts, sizes and status — never personal data or full internal paths.
+- **Mutual exclusion:** while a restore runs, Create Backup, Restore Backup and a
+  second restore are disabled, and normal DB writes are blocked during the
+  critical swap.
+- **Phase 3 exclusions:** no notification rebuild, no auto backups, no merge,
+  no cloud/encryption, no commit/push.
+

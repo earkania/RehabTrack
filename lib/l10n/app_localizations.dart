@@ -431,7 +431,7 @@ abstract class AppLocalizations {
   /// No description provided for @restoreWillReplaceData.
   ///
   /// In en, this message translates to:
-  /// **'Restoring this backup will replace the current RehabTrack data on this device. This operation cannot be completed in this phase.'**
+  /// **'Restoring this backup will replace the current RehabTrack data on this device with the backup contents. Photos, settings and all records will be overwritten.'**
   String get restoreWillReplaceData;
 
   /// No description provided for @continueRestore.
@@ -451,6 +451,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backup validation completed successfully. Restore is not available yet.'**
   String get restoreNotImplementedYet;
+
+  /// No description provided for @restoreCompletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore completed'**
+  String get restoreCompletedTitle;
+
+  /// No description provided for @restoreFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed'**
+  String get restoreFailedTitle;
+
+  /// No description provided for @restoreCancelledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore cancelled'**
+  String get restoreCancelledTitle;
+
+  /// No description provided for @restoreInProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring your data'**
+  String get restoreInProgressTitle;
+
+  /// No description provided for @restoreCompletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data was restored from the backup from {date}.'**
+  String restoreCompletedMessage(String date);
+
+  /// No description provided for @originalDataRecovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Your original data was recovered.'**
+  String get originalDataRecovered;
+
+  /// No description provided for @criticalRestoreRecoveryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic recovery could not complete. Do not close the app — contact support with this code: {code}.'**
+  String criticalRestoreRecoveryRequired(String code);
+
+  /// No description provided for @restoreInterrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'A previous restore was interrupted.'**
+  String get restoreInterrupted;
+
+  /// No description provided for @recoveringInterruptedRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovering your previous data…'**
+  String get recoveringInterruptedRestore;
+
+  /// No description provided for @restoreMigrationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration required'**
+  String get restoreMigrationRequired;
+
+  /// No description provided for @restoreMigrationNotAvailableYet.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup uses an older database format. Restoring it requires a migration that is not available yet. No data was changed.'**
+  String get restoreMigrationNotAvailableYet;
+
+  /// No description provided for @remindersNeedRebuilding.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled reminders were cancelled. They will be rebuilt in a later version.'**
+  String get remindersNeedRebuilding;
+
+  /// No description provided for @cannotCancelRestoreNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore cannot be cancelled now.'**
+  String get cannotCancelRestoreNow;
+
+  /// No description provided for @restoreOperationAlreadyInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'A restore is already in progress.'**
+  String get restoreOperationAlreadyInProgress;
+
+  /// No description provided for @restoreSafetySnapshotFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'A safety snapshot of your data could not be created. The restore was stopped and your data was not changed.'**
+  String get restoreSafetySnapshotFailed;
+
+  /// No description provided for @restoreDatabaseReplacementFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The database could not be replaced.'**
+  String get restoreDatabaseReplacementFailed;
+
+  /// No description provided for @restoreFilesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The restored files could not be placed.'**
+  String get restoreFilesFailed;
+
+  /// No description provided for @restorePreferencesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The restored settings could not be applied.'**
+  String get restorePreferencesFailed;
+
+  /// No description provided for @restoreReinitializationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The application could not be reinitialized after the restore.'**
+  String get restoreReinitializationFailed;
+
+  /// No description provided for @restoreVerificationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The restored data could not be verified.'**
+  String get restoreVerificationFailed;
+
+  /// No description provided for @restoreFailedGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'The restore could not be completed.'**
+  String get restoreFailedGeneric;
+
+  /// No description provided for @restoreCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'The restore was cancelled. No data was changed.'**
+  String get restoreCancelled;
+
+  /// No description provided for @preparingRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing to restore'**
+  String get preparingRestore;
+
+  /// No description provided for @creatingSafetySnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating a safety snapshot'**
+  String get creatingSafetySnapshot;
+
+  /// No description provided for @preparingRestoredDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing the restored database'**
+  String get preparingRestoredDatabase;
+
+  /// No description provided for @preparingRestoredFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing restored files'**
+  String get preparingRestoredFiles;
+
+  /// No description provided for @preparingRestoredPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing restored settings'**
+  String get preparingRestoredPreferences;
+
+  /// No description provided for @pausingApplicationServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Pausing application services'**
+  String get pausingApplicationServices;
+
+  /// No description provided for @replacingDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Replacing the database'**
+  String get replacingDatabase;
+
+  /// No description provided for @restoringFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring files'**
+  String get restoringFiles;
+
+  /// No description provided for @restoringPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring settings'**
+  String get restoringPreferences;
+
+  /// No description provided for @reinitializingApplication.
+  ///
+  /// In en, this message translates to:
+  /// **'Reinitializing the application'**
+  String get reinitializingApplication;
+
+  /// No description provided for @verifyingRestoredData.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying restored data'**
+  String get verifyingRestoredData;
+
+  /// No description provided for @rollingBackRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Rolling back the restore'**
+  String get rollingBackRestore;
+
+  /// No description provided for @finalizingRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Finalizing the restore'**
+  String get finalizingRestore;
 
   /// No description provided for @invalidBackupFile.
   ///

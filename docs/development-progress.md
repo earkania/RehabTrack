@@ -3750,3 +3750,158 @@ restore/confirm/cancel). Regenerated via `flutter gen-l10n`.
 | `flutter analyze` | No issues |
 | `flutter test` | 1125/1125 passed |
 | Pixel 7 manual | Verified — cancel picker (no error), valid `.rtb` → progress → preview → confirm → not-implemented, invalid file rejected, en+ka, light+dark, no logcat errors |
+
+## Phase 9D — Backup & Restore: Restore Engine (2026-08-05)
+
+**Goal:** Implement Phase 3 of Backup & Restore — a replace-style, all-or-nothing
+restore that creates a private safety snapshot of the current live state, stages
+and re-validates the selected backup (database, managed files, preferences) in a
+temp workspace, swaps the live state atomically, reinitializes database-backed
+services, verifies the restored state, and rolls back fully on any failure.
+Interrupted operations are detected and recovered on the next app start.
+
+### Scope (Phase 3)
+
+- Replace-style restore only: live state (DB + managed files + preferences)
+  mirrors the backup exactly. No merge, no selective/partial restore.
+- Migration-required backups (older schema) are gated with a
+  "migration not available yet" message; the engine never starts Phase 3 for
+  them. Newer schemas are already rejected in Phase 2.
+- No notification rebuild: after a successful restore, scheduled notifications
+  are cancelled and the user is told reminders must be rebuilt (full rebuild
+  deferred to Phase 4). Notification-permission state is untouched.
+- No auto backups, no cloud/encryption.
+
+### Key decisions (approved)
+
+- **Safety snapshot before any live change:** `database.sqlite`,
+  `preferences.json` (allowlist only) and `profile_images/`/`care_contact_images/`
+  are copied into the workspace before the first write. This snapshot is the
+  ground truth for rollback and for interrupted-operation recovery.
+- **Prepare everything in temp, then swap:** validation of the restored DB
+  (SQLite header, `user_version`, core tables, read-only count queries) is
+  re-run immediately before the swap, never trusting cached validation. Managed
+  files are re-checked against the manifest SHA-256 checksums during extraction.
+- **Atomic-ish file swaps via rename:** the live DB (plus WAL/SHM/journal
+  sidecars) and each managed root are moved aside into the rollback workspace
+  and the prepared files are renamed into place. Any partial failure during the
+  move moves already-aside items back before rethrowing.
+- **Standalone preference write:** restored preferences are applied directly
+  into the live DB file (`app_settings`) by `AppSettingsWriter`, a plain
+  sqlite3 read-write session that is decoupled from the app's connection
+  lifecycle, so it works both mid-swap and during rollback/recovery.
+- **Photo path portability:** `profiles.photoPath` / `care_contacts.photoPath`
+  are remapped to `<liveDocumentsDir>/<root>/<basename>` on the prepared DB so
+  backups restore correctly to a different device or relocated documents dir.
+- **Rollback contract:** a post-swap failure rolls the DB, files and
+  preferences back from the safety snapshot, reopens/reinitializes, and
+  verifies. Success → `rollbackSucceeded`; the workspace and recovery metadata
+  are deleted. Failure → `rollbackFailed`; the workspace and recovery metadata
+  are retained for startup recovery. Pre-swap failures never touch the live
+  state and report `rollbackSucceeded`.
+- **Interrupted recovery:** minimal non-sensitive recovery metadata (operation
+  id, phase, workspace path, swap flags) is persisted before the critical
+  replacement. On startup, `runStartupRestoreRecovery` detects a non-finalized
+  operation and rolls the device back to the safety snapshot, then reopens and
+  verifies.
+- **Cancellation only pre-swap:** the UI offers Cancel only in safe phases
+  (`preparingRestore` → `preparingPreferences`); once the live state is being
+  replaced cancellation is ignored and the restore either succeeds or rolls
+  back.
+- **Privacy:** logs and UI never contain personal data or full internal paths;
+  only an operation/recovery id, phase names, format/schema versions, counts,
+  sizes and status are shown.
+
+### Implementation
+
+- `lib/domain/restore/` — `restore_apply_phase.dart` (13 progress phases),
+  `restore_result.dart` (success, cancelled, validationFailure,
+  safetySnapshotFailure, databasePreparationFailure, databaseReplacementFailure,
+  managedFileRestoreFailure, preferencesRestoreFailure, reinitializationFailure,
+  verificationFailure, rollbackSucceeded, rollbackFailed, migrationNotSupported,
+  unexpectedFailure), `restore_failure.dart` (`success` factory; `succeeded`,
+  `rollbackFailed`, `originalDataRecovered`; non-sensitive recoveryId),
+  `restore_rollback_result.dart`.
+- `lib/data/services/restore/` — `restore_workspace.dart` (create/open, layout,
+  `deleteEntirely`), `restore_recovery_metadata.dart` (`RestoreRecoveryMetadata`
+  + `RestoreRecoveryStore` with lazy base-dir resolver),
+  `restore_environment.dart` (abstract environment bound to the live app),
+  `restore_image_path_remapper.dart`, `restore_safety_snapshot_service.dart`
+  (+ `SafetySnapshotContent`), `restore_database_manager.dart`
+  (`prepare`/`validatePrepared`/`RestoreDatabaseSwap` with sidecar handling),
+  `restore_file_manager.dart` (extract/replace/restore +
+  `restoreManagedFilesFrom`/`copyDirectoryTree`),
+  `restore_preferences_manager.dart`, `app_settings_writer.dart`,
+  `restore_reinitializer.dart`, `restore_app_environment.dart` (snapshot via
+  `VACUUM INTO`, preference writes, provider invalidation,
+  `cancelAllNotifications`), `restore_service.dart` (orchestrator),
+  `restore_interrupted_recovery_service.dart`.
+- `lib/presentation/providers/restore_apply_provider.dart` — `RestoreApplyState`
+  (idle/running/finished + applyPhase), `RestoreApplyController`
+  (`apply`, `requestCancel`, `reset`; `canCancel` gating),
+  `restoreRecoveryStoreProvider`, `restoreApplyProvider`,
+  `runStartupRestoreRecovery`.
+- `lib/presentation/providers/restore_provider.dart` — validated backup copy
+  persisted to `<tempBase>/pending-restore/selected.rtb`; `backupFilePath` in
+  state; `reset()` deletes the pending file.
+- `lib/presentation/screens/settings/backup_preview_screen.dart` — real restore
+  flow: confirm dialog, non-dismissable progress dialog with phase label and
+  cancel button (safe phases only), outcome dialog (completed + reminder
+  warning, cancelled, migration gate, rollback-recovered, critical
+  recovery-required), `restoreApplyPhaseLabel`.
+- `lib/presentation/screens/settings/backup_and_restore_screen.dart` — Restore
+  covered by `restoreApply.isRunning` mutual exclusion.
+- `lib/main.dart` — `runStartupRestoreRecovery(container)` before
+  `_warmUpPersistedSettings`.
+- Localization: 9 confirm/outcome keys + 13 phase labels added to `app_en.arb`
+  and `app_ka.arb`; `flutter gen-l10n` run (generated files never hand-edited).
+
+### Fixed during implementation
+
+- `RestoreImagePathRemapper._columnExists` read `PRAGMA table_info` column 0
+  (the cid) instead of column 1 (the column name), so remapping never matched;
+  now reads `r[1]`.
+- `RestoreService` ignored a `false` verification result and reported success;
+  now a failed verification rolls back with `verificationFailure`.
+- Pre-swap failures reported `rollback: null`, so the UI could not state that
+  the original data was intact; `cleanupAndFail` now sets
+  `rollbackSucceeded` (cancellation stays null).
+- The preview confirm dialog showed the long replacement sentence as its title
+  and "Backup preview" as its body; swapped so the body carries the
+  replacement warning.
+
+### Tests
+
+- `test/helpers/restore_test_utils.dart` — `buildRestorableSqliteBytes`,
+  `buildRestorableBackupZip`, `readAllowlistedSettings`, `readProfileCount`,
+  `FakeRestoreEnvironment` (configurable failures, one-shot reinit failure,
+  applied-prefs recording), `writeLiveDatabase`, `writeManagedFile`,
+  `managedFileExists`, `BackupSource`.
+- Component units: `app_settings_writer_test.dart`, `restore_image_path_remapper_test.dart`,
+  `restore_safety_snapshot_service_test.dart`, `restore_database_manager_test.dart`
+  (incl. sidecar swap round-trip), `restore_file_manager_test.dart` (checksum
+  rejection, replace/restore round-trip), `restore_preferences_manager_test.dart`,
+  `restore_recovery_metadata_test.dart`.
+- Orchestration: `restore_service_test.dart` — success replaces A with B
+  (DB, allowlisted prefs, remapped photo paths, managed files, notifications
+  cancelled, workspace cleaned), migration gate, cancel, preview mismatch,
+  corrupted archive, snapshot/pause failures, rollback on failed
+  reinitialization, `rollbackFailed` retention on failed verification.
+- Recovery: `restore_interrupted_recovery_service_test.dart` — none /
+  recovered (half-restored B → A) / discarded non-recovery metadata / missing
+  workspace / verification failure.
+- UI: `restore_apply_ui_test.dart` (fake `RestoreService`) — success dialog +
+  reminder warning, cancel button in safe phase only, no cancel during live
+  replacement, rollback-recovered, critical recovery-required, cancelled.
+  `backup_preview_test.dart` updated for the confirm dialog, invalid-file
+  notice and migration gate.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1167/1167 passed |
+| Pixel 7 manual | Build/install/launch verified on device — no crashes, no logcat errors, startup-recovery hook clean. Interactive visual flow (data set A → backup → restore → B; photos; en/ka, light/dark; injected-failure recovery; kill/relaunch) scheduled for human verification (agent cannot view screenshots) |
+

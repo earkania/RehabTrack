@@ -205,7 +205,7 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get restoreWillReplaceData =>
-      'ამ ასლის აღდგენა ჩაანაცვლებს მიმდინარე RehabTrack-ის მონაცემებს ამ მოწყობილობაზე. ეს ოპერაცია ამ ეტაპზე ვერ დასრულდება.';
+      'ამ სარეზერვო ასლის აღდგენა შეცვლის მიმდინარე RehabTrack-ის მონაცემებს ამ მოწყობილობაზე. ფოტოები, პარამეტრები და ყველა ჩანაწერი გადაიწერება.';
 
   @override
   String get continueRestore => 'გაგრძელება';
@@ -216,6 +216,124 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get restoreNotImplementedYet =>
       'სარეზერვო ასლის შემოწმება წარმატებით დასრულდა. აღდგენა ჯერ არ არის ხელმისაწვდომი.';
+
+  @override
+  String get restoreCompletedTitle => 'აღდგენა დასრულდა';
+
+  @override
+  String get restoreFailedTitle => 'აღდგენა ვერ მოხერხდა';
+
+  @override
+  String get restoreCancelledTitle => 'აღდგენა გაუქმდა';
+
+  @override
+  String get restoreInProgressTitle => 'მონაცემების აღდგენა';
+
+  @override
+  String restoreCompletedMessage(String date) {
+    return 'თქვენი მონაცემები აღდგენილია $date სარეზერვო ასლიდან.';
+  }
+
+  @override
+  String get originalDataRecovered =>
+      'თქვენი თავდაპირველი მონაცემები აღდგენილია.';
+
+  @override
+  String criticalRestoreRecoveryRequired(String code) {
+    return 'ავტომატური აღდგენა ვერ დასრულდა. არ დახუროთ აპლიკაცია — დაუკავშირდით მხარდაჭერას კოდით: $code.';
+  }
+
+  @override
+  String get restoreInterrupted => 'წინა აღდგენა შეწყდა.';
+
+  @override
+  String get recoveringInterruptedRestore => 'თქვენი წინა მონაცემების აღდგენა…';
+
+  @override
+  String get restoreMigrationRequired => 'საჭიროა მიგრაცია';
+
+  @override
+  String get restoreMigrationNotAvailableYet =>
+      'ეს სარეზერვო ასლი იყენებს მონაცემთა ბაზის ძველ ფორმატს. მისი აღდგენა მოითხოვს მიგრაციას, რომელიც ჯერ არ არის ხელმისაწვდომი. მონაცემები არ შეცვლილა.';
+
+  @override
+  String get remindersNeedRebuilding =>
+      'დაგეგმილი შეხსენებები გაუქმდა. ისინი აღდგება შემდეგ ვერსიაში.';
+
+  @override
+  String get cannotCancelRestoreNow => 'აღდგენის გაუქმება ახლა შეუძლებელია.';
+
+  @override
+  String get restoreOperationAlreadyInProgress => 'აღდგენა უკვე მიმდინარეობს.';
+
+  @override
+  String get restoreSafetySnapshotFailed =>
+      'უსაფრთხოების სნეფშოტის შექმნა ვერ მოხერხდა. აღდგენა შეჩერებულია და მონაცემები არ შეცვლილა.';
+
+  @override
+  String get restoreDatabaseReplacementFailed =>
+      'მონაცემთა ბაზის ჩანაცვლება ვერ მოხერხდა.';
+
+  @override
+  String get restoreFilesFailed =>
+      'აღდგენილი ფაილების განთავსება ვერ მოხერხდა.';
+
+  @override
+  String get restorePreferencesFailed =>
+      'აღდგენილი პარამეტრების გამოყენება ვერ მოხერხდა.';
+
+  @override
+  String get restoreReinitializationFailed =>
+      'აპლიკაციის ხელახლა ინიციალიზაცია აღდგენის შემდეგ ვერ მოხერხდა.';
+
+  @override
+  String get restoreVerificationFailed =>
+      'აღდგენილი მონაცემების შემოწმება ვერ მოხერხდა.';
+
+  @override
+  String get restoreFailedGeneric => 'აღდგენა ვერ დასრულდა.';
+
+  @override
+  String get restoreCancelled => 'აღდგენა გაუქმდა. მონაცემები არ შეცვლილა.';
+
+  @override
+  String get preparingRestore => 'აღდგენისთვის მომზადება';
+
+  @override
+  String get creatingSafetySnapshot => 'უსაფრთხოების სნეფშოტის შექმნა';
+
+  @override
+  String get preparingRestoredDatabase => 'აღდგენილი მონაცემთა ბაზის მომზადება';
+
+  @override
+  String get preparingRestoredFiles => 'აღდგენილი ფაილების მომზადება';
+
+  @override
+  String get preparingRestoredPreferences => 'აღდგენილი პარამეტრების მომზადება';
+
+  @override
+  String get pausingApplicationServices => 'აპლიკაციის სერვისების შეჩერება';
+
+  @override
+  String get replacingDatabase => 'მონაცემთა ბაზის ჩანაცვლება';
+
+  @override
+  String get restoringFiles => 'ფაილების აღდგენა';
+
+  @override
+  String get restoringPreferences => 'პარამეტრების აღდგენა';
+
+  @override
+  String get reinitializingApplication => 'აპლიკაციის ხელახლა ინიციალიზაცია';
+
+  @override
+  String get verifyingRestoredData => 'აღდგენილი მონაცემების შემოწმება';
+
+  @override
+  String get rollingBackRestore => 'აღდგენის უკან დაბრუნება';
+
+  @override
+  String get finalizingRestore => 'აღდგენის დასრულება';
 
   @override
   String get invalidBackupFile =>

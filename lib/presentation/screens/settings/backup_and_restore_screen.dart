@@ -6,14 +6,15 @@ import 'package:rehab_track/domain/backup/backup_validation_result.dart';
 import 'package:rehab_track/domain/backup/restore_phase.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/backup_provider.dart';
+import 'package:rehab_track/presentation/providers/restore_apply_provider.dart';
 import 'package:rehab_track/presentation/providers/restore_provider.dart';
 import 'package:rehab_track/presentation/screens/settings/backup_preview_screen.dart';
 
 /// Backup & Restore screen.
 ///
 /// Phase 1 implements manual backup creation. Phase 2 (Restore Foundation)
-/// adds backup selection, validation, compatibility checking and a preview —
-/// confirming restore does not modify any data yet.
+/// adds backup selection, validation, compatibility checking and a preview.
+/// Phase 3 implements the restore engine driven from the preview screen.
 class BackupAndRestoreScreen extends ConsumerStatefulWidget {
   const BackupAndRestoreScreen({super.key});
 
@@ -30,9 +31,11 @@ class _BackupAndRestoreScreenState
     final theme = Theme.of(context);
     final operation = ref.watch(backupOperationProvider);
     final restoreOperation = ref.watch(restoreOperationProvider);
+    final restoreApply = ref.watch(restoreApplyProvider);
     final lastBackup = ref.watch(lastBackupAtProvider);
 
-    final anyRunning = operation.isRunning || restoreOperation.isRunning;
+    final anyRunning =
+        operation.isRunning || restoreOperation.isRunning || restoreApply.isRunning;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.backupAndRestore)),
@@ -151,13 +154,18 @@ class _BackupAndRestoreScreenState
     switch (result) {
       case BackupValidationResult.valid:
         final preview = ref.read(restoreOperationProvider).preview;
+        final backupFilePath =
+            ref.read(restoreOperationProvider).backupFilePath;
         if (preview == null) {
           _showSnackBar(l10n.backupValidationFailed);
           return;
         }
         await Navigator.of(context).push(
           MaterialPageRoute<void>(
-            builder: (_) => BackupPreviewScreen(preview: preview),
+            builder: (_) => BackupPreviewScreen(
+              preview: preview,
+              backupFilePath: backupFilePath,
+            ),
           ),
         );
       case BackupValidationResult.cancelled:
