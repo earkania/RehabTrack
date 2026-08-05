@@ -128,6 +128,158 @@ class AppLocalizationsEn extends AppLocalizations {
       'Something went wrong. Please try again.';
 
   @override
+  String get selectBackupFile => 'Select backup file';
+
+  @override
+  String get selectingBackup => 'Selecting backup…';
+
+  @override
+  String get readingBackup => 'Reading backup…';
+
+  @override
+  String get validatingBackup => 'Validating backup…';
+
+  @override
+  String get verifyingChecksums => 'Verifying checksums…';
+
+  @override
+  String get checkingCompatibility => 'Checking compatibility…';
+
+  @override
+  String get backupPreview => 'Backup preview';
+
+  @override
+  String get backupDetails => 'Backup details';
+
+  @override
+  String backupDate(String date) {
+    return 'Backup date: $date';
+  }
+
+  @override
+  String backupAppVersion(String version) {
+    return 'App version: $version';
+  }
+
+  @override
+  String backupFormatVersion(String version) {
+    return 'Backup format version: $version';
+  }
+
+  @override
+  String databaseVersion(String version) {
+    return 'Database version: $version';
+  }
+
+  @override
+  String currentDatabaseVersion(String version) {
+    return 'Current database version: $version';
+  }
+
+  @override
+  String profilesCount(int count) {
+    return 'Profiles: $count';
+  }
+
+  @override
+  String filesCount(int count) {
+    return 'Managed files: $count';
+  }
+
+  @override
+  String get backupSize => 'Backup size';
+
+  @override
+  String get compatibleBackup => 'Compatible';
+
+  @override
+  String get compatibleMigrationRequired => 'Compatible, migration required';
+
+  @override
+  String get incompatibleBackup => 'Incompatible';
+
+  @override
+  String get migrationRequired => 'Migration will be required before restore.';
+
+  @override
+  String get restoreWillReplaceData =>
+      'Restoring this backup will replace the current RehabTrack data on this device. This operation cannot be completed in this phase.';
+
+  @override
+  String get continueRestore => 'Continue';
+
+  @override
+  String get cancelRestore => 'Cancel';
+
+  @override
+  String get restoreNotImplementedYet =>
+      'Backup validation completed successfully. Restore is not available yet.';
+
+  @override
+  String get invalidBackupFile => 'This file is not a valid RehabTrack backup.';
+
+  @override
+  String get corruptedBackup =>
+      'The backup archive is corrupted and could not be read.';
+
+  @override
+  String get missingBackupManifest => 'The backup is missing its manifest.';
+
+  @override
+  String get invalidBackupManifest => 'The backup manifest is invalid.';
+
+  @override
+  String get missingBackupDatabase => 'The backup is missing its database.';
+
+  @override
+  String get missingBackupPreferences =>
+      'The backup is missing its preferences.';
+
+  @override
+  String get checksumMismatch =>
+      'The backup failed checksum validation and may be damaged.';
+
+  @override
+  String get unsafeBackupArchive =>
+      'The backup contains unsafe file paths and cannot be restored.';
+
+  @override
+  String get backupTooLarge => 'The backup is too large to validate safely.';
+
+  @override
+  String get newerBackupVersion =>
+      'The backup was created by a newer, unsupported version of RehabTrack.';
+
+  @override
+  String get newerDatabaseVersion =>
+      'The backup database is newer than this app supports.';
+
+  @override
+  String get unsupportedOldDatabaseVersion =>
+      'The backup database is too old and cannot be migrated.';
+
+  @override
+  String get invalidBackupDatabase => 'The backup database is invalid.';
+
+  @override
+  String get invalidBackupPreferences => 'The backup preferences are invalid.';
+
+  @override
+  String get backupValidationFailed => 'Backup validation failed';
+
+  @override
+  String get operationAlreadyInProgress =>
+      'Another operation is already in progress. Please wait.';
+
+  @override
+  String get backupWarningOlderAppVersion =>
+      'Backup created with an older app version.';
+
+  @override
+  String get backupWarningMigrationRequired =>
+      'Migration will be required before restore.';
+
+  @override
   String get profile => 'Profile';
 
   @override

@@ -40,6 +40,83 @@
   "backupNotEnoughStorage": "Not enough free space on the selected location.",
   "backupOperationInProgress": "A backup is already in progress. Please wait.",
   "backupUnexpectedFailure": "Something went wrong. Please try again.",
+  "selectBackupFile": "Select backup file",
+  "selectingBackup": "Selecting backup…",
+  "readingBackup": "Reading backup…",
+  "validatingBackup": "Validating backup…",
+  "verifyingChecksums": "Verifying checksums…",
+  "checkingCompatibility": "Checking compatibility…",
+  "backupPreview": "Backup preview",
+  "backupDetails": "Backup details",
+  "backupDate": "Backup date: {date}",
+  "@backupDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "backupAppVersion": "App version: {version}",
+  "@backupAppVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "backupFormatVersion": "Backup format version: {version}",
+  "@backupFormatVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "databaseVersion": "Database version: {version}",
+  "@databaseVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "currentDatabaseVersion": "Current database version: {version}",
+  "@currentDatabaseVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "profilesCount": "Profiles: {count}",
+  "@profilesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "filesCount": "Managed files: {count}",
+  "@filesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupSize": "Backup size",
+  "compatibleBackup": "Compatible",
+  "compatibleMigrationRequired": "Compatible, migration required",
+  "incompatibleBackup": "Incompatible",
+  "migrationRequired": "Migration will be required before restore.",
+  "restoreWillReplaceData": "Restoring this backup will replace the current RehabTrack data on this device. This operation cannot be completed in this phase.",
+  "continueRestore": "Continue",
+  "cancelRestore": "Cancel",
+  "restoreNotImplementedYet": "Backup validation completed successfully. Restore is not available yet.",
+  "invalidBackupFile": "This file is not a valid RehabTrack backup.",
+  "corruptedBackup": "The backup archive is corrupted and could not be read.",
+  "missingBackupManifest": "The backup is missing its manifest.",
+  "invalidBackupManifest": "The backup manifest is invalid.",
+  "missingBackupDatabase": "The backup is missing its database.",
+  "missingBackupPreferences": "The backup is missing its preferences.",
+  "checksumMismatch": "The backup failed checksum validation and may be damaged.",
+  "unsafeBackupArchive": "The backup contains unsafe file paths and cannot be restored.",
+  "backupTooLarge": "The backup is too large to validate safely.",
+  "newerBackupVersion": "The backup was created by a newer, unsupported version of RehabTrack.",
+  "newerDatabaseVersion": "The backup database is newer than this app supports.",
+  "unsupportedOldDatabaseVersion": "The backup database is too old and cannot be migrated.",
+  "invalidBackupDatabase": "The backup database is invalid.",
+  "invalidBackupPreferences": "The backup preferences are invalid.",
+  "backupValidationFailed": "Backup validation failed",
+  "operationAlreadyInProgress": "Another operation is already in progress. Please wait.",
+  "backupWarningOlderAppVersion": "Backup created with an older app version.",
+  "backupWarningMigrationRequired": "Migration will be required before restore.",
   "profile": "Profile",
   "diet": "Diet",
   "labAnalyses": "Lab Analyses",

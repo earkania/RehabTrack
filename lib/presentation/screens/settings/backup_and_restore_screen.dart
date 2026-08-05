@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:rehab_track/domain/backup/backup_result.dart';
+import 'package:rehab_track/domain/backup/backup_validation_result.dart';
+import 'package:rehab_track/domain/backup/restore_phase.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/backup_provider.dart';
+import 'package:rehab_track/presentation/providers/restore_provider.dart';
+import 'package:rehab_track/presentation/screens/settings/backup_preview_screen.dart';
 
 /// Backup & Restore screen.
 ///
-/// Phase 1 implements manual backup only: the user creates a `.rtb` archive
-/// (database + photos + settings) and saves it to a location they choose via
-/// the system file picker. Restore is shown as coming soon.
+/// Phase 1 implements manual backup creation. Phase 2 (Restore Foundation)
+/// adds backup selection, validation, compatibility checking and a preview —
+/// confirming restore does not modify any data yet.
 class BackupAndRestoreScreen extends ConsumerStatefulWidget {
   const BackupAndRestoreScreen({super.key});
 
@@ -25,7 +29,10 @@ class _BackupAndRestoreScreenState
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final operation = ref.watch(backupOperationProvider);
+    final restoreOperation = ref.watch(restoreOperationProvider);
     final lastBackup = ref.watch(lastBackupAtProvider);
+
+    final anyRunning = operation.isRunning || restoreOperation.isRunning;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.backupAndRestore)),
@@ -66,7 +73,7 @@ class _BackupAndRestoreScreenState
             const SizedBox(height: 12),
           ],
           FilledButton.icon(
-            onPressed: operation.isRunning ? null : () => _createBackup(l10n),
+            onPressed: anyRunning ? null : () => _createBackup(l10n),
             icon: const Icon(Icons.save_alt),
             label: Text(l10n.createBackup),
           ),
@@ -75,15 +82,36 @@ class _BackupAndRestoreScreenState
           const SizedBox(height: 8),
           Text(l10n.backupInformation, style: theme.textTheme.titleSmall),
           const SizedBox(height: 8),
-          Text(
-            l10n.backupRestoreNotAvailable,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+          if (restoreOperation.isRunning) ...[
+            const LinearProgressIndicator(),
+            const SizedBox(height: 12),
+            Text(
+              _restoreProgressLabel(l10n, restoreOperation.phase),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium,
             ),
+            const SizedBox(height: 12),
+          ],
+          OutlinedButton.icon(
+            onPressed:
+                anyRunning ? null : () => _restoreBackup(l10n),
+            icon: const Icon(Icons.restore),
+            label: Text(l10n.restoreBackup),
           ),
         ],
       ),
     );
+  }
+
+  String _restoreProgressLabel(AppLocalizations l10n, RestorePhase phase) {
+    return switch (phase) {
+      RestorePhase.selectingFile => l10n.selectingBackup,
+      RestorePhase.readingArchive => l10n.readingBackup,
+      RestorePhase.validatingManifest => l10n.validatingBackup,
+      RestorePhase.verifyingChecksums => l10n.verifyingChecksums,
+      RestorePhase.checkingCompatibility => l10n.checkingCompatibility,
+      _ => l10n.validatingBackup,
+    };
   }
 
   Future<void> _createBackup(AppLocalizations l10n) async {
@@ -112,6 +140,64 @@ class _BackupAndRestoreScreenState
           message: _failureMessage(l10n, result),
         );
     }
+  }
+
+  Future<void> _restoreBackup(AppLocalizations l10n) async {
+    final result = await ref
+        .read(restoreOperationProvider.notifier)
+        .restoreBackup();
+    if (!mounted) return;
+
+    switch (result) {
+      case BackupValidationResult.valid:
+        final preview = ref.read(restoreOperationProvider).preview;
+        if (preview == null) {
+          _showSnackBar(l10n.backupValidationFailed);
+          return;
+        }
+        await Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => BackupPreviewScreen(preview: preview),
+          ),
+        );
+      case BackupValidationResult.cancelled:
+        // User dismissed the picker: normal outcome, not an error.
+        break;
+      case BackupValidationResult.operationAlreadyInProgress:
+        _showSnackBar(l10n.operationAlreadyInProgress);
+      default:
+        await _showResultDialog(
+          title: l10n.backupValidationFailed,
+          message: _restoreFailureMessage(l10n, result),
+        );
+    }
+  }
+
+  String _restoreFailureMessage(
+    AppLocalizations l10n,
+    BackupValidationResult result,
+  ) {
+    return switch (result) {
+      BackupValidationResult.invalidArchive ||
+      BackupValidationResult.corruptedArchive =>
+        l10n.corruptedBackup,
+      BackupValidationResult.missingManifest => l10n.missingBackupManifest,
+      BackupValidationResult.invalidManifest => l10n.invalidBackupManifest,
+      BackupValidationResult.missingDatabase => l10n.missingBackupDatabase,
+      BackupValidationResult.missingPreferences => l10n.missingBackupPreferences,
+      BackupValidationResult.checksumMismatch => l10n.checksumMismatch,
+      BackupValidationResult.unsafeArchivePath => l10n.unsafeBackupArchive,
+      BackupValidationResult.backupTooLarge => l10n.backupTooLarge,
+      BackupValidationResult.unsupportedBackupFormat => l10n.newerBackupVersion,
+      BackupValidationResult.newerDatabaseVersion => l10n.newerDatabaseVersion,
+      BackupValidationResult.unsupportedOldDatabaseVersion =>
+        l10n.unsupportedOldDatabaseVersion,
+      BackupValidationResult.invalidBackupDatabase => l10n.invalidBackupDatabase,
+      BackupValidationResult.invalidBackupPreferences =>
+        l10n.invalidBackupPreferences,
+      BackupValidationResult.storageFailure => l10n.backupStorageFailure,
+      _ => l10n.invalidBackupFile,
+    };
   }
 
   String _failureMessage(AppLocalizations l10n, BackupResult result) {

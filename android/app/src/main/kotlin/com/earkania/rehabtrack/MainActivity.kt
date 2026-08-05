@@ -9,6 +9,7 @@ import android.provider.Settings
 import androidx.annotation.RequiresApi
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.util.TimeZone
 
@@ -16,9 +17,11 @@ class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.earkania.rehabtrack/notifications"
     private val BACKUP_CHANNEL = "com.earkania.rehabtrack/backup"
     private val CREATE_DOCUMENT_REQUEST = 2001
+    private val OPEN_DOCUMENT_REQUEST = 2002
 
     private var pendingCreateResult: MethodChannel.Result? = null
     private var pendingCreateBytes: ByteArray? = null
+    private var pendingOpenResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -50,6 +53,12 @@ class MainActivity : FlutterActivity() {
                         createDocument(fileName, bytes, result)
                     }
                 }
+                "openDocument" -> {
+                    openDocument(result)
+                }
+                "copyDocument" -> {
+                    copyDocument(call, result)
+                }
                 else -> result.notImplemented()
             }
         }
@@ -77,10 +86,60 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    /** Launches the Storage Access Framework document opener (backup selection). */
+    private fun openDocument(result: MethodChannel.Result) {
+        if (pendingOpenResult != null) {
+            result.error("OPERATION_IN_PROGRESS", "a document open is already in progress", null)
+            return
+        }
+        pendingOpenResult = result
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/octet-stream"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/octet-stream", "application/zip"))
+        }
+        try {
+            startActivityForResult(intent, OPEN_DOCUMENT_REQUEST)
+        } catch (e: Exception) {
+            pendingOpenResult = null
+            result.error("OPEN_DOCUMENT_ERROR", e.message, null)
+        }
+    }
+
+    /** Copies the selected [contentUri] document into [destinationPath] via the content resolver. */
+    private fun copyDocument(call: MethodCall, result: MethodChannel.Result) {
+        val contentUri = call.argument<String>("contentUri")
+        val destinationPath = call.argument<String>("destinationPath")
+        if (contentUri == null || destinationPath == null) {
+            result.error("INVALID_ARGUMENTS", "contentUri and destinationPath are required", null)
+            return
+        }
+        try {
+            val input = contentResolver.openInputStream(android.net.Uri.parse(contentUri))
+                ?: throw IllegalStateException("openInputStream returned null")
+            input.use { source ->
+                java.io.File(destinationPath).apply {
+                    parentFile?.mkdirs()
+                }.outputStream().use { target ->
+                    source.copyTo(target)
+                }
+            }
+            result.success(null)
+        } catch (e: Exception) {
+            result.error("COPY_ERROR", e.message, null)
+        }
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != CREATE_DOCUMENT_REQUEST) return
+        when (requestCode) {
+            CREATE_DOCUMENT_REQUEST -> handleCreateDocumentResult(resultCode, data)
+            OPEN_DOCUMENT_REQUEST -> handleOpenDocumentResult(resultCode, data)
+        }
+    }
+
+    private fun handleCreateDocumentResult(resultCode: Int, data: Intent?) {
         val result = pendingCreateResult ?: return
         val bytes = pendingCreateBytes
         pendingCreateResult = null
@@ -100,6 +159,17 @@ class MainActivity : FlutterActivity() {
         } catch (e: Exception) {
             result.error("WRITE_ERROR", e.message, null)
         }
+    }
+
+    private fun handleOpenDocumentResult(resultCode: Int, data: Intent?) {
+        val result = pendingOpenResult ?: return
+        pendingOpenResult = null
+        if (resultCode != Activity.RESULT_OK || data?.data == null) {
+            // User dismissed the picker.
+            result.success(null)
+            return
+        }
+        result.success(data.data!!.toString())
     }
 
     private fun openNotificationSettings(result: MethodChannel.Result) {

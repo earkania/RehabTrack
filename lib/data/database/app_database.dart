@@ -66,6 +66,9 @@ part 'app_database.g.dart';
   ],
 )
 class AppDatabase extends _$AppDatabase {
+  /// Canonical current schema version used by the backup/restore validator.
+  static const int currentSchemaVersion = 14;
+
   AppDatabase() : super(_openConnection());
 
   AppDatabase.test() : super(NativeDatabase.memory());
@@ -95,7 +98,7 @@ class AppDatabase extends _$AppDatabase {
   AppSettingDao get appSettingDao => AppSettingDao(this);
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => currentSchemaVersion;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

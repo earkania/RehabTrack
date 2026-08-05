@@ -40,6 +40,83 @@
   "backupNotEnoughStorage": "არჩეულ ადგილას საკმარისი თავისუფალი ადგილი არ არის.",
   "backupOperationInProgress": "სარეზერვო ასლი უკვე მიმდინარეობს. გთხოვთ, დაელოდოთ.",
   "backupUnexpectedFailure": "რაღაც არასწორად წარიმართა. გთხოვთ, სცადოთ თავიდან.",
+  "selectBackupFile": "აირჩიეთ სარეზერვო ფაილი",
+  "selectingBackup": "სარეზერვო ფაილის არჩევა…",
+  "readingBackup": "სარეზერვო ასლის წაკითხვა…",
+  "validatingBackup": "სარეზერვო ასლის შემოწმება…",
+  "verifyingChecksums": "შემოწმების თანხების (checksum) დადასტურება…",
+  "checkingCompatibility": "თავსებადობის შემოწმება…",
+  "backupPreview": "სარეზერვო ასლის შინაარსის გადახედვა",
+  "backupDetails": "სარეზერვო ასლის დეტალები",
+  "backupDate": "ასლის თარიღი: {date}",
+  "@backupDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "backupAppVersion": "აპლიკაციის ვერსია: {version}",
+  "@backupAppVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "backupFormatVersion": "ასლის ფორმატის ვერსია: {version}",
+  "@backupFormatVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "databaseVersion": "მონაცემთა ბაზის ვერსია: {version}",
+  "@databaseVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "currentDatabaseVersion": "მიმდინარე მონაცემთა ბაზის ვერსია: {version}",
+  "@currentDatabaseVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "profilesCount": "პროფილები: {count}",
+  "@profilesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "filesCount": "ფაილები: {count}",
+  "@filesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupSize": "ასლის ზომა",
+  "compatibleBackup": "თავსებადი",
+  "compatibleMigrationRequired": "თავსებადი, საჭიროა მიგრაცია",
+  "incompatibleBackup": "თავსებადი არ არის",
+  "migrationRequired": "აღდგენამდე საჭირო იქნება მიგრაცია.",
+  "restoreWillReplaceData": "ამ ასლის აღდგენა ჩაანაცვლებს მიმდინარე RehabTrack-ის მონაცემებს ამ მოწყობილობაზე. ეს ოპერაცია ამ ეტაპზე ვერ დასრულდება.",
+  "continueRestore": "გაგრძელება",
+  "cancelRestore": "გაუქმება",
+  "restoreNotImplementedYet": "სარეზერვო ასლის შემოწმება წარმატებით დასრულდა. აღდგენა ჯერ არ არის ხელმისაწვდომი.",
+  "invalidBackupFile": "ეს ფაილი არ არის სწორი RehabTrack-ის სარეზერვო ასლი.",
+  "corruptedBackup": "სარეზერვო არქივი დაზიანებულია და ვერ წაიკითხება.",
+  "missingBackupManifest": "ასლს აკლია მანიფესტი.",
+  "invalidBackupManifest": "ასლის მანიფესტი არასწორია.",
+  "missingBackupDatabase": "ასლს აკლია მონაცემთა ბაზა.",
+  "missingBackupPreferences": "ასლს აკლია პარამეტრები.",
+  "checksumMismatch": "ასლმა ვერ გაიარა შემოწმება და შესაძლოა დაზიანებული იყოს.",
+  "unsafeBackupArchive": "ასლი შეიცავს სახიფათო ფაილის ბილიკებს და ვერ აღდგება.",
+  "backupTooLarge": "ასლი ძალიან დიდია უსაფრთხო შესამოწმებლად.",
+  "newerBackupVersion": "ასლი შექმნილია RehabTrack-ის ახალ, არმხარდაჭერილ ვერსიაში.",
+  "newerDatabaseVersion": "ასლის მონაცემთა ბაზა უფრო ახალია, ვიდრე ამ აპლიკაციას შეუძლია.",
+  "unsupportedOldDatabaseVersion": "ასლის მონაცემთა ბაზა ძალიან ძველია და მისი მიგრაცია შეუძლებელია.",
+  "invalidBackupDatabase": "ასლის მონაცემთა ბაზა არასწორია.",
+  "invalidBackupPreferences": "ასლის პარამეტრები არასწორია.",
+  "backupValidationFailed": "ასლის შემოწმება ვერ მოხერხდა",
+  "operationAlreadyInProgress": "სხვა ოპერაცია უკვე მიმდინარეობს. გთხოვთ, დაელოდოთ.",
+  "backupWarningOlderAppVersion": "ასლი შექმნილია აპლიკაციის სხვა ვერსიით.",
+  "backupWarningMigrationRequired": "აღდგენამდე საჭირო იქნება მიგრაცია.",
   "profile": "პროფილი",
   "diet": "დიეტა",
   "labAnalyses": "ლაბორატორიული ანალიზები",

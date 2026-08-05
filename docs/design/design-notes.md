@@ -845,3 +845,36 @@ schema version, unsafe checksum paths, empty digests).
 - **Memory:** the database and managed files are streamed from disk by
   `ZipFileEncoder`; the archive is read as bytes only when handing it to
   `file_picker` for the SAF write.
+
+## Backup & Restore — Restore Foundation — Approved Design (2026-08-05)
+
+Phase 2 (Restore Foundation) selects and validates a `.rtb` backup and shows a
+safe preview. **It does not modify any data** — the restore engine is deferred.
+
+### Approved decisions
+
+- **SAF selection:** `ACTION_OPEN_DOCUMENT` with `application/octet-stream`
+  (+`application/zip` as extra MIME). `.rtb` extension is never trusted; entry
+  integrity, paths and checksums are validated independently. The selected
+  document is copied into an app-owned temp file through the content resolver —
+  `content://` URIs are never converted to filesystem paths and never exposed.
+  Cancelling the picker is a normal outcome, not an error.
+- **Full validation before preview:** the archive must pass every check
+  (structure, manifest, checksums, format/schema compatibility, read-only
+  database and preferences) before a preview is shown.
+- **Compatibility:** `.rtb` format must be exactly 1 (>1 rejected, <1 invalid).
+  DB schema ≤ current accepted (equal → compatible, older → migration required);
+  schema > current or < min (1) rejected. `AppDatabase.currentSchemaVersion`
+  is the canonical constant.
+- **Safety:** reject unsafe paths, duplicate entries, missing/bad checksums,
+  oversized/inflated archives (limits above), and non-SQLite databases; validate
+  known preference-value types while tolerating unknown future keys.
+- **Preview is non-sensitive:** no profiles, medications, measurements,
+  diagnoses, notes, contacts, phones, emails, addresses, policy numbers, or
+  internal file paths. Only metadata (date, app/format/db versions, profile
+  count when safely determinable, file count, size, warnings).
+- **Read-only validation:** `database.sqlite` is written to a temp file, opened
+  `OpenMode.readOnly`, closed, and deleted; the live database is never touched.
+  No migrations, no table-content exposure.
+- **No data change in this phase:** no DB replacement, no preferences/files
+  restore, no notification rebuild, no rollback, no auto commit/push.

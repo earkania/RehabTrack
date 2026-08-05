@@ -3609,3 +3609,144 @@ dialogs, missing-files note, last-backup labels) and regenerated via
 | `flutter analyze` | No issues |
 | `flutter test` | 1082/1082 passed |
 | Pixel 7 manual | Pending — device disconnected from adb mid-session |
+
+
+## Phase 9C — Backup & Restore: Restore Foundation (2026-08-05)
+
+**Goal:** Implement Phase 2 of Backup & Restore — select a `.rtb` backup via the
+Android Storage Access Framework, read and validate it (archive structure,
+manifest, checksums, format/schema compatibility, read-only database and
+preferences checks), and present a safe preview. Confirming restore does **not**
+modify any data yet: the restore engine is deferred to a later phase.
+
+### Decisions (approved)
+
+- **Selection:** SAF `ACTION_OPEN_DOCUMENT` with `application/octet-stream`
+  (+`application/zip`) MIME. The file extension `.rtb` is not trusted; archive
+  contents are validated independently. The chosen document is copied into an
+  app-owned temp file via the content resolver — `content://` URIs are never
+  treated as filesystem paths and never exposed. Cancelling the picker is a
+  normal outcome, not an error.
+- **Full validation before any restore:** the archive must pass every check
+  before a preview is shown. Newer backup formats and newer database schemas are
+  rejected; older supported schemas are accepted and flagged "migration
+  required"; schemas below the minimum are rejected. Unsafe paths, duplicate
+  entries and bad checksums are rejected. No sensitive data (profiles, meds,
+  measurements, notes, contacts, internal paths) is surfaced in the preview.
+- **Phase 2 does not modify data:** no live DB replacement, no preferences/files
+  restore, no notification rebuild, no rollback, no migrations, no auto
+  commit/push.
+
+### Compatibility rules
+
+- `.rtb` format version must be **exactly 1**; >1 rejected as newer, <1 as
+  invalid.
+- DB schema ≤ current (14) accepted; equal → "compatible", older → "compatible,
+  migration required" (migration strategy covers every `from ≥ 1`).
+- DB schema > current → rejected (`newerDatabaseVersion`); <
+  `minSupportedDatabaseSchemaVersion` (1) → rejected
+  (`unsupportedOldDatabaseVersion`).
+- `AppDatabase.currentSchemaVersion = 14` added as the canonical constant; the
+  schema getter returns it.
+
+### Archive limits (`BackupLimits`)
+
+| Limit | Value |
+|---|---|
+| Archive file | ≤ 2 GiB |
+| Entry count | ≤ 5000 |
+| Per-entry uncompressed | ≤ 512 MiB |
+| Total uncompressed | ≤ 4 GiB |
+| Compression ratio | ≤ 200:1 |
+| Manifest / preferences | ≤ 1 MiB each |
+
+### Policy
+
+- Unknown/undocumented future preference keys are tolerated (do not fail a
+  backup merely because a newer version added an optional key); known keys must
+  have stable types (`app_language` string; `default_snooze_duration`,
+  `next_item_grace_period_minutes` int; the rest boolean).
+- Checksum keys must be `database.sqlite`/`preferences.json` or under `files/`;
+  anything else is an unsafe key (`invalidManifest`).
+- Duplicate archive entry names → `unsafeArchivePath`.
+- Profile count is best-effort (`SELECT COUNT(*) FROM profiles`); on the count
+  query failing it is omitted (`null`), while `-1` marks an invalid database.
+
+### Validation order (`BackupValidator`)
+
+Duplicates → entry-path safety → entry-count/total size → manifest parse/validate
+→ format version → required entries → `fileCount` vs managed files → checksum
+presence/coverage → SHA-256 verify each checksummed entry → compatibility → read-only
+SQLite check → preferences JSON type check → preview.
+
+### Database / preferences checks (read-only)
+
+- SQLite header magic `"SQLite format 3\0"` checked before opening.
+- `database.sqlite` is written to a temp file, opened `OpenMode.readOnly`, and
+  closed + deleted in `finally`. It never touches the live DB.
+- Cross-checks `db.userVersion == manifest.databaseSchemaVersion`; verifies core
+  tables `profiles`, `medications`, `measurement_types`, `app_settings`.
+
+### Implementation
+
+- `lib/domain/backup/` — `restore_phase.dart` (idle/selecting/reading/validating/
+  verifying/checking/ready/cancelled/failure), `restore_operation_state.dart`
+  (`isRunning`, `isReadyForPreview`), `backup_compatibility.dart`,
+  `backup_preview.dart` (no sensitive data; optional `profileCount`),
+  `backup_validation_result.dart` (16-result enum incl. `valid`, `cancelled`,
+  `newerDatabaseVersion`, `unsupportedOldDatabaseVersion`).
+- `lib/data/database/app_database.dart` — `AppDatabase.currentSchemaVersion = 14`.
+- `lib/data/services/backup/` — `backup_limits.dart`, `backup_document_gateway.dart`
+  (MethodChannel `openDocument`/`copyDocument`), `backup_archive_reader.dart`
+  (lazy content, duplicate detection from central-directory headers, size checks
+  before decompression; a zero-entry decode is treated as corrupt),
+  `backup_validator.dart`, `restore_selection_service.dart`.
+- `lib/presentation/providers/restore_provider.dart` — `backupDocumentGatewayProvider`,
+  `restoreSelectionServiceProvider`, `backupArchiveReaderProvider`,
+  `backupValidatorProvider`, `restoreOperationProvider` (`RestoreOperationController`
+  with temp-file handling and cleanup in `finally`).
+- `lib/presentation/screens/settings/backup_preview_screen.dart` — compatibility
+  banner, details list, warnings, confirm (informational, no data changes).
+- `lib/presentation/screens/settings/backup_and_restore_screen.dart` — Restore
+  button + progress, mutual exclusion with backup, error dialogs by result,
+  removed the coming-soon section.
+- `android/app/src/main/kotlin/com/earkania/rehabtrack/MainActivity.kt` —
+  `openDocument`/`copyDocument` handlers + `handleOpenDocumentResult`
+  (request code 2002).
+- `pubspec.yaml` — added `sqlite3: ^3.5.0`.
+
+### Localization (en + ka)
+
+Added the full restore key set (selection/reading/validation/checksum/compatibility
+progress, preview labels, each failure message, newer/too-old database messages,
+restore/confirm/cancel). Regenerated via `flutter gen-l10n`.
+
+### Tests
+
+- `test/helpers/backup_test_utils.dart` — builds valid `.rtb` archives (SQLite +
+  manifest + checksums), raw ZIPs with duplicate entries, temp-file helpers.
+- `test/backup_archive_reader_test.dart` — structure, duplicate detection,
+  truncated/corrupt, missing-file.
+- `test/backup_validator_test.dart` — valid (compatible / migration-required /
+  older-app-version), and every rejection (format, schema, missing entries,
+  checksum mismatch, unsafe path, duplicates, file-count, invalid DB,
+  invalid prefs).
+- `test/restore_selection_service_test.dart` — success/cancel/storage-failure,
+  copy-target wiring.
+- `test/restore_provider_test.dart` — controller phases, ready-for-preview,
+  cancel/fail, `operationAlreadyInProgress`, temp cleanup.
+- `test/backup_preview_test.dart` — model metadata, banner/details render,
+  confirm-without-data, pop.
+- `test/backup_restore_ui_test.dart` — mutual exclusion of buttons, progress,
+  preview navigation, mapped error dialog, cancelled-does-nothing.
+- `test/backup_screen_test.dart` / `test/settings_navigation_test.dart` —
+  updated for the Restore button replacing the coming-soon text.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1125/1125 passed |
+| Pixel 7 manual | Verified — cancel picker (no error), valid `.rtb` → progress → preview → confirm → not-implemented, invalid file rejected, en+ka, light+dark, no logcat errors |

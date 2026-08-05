@@ -160,7 +160,7 @@ void main() {
       );
     });
 
-    testWidgets('backup screen offers creation and shows restore as coming soon',
+    testWidgets('backup screen offers creation and a restore action',
         (tester) async {
       await pumpApp(tester);
       await tapSettingsTab(tester);
@@ -172,10 +172,7 @@ void main() {
       expect(find.text('Create backup'), findsOneWidget);
       expect(find.byType(FilledButton), findsOneWidget);
       expect(find.text('Backup information'), findsOneWidget);
-      expect(
-        find.text('Restore will be available in a future update.'),
-        findsOneWidget,
-      );
+      expect(find.text('Restore backup'), findsOneWidget);
     });
 
     testWidgets('back from App Settings returns to the Settings dashboard',

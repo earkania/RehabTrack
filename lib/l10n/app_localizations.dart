@@ -308,6 +308,258 @@ abstract class AppLocalizations {
   /// **'Something went wrong. Please try again.'**
   String get backupUnexpectedFailure;
 
+  /// No description provided for @selectBackupFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select backup file'**
+  String get selectBackupFile;
+
+  /// No description provided for @selectingBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Selecting backup…'**
+  String get selectingBackup;
+
+  /// No description provided for @readingBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading backup…'**
+  String get readingBackup;
+
+  /// No description provided for @validatingBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Validating backup…'**
+  String get validatingBackup;
+
+  /// No description provided for @verifyingChecksums.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying checksums…'**
+  String get verifyingChecksums;
+
+  /// No description provided for @checkingCompatibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking compatibility…'**
+  String get checkingCompatibility;
+
+  /// No description provided for @backupPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup preview'**
+  String get backupPreview;
+
+  /// No description provided for @backupDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup details'**
+  String get backupDetails;
+
+  /// No description provided for @backupDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup date: {date}'**
+  String backupDate(String date);
+
+  /// No description provided for @backupAppVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'App version: {version}'**
+  String backupAppVersion(String version);
+
+  /// No description provided for @backupFormatVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup format version: {version}'**
+  String backupFormatVersion(String version);
+
+  /// No description provided for @databaseVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Database version: {version}'**
+  String databaseVersion(String version);
+
+  /// No description provided for @currentDatabaseVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Current database version: {version}'**
+  String currentDatabaseVersion(String version);
+
+  /// No description provided for @profilesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles: {count}'**
+  String profilesCount(int count);
+
+  /// No description provided for @filesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Managed files: {count}'**
+  String filesCount(int count);
+
+  /// No description provided for @backupSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup size'**
+  String get backupSize;
+
+  /// No description provided for @compatibleBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Compatible'**
+  String get compatibleBackup;
+
+  /// No description provided for @compatibleMigrationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Compatible, migration required'**
+  String get compatibleMigrationRequired;
+
+  /// No description provided for @incompatibleBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Incompatible'**
+  String get incompatibleBackup;
+
+  /// No description provided for @migrationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration will be required before restore.'**
+  String get migrationRequired;
+
+  /// No description provided for @restoreWillReplaceData.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring this backup will replace the current RehabTrack data on this device. This operation cannot be completed in this phase.'**
+  String get restoreWillReplaceData;
+
+  /// No description provided for @continueRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueRestore;
+
+  /// No description provided for @cancelRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelRestore;
+
+  /// No description provided for @restoreNotImplementedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup validation completed successfully. Restore is not available yet.'**
+  String get restoreNotImplementedYet;
+
+  /// No description provided for @invalidBackupFile.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is not a valid RehabTrack backup.'**
+  String get invalidBackupFile;
+
+  /// No description provided for @corruptedBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup archive is corrupted and could not be read.'**
+  String get corruptedBackup;
+
+  /// No description provided for @missingBackupManifest.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup is missing its manifest.'**
+  String get missingBackupManifest;
+
+  /// No description provided for @invalidBackupManifest.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup manifest is invalid.'**
+  String get invalidBackupManifest;
+
+  /// No description provided for @missingBackupDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup is missing its database.'**
+  String get missingBackupDatabase;
+
+  /// No description provided for @missingBackupPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup is missing its preferences.'**
+  String get missingBackupPreferences;
+
+  /// No description provided for @checksumMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup failed checksum validation and may be damaged.'**
+  String get checksumMismatch;
+
+  /// No description provided for @unsafeBackupArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup contains unsafe file paths and cannot be restored.'**
+  String get unsafeBackupArchive;
+
+  /// No description provided for @backupTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup is too large to validate safely.'**
+  String get backupTooLarge;
+
+  /// No description provided for @newerBackupVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup was created by a newer, unsupported version of RehabTrack.'**
+  String get newerBackupVersion;
+
+  /// No description provided for @newerDatabaseVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup database is newer than this app supports.'**
+  String get newerDatabaseVersion;
+
+  /// No description provided for @unsupportedOldDatabaseVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup database is too old and cannot be migrated.'**
+  String get unsupportedOldDatabaseVersion;
+
+  /// No description provided for @invalidBackupDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup database is invalid.'**
+  String get invalidBackupDatabase;
+
+  /// No description provided for @invalidBackupPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup preferences are invalid.'**
+  String get invalidBackupPreferences;
+
+  /// No description provided for @backupValidationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup validation failed'**
+  String get backupValidationFailed;
+
+  /// No description provided for @operationAlreadyInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Another operation is already in progress. Please wait.'**
+  String get operationAlreadyInProgress;
+
+  /// No description provided for @backupWarningOlderAppVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup created with an older app version.'**
+  String get backupWarningOlderAppVersion;
+
+  /// No description provided for @backupWarningMigrationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration will be required before restore.'**
+  String get backupWarningMigrationRequired;
+
   /// No description provided for @profile.
   ///
   /// In en, this message translates to:

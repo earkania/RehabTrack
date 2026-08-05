@@ -129,6 +129,159 @@ class AppLocalizationsKa extends AppLocalizations {
       'რაღაც არასწორად წარიმართა. გთხოვთ, სცადოთ თავიდან.';
 
   @override
+  String get selectBackupFile => 'აირჩიეთ სარეზერვო ფაილი';
+
+  @override
+  String get selectingBackup => 'სარეზერვო ფაილის არჩევა…';
+
+  @override
+  String get readingBackup => 'სარეზერვო ასლის წაკითხვა…';
+
+  @override
+  String get validatingBackup => 'სარეზერვო ასლის შემოწმება…';
+
+  @override
+  String get verifyingChecksums =>
+      'შემოწმების თანხების (checksum) დადასტურება…';
+
+  @override
+  String get checkingCompatibility => 'თავსებადობის შემოწმება…';
+
+  @override
+  String get backupPreview => 'სარეზერვო ასლის შინაარსის გადახედვა';
+
+  @override
+  String get backupDetails => 'სარეზერვო ასლის დეტალები';
+
+  @override
+  String backupDate(String date) {
+    return 'ასლის თარიღი: $date';
+  }
+
+  @override
+  String backupAppVersion(String version) {
+    return 'აპლიკაციის ვერსია: $version';
+  }
+
+  @override
+  String backupFormatVersion(String version) {
+    return 'ასლის ფორმატის ვერსია: $version';
+  }
+
+  @override
+  String databaseVersion(String version) {
+    return 'მონაცემთა ბაზის ვერსია: $version';
+  }
+
+  @override
+  String currentDatabaseVersion(String version) {
+    return 'მიმდინარე მონაცემთა ბაზის ვერსია: $version';
+  }
+
+  @override
+  String profilesCount(int count) {
+    return 'პროფილები: $count';
+  }
+
+  @override
+  String filesCount(int count) {
+    return 'ფაილები: $count';
+  }
+
+  @override
+  String get backupSize => 'ასლის ზომა';
+
+  @override
+  String get compatibleBackup => 'თავსებადი';
+
+  @override
+  String get compatibleMigrationRequired => 'თავსებადი, საჭიროა მიგრაცია';
+
+  @override
+  String get incompatibleBackup => 'თავსებადი არ არის';
+
+  @override
+  String get migrationRequired => 'აღდგენამდე საჭირო იქნება მიგრაცია.';
+
+  @override
+  String get restoreWillReplaceData =>
+      'ამ ასლის აღდგენა ჩაანაცვლებს მიმდინარე RehabTrack-ის მონაცემებს ამ მოწყობილობაზე. ეს ოპერაცია ამ ეტაპზე ვერ დასრულდება.';
+
+  @override
+  String get continueRestore => 'გაგრძელება';
+
+  @override
+  String get cancelRestore => 'გაუქმება';
+
+  @override
+  String get restoreNotImplementedYet =>
+      'სარეზერვო ასლის შემოწმება წარმატებით დასრულდა. აღდგენა ჯერ არ არის ხელმისაწვდომი.';
+
+  @override
+  String get invalidBackupFile =>
+      'ეს ფაილი არ არის სწორი RehabTrack-ის სარეზერვო ასლი.';
+
+  @override
+  String get corruptedBackup =>
+      'სარეზერვო არქივი დაზიანებულია და ვერ წაიკითხება.';
+
+  @override
+  String get missingBackupManifest => 'ასლს აკლია მანიფესტი.';
+
+  @override
+  String get invalidBackupManifest => 'ასლის მანიფესტი არასწორია.';
+
+  @override
+  String get missingBackupDatabase => 'ასლს აკლია მონაცემთა ბაზა.';
+
+  @override
+  String get missingBackupPreferences => 'ასლს აკლია პარამეტრები.';
+
+  @override
+  String get checksumMismatch =>
+      'ასლმა ვერ გაიარა შემოწმება და შესაძლოა დაზიანებული იყოს.';
+
+  @override
+  String get unsafeBackupArchive =>
+      'ასლი შეიცავს სახიფათო ფაილის ბილიკებს და ვერ აღდგება.';
+
+  @override
+  String get backupTooLarge => 'ასლი ძალიან დიდია უსაფრთხო შესამოწმებლად.';
+
+  @override
+  String get newerBackupVersion =>
+      'ასლი შექმნილია RehabTrack-ის ახალ, არმხარდაჭერილ ვერსიაში.';
+
+  @override
+  String get newerDatabaseVersion =>
+      'ასლის მონაცემთა ბაზა უფრო ახალია, ვიდრე ამ აპლიკაციას შეუძლია.';
+
+  @override
+  String get unsupportedOldDatabaseVersion =>
+      'ასლის მონაცემთა ბაზა ძალიან ძველია და მისი მიგრაცია შეუძლებელია.';
+
+  @override
+  String get invalidBackupDatabase => 'ასლის მონაცემთა ბაზა არასწორია.';
+
+  @override
+  String get invalidBackupPreferences => 'ასლის პარამეტრები არასწორია.';
+
+  @override
+  String get backupValidationFailed => 'ასლის შემოწმება ვერ მოხერხდა';
+
+  @override
+  String get operationAlreadyInProgress =>
+      'სხვა ოპერაცია უკვე მიმდინარეობს. გთხოვთ, დაელოდოთ.';
+
+  @override
+  String get backupWarningOlderAppVersion =>
+      'ასლი შექმნილია აპლიკაციის სხვა ვერსიით.';
+
+  @override
+  String get backupWarningMigrationRequired =>
+      'აღდგენამდე საჭირო იქნება მიგრაცია.';
+
+  @override
   String get profile => 'პროფილი';
 
   @override

@@ -92,7 +92,7 @@ void main() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   });
 
-  testWidgets('renders description, includes list and coming-soon restore',
+  testWidgets('renders description, includes list and restore actions',
       (tester) async {
     final settings = FakeSettingsRepository();
     await tester.pumpWidget(_wrap(ControllableBackupService(BackupResult.success), settings));
@@ -104,8 +104,8 @@ void main() {
     expect(find.text('Profile and care contact photos'), findsOneWidget);
     expect(find.text('App settings and preferences'), findsOneWidget);
     expect(find.text('Create backup'), findsOneWidget);
+    expect(find.text('Restore backup'), findsOneWidget);
     expect(find.text('No backup created yet'), findsOneWidget);
-    expect(find.text('Restore will be available in a future update.'), findsOneWidget);
   });
 
   testWidgets('shows progress while running and success dialog afterwards',
