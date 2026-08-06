@@ -32,8 +32,24 @@ class RestoreFailure {
   const RestoreFailure.success(String recoveryId)
       : this(result: RestoreResult.success, recoveryId: recoveryId);
 
-  /// Whether the operation succeeded.
-  bool get succeeded => result == RestoreResult.success;
+  const RestoreFailure.successWithReminderWarning(String recoveryId)
+      : this(
+          result: RestoreResult.successWithReminderWarning,
+          recoveryId: recoveryId,
+        );
+
+  const RestoreFailure.successWithMissingOptionalFiles(String recoveryId)
+      : this(
+          result: RestoreResult.successWithMissingOptionalFiles,
+          recoveryId: recoveryId,
+        );
+
+  /// Whether the operation succeeded (including success-with-warning
+  /// variants where the data restore completed and was verified).
+  bool get succeeded =>
+      result == RestoreResult.success ||
+      result == RestoreResult.successWithReminderWarning ||
+      result == RestoreResult.successWithMissingOptionalFiles;
 
   /// Whether automatic recovery could not complete.
   bool get rollbackFailed => rollback == RestoreRollbackResult.rollbackFailed;

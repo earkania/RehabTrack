@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
+
 /// The app-specific operations a restore needs, abstracted so the restore
 /// engine can be unit-tested without Flutter or a live database.
 ///
@@ -41,6 +43,15 @@ abstract class RestoreEnvironment {
   /// Cancels currently scheduled RehabTrack notifications. Called after a
   /// successful restore; reminders are rebuilt in a later phase.
   Future<void> cancelScheduledNotifications();
+
+  /// Rebuilds the future reminder schedule (medication, measurement and
+  /// doctor-visit) from the restored data, using the app's normal scheduling
+  /// logic and notification-ID scheme. Returns a non-sensitive tally.
+  ///
+  /// Implementations must not declare success for data-restore purposes when
+  /// reminders cannot be rebuilt; they should report failure through a
+  /// [ReminderRebuildReport] or by throwing [RestoreEnvironmentFailure].
+  Future<ReminderRebuildReport> rebuildScheduledNotifications();
 }
 
 /// A recoverable failure from a [RestoreEnvironment] operation.

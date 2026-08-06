@@ -662,6 +662,72 @@ abstract class AppLocalizations {
   /// **'Finalizing the restore'**
   String get finalizingRestore;
 
+  /// No description provided for @migratingDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Migrating the database to the current version'**
+  String get migratingDatabase;
+
+  /// No description provided for @validatingMigratedDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Validating the migrated database'**
+  String get validatingMigratedDatabase;
+
+  /// No description provided for @repairingFilePaths.
+  ///
+  /// In en, this message translates to:
+  /// **'Repairing file paths'**
+  String get repairingFilePaths;
+
+  /// No description provided for @rebuildingReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuilding reminders'**
+  String get rebuildingReminders;
+
+  /// No description provided for @restoreMigrationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup database could not be migrated to the current version. No data was changed.'**
+  String get restoreMigrationFailed;
+
+  /// No description provided for @restorePathRepairFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The restored file paths could not be repaired.'**
+  String get restorePathRepairFailed;
+
+  /// No description provided for @restoreDatabaseVerificationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The restored database could not be verified.'**
+  String get restoreDatabaseVerificationFailed;
+
+  /// No description provided for @restoreReminderRebuildFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The restored reminders could not be rebuilt.'**
+  String get restoreReminderRebuildFailed;
+
+  /// No description provided for @restoreCompletedRemindersPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Data was restored. Reminders could not be fully rebuilt and will be rescheduled.'**
+  String get restoreCompletedRemindersPending;
+
+  /// No description provided for @retryReminderRebuild.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry reminder rebuild'**
+  String get retryReminderRebuild;
+
+  /// No description provided for @someOptionalFilesMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Some optional files (such as photos) referenced by the backup are missing and were cleared.'**
+  String get someOptionalFilesMissing;
+
   /// No description provided for @invalidBackupFile.
   ///
   /// In en, this message translates to:

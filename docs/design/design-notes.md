@@ -914,10 +914,12 @@ for interrupted operations.
   Pre-swap failures never touch live data and report `rollbackSucceeded`.
 - **Migration gate:** backups requiring migration (older schema) never start the
   engine; the UI shows a "migration not available yet" message (Phase 4 adds
-  migrations). Newer schemas remain rejected in Phase 2.
+  migrations). Newer schemas remain rejected in Phase 2. **Superseded by Phase 4E**
+  (older schemas are now migrated and restored).
 - **Notifications:** on success, scheduled notifications are cancelled (best-effort,
   does not fail the restore) and the user is told reminders must be rebuilt in a
-  later version. Permission state is untouched.
+  later version. Permission state is untouched. **Superseded by Phase 4E**
+  (reminders are rebuilt automatically on success).
 - **Interrupted recovery:** minimal non-sensitive metadata (operation id, phase,
   workspace path, swap flags) is persisted before the critical section. On
   startup `runStartupRestoreRecovery` rolls a non-finalized operation back to the
@@ -934,3 +936,47 @@ for interrupted operations.
 - **Phase 3 exclusions:** no notification rebuild, no auto backups, no merge,
   no cloud/encryption, no commit/push.
 
+
+## Backup & Restore — Compatibility, Path Repair & Reminder Rebuild — Approved Design (2026-08-06)
+
+Phase 4E lifts the two Phase 3 exclusions: backups with an older schema are now
+restored (migrated on a temp copy), and reminders are rebuilt on success. It
+also hardens path repair.
+
+### Approved decisions
+
+- **Canonical version policy** in `lib/domain/backup/backup_version_policy.dart`
+  as the single source of truth (`BackupVersionPolicy`): current schema,
+  oldest restore-compatible schema (1), supported format version (1). Both the
+  validator and the restore engine read from it so they can never drift apart.
+- **Migrate only the prepared temp copy, never the live DB.** A future restore
+  at schema `1..13` opens the workspace copy through
+  `AppDatabase.forTesting(NativeDatabase.createInBackground(...))`, and Drift
+  replays the exact cumulative `onUpgrade` blocks the app uses in production to
+  reach the current schema. After migration the copy is validated (header,
+  schema version, core tables, read-only sample query, `PRAGMA foreign_key_check`)
+  before any live change. A backed-up DB newer than the current schema remains
+  rejected; migration failure aborts with `migrationFailure` and leaves live
+  data untouched.
+- **Canonical portable photo path** `<managedRoot>/<dir>/<basename>` is retained,
+  and path repair now also: resolves `content://` URIs to a usable basename,
+  refuses unusable/empty basenames, clears a reference whose file is absent from
+  the restored archive (avatar/initial fallback, never a crash), reports missing
+  optional files (`successWithMissingOptionalFiles`), and only ever touches the
+  `photoPath` columns (`website` etc. are never rewritten).
+- **Reminder rebuild via the normal scheduler.** `RestoreEnvironment` exposes
+  `rebuildScheduledNotifications()`; `RestoreAppEnvironment` routes it through
+  `NotificationActionBridge.recoverAll(profileId)` so medication, measurement,
+  doctor-visit reminders are rescheduled with the app's existing scheduler and
+  notification-ID scheme (each reminder few minutes in the future). The bridge's
+  recovery methods return per-type counts. A rebuild failure yields
+  `successWithReminderWarning` — the restored data is *not* rolled back — and the
+  UI offers `retryReminderRebuild`.
+- **Durable completion marker.** Recovery metadata is written `finalized:true`
+  immediately after verification. An interruption during reminder rebuilding
+  therefore never rolls back restored medical data; the existing
+  `notificationInitializerProvider.recoverAll` re-schedules on next launch.
+- **Interrupted reminder rebuild** is recovered automatically out-of-band on
+  start, so a kill during rebuild does not strand the user without reminders.
+- **Phase 4E exclusions (unchanged from engine via build file):** no cloud,
+  no encryption, no auto backups, no commit/push.

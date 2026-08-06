@@ -107,7 +107,7 @@ void main() {
     expect(find.text('Backup preview'), findsWidgets);
   });
 
-  testWidgets('migration-required backups show the migration gate', (
+  testWidgets('migration-required backups can now start the restore', (
     tester,
   ) async {
     await tester.pumpWidget(_wrap(
@@ -120,8 +120,13 @@ void main() {
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Migration required'), findsOneWidget);
-    // The restore engine never starts (no "Restoring your data" progress).
-    expect(find.text('Restoring your data'), findsNothing);
+    // No "not available yet" gate: the confirmation dialog is shown directly.
+    expect(find.text('Migration required'), findsNothing);
+    expect(
+      find.text('Restoring this backup will replace the current RehabTrack '
+          'data on this device with the backup contents. Photos, settings and '
+          'all records will be overwritten.'),
+      findsOneWidget,
+    );
   });
 }

@@ -14,6 +14,7 @@ import 'package:rehab_track/data/services/notification/schedule_recovery_service
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/enums/enums.dart';
+import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
 
 import 'package:rehab_track/domain/entities/schedule_config.dart';
 import 'package:rehab_track/domain/repositories/care_contact_repository.dart';
@@ -59,19 +60,29 @@ class NotificationActionBridge {
     debugPrint('[NotificationActionBridge] action and tap callbacks registered');
   }
 
-  Future<void> recoverAll(int profileId) async {
-    await recoverMedicationSchedules(profileId);
-    await recoverMeasurementSchedules(profileId);
-    await recoverDoctorVisitSchedules(profileId);
+  Future<ReminderRebuildReport> recoverAll(int profileId) async {
+    try {
+      final medication = await recoverMedicationSchedules(profileId);
+      final measurement = await recoverMeasurementSchedules(profileId);
+      final doctorVisit = await recoverDoctorVisitSchedules(profileId);
+      return ReminderRebuildReport(
+        succeeded: true,
+        medicationReminders: medication,
+        measurementReminders: measurement,
+        doctorVisitReminders: doctorVisit,
+      );
+    } catch (_) {
+      return const ReminderRebuildReport.failure();
+    }
   }
 
-  Future<void> recoverMedicationSchedules(int profileId) =>
+  Future<int> recoverMedicationSchedules(int profileId) =>
       _recoverMedicationSchedules(profileId);
 
-  Future<void> recoverMeasurementSchedules(int profileId) =>
+  Future<int> recoverMeasurementSchedules(int profileId) =>
       _recoverMeasurementSchedules(profileId);
 
-  Future<void> recoverDoctorVisitSchedules(int profileId) =>
+  Future<int> recoverDoctorVisitSchedules(int profileId) =>
       _recoverDoctorVisitSchedules(profileId);
 
   Future<void> processPendingActions() async {
@@ -629,7 +640,7 @@ class NotificationActionBridge {
 
   // --- Recovery ---
 
-  Future<void> _recoverMedicationSchedules(int profileId) async {
+  Future<int> _recoverMedicationSchedules(int profileId) async {
     try {
       final entries = <ScheduleRecoveryEntry>[];
 
@@ -669,7 +680,7 @@ class NotificationActionBridge {
 
       if (entries.isEmpty) {
         debugPrint('[NotificationActionBridge] no active medication schedules to recover');
-        return;
+        return 0;
       }
 
       await scheduleRecoveryService.recoverAllSchedules(
@@ -677,8 +688,10 @@ class NotificationActionBridge {
       );
       debugPrint('[NotificationActionBridge] medication recovery complete, '
           '${entries.length} schedule entries processed');
+      return entries.length;
     } catch (e) {
       debugPrint('[NotificationActionBridge] medication recovery FAILED: $e');
+      return 0;
     }
   }
 
@@ -723,7 +736,7 @@ class NotificationActionBridge {
     );
   }
 
-  Future<void> _recoverMeasurementSchedules(int profileId) async {
+  Future<int> _recoverMeasurementSchedules(int profileId) async {
     try {
       final schedules =
           await _measurementRepository.getActiveSchedules(profileId);
@@ -742,7 +755,7 @@ class NotificationActionBridge {
 
       if (entries.isEmpty) {
         debugPrint('[NotificationActionBridge] no active measurement schedules to recover');
-        return;
+        return 0;
       }
 
       await scheduleRecoveryService.recoverAllSchedules(
@@ -750,15 +763,17 @@ class NotificationActionBridge {
       );
       debugPrint('[NotificationActionBridge] measurement recovery complete, '
           '${entries.length} schedule entries processed');
+      return entries.length;
     } catch (e) {
       debugPrint('[NotificationActionBridge] measurement recovery FAILED: $e');
+      return 0;
     }
   }
 
   /// Re-schedules single reminders for open doctor visits whose reminder time
   /// is still in the future. Runs after app restart so reminders survive
   /// reboots (alongside the plugin's own persistence when available).
-  Future<void> _recoverDoctorVisitSchedules(int profileId) async {
+  Future<int> _recoverDoctorVisitSchedules(int profileId) async {
     try {
       final visits = await _doctorVisitRepository.getUpcomingVisits(profileId);
       var restoredCount = 0;
@@ -827,8 +842,10 @@ class NotificationActionBridge {
 
       debugPrint('[NotificationActionBridge] doctor visit recovery complete, '
           '$restoredCount reminders scheduled');
+      return restoredCount;
     } catch (e) {
       debugPrint('[NotificationActionBridge] doctor visit recovery FAILED: $e');
+      return 0;
     }
   }
 

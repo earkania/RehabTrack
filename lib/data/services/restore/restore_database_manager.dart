@@ -39,6 +39,10 @@ const Set<String> _coreTables = {
 class RestoreDatabaseManager {
   const RestoreDatabaseManager();
 
+  /// The shared set of core tables that must exist in every supported schema
+  /// version. Also used by the migrator's post-migration validation.
+  static const Set<String> coreTables = _coreTables;
+
   /// Writes [dbBytes] into [preparedDir]/database.sqlite and validates it.
   /// Returns the validated prepared file.
   Future<PreparedDatabase> prepare({

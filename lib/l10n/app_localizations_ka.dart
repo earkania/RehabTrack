@@ -336,6 +336,46 @@ class AppLocalizationsKa extends AppLocalizations {
   String get finalizingRestore => 'აღდგენის დასრულება';
 
   @override
+  String get migratingDatabase => 'მონაცემთა ბაზის მიგრაცია მიმდინარე ვერსიაზე';
+
+  @override
+  String get validatingMigratedDatabase =>
+      'მიგრირებული მონაცემთა ბაზის შემოწმება';
+
+  @override
+  String get repairingFilePaths => 'ფაილების ბილიკების შეკეთება';
+
+  @override
+  String get rebuildingReminders => 'შეხსენებების აღდგენა';
+
+  @override
+  String get restoreMigrationFailed =>
+      'ასლის მონაცემთა ბაზის მიმდინარე ვერსიაზე მიგრაცია ვერ მოხერხდა. მონაცემები არ შეცვლილა.';
+
+  @override
+  String get restorePathRepairFailed =>
+      'აღდგენილი ფაილების ბილიკების შეკეთება ვერ მოხერდა.';
+
+  @override
+  String get restoreDatabaseVerificationFailed =>
+      'აღდგენილი მონაცემთა ბაზის შემოწმება ვერ მოხერდა.';
+
+  @override
+  String get restoreReminderRebuildFailed =>
+      'აღდგენილი შეხსენებების თავიდან აგება ვერ მოხერდა.';
+
+  @override
+  String get restoreCompletedRemindersPending =>
+      'მონაცემები აღდგა. შეხსნებების სრულად აღდგენა ვერ მოხერდა და ისინი ხელახლა დაიგეგმება.';
+
+  @override
+  String get retryReminderRebuild => 'შეხსენებების ხელახლა აღდგენა';
+
+  @override
+  String get someOptionalFilesMissing =>
+      'ასლში მოხსენიებული ზოგიერთი არასავალდებულო ფაილი (მაგ. ფოტო) აკლია და გასსუფთავდა.';
+
+  @override
   String get invalidBackupFile =>
       'ეს ფაილი არ არის სწორი RehabTrack-ის სარეზერვო ასლი.';
 

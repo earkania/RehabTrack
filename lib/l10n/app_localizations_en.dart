@@ -334,6 +334,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get finalizingRestore => 'Finalizing the restore';
 
   @override
+  String get migratingDatabase =>
+      'Migrating the database to the current version';
+
+  @override
+  String get validatingMigratedDatabase => 'Validating the migrated database';
+
+  @override
+  String get repairingFilePaths => 'Repairing file paths';
+
+  @override
+  String get rebuildingReminders => 'Rebuilding reminders';
+
+  @override
+  String get restoreMigrationFailed =>
+      'The backup database could not be migrated to the current version. No data was changed.';
+
+  @override
+  String get restorePathRepairFailed =>
+      'The restored file paths could not be repaired.';
+
+  @override
+  String get restoreDatabaseVerificationFailed =>
+      'The restored database could not be verified.';
+
+  @override
+  String get restoreReminderRebuildFailed =>
+      'The restored reminders could not be rebuilt.';
+
+  @override
+  String get restoreCompletedRemindersPending =>
+      'Data was restored. Reminders could not be fully rebuilt and will be rescheduled.';
+
+  @override
+  String get retryReminderRebuild => 'Retry reminder rebuild';
+
+  @override
+  String get someOptionalFilesMissing =>
+      'Some optional files (such as photos) referenced by the backup are missing and were cleared.';
+
+  @override
   String get invalidBackupFile => 'This file is not a valid RehabTrack backup.';
 
   @override

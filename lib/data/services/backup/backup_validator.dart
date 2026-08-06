@@ -13,6 +13,7 @@ import 'package:rehab_track/domain/backup/backup_compatibility.dart';
 import 'package:rehab_track/domain/backup/backup_manifest.dart';
 import 'package:rehab_track/domain/backup/backup_preview.dart';
 import 'package:rehab_track/domain/backup/backup_validation_result.dart';
+import 'package:rehab_track/domain/backup/backup_version_policy.dart';
 import 'package:rehab_track/domain/backup/restore_phase.dart';
 
 /// Result of validating a backup archive.
@@ -49,9 +50,11 @@ class BackupValidationOutcome {
 class BackupValidator {
   const BackupValidator();
 
-  /// Oldest database schema this app can migrate from (the Drift migration
-  /// strategy covers every `from >= 1`). Schemas older than this are rejected.
-  static const int minSupportedDatabaseSchemaVersion = 1;
+  /// Oldest database schema this app can restore. The Drift migration strategy
+  /// covers every `from >= 1`; schemas older than this are rejected. Read from
+  /// [BackupVersionPolicy] so the value is never duplicated.
+  static const int minSupportedDatabaseSchemaVersion =
+      BackupVersionPolicy.minSupportedDatabaseSchemaVersion;
 
   /// Core tables that must exist in every schema version 1..current.
   static const Set<String> coreTables = {

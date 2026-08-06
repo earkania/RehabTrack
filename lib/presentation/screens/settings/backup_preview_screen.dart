@@ -150,16 +150,6 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
   }
 
   Future<void> _continueRestore(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-
-    if (widget.preview.migrationRequired) {
-      await _showAlertDialog(
-        title: l10n.restoreMigrationRequired,
-        message: l10n.restoreMigrationNotAvailableYet,
-      );
-      return;
-    }
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) {
@@ -242,11 +232,21 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
         context,
         widget.preview.backupCreatedAt,
       );
-      await _showAlertDialog(
-        title: l10n.restoreCompletedTitle,
-        message: l10n.restoreCompletedMessage(date),
-        extra: l10n.remindersNeedRebuilding,
-      );
+      switch (failure.result) {
+        case RestoreResult.successWithReminderWarning:
+          await _showReminderWarningDialog(context, date);
+        case RestoreResult.successWithMissingOptionalFiles:
+          await _showAlertDialog(
+            title: l10n.restoreCompletedTitle,
+            message: l10n.restoreCompletedMessage(date),
+            extra: l10n.someOptionalFilesMissing,
+          );
+        default:
+          await _showAlertDialog(
+            title: l10n.restoreCompletedTitle,
+            message: l10n.restoreCompletedMessage(date),
+          );
+      }
       return;
     }
 
@@ -254,14 +254,6 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
       await _showAlertDialog(
         title: l10n.restoreCancelledTitle,
         message: l10n.restoreCancelled,
-      );
-      return;
-    }
-
-    if (failure.result == RestoreResult.migrationNotSupported) {
-      await _showAlertDialog(
-        title: l10n.restoreMigrationRequired,
-        message: l10n.restoreMigrationNotAvailableYet,
       );
       return;
     }
@@ -293,16 +285,72 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
     return switch (failure.result) {
       RestoreResult.validationFailure => l10n.invalidBackupFile,
       RestoreResult.safetySnapshotFailure => l10n.restoreSafetySnapshotFailed,
-      RestoreResult.databasePreparationFailure ||
-      RestoreResult.databaseReplacementFailure =>
-        l10n.restoreDatabaseReplacementFailed,
+      RestoreResult.databasePreparationFailure => l10n.restoreDatabaseReplacementFailed,
+      RestoreResult.migrationFailure => l10n.restoreMigrationFailed,
+      RestoreResult.pathRepairFailure => l10n.restorePathRepairFailed,
+      RestoreResult.databaseVerificationFailure => l10n.restoreDatabaseVerificationFailed,
+      RestoreResult.databaseReplacementFailure => l10n.restoreDatabaseReplacementFailed,
       RestoreResult.managedFileRestoreFailure => l10n.restoreFilesFailed,
       RestoreResult.preferencesRestoreFailure => l10n.restorePreferencesFailed,
       RestoreResult.reinitializationFailure =>
         l10n.restoreReinitializationFailed,
       RestoreResult.verificationFailure => l10n.restoreVerificationFailed,
+      RestoreResult.reminderRebuildFailure => l10n.restoreReminderRebuildFailed,
       _ => l10n.restoreFailedGeneric,
     };
+  }
+
+  Future<void> _showReminderWarningDialog(
+    BuildContext context,
+    String date,
+  ) async {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        final dialogL10n = AppLocalizations.of(ctx)!;
+        return AlertDialog(
+          title: Text(dialogL10n.restoreCompletedTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(dialogL10n.restoreCompletedMessage(date)),
+              const SizedBox(height: 12),
+              Text(dialogL10n.restoreCompletedRemindersPending),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(dialogL10n.ok),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final ok = await ref
+                    .read(restoreApplyProvider.notifier)
+                    .retryReminderRebuild();
+                if (!ctx.mounted) return;
+                Navigator.of(ctx).pop();
+                await _showRetryResult(context, ok);
+              },
+              child: Text(dialogL10n.retryReminderRebuild),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showRetryResult(BuildContext context, bool succeeded) async {
+    final l10n = AppLocalizations.of(context)!;
+    await _showAlertDialog(
+      title: succeeded
+          ? l10n.restoreCompletedTitle
+          : l10n.restoreFailedTitle,
+      message: succeeded
+          ? l10n.restoreCompletedRemindersPending
+          : l10n.restoreReminderRebuildFailed,
+    );
   }
 
   Future<void> _showAlertDialog({
@@ -357,6 +405,9 @@ String restoreApplyPhaseLabel(
     RestoreApplyPhase.preparingRestore => l10n.preparingRestore,
     RestoreApplyPhase.creatingSafetySnapshot => l10n.creatingSafetySnapshot,
     RestoreApplyPhase.preparingDatabase => l10n.preparingRestoredDatabase,
+    RestoreApplyPhase.migratingDatabase => l10n.migratingDatabase,
+    RestoreApplyPhase.validatingMigratedDatabase => l10n.validatingMigratedDatabase,
+    RestoreApplyPhase.repairingFilePaths => l10n.repairingFilePaths,
     RestoreApplyPhase.preparingFiles => l10n.preparingRestoredFiles,
     RestoreApplyPhase.preparingPreferences => l10n.preparingRestoredPreferences,
     RestoreApplyPhase.pausingServices => l10n.pausingApplicationServices,
@@ -365,6 +416,7 @@ String restoreApplyPhaseLabel(
     RestoreApplyPhase.restoringPreferences => l10n.restoringPreferences,
     RestoreApplyPhase.reinitializing => l10n.reinitializingApplication,
     RestoreApplyPhase.verifyingData => l10n.verifyingRestoredData,
+    RestoreApplyPhase.rebuildingReminders => l10n.rebuildingReminders,
     RestoreApplyPhase.rollingBack => l10n.rollingBackRestore,
     RestoreApplyPhase.finalizing => l10n.finalizingRestore,
   };

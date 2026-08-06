@@ -15,6 +15,7 @@ import 'package:rehab_track/data/services/restore/restore_preferences_manager.da
 import 'package:rehab_track/data/services/restore/restore_recovery_metadata.dart';
 import 'package:rehab_track/data/services/restore/restore_reinitializer.dart';
 import 'package:rehab_track/data/services/restore/restore_safety_snapshot_service.dart';
+import 'package:rehab_track/data/services/restore/restore_sqlite_migrator.dart';
 import 'package:rehab_track/data/services/restore/restore_workspace.dart';
 import 'package:rehab_track/domain/backup/backup_manifest.dart';
 import 'package:rehab_track/domain/backup/backup_preview.dart';
@@ -41,6 +42,7 @@ class RestoreService {
   final Directory tempBaseDir;
   final int currentDatabaseSchemaVersion;
   final String currentAppVersion;
+  final RestoreSqliteMigrator migrator;
   final Random _random;
 
   RestoreService({
@@ -51,6 +53,7 @@ class RestoreService {
     required this.tempBaseDir,
     required this.currentDatabaseSchemaVersion,
     required this.currentAppVersion,
+    this.migrator = const RestoreSqliteMigrator(),
     Random? random,
   }) : _random = random ?? Random.secure();
 
@@ -125,9 +128,6 @@ class RestoreService {
             rollbackSucceeded: true);
       }
       final preview = outcome.preview!;
-      if (preview.migrationRequired) {
-        return await cleanupAndFail(RestoreResult.migrationNotSupported, rollbackSucceeded: true);
-      }
       if (preview.backupCreatedAt != expectedPreview.backupCreatedAt ||
           preview.databaseSchemaVersion != expectedPreview.databaseSchemaVersion) {
         return await cleanupAndFail(RestoreResult.validationFailure,
@@ -182,21 +182,24 @@ class RestoreService {
         return await cleanupAndFail(RestoreResult.databasePreparationFailure, rollbackSucceeded: true);
       }
 
-      final documentsDir = await environment.documentsDirectory();
-      try {
-        RestoreImagePathRemapper.remap(
-          databasePath: prepared.file.path,
-          managedFilesRoot: documentsDir.path,
-        );
-        final stillValid = await dbManager.validatePrepared(
-          file: prepared.file,
-          expectedSchemaVersion: preview.databaseSchemaVersion,
-        );
-        if (!stillValid) {
-          return await cleanupAndFail(RestoreResult.databasePreparationFailure, rollbackSucceeded: true);
+      // --- Migrate an older schema (strictly on the temp copy, never live) --
+      final migrated = preview.migrationRequired;
+      if (migrated) {
+        _emit(onPhase, RestoreApplyPhase.migratingDatabase);
+        await _writeMetadata(operationId, workspace,
+            phase: RestoreApplyPhase.migratingDatabase);
+        try {
+          await migrator.migrateToCurrent(
+            file: prepared.file,
+            fromSchemaVersion: preview.databaseSchemaVersion,
+          );
+        } catch (_) {
+          return await cleanupAndFail(RestoreResult.migrationFailure,
+              rollbackSucceeded: true);
         }
-      } catch (_) {
-        return await cleanupAndFail(RestoreResult.databasePreparationFailure, rollbackSucceeded: true);
+        _emit(onPhase, RestoreApplyPhase.validatingMigratedDatabase);
+        await _writeMetadata(operationId, workspace,
+            phase: RestoreApplyPhase.validatingMigratedDatabase);
       }
 
       // --- Prepare files ---------------------------------------------------
@@ -212,6 +215,38 @@ class RestoreService {
         );
       } catch (_) {
         return await cleanupAndFail(RestoreResult.managedFileRestoreFailure, rollbackSucceeded: true);
+      }
+
+      // --- Repair paths + validate prepared database ------------------------
+      _emit(onPhase, RestoreApplyPhase.repairingFilePaths);
+      await _writeMetadata(operationId, workspace,
+          phase: RestoreApplyPhase.repairingFilePaths);
+      final documentsDir = await environment.documentsDirectory();
+      var missingManagedFiles = false;
+      try {
+        final repair = RestoreImagePathRemapper.remap(
+          databasePath: prepared.file.path,
+          managedFilesRoot: documentsDir.path,
+          restoredFilesDir: workspace.preparedFiles.path,
+        );
+        missingManagedFiles = repair.hasMissingFiles;
+      } catch (_) {
+        return await cleanupAndFail(RestoreResult.pathRepairFailure, rollbackSucceeded: true);
+      }
+      final expectedFinalSchema = migrated
+          ? currentDatabaseSchemaVersion
+          : preview.databaseSchemaVersion;
+      final bool stillValid;
+      try {
+        stillValid = await dbManager.validatePrepared(
+          file: prepared.file,
+          expectedSchemaVersion: expectedFinalSchema,
+        );
+      } catch (_) {
+        return await cleanupAndFail(RestoreResult.databaseVerificationFailure, rollbackSucceeded: true);
+      }
+      if (!stillValid) {
+        return await cleanupAndFail(RestoreResult.databaseVerificationFailure, rollbackSucceeded: true);
       }
 
       // --- Prepare preferences ---------------------------------------------
@@ -367,13 +402,40 @@ class RestoreService {
         );
       }
 
-      // --- Finalize ------------------------------------------------------------
-      _emit(onPhase, RestoreApplyPhase.finalizing);
+      // --- Durable completion marker ----------------------------------------
+      // Data is restored and verified from here on. Any interruption after this
+      // point must not trigger a rollback (the marker is finalized); reminders
+      // are rebuilt and the marker is cleared only once they finish.
+      await _writeMetadata(operationId, workspace,
+          phase: RestoreApplyPhase.verifyingData,
+          databaseSwapStarted: true,
+          fileSwapStarted: true,
+          preferencesApplied: true,
+          finalized: true);
+
+      // --- Rebuild reminders ------------------------------------------------
+      _emit(onPhase, RestoreApplyPhase.rebuildingReminders);
+      await _writeMetadata(operationId, workspace,
+          phase: RestoreApplyPhase.rebuildingReminders,
+          databaseSwapStarted: true,
+          fileSwapStarted: true,
+          preferencesApplied: true,
+          finalized: true);
       try {
         await environment.cancelScheduledNotifications();
       } catch (_) {
         // Best-effort; a failed cancellation must not fail the restore.
       }
+      var remindersSucceeded = true;
+      try {
+        final report = await environment.rebuildScheduledNotifications();
+        remindersSucceeded = report.succeeded;
+      } catch (_) {
+        remindersSucceeded = false;
+      }
+
+      // --- Finalize ------------------------------------------------------------
+      _emit(onPhase, RestoreApplyPhase.finalizing);
       try {
         await recoveryStore.write(
           RestoreRecoveryMetadata(
@@ -390,6 +452,15 @@ class RestoreService {
         await workspace.deleteEntirely();
       } catch (_) {
         // Cleanup is best-effort; the restore itself already succeeded.
+      }
+
+      if (!remindersSucceeded) {
+        // The data restore succeeded and was verified, but reminders could not
+        // be fully rebuilt. This is a success-with-warning, never a rollback.
+        return RestoreFailure.successWithReminderWarning(operationId);
+      }
+      if (missingManagedFiles) {
+        return RestoreFailure.successWithMissingOptionalFiles(operationId);
       }
       return RestoreFailure.success(operationId);
     } catch (_) {

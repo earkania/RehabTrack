@@ -3905,3 +3905,110 @@ Interrupted operations are detected and recovered on the next app start.
 | `flutter test` | 1167/1167 passed |
 | Pixel 7 manual | Build/install/launch verified on device — no crashes, no logcat errors, startup-recovery hook clean. Interactive visual flow (data set A → backup → restore → B; photos; en/ka, light/dark; injected-failure recovery; kill/relaunch) scheduled for human verification (agent cannot view screenshots) |
 
+
+## Phase 9E — Backup & Restore: Compatibility, Migration, Path Repair & Reminder Rebuilding (2026-08-06)
+
+**Goal:** Implement Phase 4 of Backup & Restore — let older-schema backups be
+restored by migrating them to the current schema on a temporary copy, repair
+stored file paths to the restoring device, and rebuild future reminders after a
+restore. Phase 3 already delivered the replace-style engine; this phase removes
+the "migration not yet available" gate.
+
+### Key decisions
+
+- **Canonical version policy** (`lib/domain/backup/backup_version_policy.dart`)
+  is the single source of truth: current schema = `AppDatabase.currentSchemaVersion`
+  (14), oldest restore-compatible = 1 (Drift's cumulative `onUpgrade` covers
+  every `from >= 1`), backup format = `BackupManifest.currentFormatVersion` (1).
+  `BackupValidator` now reads `minSupportedDatabaseSchemaVersion` from it.
+- **Migration runs only on the temp copy.** `RestoreSqliteMigrator`
+  (`lib/data/services/restore/restore_sqlite_migrator.dart`) opens the prepared
+  workspace copy with `AppDatabase.forTesting(NativeDatabase.createInBackground(file))`,
+  lets Drift replay the same cumulative `onUpgrade` blocks, then validates
+  schema version, core tables, sample queries and `PRAGMA foreign_key_check`.
+  The live database is never migrated in place. Failure aborts before any swap
+  and maps to the new `RestoreResult.migrationFailure` (original data intact).
+- **Path repair** (`RestoreImagePathRemapper`): canonical persisted form stays
+  `<managedRoot>/<dir>/<basename>` (matches how the app persists photo paths and
+  how `File(photoPath)` consumers resolve them). It now also normalises
+  `content://` URIs, refuses unusable basenames, clears references whose managed
+  file is absent from the restored archive (UI falls back to initials/avatars,
+  never crashes), only touches the `photoPath` columns, and never rewrites
+  `website`/other fields. A `RestorePathRepairReport` surfaces
+  `successWithMissingOptionalFiles` when photos are missing.
+- **Reminder rebuild** is part of `RestoreEnvironment`
+  (`rebuildScheduledNotifications`), implemented by `RestoreAppEnvironment`
+  through the existing `NotificationActionBridge.recoverAll(profileId)` so the
+  normal scheduling and notification-ID scheme is reused. The bridge's recovery
+  methods now return per-type counts. The rebuild runs after verification; a
+  failure yields `successWithReminderWarning` (data restore is still success,
+  never a rollback of medical data) and the UI offers
+  `retryReminderRebuild`. An interrupted rebuild is recovered automatically by
+  the existing startup `notificationInitializerProvider.recoverAll`.
+- **Durable completion marker:** the recovery metadata is written `finalized:true`
+  immediately after verification, so an interruption during reminder rebuilding
+  never triggers a rollback of already-restored data.
+- Old `RestoreResult.migrationNotSupported` and its "not available yet" gate are
+  removed.
+
+### New/changed files
+
+- `lib/domain/backup/backup_version_policy.dart` (new)
+- `lib/data/services/restore/restore_sqlite_migrator.dart` (new)
+- `lib/data/services/restore/restore_image_path_remapper.dart` (report + content-URI/missing handling)
+- `lib/domain/restore/reminder_rebuild_report.dart` (new)
+- `lib/domain/restore/restore_result.dart` — added `migrationFailure`,
+  `pathRepairFailure`, `databaseVerificationFailure`,
+  `successWithReminderWarning`, `successWithMissingOptionalFiles`,
+  `reminderRebuildFailure`; removed `migrationNotSupported`.
+- `lib/domain/restore/restore_failure.dart` — success-with-warning factories;
+  `succeeded` covers them.
+- `lib/domain/restore/restore_apply_phase.dart` — added `migratingDatabase`,
+  `validatingMigratedDatabase`, `repairingFilePaths`, `rebuildingReminders`.
+- `lib/data/services/restore/restore_environment.dart` +
+  `restore_app_environment.dart` — `rebuildScheduledNotifications()`.
+- `lib/data/services/notification/notification_action_bridge.dart` — recovery
+  methods return counts.
+- `lib/data/services/restore/restore_service.dart` — migrate on temp copy,
+  reordered prepare (database → migrate → files → repair → validate), durable
+  marker, reminder rebuild, success variants.
+- `lib/data/services/backup/backup_validator.dart` — reads the shared policy.
+- `lib/presentation/providers/restore_apply_provider.dart` — new safe phases,
+  `retryReminderRebuild`.
+- `lib/presentation/screens/settings/backup_preview_screen.dart` — migration
+  gate removed, new phase labels, warning outcomes + retry dialog.
+- Localization: ~10 new keys added to `app_en.arb`/`app_ka.arb`;
+  `flutter gen-l10n` run (generated files never hand-edited).
+
+### Tests
+
+- `test/restore_sqlite_migrator_test.dart` (new) — faithful v13 fixture (real
+  Drift schema, `doctor_visit_records` dropped, user_version demoted to 13)
+  migrates to 14 and re-adds the table; already-current is a no-op; garbage is
+  rejected.
+- `test/restore_image_path_remapper_test.dart` — content-URI rewrite,
+  missing-file clearing + report, `website` untouched.
+- `test/restore_service_test.dart` — older-schema backup now migrates and
+  restores (user_version 14, `doctor_visit_records` present);
+  failed reminder rebuild still restores data with `successWithReminderWarning`.
+- `test/backup_preview_test.dart` — migration-required preview now starts the
+  confirmation instead of the "not available yet" gate.
+- `test/restore_apply_ui_test.dart` — reminder-warning success dialog now shows
+  the "Reminders could not be fully rebuilt" copy (via
+  `successWithReminderWarning`).
+- `test/helpers/restore_test_utils.dart` — `FakeRestoreEnvironment` implements
+  `rebuildScheduledNotifications` with failure hooks and call counting.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1174/1174 passed |
+| Pixel 7 manual | Not yet run for the Phase 4 flow (planned: current-schema backup restore, older-schema fixture restore, reminder rebuild for all three types, exact-alarm permission toggling, en/ka, light/dark, force-close/reopen duplicate check) |
+
+Known limitation: automated migration fixtures currently exercise the v13→v14
+step (the last cumulative step); older historical steps reuse the identical
+production `onUpgrade` code and are covered by the existing in-app upgrade path,
+but a full fixture matrix (v1→v14) is a documented follow-up.

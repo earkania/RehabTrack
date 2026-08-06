@@ -61,9 +61,13 @@ void main() {
     expect(phases.last, RestoreApplyPhase.finalizing);
   });
 
-  test('migration-required backups do not start the restore', () async {
-    // A schema-13 backup requires migration and must be gated.
-    final oldDb = buildRestorableSqliteBytes(schema: 13, profiles: 1);
+  test('older-schema backups are migrated and restored', () async {
+    // A schema-13 backup now runs through the app's migrations, not gated off.
+    final oldDb = buildRestorableSqliteBytes(
+      schema: 13,
+      profiles: 1,
+      settings: const {},
+    );
     final oldArchive = buildRestorableBackupZip(
       schema: 13,
       database: oldDb,
@@ -72,14 +76,40 @@ void main() {
     final oldFile = File(p.join(fix.tempBaseDir.path, 'old.rtb'));
     await oldFile.writeAsBytes(oldArchive);
     final oldPreview = await fix.previewFor(oldFile);
+    expect(oldPreview.migrationRequired, isTrue);
 
     final failure = await fix.service.run(
       selectedBackupFile: oldFile,
       expectedPreview: oldPreview,
     );
-    expect(failure.result, RestoreResult.migrationNotSupported);
-    // Live state untouched.
-    expect(readProfileCount((await fix.env.liveDb()).path), 2);
+    expect(failure.succeeded, isTrue);
+
+    final liveDb = (await fix.env.liveDb()).path;
+    expect(readProfileCount(liveDb), 1);
+    final db = sqlite.sqlite3.open(liveDb, mode: sqlite.OpenMode.readOnly);
+    final version = db.userVersion;
+    final hasVisitRecords = db
+        .select(
+          "SELECT name FROM sqlite_master "
+          "WHERE type='table' AND name='doctor_visit_records'",
+        )
+        .isNotEmpty;
+    db.close();
+    expect(version, 14);
+    expect(hasVisitRecords, isTrue);
+  });
+
+  test('a failed reminder rebuild still restores the data', () async {
+    fix.env.failRebuildNotifications = true;
+    final failure = await fix.service.run(
+      selectedBackupFile: fix.selectedFile,
+      expectedPreview: fix.preview,
+    );
+    expect(failure.result, RestoreResult.successWithReminderWarning);
+    expect(failure.succeeded, isTrue);
+    // The data restore completed and the recovery store is cleared.
+    expect(readProfileCount((await fix.env.liveDb()).path), 1);
+    expect(await fix.recoveryStore.listAll(), isEmpty);
   });
 
   test('cancellation requested before the swap leaves the live state intact',

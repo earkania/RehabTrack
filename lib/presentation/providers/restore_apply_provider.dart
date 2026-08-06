@@ -57,6 +57,9 @@ class RestoreApplyController extends StateNotifier<RestoreApplyState> {
     RestoreApplyPhase.preparingRestore,
     RestoreApplyPhase.creatingSafetySnapshot,
     RestoreApplyPhase.preparingDatabase,
+    RestoreApplyPhase.migratingDatabase,
+    RestoreApplyPhase.validatingMigratedDatabase,
+    RestoreApplyPhase.repairingFilePaths,
     RestoreApplyPhase.preparingFiles,
     RestoreApplyPhase.preparingPreferences,
   };
@@ -102,6 +105,17 @@ class RestoreApplyController extends StateNotifier<RestoreApplyState> {
   /// Requests cancellation. Honoured only while in a safe phase.
   void requestCancel() {
     _cancelRequested = true;
+  }
+
+  /// Retries rebuilding future reminders after a restore that completed with a
+  /// reminder warning. Returns whether the rebuild succeeded.
+  Future<bool> retryReminderRebuild() async {
+    try {
+      final report = await _service.environment.rebuildScheduledNotifications();
+      return report.succeeded;
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Resets to idle so the screen can start fresh.

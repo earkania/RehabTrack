@@ -8,8 +8,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:rehab_track/data/services/backup/preferences_exporter.dart';
 import 'package:rehab_track/data/services/restore/app_settings_writer.dart';
 import 'package:rehab_track/data/services/restore/restore_environment.dart';
+import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
+import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
 /// Binds the restore engine to the live app: the canonical Riverpod container,
 /// the app documents directory, the Drift database and the settings store.
@@ -94,5 +96,17 @@ class RestoreAppEnvironment implements RestoreEnvironment {
   @override
   Future<void> cancelScheduledNotifications() async {
     await _container.read(notificationServiceProvider).cancelAllNotifications();
+  }
+
+  @override
+  Future<ReminderRebuildReport> rebuildScheduledNotifications() async {
+    try {
+      final bridge = _container.read(notificationActionBridgeProvider);
+      final profileId = _container.read(currentActiveProfileIdProvider);
+      if (profileId == null) return const ReminderRebuildReport();
+      return await bridge.recoverAll(profileId);
+    } catch (_) {
+      throw const RestoreEnvironmentFailure(reason: 'reminder-rebuild');
+    }
   }
 }

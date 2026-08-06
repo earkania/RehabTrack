@@ -135,7 +135,7 @@ void main() {
   testWidgets('successful restore shows the completion dialog with the '
       'reminder warning', (tester) async {
     final service = FakeApplyService(phases: _phases)
-      ..failure = RestoreFailure.success('op1')
+      ..failure = RestoreFailure.successWithReminderWarning('op1')
       ..gate = Completer<void>();
 
     await tester.pumpWidget(_wrap(service));
@@ -150,7 +150,7 @@ void main() {
     expect(find.text('Restore completed'), findsOneWidget);
     expect(find.textContaining('Your data was restored'), findsOneWidget);
     expect(
-      find.textContaining('Scheduled reminders were cancelled'),
+      find.textContaining('Reminders could not be fully rebuilt'),
       findsOneWidget,
     );
 

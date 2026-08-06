@@ -13,6 +13,18 @@ enum RestoreApplyPhase {
   /// Validating and staging the restored database in temporary storage.
   preparingDatabase,
 
+  /// Migrating an older-schema restored database to the current schema (only
+  /// when the backup predates the current schema).
+  migratingDatabase,
+
+  /// Validating that the migrated database reached the current schema and is
+  /// internally consistent.
+  validatingMigratedDatabase,
+
+  /// Repairing stored file paths in the prepared database so they resolve to
+  /// this device's managed-file location.
+  repairingFilePaths,
+
   /// Staging restored managed files in temporary storage.
   preparingFiles,
 
@@ -36,6 +48,10 @@ enum RestoreApplyPhase {
 
   /// Verifying that the restored state can be read.
   verifyingData,
+
+  /// Rebuilding future medication, measurement and doctor-visit reminders from
+  /// the restored data.
+  rebuildingReminders,
 
   /// Recovering the previous state after a failure.
   rollingBack,

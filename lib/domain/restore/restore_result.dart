@@ -6,6 +6,15 @@ enum RestoreResult {
   /// The restore fully completed and the restored state was verified.
   success,
 
+  /// The restore completed and the restored state was verified, but the future
+  /// reminder schedule could not be fully rebuilt.
+  successWithReminderWarning,
+
+  /// The restore completed and the restored state was verified, but some
+  /// optional managed files (photos) referenced by the backup are missing and
+  /// were cleared so the app falls back to avatars/initials.
+  successWithMissingOptionalFiles,
+
   /// The user cancelled before the live state was modified.
   cancelled,
 
@@ -18,6 +27,16 @@ enum RestoreResult {
 
   /// The restored database could not be staged/validated.
   databasePreparationFailure,
+
+  /// The older-schema restored database could not be migrated to the current
+  /// schema.
+  migrationFailure,
+
+  /// Repairing the restored file paths could not be completed.
+  pathRepairFailure,
+
+  /// The prepared database did not reach/verify the current schema version.
+  databaseVerificationFailure,
 
   /// The prepared database could not be placed into the live location.
   databaseReplacementFailure,
@@ -34,15 +53,14 @@ enum RestoreResult {
   /// Post-restore verification of the restored state failed.
   verificationFailure,
 
+  /// Rebuilding future reminders after a successful data restore failed.
+  reminderRebuildFailure,
+
   /// A failure occurred and the previous state was fully recovered.
   rollbackSucceeded,
 
   /// A failure occurred and automatic recovery could not be completed.
   rollbackFailed,
-
-  /// The backup is supported (preview-compatible) but its older database
-  /// schema requires migration, which is not implemented yet.
-  migrationNotSupported,
 
   /// Any unexpected error.
   unexpectedFailure,

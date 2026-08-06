@@ -9,6 +9,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite;
 import 'package:rehab_track/data/services/backup/preferences_exporter.dart';
 import 'package:rehab_track/data/services/restore/app_settings_writer.dart';
 import 'package:rehab_track/data/services/restore/restore_environment.dart';
+import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
 
 import 'backup_test_utils.dart' show buildZip;
 
@@ -144,6 +145,8 @@ class FakeRestoreEnvironment implements RestoreEnvironment {
   bool verifyResult = true;
   bool failCancelNotifications = false;
   int cancelNotificationCalls = 0;
+  bool failRebuildNotifications = false;
+  int rebuildNotificationCalls = 0;
   final List<String> appliedPreferences = [];
 
   FakeRestoreEnvironment(this.docsDir);
@@ -206,6 +209,19 @@ class FakeRestoreEnvironment implements RestoreEnvironment {
   Future<void> cancelScheduledNotifications() async {
     if (failCancelNotifications) throw const RestoreEnvironmentFailure();
     cancelNotificationCalls++;
+  }
+
+  @override
+  Future<ReminderRebuildReport> rebuildScheduledNotifications() async {
+    if (failRebuildNotifications) {
+      throw const RestoreEnvironmentFailure(reason: 'test');
+    }
+    rebuildNotificationCalls++;
+    return const ReminderRebuildReport(
+      medicationReminders: 1,
+      measurementReminders: 1,
+      doctorVisitReminders: 1,
+    );
   }
 }
 

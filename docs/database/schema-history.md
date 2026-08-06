@@ -30,11 +30,48 @@ exactly the steps needed. The initial `onCreate` creates all tables and seeds de
 > appears in the `-S "schemaVersion => 3"` history alongside `66678b7`. The
 > mapping above is the earliest commit that introduced each `schemaVersion`.
 
+## Restore compatibility
+
+Backup/restore uses the same cumulative migration strategy (`onUpgrade`) to bring
+an older backup's database up to the current schema **before** it replaces the
+live database. The single source of truth for the versioning policy is
+`lib/domain/backup/backup_version_policy.dart`:
+
+- Current schema: **14** (`AppDatabase.currentSchemaVersion`).
+- Oldest restore-compatible schema: **1** (`minSupportedDatabaseSchemaVersion`).
+  Because Migrations 2→14 are cumulative `if (from < N)` steps, every backup at
+  `>= 1` has a supported migration path.
+- Backup-format version: **1** (`BackupManifest.currentFormatVersion`).
+
+Restore rules:
+
+- A backup **newer than the current schema** (schema `> 14`) is rejected as
+  `newerDatabaseVersion` and cannot be restored.
+- A backup **older than 1** is rejected as `unsupportedOldDatabaseVersion`.
+- A backup at schema `1..13` is restored via `RestoreSqliteMigrator`, which opens
+  a temporary copy with `AppDatabase.forTesting(...)` and lets Drift run the same
+  `onUpgrade` blocks to reach 14, then validates schema version, core tables,
+  sample queries and `foreign_key_check`. The live database is never migrated in
+  place; migration runs strictly on the prepared temporary copy in the restore
+  workspace.
+- A backup at schema **14** is restored directly (no migration).
+
+> The full 1→→14 path is exercised by Drift's own migration strategy; automated
+> coverage currently validates a faithful v13 fixture migrating to 14 (the
+> last step, which adds `doctor_visit_records`). Historical pre-v12 fixtures are
+> marked a known limitation of the automated tests, not of the migration itself —
+> the production path reuses the exact same cumulative `onUpgrade` logic the app
+> has run on every upgrade since these versions existed.
+
 ## Related
 
 - Migration logic: `lib/data/database/app_database.dart` → `MigrationStrategy.onUpgrade`.
+- Restore migration service: `lib/data/services/restore/restore_sqlite_migrator.dart`.
+- Version policy: `lib/domain/backup/backup_version_policy.dart`.
 - Migration coverage: `test/care_contact_migration_test.dart` asserts the schema
-  version is 14 and that care-contact/doctor-visit tables and indexes exist.
-- `docs/design/design-notes.md` documents the v13→v14 additive migration.
-- Backup archives record `databaseSchemaVersion` in `manifest.json`; restore
-  (future) will validate against this value.
+  version is 14 and that care-contact/doctor-visit tables and indexes exist;
+  `test/restore_sqlite_migrator_test.dart` asserts v13→v14 restore migration.
+- `docs/design/design-notes.md` documents the v13→v14 additive migration and the
+  Phase 4 restore decisions.
+- Backup archives record `databaseSchemaVersion` in `manifest.json`; the preview
+  validator checks it and the restore engine migrates supported older values.
