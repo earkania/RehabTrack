@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:rehab_track/data/services/restore/restore_operation.dart';
 import 'package:rehab_track/domain/backup/backup_compatibility.dart';
 import 'package:rehab_track/domain/backup/backup_preview.dart';
 import 'package:rehab_track/domain/restore/restore_apply_phase.dart';
@@ -11,6 +12,8 @@ import 'package:rehab_track/domain/restore/restore_failure.dart';
 import 'package:rehab_track/domain/restore/restore_result.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/restore_apply_provider.dart';
+import 'package:rehab_track/presentation/providers/locale_provider.dart';
+import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 /// Shows the safe metadata of a validated backup and lets the user confirm or
@@ -176,7 +179,7 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
     await _runRestore(context);
   }
 
-  Future<void> _runRestore(BuildContext context) async {
+Future<void> _runRestore(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final filePath = widget.backupFilePath;
     if (filePath == null || filePath.isEmpty) {
@@ -186,7 +189,7 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
       return;
     }
 
-    final controller = ref.read(restoreApplyProvider.notifier);
+    // Check if a restore is already running in the main provider.
     if (ref.read(restoreApplyProvider).isRunning) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.restoreOperationAlreadyInProgress)),
@@ -194,24 +197,55 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
       return;
     }
 
+    // Capture navigator before any async operations to avoid stale context.
+    final navigator = Navigator.of(context);
+
+    // Create a completely independent RestoreOperation that doesn't
+    // depend on Riverpod providers. This isolates it from the main
+    // container's provider invalidation during database reinitialization.
+    final operation = await createRestoreOperation(ProviderScope.containerOf(context));
+
     unawaited(showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const RestoreProgressDialog(),
+      builder: (_) => RestoreProgressDialog(
+        stateStream: operation.stateStream,
+        onCancel: operation.requestCancel,
+      ),
     ));
 
-    final failure = await controller.apply(
-      backupFile: File(filePath),
-      preview: widget.preview,
-    );
+    // Listen to state changes and handle completion.
+    final subscription = operation.stateStream.listen((state) {
+      if (state.isFinished && navigator.canPop()) {
+        // Don't auto-dismiss progress dialog on success - let _showOutcome handle it
+        // The progress dialog will be handled by _showOutcome
+      }
+    });
 
-    if (!context.mounted) return;
-    // Close the progress dialog, then present the outcome.
-    Navigator.of(context).pop();
-    final outcome = failure ?? ref.read(restoreApplyProvider).failure;
-    await _showOutcome(context, outcome);
-    if (!context.mounted) return;
-    Navigator.of(context).pop();
+    try {
+      final failure = await operation.apply(
+        backupFile: File(filePath),
+        preview: widget.preview,
+      );
+
+      if (!context.mounted) return;
+      // Present outcome (handles progress dialog dismissal and success dialog)
+      final outcome = failure ?? const RestoreFailure(
+        result: RestoreResult.unexpectedFailure,
+        recoveryId: 'unknown',
+      );
+      await _showOutcome(context, outcome);
+      if (!context.mounted) return;
+      // The restore operation swapped the database in its own container.
+      // Invalidate main app's database to pick up the restored data (including locale).
+      ref.invalidate(databaseProvider);
+      // Small delay to allow database to reopen and locale to load.
+      await Future.delayed(const Duration(milliseconds: 500));
+      navigator.pop(); // preview screen
+    } finally {
+      await subscription.cancel();
+      operation.dispose();
+    }
   }
 
   Future<void> _showOutcome(
@@ -227,26 +261,37 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
       return;
     }
 
+    // Close progress dialog first
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
+
     if (failure.succeeded) {
       final date = LocalizedDateFormat.fullMonthDayYear(
         context,
         widget.preview.backupCreatedAt,
       );
-      switch (failure.result) {
-        case RestoreResult.successWithReminderWarning:
-          await _showReminderWarningDialog(context, date);
-        case RestoreResult.successWithMissingOptionalFiles:
-          await _showAlertDialog(
-            title: l10n.restoreCompletedTitle,
-            message: l10n.restoreCompletedMessage(date),
-            extra: l10n.someOptionalFilesMissing,
-          );
-        default:
-          await _showAlertDialog(
-            title: l10n.restoreCompletedTitle,
-            message: l10n.restoreCompletedMessage(date),
-          );
-      }
+      await _showAlertDialog(
+        title: l10n.restoreCompletedTitle,
+        message: switch (failure.result) {
+          RestoreResult.successWithReminderWarning =>
+            l10n.restoreCompletedRemindersPending,
+          RestoreResult.successWithMissingOptionalFiles =>
+            '${l10n.restoreCompletedMessage(date)}\n${l10n.someOptionalFilesMissing}',
+          _ => l10n.restoreCompletedMessage(date),
+        },
+        actions: [
+          FilledButton(
+            onPressed: () {
+              if (context.mounted) {
+                Navigator.of(context).pop(); // outcome dialog
+                Navigator.of(context).pop(); // preview screen -> back to Backup & Restore
+              }
+            },
+            child: Text(l10n.ok),
+          ),
+        ],
+      );
       return;
     }
 
@@ -296,6 +341,7 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
         l10n.restoreReinitializationFailed,
       RestoreResult.verificationFailure => l10n.restoreVerificationFailed,
       RestoreResult.reminderRebuildFailure => l10n.restoreReminderRebuildFailed,
+      RestoreResult.insufficientStorage => l10n.restoreNotEnoughStorage,
       _ => l10n.restoreFailedGeneric,
     };
   }
@@ -357,6 +403,7 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
     required String title,
     required String message,
     String? extra,
+    List<Widget>? actions,
   }) {
     return showDialog<void>(
       context: context,
@@ -375,12 +422,13 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
               ],
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(l10n.ok),
-            ),
-          ],
+          actions: actions ??
+              [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(l10n.ok),
+                ),
+              ],
         );
       },
     );
@@ -424,20 +472,37 @@ String restoreApplyPhaseLabel(
 
 /// Non-dismissable progress dialog that reflects the running restore apply
 /// phase and allows cancellation only while it is still safe.
-class RestoreProgressDialog extends ConsumerStatefulWidget {
-  const RestoreProgressDialog({super.key});
+class RestoreProgressDialog extends StatefulWidget {
+  final Stream<RestoreOperationState> stateStream;
+  final VoidCallback? onCancel;
+
+  const RestoreProgressDialog({
+    super.key,
+    required this.stateStream,
+    this.onCancel,
+  });
 
   @override
-  ConsumerState<RestoreProgressDialog> createState() =>
-      _RestoreProgressDialogState();
+  State<RestoreProgressDialog> createState() => _RestoreProgressDialogState();
 }
 
-class _RestoreProgressDialogState extends ConsumerState<RestoreProgressDialog> {
+class _RestoreProgressDialogState extends State<RestoreProgressDialog> {
+  RestoreOperationState? _latestState;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.stateStream.listen((state) {
+      if (mounted) {
+        setState(() => _latestState = state);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(restoreApplyProvider);
+    final state = _latestState ?? const RestoreOperationState();
     final l10n = AppLocalizations.of(context)!;
-    final controller = ref.read(restoreApplyProvider.notifier);
 
     return PopScope(
       canPop: false,
@@ -449,20 +514,32 @@ class _RestoreProgressDialogState extends ConsumerState<RestoreProgressDialog> {
           children: [
             const LinearProgressIndicator(),
             const SizedBox(height: 16),
-            Text(
-              state.applyPhase == null
+            Semantics(
+              liveRegion: true,
+              label: state.applyPhase == null
                   ? l10n.preparingRestore
                   : restoreApplyPhaseLabel(l10n, state.applyPhase!),
-              style: Theme.of(context).textTheme.bodyMedium,
+              child: Text(
+                state.applyPhase == null
+                    ? l10n.preparingRestore
+                    : restoreApplyPhaseLabel(l10n, state.applyPhase!),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ),
-            if (controller.canCancel) ...[
+            if (state.isRunning && state.applyPhase != null) ...[
               const SizedBox(height: 16),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: controller.requestCancel,
+                  onPressed: widget.onCancel,
                   child: Text(l10n.cancelRestore),
                 ),
+              ),
+            ] else ...[
+              const SizedBox(height: 16),
+              Text(
+                l10n.restoreCancellationUnavailable,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ],

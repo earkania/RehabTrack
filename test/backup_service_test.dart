@@ -9,10 +9,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:rehab_track/data/database/app_database.dart';
+import 'package:rehab_track/data/services/backup/backup_archive_reader.dart';
 import 'package:rehab_track/data/services/backup/backup_archive_writer.dart';
 import 'package:rehab_track/data/services/backup/backup_service.dart';
 import 'package:rehab_track/data/services/backup/backup_storage_gateway.dart';
 import 'package:rehab_track/data/services/backup/preferences_exporter.dart';
+import 'package:rehab_track/data/services/storage/storage_inspector.dart';
 import 'package:rehab_track/domain/backup/backup_manifest.dart';
 import 'package:rehab_track/domain/backup/backup_phase.dart';
 import 'package:rehab_track/domain/backup/backup_result.dart';
@@ -48,6 +50,7 @@ class FakeStorageGateway extends BackupStorageGateway {
 
   Uint8List? lastBytes;
   String? lastFileName;
+  bool saved = false;
 
   FakeStorageGateway({required this.handler});
 
@@ -58,6 +61,7 @@ class FakeStorageGateway extends BackupStorageGateway {
   }) async {
     lastBytes = bytes;
     lastFileName = fileName;
+    saved = true;
     return handler(bytes, fileName);
   }
 }
@@ -73,6 +77,26 @@ class ThrowingArchiveWriter extends BackupArchiveWriter {
   }) async {
     throw StateError('zip boom');
   }
+}
+
+class FailingArchiveReader extends BackupArchiveReader {
+  const FailingArchiveReader(this.status);
+
+  final BackupArchiveReadStatus status;
+
+  @override
+  Future<BackupArchiveReadResult> read(File archiveFile) async {
+    return BackupArchiveReadResult.failure(status);
+  }
+}
+
+class FixedStorageInspector extends StorageInspector {
+  const FixedStorageInspector(this.bytes);
+
+  final int? bytes;
+
+  @override
+  Future<int?> freeBytes(String path) async => bytes;
 }
 
 void main() {
@@ -98,7 +122,11 @@ void main() {
     tempDir.deleteSync(recursive: true);
   });
 
-  BackupService buildService({DateTime Function()? clock}) {
+  BackupService buildService({
+    DateTime Function()? clock,
+    BackupArchiveReader? archiveReader,
+    StorageInspector? storageInspector,
+  }) {
     return BackupService(
       database: database,
       archiveWriter: BackupArchiveWriter(),
@@ -108,6 +136,8 @@ void main() {
       tempBaseDir: tempDir,
       platform: 'test',
       clock: clock ?? () => DateTime.utc(2026, 8, 4, 12, 30),
+      archiveReader: archiveReader ?? const BackupArchiveReader(),
+      storageInspector: storageInspector ?? const StorageInspector(),
     );
   }
 
@@ -314,6 +344,45 @@ void main() {
       final service = buildService(clock: () => fixed);
       await service.createBackup();
       expect(gateway.lastFileName, 'RehabTrack-Backup-2026-01-02_03-04.rtb');
+    });
+
+    test('sanitizes illegal filename characters from the suggested name',
+        () async {
+      final service = buildService(
+        clock: () => DateTime.utc(2026, 1, 2, 3, 4),
+      );
+      await service.createBackup();
+      expect(gateway.lastFileName, contains('_'));
+      expect(gateway.lastFileName, isNot(contains(':')));
+      expect(gateway.lastFileName, endsWith('.rtb'));
+    });
+
+    test('reports notEnoughStorage before saving when free space is low',
+        () async {
+      final outcome = await buildService(
+        storageInspector: const FixedStorageInspector(10),
+      ).createBackup();
+      expect(outcome.result, BackupResult.notEnoughStorage);
+      expect(gateway.saved, isFalse);
+    });
+
+    test('reports archiveFailure when the post-write self-check fails',
+        () async {
+      final outcome = await buildService(
+        archiveReader: const FailingArchiveReader(
+          BackupArchiveReadStatus.corruptedArchive,
+        ),
+      ).createBackup();
+      expect(outcome.result, BackupResult.archiveFailure);
+      expect(gateway.saved, isFalse);
+    });
+
+    test('exposes the provider-renamed display name after saving', () async {
+      gateway.handler = (b, f) =>
+          BackupSaveResult.success('/tmp/custom.rtb', displayName: 'My Rehab');
+      final outcome = await buildService().createBackup();
+      expect(outcome.result, BackupResult.success);
+      expect(outcome.savedFileName, 'My Rehab');
     });
   });
 }

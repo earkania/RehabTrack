@@ -980,3 +980,91 @@ also hardens path repair.
   start, so a kill during rebuild does not strand the user without reminders.
 - **Phase 4E exclusions (unchanged from engine via build file):** no cloud,
   no encryption, no auto backups, no commit/push.
+
+## Backup & Restore — Polish & Hardening — Approved Design (2026-08-06)
+
+Phase 5 hardens the completed backup/restore feature and adds Last Backup / Last
+Restore metadata and UX polish. It intentionally adds **no new backup types**.
+
+### Archive self-check (backup)
+
+- After `BackupArchiveWriter` produces the temp archive and **before** the
+  picker save, `BackupService` reopens it with `BackupArchiveReader` and checks:
+  entry presence, path safety, manifest parseability, `checksumsComplete`, and a
+  SHA-256 sample against the manifest.
+- Any failure → `BackupResult.archiveFailure`; the user is never offered a save
+  of a corrupt file, so a damaged archive cannot land in the documents provider.
+
+### Storage-space guards
+
+- **Backup:** `StorageInspector.freeBytes` (native `StatFs` on the app-cache
+  dir via the existing `com.earkania.rehabtrack/backup` channel) vs 2× archive
+  size → `notEnoughStorage`.
+- **Restore:** before the first live change, the workspace size × 2 vs free
+  space → `RestoreResult.insufficientStorage` (mapped to a localized message in
+  the preview screen). A failed guard touches nothing: no snapshot, no pause,
+  no swap, no recovery marker.
+- If the native call is unavailable (`freeBytes` returns null) the guard is
+  skipped — a degraded check is better than a false "out of space".
+
+### Filename handling
+
+- `_sanitizeFileName` strips `\ / : * ? " < > |` and control characters before
+  suggesting `RehabTrack-Backup-yyyy-MM-dd_HH-mm.rtb`.
+- The provider may rename the file; the native `createDocument` now resolves the
+  real display name (`OpenableColumns.DISPLAY_NAME`) and returns JSON
+  `{uri, displayName}`. `BackupSaveResult` carries it as `displayName`, stored as
+  the "Stored as: …" Last Backup display name. Unknown/missing display names fall
+  back to the suggested sanitized name.
+
+### Last Backup / Last Restore metadata
+
+- `last_backup_at` (existing), `last_backup_display_name`, `last_restore_at`.
+- `last_restore_at` is written **only** after the restore, verification and
+  reminder rebuild all finalize — never on rollback or cancellation. Restore
+  never overwrites the last-backup marker. Settings writes are best-effort
+  (a metadata write failure never fails an otherwise-successful operation).
+
+### Startup stale-temp cleanup
+
+- `RestoreStaleWorkspaceCleaner` deletes restore workspaces **not referenced by
+  any `needsRecovery` marker**, abandoned `rehabtrack_backup_*` temp dirs, and a
+  stale `pending-restore` copy — but never a workspace still tied to an active
+  interrupted restore, and never unrelated cache. It runs from
+  `runStartupRestoreRecovery` after recovery.
+
+### Recovery retry limit
+
+- Recovery metadata gains `attemptCount`. `RestoreInterruptedRecoveryService`
+  stops after `maxRecoveryAttempts = 3`, returning
+  `RestoreInterruptedRecoveryResult.recoveryLimitReached` (terminal state): a
+  persistent failure is never retried every launch; the metadata and safety
+  snapshot are retained for manual action.
+
+### Deeper restore verification
+
+- `RestoreStateVerifier` checks, in addition to "it opens": SQLite header magic,
+  exact `userVersion`, presence of all core tables, a read-only `COUNT(*)` on
+  each, and the managed-files root existing. Row values are never read, logged
+  or returned. Wired into `RestoreAppEnvironment.verifyRestoredState`.
+
+### Notification duplicate-prevention audit
+
+- `RestoreEnvironment.verifyScheduledNotificationsNoDuplicates()` checks the
+  pending notification IDs after the rebuild; duplicate IDs downgrade the verdict
+  to `successWithReminderWarning`. Reminder issues never roll back restored data.
+- Reminder rebuild remains exactly-once per restore via the durable finalized
+  marker + startup `recoverAll`.
+
+### Accessibility & localization
+
+- Semantics live regions on the backup and restore progress dialogs; semantics
+  labels on the backup/operations tiles.
+- Localized date rendering (`fullMonthDayYear` + `hourMinute`).
+- New keys (en + ka): `backupLastCreated`, `restoreLastCompleted`,
+  `restoreCancellationUnavailable`, `restoreNotEnoughStorage`, `backupStoredAs`.
+
+### Non-goals (unchanged)
+
+No automatic backups, no cloud, no merge/selective restore, no encryption, no
+commit/push.

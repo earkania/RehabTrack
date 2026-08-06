@@ -18,6 +18,10 @@ enum RestoreResult {
   /// The user cancelled before the live state was modified.
   cancelled,
 
+  /// The device has insufficient free storage to safely run the restore, so
+  /// the live state was left untouched.
+  insufficientStorage,
+
   /// The selected archive failed validation when re-checked immediately
   /// before restore.
   validationFailure,

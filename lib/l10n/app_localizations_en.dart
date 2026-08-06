@@ -2195,4 +2195,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get contactReferencedByVisits =>
       'This contact is used by a doctor visit and cannot be permanently deleted.';
+
+  @override
+  String backupLastCreated(Object time) {
+    return 'Last backup created: $time';
+  }
+
+  @override
+  String restoreLastCompleted(Object time) {
+    return 'Last restore completed: $time';
+  }
+
+  @override
+  String get restoreCancellationUnavailable =>
+      'Restoring is in progress and cannot be cancelled right now.';
+
+  @override
+  String get restoreNotEnoughStorage =>
+      'There is not enough free storage space to run the restore. No data was changed.';
+
+  @override
+  String backupStoredAs(Object name) {
+    return 'Stored as: $name';
+  }
 }

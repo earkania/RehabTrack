@@ -51,43 +51,57 @@
   "backupDate": "Backup date: {date}",
   "@backupDate": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "backupAppVersion": "App version: {version}",
   "@backupAppVersion": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "backupFormatVersion": "Backup format version: {version}",
   "@backupFormatVersion": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "databaseVersion": "Database version: {version}",
   "@databaseVersion": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "currentDatabaseVersion": "Current database version: {version}",
   "@currentDatabaseVersion": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "profilesCount": "Profiles: {count}",
   "@profilesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "filesCount": "Managed files: {count}",
   "@filesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "backupSize": "Backup size",
@@ -106,14 +120,18 @@
   "restoreCompletedMessage": "Your data was restored from the backup from {date}.",
   "@restoreCompletedMessage": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "originalDataRecovered": "Your original data was recovered.",
   "criticalRestoreRecoveryRequired": "Automatic recovery could not complete. Do not close the app — contact support with this code: {code}.",
   "@criticalRestoreRecoveryRequired": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "restoreInterrupted": "A previous restore was interrupted.",
@@ -248,14 +266,20 @@
   "dailyAt": "Daily at {times}",
   "@dailyAt": {
     "placeholders": {
-      "times": {"type": "String"}
+      "times": {
+        "type": "String"
+      }
     }
   },
   "everyNDays": "Every {count} days at {times}",
   "@everyNDays": {
     "placeholders": {
-      "count": {"type": "int"},
-      "times": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "times": {
+        "type": "String"
+      }
     }
   },
   "intakeQuantity": "Intake Quantity",
@@ -269,7 +293,7 @@
   "drop": "drop",
   "ml": "ml",
   "puff": "puff",
-  "unit": "unit",
+  "unit": "Unit",
   "sachet": "sachet",
   "spoon": "spoon",
   "injection": "injection",
@@ -293,7 +317,7 @@
   "invalidRoute": "Invalid page",
   "schedules": "Schedules",
   "deleteSchedule": "Delete Schedule",
-  "deleteScheduleConfirmation": "Remove this schedule? Notifications will be cancelled.",
+  "deleteScheduleConfirmation": "Are you sure you want to delete this schedule?",
   "selectTime": "Select Time",
   "addTime": "Add Time",
   "scheduledTime": "Scheduled Time",
@@ -305,7 +329,7 @@
   "failedToSaveSchedule": "Failed to save schedule",
   "failedToDeleteSchedule": "Failed to delete schedule",
   "schedulesSection": "Schedules",
-  "addScheduleSubtitle": "Set up reminders for this medication",
+  "addScheduleSubtitle": "Add a schedule to get reminders",
   "editAlternative": "Edit Alternative",
   "deleteAlternative": "Delete Alternative",
   "deleteAlternativeConfirmation": "Remove this alternative? This will not affect the medication or its schedules.",
@@ -325,7 +349,9 @@
   "adherencePercentage": "{percentage}%",
   "@adherencePercentage": {
     "placeholders": {
-      "percentage": {"type": "double"}
+      "percentage": {
+        "type": "double"
+      }
     }
   },
   "noLogsYet": "No logs yet",
@@ -344,13 +370,17 @@
   "scheduledFor": "Scheduled for {time}",
   "@scheduledFor": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "takenAt": "Taken at {time}",
   "@takenAt": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "nameRequired": "Name is required",
@@ -384,7 +414,6 @@
   "irregularHeartbeat": "Irregular heartbeat",
   "pulseLabel": "pulse",
   "fieldName": "Field Name",
-  "unit": "Unit",
   "requiredField": "Required",
   "minimumValue": "Minimum Value",
   "maximumValue": "Maximum Value",
@@ -404,7 +433,7 @@
   "selectMeasurementType": "Select measurement type",
   "addReading": "Add Reading",
   "addReadingTooltip": "Add Reading",
-  "viewHistory": "View History",
+  "viewHistory": "History",
   "valueRequired": "Value is required",
   "mustBePositive": "Value must be positive",
   "systolicGreaterThanDiastolic": "Systolic should be greater than diastolic",
@@ -430,16 +459,17 @@
   "referenceRangeCount": "{count,plural, =0{0 reference ranges} =1{1 reference range} other{{count} reference ranges}}",
   "@referenceRangeCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "trends": "Trends",
   "measurementTrends": "Measurement Trends",
-  "viewTrends": "View Trends",
+  "viewTrends": "Trends",
   "lastSevenDays": "Last 7 Days",
   "lastThirtyDays": "Last 30 Days",
   "lastNinetyDays": "Last 90 Days",
-  "allTime": "All Time",
   "latest": "Latest",
   "average": "Average",
   "minimum": "Minimum",
@@ -474,19 +504,25 @@
   "componentStatusSystolic": "Systolic {status}",
   "@componentStatusSystolic": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "componentStatusDiastolic": "Diastolic {status}",
   "@componentStatusDiastolic": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "componentStatusPulse": "Pulse {status}",
   "@componentStatusPulse": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "measurementSchedules": "Measurement Schedules",
@@ -494,36 +530,30 @@
   "editMeasurementSchedule": "Edit Measurement Schedule",
   "noMeasurementSchedules": "No measurement schedules",
   "noMeasurementSchedulesDescription": "Add a schedule to get reminders for this measurement",
-  "schedulesSection": "Schedules",
-  "addScheduleSubtitle": "Add a schedule to get reminders",
   "daily": "Daily",
   "everyNDaysLabel": "Every N Days",
-  "intervalDays": "Interval (days)",
   "everyNDaysRequiresStartDate": "Every N Days requires a start date",
   "recordNow": "Record Now",
   "measurementReminder": "Measurement Reminder",
-  "measurementReminders": "Measurement Reminders",
+  "measurementReminders": "Measurement reminders",
   "timeToRecordMeasurement": "Time to record {name}",
   "@timeToRecordMeasurement": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "reminderScheduled": "Reminder scheduled",
   "reminderUpdated": "Reminder updated",
   "reminderDeleted": "Reminder deleted",
-  "failedToSaveSchedule": "Failed to save schedule",
   "scheduleRecovered": "Schedule recovered",
   "measurementsDueToday": "Measurements Due Today",
   "noRemindersToday": "No reminders scheduled for today",
   "upcoming": "Upcoming",
   "overdue": "Overdue",
   "completed": "Completed",
-  "skipped": "Skipped",
   "snoozed": "Snoozed",
-  "schedules": "Schedules",
-  "deleteSchedule": "Delete Schedule",
-  "deleteScheduleConfirmation": "Are you sure you want to delete this schedule?",
   "todaysProgress": "Today's Progress",
   "todaysPlan": "Today's Plan",
   "nothingScheduledToday": "Nothing scheduled for today",
@@ -532,7 +562,6 @@
   "measurementsToday": "Measurements",
   "completedAndSkipped": "Completed & Skipped",
   "markTaken": "Mark as Taken",
-  "recordNow": "Record Now",
   "snooze10min": "Snooze 10 min",
   "due": "Due",
   "dueSoon": "Due soon",
@@ -545,8 +574,6 @@
   "moreActions": "More actions",
   "skip": "Skip",
   "openDetails": "Details",
-  "viewHistory": "History",
-  "viewTrends": "Trends",
   "failedToUpdateItem": "Failed to update item",
   "changeToSkipped": "Change to Skipped",
   "changeToTaken": "Change to Taken",
@@ -559,7 +586,6 @@
   "nothingScheduledForThisDay": "Nothing scheduled for this day",
   "firstPlannedItem": "First planned item",
   "scheduledAt": "Scheduled at {time}",
-  "history": "History",
   "medicationsMissed": "Missed medications",
   "measurementsMissed": "Missed measurements",
   "dailySummary": "Daily Summary",
@@ -601,7 +627,9 @@
   "yearsOld": "{years} years old",
   "@yearsOld": {
     "placeholders": {
-      "years": {"type": "int"}
+      "years": {
+        "type": "int"
+      }
     }
   },
   "activeProfile": "Active Profile",
@@ -629,7 +657,9 @@
   "minutesValue": "{minutes} minutes",
   "@minutesValue": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "fiveMinutes": "5 minutes",
@@ -639,7 +669,6 @@
   "sixtyMinutes": "60 minutes",
   "reminders": "Reminders",
   "medicationReminders": "Medication reminders",
-  "measurementReminders": "Measurement reminders",
   "reminderSound": "Sound",
   "reminderVibration": "Vibration",
   "defaultSnoozeDuration": "Default snooze duration",
@@ -661,11 +690,9 @@
   "testReminderBody": "This is a test reminder to verify notification sound, vibration, and presentation.",
   "medicationReminder": "Medication Reminder",
   "markAsTaken": "Mark as Taken",
-  "recordNow": "Record Now",
-  "skip": "Skip",
   "snooze": "Snooze",
   "scheduleSavedReminderFailed": "Schedule saved, but reminder could not be scheduled",
-  "reminderSchedulingFailed": "Reminder scheduling failed",
+  "reminderSchedulingFailed": "Could not schedule reminder",
   "reminderDetails": "Reminder Details",
   "reminderPermissionExplanation": "RehabTrack needs notification permission to show reminders for medications and measurements.",
   "exactAlarmExplanation": "Exact alarm permission allows reminders to appear at the precise scheduled time. Without it, reminder timing may be less precise.",
@@ -780,7 +807,9 @@
   "doctorVisitsUpcomingBadgeSemantics": "Doctor Visits, {count, plural, =1{1 upcoming visit} other{{count} upcoming visits}}",
   "@doctorVisitsUpcomingBadgeSemantics": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "visitHistory": "History",
@@ -795,7 +824,6 @@
   "saveVisitFailed": "Could not save visit",
   "visitUpdated": "Visit updated",
   "visitSaved": "Visit saved",
-  "reminderSchedulingFailed": "Could not schedule reminder",
   "doctorVisitDetails": "Visit Details",
   "visitNeedsAttention": "This visit is past due — mark it completed, cancelled, or missed.",
   "markCompleted": "Mark completed",
@@ -814,5 +842,10 @@
   "selectDoctor": "Select doctor",
   "selectClinicOrHospital": "Select clinic or hospital",
   "noEligibleContacts": "No eligible contacts. Add a care contact first.",
-  "contactReferencedByVisits": "This contact is used by a doctor visit and cannot be permanently deleted."
+  "contactReferencedByVisits": "This contact is used by a doctor visit and cannot be permanently deleted.",
+  "backupLastCreated": "Last backup created: {time}",
+  "restoreLastCompleted": "Last restore completed: {time}",
+  "restoreCancellationUnavailable": "Restoring is in progress and cannot be cancelled right now.",
+  "restoreNotEnoughStorage": "There is not enough free storage space to run the restore. No data was changed.",
+  "backupStoredAs": "Stored as: {name}"
 }

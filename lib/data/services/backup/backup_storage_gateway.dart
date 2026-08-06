@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 
 import 'package:rehab_track/domain/backup/backup_result.dart';
@@ -9,16 +11,21 @@ class BackupSaveResult {
   /// URI of the chosen destination, set only on [BackupResult.success].
   final String? path;
 
-  const BackupSaveResult._(this.result, this.path);
+  /// The display name the document provider assigned to the saved file, when
+  /// one is available. The user (or provider) may rename the suggested name, so
+  /// this reflects the final stored name rather than the suggested one.
+  final String? displayName;
 
-  factory BackupSaveResult.success(String path) =>
-      BackupSaveResult._(BackupResult.success, path);
+  const BackupSaveResult._(this.result, this.path, this.displayName);
+
+  factory BackupSaveResult.success(String path, {String? displayName}) =>
+      BackupSaveResult._(BackupResult.success, path, displayName);
 
   factory BackupSaveResult.cancelled() =>
-      const BackupSaveResult._(BackupResult.cancelled, null);
+      const BackupSaveResult._(BackupResult.cancelled, null, null);
 
   factory BackupSaveResult.failed(BackupResult result) =>
-      BackupSaveResult._(result, null);
+      BackupSaveResult._(result, null, null);
 
   bool get succeeded => result == BackupResult.success;
 }
@@ -39,32 +46,61 @@ class BackupStorageGateway {
   ///
   /// Returns [BackupSaveResult.cancelled] when the user dismisses the picker
   /// and [BackupSaveResult.failed] with a mapped [BackupResult] on write
-  /// errors.
+  /// errors. On success the returned result carries the final display name the
+  /// document provider assigned (the user may have renamed the suggested file).
   Future<BackupSaveResult> save({
     required Uint8List bytes,
     required String fileName,
   }) async {
     try {
-      final path = await _channel.invokeMethod<String>('createDocument', {
+      final raw = await _channel.invokeMethod<String>('createDocument', {
         'fileName': fileName,
         'bytes': bytes,
       });
-      if (path == null || path.isEmpty) {
+      if (raw == null || raw.isEmpty) {
         return BackupSaveResult.cancelled();
       }
-      return BackupSaveResult.success(path);
+      return BackupSaveResult.success(
+        _uriOf(raw),
+        displayName: _displayNameOf(raw),
+      );
     } on PlatformException catch (e) {
       return BackupSaveResult.failed(_mapPlatformException(e));
     } on MissingPluginException {
       return const BackupSaveResult._(
         BackupResult.unexpectedFailure,
         null,
+        null,
       );
     } catch (_) {
       return const BackupSaveResult._(
         BackupResult.storageFailure,
         null,
+        null,
       );
+    }
+  }
+
+  /// The native side returns either a raw URI string (older behaviour) or a
+  /// JSON document `{ "uri": "...", "displayName": "..." }`. Decode both.
+  static String _uriOf(String raw) {
+    final map = _decode(raw);
+    if (map != null) return map['uri'] as String? ?? raw;
+    return raw;
+  }
+
+  static String? _displayNameOf(String raw) {
+    final map = _decode(raw);
+    return map?['displayName'] as String?;
+  }
+
+  static Map<String, Object?>? _decode(String raw) {
+    if (!raw.startsWith('{')) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      return decoded is Map ? decoded.cast<String, Object?>() : null;
+    } catch (_) {
+      return null;
     }
   }
 

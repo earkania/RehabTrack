@@ -17,9 +17,11 @@ import 'package:rehab_track/data/services/restore/restore_reinitializer.dart';
 import 'package:rehab_track/data/services/restore/restore_safety_snapshot_service.dart';
 import 'package:rehab_track/data/services/restore/restore_sqlite_migrator.dart';
 import 'package:rehab_track/data/services/restore/restore_workspace.dart';
+import 'package:rehab_track/data/services/storage/storage_inspector.dart';
 import 'package:rehab_track/domain/backup/backup_manifest.dart';
 import 'package:rehab_track/domain/backup/backup_preview.dart';
 import 'package:rehab_track/domain/backup/backup_validation_result.dart';
+import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
 import 'package:rehab_track/domain/restore/restore_apply_phase.dart';
 import 'package:rehab_track/domain/restore/restore_failure.dart';
 import 'package:rehab_track/domain/restore/restore_result.dart';
@@ -43,6 +45,7 @@ class RestoreService {
   final int currentDatabaseSchemaVersion;
   final String currentAppVersion;
   final RestoreSqliteMigrator migrator;
+  final StorageInspector storageInspector;
   final Random _random;
 
   RestoreService({
@@ -54,6 +57,7 @@ class RestoreService {
     required this.currentDatabaseSchemaVersion,
     required this.currentAppVersion,
     this.migrator = const RestoreSqliteMigrator(),
+    this.storageInspector = const StorageInspector(),
     Random? random,
   }) : _random = random ?? Random.secure();
 
@@ -273,11 +277,30 @@ class RestoreService {
       _emit(onPhase, RestoreApplyPhase.pausingServices);
       await _writeMetadata(operationId, workspace,
           phase: RestoreApplyPhase.pausingServices);
+
+      // --- Storage guard ---------------------------------------------------
+      // Before any live change, ensure the workspace (safety snapshot +
+      // prepared data) does not clearly exceed the available temporary space.
+      // A failed guard leaves the live state untouched.
+      final freeBytes = await storageInspector.freeBytes(workspace.root.path)
+          .timeout(const Duration(seconds: 10), onTimeout: () => null);
+      if (freeBytes != null) {
+        final needed = await _directoryBytes(workspace.root)
+            .timeout(const Duration(seconds: 10), onTimeout: () => 0) * 2;
+        if (freeBytes < needed) {
+          return await cleanupAndFail(RestoreResult.insufficientStorage,
+              rollbackSucceeded: true);
+        }
+      }
+
       if (isCancellationRequested != null && await isCancellationRequested()) {
         return await cleanupAndFail(RestoreResult.cancelled);
       }
       try {
-        await environment.pauseLiveDatabase();
+        await environment.pauseLiveDatabase()
+            .timeout(const Duration(seconds: 15), onTimeout: () {
+              throw const RestoreEnvironmentFailure(reason: 'pause-timeout');
+            });
       } catch (_) {
         return await cleanupAndFail(RestoreResult.unexpectedFailure, rollbackSucceeded: true);
       }
@@ -382,7 +405,8 @@ class RestoreService {
           fileSwapStarted: true,
           preferencesApplied: true);
       try {
-        final verified = await reinitializer.verifyRestoredState();
+        final verified = await reinitializer.verifyRestoredState()
+            .timeout(const Duration(seconds: 30), onTimeout: () => false);
         if (!verified) {
           return await _rollbackAndFinish(
             operationId: operationId,
@@ -422,16 +446,30 @@ class RestoreService {
           preferencesApplied: true,
           finalized: true);
       try {
-        await environment.cancelScheduledNotifications();
+        await environment.cancelScheduledNotifications()
+            .timeout(const Duration(seconds: 15), onTimeout: () {});
       } catch (_) {
-        // Best-effort; a failed cancellation must not fail the restore.
+        // Best-effort; a failed/timeout cancellation must not fail the restore.
       }
       var remindersSucceeded = true;
       try {
-        final report = await environment.rebuildScheduledNotifications();
+        final report = await environment.rebuildScheduledNotifications()
+            .timeout(const Duration(seconds: 30), onTimeout: () => const ReminderRebuildReport.failure());
         remindersSucceeded = report.succeeded;
       } catch (_) {
         remindersSucceeded = false;
+      }
+
+      // Duplicate notification IDs would double-fires; treat as a warning so
+      // the user can retry the rebuild, never as a data-rollback condition.
+      if (remindersSucceeded) {
+        try {
+          final noDuplicates = await environment.verifyScheduledNotificationsNoDuplicates()
+              .timeout(const Duration(seconds: 10), onTimeout: () => true);
+          if (!noDuplicates) remindersSucceeded = false;
+        } catch (_) {
+          // Unknown: keep the successful verdict.
+        }
       }
 
       // --- Finalize ------------------------------------------------------------
@@ -447,9 +485,11 @@ class RestoreService {
             preferencesApplied: true,
             finalized: true,
           ),
-        );
-        await recoveryStore.clear(operationId);
-        await workspace.deleteEntirely();
+        ).timeout(const Duration(seconds: 5), onTimeout: () {});
+        await recoveryStore.clear(operationId)
+            .timeout(const Duration(seconds: 5), onTimeout: () {});
+        await workspace.deleteEntirely()
+            .timeout(const Duration(seconds: 10), onTimeout: () {});
       } catch (_) {
         // Cleanup is best-effort; the restore itself already succeeded.
       }
@@ -545,8 +585,12 @@ class RestoreService {
       final originalPrefs = await snapshot.readPreferences();
       await environment.applyPreferences(originalPrefs);
 
-      await environment.reopenDatabase();
-      await environment.reinitializeProviders();
+      await environment.reopenDatabase()
+          .timeout(const Duration(seconds: 15), onTimeout: () {
+            throw const RestoreEnvironmentFailure(reason: 'reopen-timeout');
+          });
+      await environment.reinitializeProviders()
+          .timeout(const Duration(seconds: 15), onTimeout: () {});
       final ok = await environment.verifyRestoredState();
       if (!ok) return RestoreRollbackResult.rollbackFailed;
       return RestoreRollbackResult.rollbackSucceeded;
@@ -591,6 +635,21 @@ class RestoreService {
   String _newOperationId() {
     final random = _random.nextInt(0x7fffffff);
     return 'restore_${random.toRadixString(16)}';
+  }
+
+  /// Total size in bytes of every file under [directory] (recursive).
+  Future<int> _directoryBytes(Directory directory) async {
+    var total = 0;
+    try {
+      await for (final entity in directory.list(recursive: true)) {
+        if (entity is File) {
+          total += await entity.length();
+        }
+      }
+    } catch (_) {
+      // Best-effort estimate.
+    }
+    return total;
   }
 }
 

@@ -56,6 +56,14 @@ Uint8List buildRestorableSqliteBytes({
           'profileId INTEGER, photoPath TEXT)',
         );
       }
+      db.execute(
+        'CREATE TABLE measurement_records '
+        '(id INTEGER PRIMARY KEY AUTOINCREMENT, profileId INTEGER, value REAL)',
+      );
+      db.execute(
+        'CREATE TABLE doctor_visit_records '
+        '(id INTEGER PRIMARY KEY AUTOINCREMENT, profileId INTEGER)',
+      );
     } finally {
       db.close();
     }
@@ -149,6 +157,11 @@ class FakeRestoreEnvironment implements RestoreEnvironment {
   int rebuildNotificationCalls = 0;
   final List<String> appliedPreferences = [];
 
+  /// When true, [verifyScheduledNotificationsNoDuplicates] reports duplicates.
+  bool hasDuplicateNotificationIds = false;
+  int verifyNoDuplicateCalls = 0;
+  int reopenDatabaseCalls = 0;
+
   FakeRestoreEnvironment(this.docsDir);
 
   Future<File> liveDb() async =>
@@ -181,6 +194,7 @@ class FakeRestoreEnvironment implements RestoreEnvironment {
 
   @override
   Future<void> reopenDatabase() async {
+    reopenDatabaseCalls++;
     if (failReopen) throw const RestoreEnvironmentFailure();
   }
 
@@ -222,6 +236,12 @@ class FakeRestoreEnvironment implements RestoreEnvironment {
       measurementReminders: 1,
       doctorVisitReminders: 1,
     );
+  }
+
+  @override
+  Future<bool> verifyScheduledNotificationsNoDuplicates() async {
+    verifyNoDuplicateCalls++;
+    return !hasDuplicateNotificationIds;
   }
 }
 

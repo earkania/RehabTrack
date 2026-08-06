@@ -52,6 +52,11 @@ abstract class RestoreEnvironment {
   /// reminders cannot be rebuilt; they should report failure through a
   /// [ReminderRebuildReport] or by throwing [RestoreEnvironmentFailure].
   Future<ReminderRebuildReport> rebuildScheduledNotifications();
+
+  /// Whether the currently scheduled RehabTrack notifications use distinct
+  /// notification IDs (no duplicates). Implementations must not surface
+  /// content; this returns only a boolean verdict.
+  Future<bool> verifyScheduledNotificationsNoDuplicates();
 }
 
 /// A recoverable failure from a [RestoreEnvironment] operation.

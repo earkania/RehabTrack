@@ -10,6 +10,7 @@ import 'package:rehab_track/data/services/backup/backup_archive_reader.dart';
 import 'package:rehab_track/data/services/backup/backup_validator.dart';
 import 'package:rehab_track/data/services/restore/restore_recovery_metadata.dart';
 import 'package:rehab_track/data/services/restore/restore_service.dart';
+import 'package:rehab_track/data/services/storage/storage_inspector.dart';
 import 'package:rehab_track/domain/backup/backup_preview.dart';
 import 'package:rehab_track/domain/restore/restore_apply_phase.dart';
 import 'package:rehab_track/domain/restore/restore_result.dart';
@@ -220,6 +221,43 @@ void main() {
     expect(await readAllowlistedSettings(liveDb), {'app_language': 'ka'});
   });
 
+  test('low free space aborts with insufficientStorage before any swap',
+      () async {
+    final guarded = await _Fixture.create(
+      storageInspector: const _FixedStorageInspector(0),
+    );
+    final failure = await guarded.service.run(
+      selectedBackupFile: guarded.selectedFile,
+      expectedPreview: guarded.preview,
+    );
+    expect(failure.result, RestoreResult.insufficientStorage);
+    // Nothing was applied, no recovery data remains.
+    expect(await guarded.recoveryStore.listAll(), isEmpty);
+    expect(readProfileCount((await guarded.env.liveDb()).path), 2);
+    expect(guarded.env.cancelNotificationCalls, 0);
+  });
+
+  test('duplicate notification ids yield successWithReminderWarning',
+      () async {
+    fix.env.hasDuplicateNotificationIds = true;
+    final failure = await fix.service.run(
+      selectedBackupFile: fix.selectedFile,
+      expectedPreview: fix.preview,
+    );
+    expect(failure.result, RestoreResult.successWithReminderWarning);
+    expect(failure.succeeded, isTrue);
+    expect(readProfileCount((await fix.env.liveDb()).path), 1);
+    expect(await fix.recoveryStore.listAll(), isEmpty);
+  });
+}
+
+class _FixedStorageInspector extends StorageInspector {
+  const _FixedStorageInspector(this.bytes);
+
+  final int? bytes;
+
+  @override
+  Future<int?> freeBytes(String path) async => bytes;
 }
 
 class _Fixture {
@@ -234,7 +272,9 @@ class _Fixture {
   _Fixture(this.tempBaseDir, this.docsDir, this.env, this.recoveryStore,
       this.service, this.selectedFile, this.preview);
 
-  static Future<_Fixture> create() async {
+  static Future<_Fixture> create({
+    StorageInspector? storageInspector,
+  }) async {
     final tempBaseDir = Directory.systemTemp.createTempSync('restore_svc_');
     final docsDir = Directory(p.join(tempBaseDir.path, 'documents'));
     final env = FakeRestoreEnvironment(docsDir);
@@ -249,6 +289,7 @@ class _Fixture {
       tempBaseDir: tempBaseDir,
       currentDatabaseSchemaVersion: 14,
       currentAppVersion: '1.2.0',
+      storageInspector: storageInspector ?? const StorageInspector(),
       random: Random(7),
     );
 

@@ -173,6 +173,36 @@ void main() {
     await tester.pumpWidget(_wrap(ControllableBackupService(BackupResult.success), settings));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('Last successful backup:'), findsOneWidget);
+    expect(find.textContaining('Last backup created:'), findsOneWidget);
+  });
+
+  testWidgets('shows the stored-as file name after a successful backup',
+      (tester) async {
+    final settings = FakeSettingsRepository();
+    final service = ControllableBackupService(BackupResult.success);
+    await tester.pumpWidget(_wrap(service, settings));
+
+    await tester.tap(find.text('Create backup'));
+    await tester.pump();
+    service.gate.complete(
+      const BackupOutcome(
+        result: BackupResult.success,
+        savedFileName: 'My Rehab Backup',
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.text('Stored as: My Rehab Backup'), findsOneWidget);
+  });
+
+  testWidgets('shows the last completed restore time', (tester) async {
+    final settings = FakeSettingsRepository()
+      ..store['last_restore_at'] = '2026-08-05T09:30:00.000';
+    await tester.pumpWidget(_wrap(ControllableBackupService(BackupResult.success), settings));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Last restore completed:'), findsOneWidget);
   });
 }

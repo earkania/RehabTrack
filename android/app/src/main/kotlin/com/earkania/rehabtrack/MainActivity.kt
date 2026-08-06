@@ -5,12 +5,17 @@ import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Environment
+import android.os.StatFs
+import android.provider.OpenableColumns
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import org.json.JSONObject
+import java.io.File
 import java.util.TimeZone
 
 class MainActivity : FlutterActivity() {
@@ -58,6 +63,9 @@ class MainActivity : FlutterActivity() {
                 }
                 "copyDocument" -> {
                     copyDocument(call, result)
+                }
+                "freeBytes" -> {
+                    freeBytes(call, result)
                 }
                 else -> result.notImplemented()
             }
@@ -155,9 +163,44 @@ class MainActivity : FlutterActivity() {
                 stream.write(bytes ?: ByteArray(0))
                 stream.flush()
             }
-            result.success(uri.toString())
+            val displayName = queryDisplayName(uri)
+            val payload = JSONObject()
+                .put("uri", uri.toString())
+                .put("displayName", displayName ?: JSONObject.NULL)
+            result.success(payload.toString())
         } catch (e: Exception) {
             result.error("WRITE_ERROR", e.message, null)
+        }
+    }
+
+    /** Resolves the document provider's display name for [uri], or null. */
+    private fun queryDisplayName(uri: android.net.Uri): String? {
+        return try {
+            contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (nameIndex >= 0 && cursor.moveToFirst()) cursor.getString(nameIndex) else null
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /** Reports the number of free bytes on the filesystem hosting [path]. */
+    private fun freeBytes(call: MethodCall, result: MethodChannel.Result) {
+        val path = call.argument<String>("path")
+        if (path == null || path.isEmpty()) {
+            result.error("INVALID_ARGUMENTS", "path is required", null)
+            return
+        }
+        try {
+            val file = File(path)
+            val root = if (file.isDirectory) file else file.parentFile
+                ?: Environment.getDataDirectory()
+            val stat = StatFs(root.absolutePath)
+            val bytes = stat.blockSizeLong * stat.availableBlocksLong
+            result.success(bytes)
+        } catch (e: Exception) {
+            result.error("FREE_BYTES_ERROR", e.message, null)
         }
     }
 

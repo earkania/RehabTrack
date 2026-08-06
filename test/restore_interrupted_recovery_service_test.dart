@@ -140,4 +140,50 @@ void main() {
     expect(await service.recover(), RestoreInterruptedRecoveryResult.failed);
     expect(await recoveryStore.listAll(), isNotEmpty);
   });
+
+  test('exhausted attempts enter the terminal recoveryLimitReached state',
+      () async {
+    final opId = 'op_limited';
+    final ws = await buildWorkspaceWithSnapshot(opId);
+    await recoveryStore.write(RestoreRecoveryMetadata(
+      operationId: opId,
+      phase: 'replacingDatabase',
+      workspacePath: ws.path,
+      databaseSwapStarted: true,
+      attemptCount: RestoreInterruptedRecoveryService.maxRecoveryAttempts,
+    ));
+
+    expect(
+      await service.recover(),
+      RestoreInterruptedRecoveryResult.recoveryLimitReached,
+    );
+    // Metadata is retained for manual action and never retried.
+    expect(await recoveryStore.listAll(), isNotEmpty);
+    expect(env.reopenDatabaseCalls, 0);
+  });
+
+  test('failed recovery increments the attempt counter across launches',
+      () async {
+    final opId = 'op_attempts';
+    final ws = await buildWorkspaceWithSnapshot(opId);
+    await recoveryStore.write(RestoreRecoveryMetadata(
+      operationId: opId,
+      phase: 'replacingDatabase',
+      workspacePath: ws.path,
+      databaseSwapStarted: true,
+    ));
+    env.verifyResult = false;
+
+    for (var i = 1; i <= RestoreInterruptedRecoveryService.maxRecoveryAttempts;
+        i++) {
+      expect(await service.recover(), RestoreInterruptedRecoveryResult.failed);
+      final stored = (await recoveryStore.listAll()).single;
+      expect(stored.attemptCount, i);
+    }
+
+    expect(
+      await service.recover(),
+      RestoreInterruptedRecoveryResult.recoveryLimitReached,
+    );
+  });
 }

@@ -9,6 +9,7 @@ import 'package:rehab_track/presentation/providers/backup_provider.dart';
 import 'package:rehab_track/presentation/providers/restore_apply_provider.dart';
 import 'package:rehab_track/presentation/providers/restore_provider.dart';
 import 'package:rehab_track/presentation/screens/settings/backup_preview_screen.dart';
+import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 /// Backup & Restore screen.
 ///
@@ -33,6 +34,8 @@ class _BackupAndRestoreScreenState
     final restoreOperation = ref.watch(restoreOperationProvider);
     final restoreApply = ref.watch(restoreApplyProvider);
     final lastBackup = ref.watch(lastBackupAtProvider);
+    final lastBackupDisplayName = ref.watch(lastBackupDisplayNameProvider);
+    final lastRestore = ref.watch(lastRestoreAtProvider);
 
     final anyRunning =
         operation.isRunning || restoreOperation.isRunning || restoreApply.isRunning;
@@ -44,11 +47,27 @@ class _BackupAndRestoreScreenState
         children: [
           _Header(description: l10n.backupScreenDescription),
           const SizedBox(height: 16),
-          _LastBackupTile(
-            lastBackup: lastBackup.value,
-            neverLabel: l10n.backupLastNever,
-            lastLabel: l10n.backupLastSuccessful,
+          _LastOperationTile(
+            icon: Icons.history,
+            primary: lastBackup.value == null
+                ? l10n.backupLastNever
+                : l10n.backupLastCreated(
+                    _formatDateTime(context, lastBackup.value!),
+                  ),
+            secondary: switch (lastBackupDisplayName.value) {
+              final name? => l10n.backupStoredAs(name),
+              null => null,
+            },
           ),
+          if (lastRestore.value != null) ...[
+            const SizedBox(height: 8),
+            _LastOperationTile(
+              icon: Icons.restore,
+              primary: l10n.restoreLastCompleted(
+                _formatDateTime(context, lastRestore.value!),
+              ),
+            ),
+          ],
           const Divider(height: 32),
           Text(l10n.backupIncludes, style: theme.textTheme.titleSmall),
           const SizedBox(height: 8),
@@ -68,10 +87,14 @@ class _BackupAndRestoreScreenState
           if (operation.isRunning) ...[
             const LinearProgressIndicator(),
             const SizedBox(height: 12),
-            Text(
-              l10n.backupInProgress,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium,
+            Semantics(
+              liveRegion: true,
+              label: l10n.backupInProgress,
+              child: Text(
+                l10n.backupInProgress,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium,
+              ),
             ),
             const SizedBox(height: 12),
           ],
@@ -88,10 +111,14 @@ class _BackupAndRestoreScreenState
           if (restoreOperation.isRunning) ...[
             const LinearProgressIndicator(),
             const SizedBox(height: 12),
-            Text(
-              _restoreProgressLabel(l10n, restoreOperation.phase),
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium,
+            Semantics(
+              liveRegion: true,
+              label: _restoreProgressLabel(l10n, restoreOperation.phase),
+              child: Text(
+                _restoreProgressLabel(l10n, restoreOperation.phase),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium,
+              ),
             ),
             const SizedBox(height: 12),
           ],
@@ -121,6 +148,7 @@ class _BackupAndRestoreScreenState
     final result = await ref.read(backupOperationProvider.notifier).createBackup();
     if (!mounted) return;
     ref.invalidate(lastBackupAtProvider);
+    ref.invalidate(lastBackupDisplayNameProvider);
 
     switch (result) {
       case BackupResult.success:
@@ -168,6 +196,8 @@ class _BackupAndRestoreScreenState
             ),
           ),
         );
+        if (!mounted) return;
+        ref.invalidate(lastRestoreAtProvider);
       case BackupValidationResult.cancelled:
         // User dismissed the picker: normal outcome, not an error.
         break;
@@ -258,6 +288,11 @@ class _BackupAndRestoreScreenState
       SnackBar(content: Text(message)),
     );
   }
+
+  String _formatDateTime(BuildContext context, DateTime time) {
+    return '${LocalizedDateFormat.fullMonthDayYear(context, time)}, '
+        '${LocalizedDateFormat.hourMinute(context, time)}';
+  }
 }
 
 class _Header extends StatelessWidget {
@@ -288,38 +323,52 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _LastBackupTile extends StatelessWidget {
-  final DateTime? lastBackup;
-  final String neverLabel;
-  final String Function(String time) lastLabel;
+class _LastOperationTile extends StatelessWidget {
+  final IconData icon;
+  final String primary;
 
-  const _LastBackupTile({
-    required this.lastBackup,
-    required this.neverLabel,
-    required this.lastLabel,
+  /// Optional secondary line (e.g. the stored file name).
+  final String? secondary;
+
+  const _LastOperationTile({
+    required this.icon,
+    required this.primary,
+    this.secondary,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final label = lastBackup == null
-        ? neverLabel
-        : lastLabel(_formatDateTime(lastBackup!));
-    return Row(
-      children: [
-        Icon(Icons.history, size: 20, color: theme.colorScheme.onSurfaceVariant),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(label, style: theme.textTheme.bodySmall),
-        ),
-      ],
+    return Semantics(
+      container: true,
+      label: [primary, ?secondary].join(', '),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(primary, style: theme.textTheme.bodySmall),
+                if (secondary != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    secondary!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
-  }
-
-  static String _formatDateTime(DateTime time) {
-    String two(int v) => v.toString().padLeft(2, '0');
-    return '${two(time.day)}.${two(time.month)}.${time.year} '
-        '${two(time.hour)}:${two(time.minute)}';
   }
 }
 

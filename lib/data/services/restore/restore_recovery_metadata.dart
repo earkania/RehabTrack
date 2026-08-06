@@ -29,6 +29,11 @@ class RestoreRecoveryMetadata {
 
   final bool finalized;
 
+  /// Number of times automatic interrupted-recovery has been attempted for
+  /// this operation. Bounded by [RestoreInterruptedRecoveryService] so a
+  /// persistent failure reaches a terminal state instead of retrying forever.
+  final int attemptCount;
+
   const RestoreRecoveryMetadata({
     required this.operationId,
     required this.phase,
@@ -37,6 +42,7 @@ class RestoreRecoveryMetadata {
     this.fileSwapStarted = false,
     this.preferencesApplied = false,
     this.finalized = false,
+    this.attemptCount = 0,
   });
 
   bool get needsRecovery =>
@@ -51,6 +57,7 @@ class RestoreRecoveryMetadata {
         'fileSwapStarted': fileSwapStarted,
         'preferencesApplied': preferencesApplied,
         'finalized': finalized,
+        'attemptCount': attemptCount,
       };
 
   factory RestoreRecoveryMetadata.fromJson(Map<String, Object?> json) {
@@ -62,6 +69,7 @@ class RestoreRecoveryMetadata {
       fileSwapStarted: json['fileSwapStarted'] as bool? ?? false,
       preferencesApplied: json['preferencesApplied'] as bool? ?? false,
       finalized: json['finalized'] as bool? ?? false,
+      attemptCount: json['attemptCount'] as int? ?? 0,
     );
   }
 

@@ -4165,6 +4165,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This contact is used by a doctor visit and cannot be permanently deleted.'**
   String get contactReferencedByVisits;
+
+  /// No description provided for @backupLastCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup created: {time}'**
+  String backupLastCreated(Object time);
+
+  /// No description provided for @restoreLastCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Last restore completed: {time}'**
+  String restoreLastCompleted(Object time);
+
+  /// No description provided for @restoreCancellationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring is in progress and cannot be cancelled right now.'**
+  String get restoreCancellationUnavailable;
+
+  /// No description provided for @restoreNotEnoughStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'There is not enough free storage space to run the restore. No data was changed.'**
+  String get restoreNotEnoughStorage;
+
+  /// No description provided for @backupStoredAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored as: {name}'**
+  String backupStoredAs(Object name);
 }
 
 class _AppLocalizationsDelegate

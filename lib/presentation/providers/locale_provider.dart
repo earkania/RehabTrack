@@ -37,6 +37,26 @@ class LocaleNotifier extends StateNotifier<Locale?> {
       AppLocale.system.storageValue,
     );
   }
+
+/// Reloads the locale from settings (e.g. after a restore).
+  Future<void> reload() async {
+    try {
+      await _load();
+    } catch (_) {
+      // Database might be temporarily unavailable during restore;
+      // schedule retries with increasing delays (total ~15s max).
+      for (int i = 0; i < 5; i++) {
+        await Future.delayed(Duration(seconds: i + 2));
+        if (!mounted) return;
+        try {
+          await _load();
+          return;
+        } catch (_) {
+          // Continue retrying
+        }
+      }
+    }
+  }
 }
 
 final localeProvider = StateNotifierProvider<LocaleNotifier, Locale?>((ref) {

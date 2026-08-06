@@ -10,9 +10,12 @@ import 'package:rehab_track/data/services/restore/restore_app_environment.dart';
 import 'package:rehab_track/data/services/restore/restore_interrupted_recovery_service.dart';
 import 'package:rehab_track/data/services/restore/restore_recovery_metadata.dart';
 import 'package:rehab_track/data/services/restore/restore_service.dart';
+import 'package:rehab_track/data/services/restore/restore_stale_workspace_cleaner.dart';
 import 'package:rehab_track/domain/backup/backup_preview.dart';
+import 'package:rehab_track/domain/repositories/settings_repository.dart';
 import 'package:rehab_track/domain/restore/restore_apply_phase.dart';
 import 'package:rehab_track/domain/restore/restore_failure.dart';
+import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/restore_provider.dart';
 
 /// Coarse lifecycle of the restore-apply controller.
@@ -49,9 +52,11 @@ class RestoreApplyState {
 /// whether the original data was recovered.
 class RestoreApplyController extends StateNotifier<RestoreApplyState> {
   final RestoreService _service;
+  final SettingsRepository _settingsRepository;
   bool _cancelRequested = false;
 
-  RestoreApplyController(this._service) : super(const RestoreApplyState());
+  RestoreApplyController(this._service, this._settingsRepository)
+      : super(const RestoreApplyState());
 
   static const Set<RestoreApplyPhase> _safeCancellationPhases = {
     RestoreApplyPhase.preparingRestore,
@@ -95,6 +100,21 @@ class RestoreApplyController extends StateNotifier<RestoreApplyState> {
       },
       isCancellationRequested: () async => _cancelRequested,
     );
+
+    // "Last restore" is recorded only after the restored state and reminder
+    // rebuild were finalized — never after a rollback. Restoring never touches
+    // the "last backup" marker.
+    if (failure.succeeded) {
+      try {
+        await _settingsRepository.setValue(
+          AppConstants.lastSuccessfulRestoreKey,
+          DateTime.now().toIso8601String(),
+        );
+      } catch (_) {
+        // Best-effort metadata; the restore itself already succeeded.
+      }
+    }
+
     state = RestoreApplyState(
       phase: RestoreApplyUiPhase.finished,
       failure: failure,
@@ -150,10 +170,24 @@ final restoreApplyProvider =
     currentDatabaseSchemaVersion: AppDatabase.currentSchemaVersion,
     currentAppVersion: AppConstants.appVersion,
   );
-  return RestoreApplyController(service);
+  final controller = RestoreApplyController(service, ref.watch(settingsRepositoryProvider));
+  ref.keepAlive();
+  return controller;
 });
 
-/// Detects and recovers an interrupted restore at app startup.
+/// Timestamp (ISO 8601) of the last completed restore, or null if never.
+/// Written only after the restored state and reminders were finalized, so it is
+/// never updated by a rolled-back or interrupted restore.
+final lastRestoreAtProvider = FutureProvider<DateTime?>((ref) async {
+  final raw = await ref.watch(settingsRepositoryProvider).getValue(
+        AppConstants.lastSuccessfulRestoreKey,
+      );
+  final parsed = raw == null ? null : DateTime.tryParse(raw);
+  return parsed?.toLocal();
+});
+
+/// Detects and recovers an interrupted restore at app startup, then clears any
+/// stale temporary workspaces.
 ///
 /// Called from `main()` before the persisted settings are warmed up so the
 /// database is not opened against a half-restored file. Returns the recovery
@@ -162,21 +196,26 @@ Future<RestoreInterruptedRecoveryResult> runStartupRestoreRecovery(
   ProviderContainer container,
 ) async {
   final environment = RestoreAppEnvironment(container);
+  final support = await getApplicationSupportDirectory();
   final store = RestoreRecoveryStore.inDirectory(
-    Directory(
-      p.join(
-        (await getApplicationSupportDirectory()).path,
-        'restore_recovery',
-      ),
-    ),
+    Directory(p.join(support.path, 'restore_recovery')),
   );
   final service = RestoreInterruptedRecoveryService(
     environment: environment,
     recoveryStore: store,
   );
+  final RestoreInterruptedRecoveryResult result;
   try {
-    return await service.recover();
+    result = await service.recover();
   } catch (_) {
     return RestoreInterruptedRecoveryResult.failed;
   }
+
+  // Clear abandoned temporary workspaces (never any workspace still referenced
+  // by an active recovery marker).
+  await const RestoreStaleWorkspaceCleaner().clean(
+    tempBaseDir: Directory.systemTemp,
+    recoveryStore: store,
+  );
+  return result;
 }

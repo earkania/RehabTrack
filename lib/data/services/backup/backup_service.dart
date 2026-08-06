@@ -2,6 +2,7 @@
 // parameters must stay public so other libraries can construct the service.
 // ignore_for_file: prefer_initializing_formals
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -10,10 +11,12 @@ import 'package:path/path.dart' as p;
 
 import 'package:rehab_track/core/constants/app_constants.dart';
 import 'package:rehab_track/data/database/app_database.dart';
+import 'package:rehab_track/data/services/backup/backup_archive_reader.dart';
 import 'package:rehab_track/data/services/backup/backup_archive_writer.dart';
 import 'package:rehab_track/data/services/backup/backup_storage_gateway.dart';
 import 'package:rehab_track/data/services/backup/managed_file_collector.dart';
 import 'package:rehab_track/data/services/backup/preferences_exporter.dart';
+import 'package:rehab_track/data/services/storage/storage_inspector.dart';
 import 'package:rehab_track/domain/backup/backup_manifest.dart';
 import 'package:rehab_track/domain/backup/backup_phase.dart';
 import 'package:rehab_track/domain/backup/backup_result.dart';
@@ -25,9 +28,14 @@ class BackupOutcome {
   /// Non-sensitive warnings collected during the operation.
   final List<String> warnings;
 
+  /// Final display name of the stored file as reported by the document
+  /// provider, when available (set only on success).
+  final String? savedFileName;
+
   const BackupOutcome({
     required this.result,
     this.warnings = const [],
+    this.savedFileName,
   });
 }
 
@@ -39,6 +47,8 @@ class BackupService {
   final BackupArchiveWriter _archiveWriter;
   final BackupStorageGateway _storageGateway;
   final PreferencesExporter _preferencesExporter;
+  final BackupArchiveReader _archiveReader;
+  final StorageInspector _storageInspector;
 
   /// Resolves the application documents directory lazily so the service can be
   /// constructed synchronously and tests can inject a temp directory.
@@ -61,10 +71,14 @@ class BackupService {
     String appVersion = AppConstants.appVersion,
     String? platform,
     DateTime Function()? clock,
+    BackupArchiveReader archiveReader = const BackupArchiveReader(),
+    StorageInspector storageInspector = const StorageInspector(),
   })  : _database = database,
         _archiveWriter = archiveWriter,
         _storageGateway = storageGateway,
         _preferencesExporter = preferencesExporter,
+        _archiveReader = archiveReader,
+        _storageInspector = storageInspector,
         _documentsDirectory = documentsDirectory,
         _tempBaseDir = tempBaseDir,
         _appVersion = appVersion,
@@ -127,9 +141,33 @@ class BackupService {
         );
       }
 
+      // Integrity self-check: reopen the freshly written archive and re-verify
+      // structure, manifest and checksums before presenting it to the user.
+      // A backup is only reported successful after this passes.
+      final archive = File(archivePath);
+      final selfCheck = await _selfCheckArchive(archive);
+      if (!selfCheck) {
+        return BackupOutcome(
+          result: BackupResult.archiveFailure,
+          warnings: collection.warnings,
+        );
+      }
+
+      // Conservative storage guard: the destination write needs roughly the
+      // archive size; require a safe margin so a partial write is avoided
+      // where the free space can be measured.
+      final freeBytes = await _storageInspector.freeBytes(workDir.path);
+      final archiveSize = await archive.length();
+      if (freeBytes != null && freeBytes < archiveSize * 2) {
+        return BackupOutcome(
+          result: BackupResult.notEnoughStorage,
+          warnings: collection.warnings,
+        );
+      }
+
       onPhase?.call(BackupPhase.writing);
       final fileName =
-          'RehabTrack-Backup-${_formatTimestamp(_clock())}.rtb';
+          _sanitizeFileName('RehabTrack-Backup-${_formatTimestamp(_clock())}.rtb');
       final saveResult = await _storageGateway.save(
         bytes: await File(archivePath).readAsBytes(),
         fileName: fileName,
@@ -145,6 +183,7 @@ class BackupService {
       return BackupOutcome(
         result: BackupResult.success,
         warnings: collection.warnings,
+        savedFileName: saveResult.displayName,
       );
     } catch (_) {
       return const BackupOutcome(result: BackupResult.unexpectedFailure);
@@ -152,6 +191,46 @@ class BackupService {
       try {
         await workDir.delete(recursive: true);
       } catch (_) {}
+    }
+  }
+
+  /// Reopens [archive] and verifies required entries, manifest structure,
+  /// checksums and entry-path safety. Returns false when any check fails so a
+  /// corrupt or incomplete archive is never presented as a valid backup.
+  Future<bool> _selfCheckArchive(File archive) async {
+    try {
+      final read = await _archiveReader.read(archive);
+      if (!read.succeeded) return false;
+      final handle = read.handle!;
+      final info = handle.info;
+      if (info.duplicateEntryNames.isNotEmpty) return false;
+      if (!info.hasManifest || !info.hasDatabase || !info.hasPreferences) {
+        return false;
+      }
+      for (final entry in info.entries) {
+        try {
+          BackupArchivePath.validate(entry.name);
+        } catch (_) {
+          return false;
+        }
+      }
+      final manifestBytes = handle.content(BackupManifest.manifestFileName);
+      if (manifestBytes == null) return false;
+      final manifest = BackupManifest.fromJsonString(utf8.decode(manifestBytes));
+      if (manifest.validate().isNotEmpty) return false;
+      if (!manifestChecksumsComplete(manifest, info.entries
+              .where((e) => e.name.startsWith(BackupManifest.filesDirectory))
+              .length)) {
+        return false;
+      }
+      for (final entry in manifest.checksums.entries) {
+        final content = handle.content(entry.key);
+        if (content == null) return false;
+        if (sha256.convert(content).toString() != entry.value) return false;
+      }
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 
@@ -201,5 +280,18 @@ class BackupService {
     return '${time.year.toString().padLeft(4, '0')}-'
         '${two(time.month)}-${two(time.day)}_'
         '${two(time.hour)}-${two(time.minute)}';
+  }
+
+  /// Sanitizes a suggested backup file name so it never carries path
+  /// separators, control characters or other invalid filesystem characters.
+  /// The generated names already comply; this guards against edge cases.
+  static String _sanitizeFileName(String fileName) {
+    final cleaned = fileName.replaceAll(
+      RegExp(r'[\\/:*?"<>|\x00-\x1f]'),
+      '-',
+    );
+    final trimmed = cleaned.trim();
+    if (trimmed.isEmpty) return 'RehabTrack-Backup.rtb';
+    return trimmed;
   }
 }

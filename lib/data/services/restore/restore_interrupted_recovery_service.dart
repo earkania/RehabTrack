@@ -22,6 +22,12 @@ enum RestoreInterruptedRecoveryResult {
   /// An interrupted restore was found but automatic recovery could not
   /// complete; the recovery metadata and safety snapshot are retained.
   failed,
+
+  /// Automatic recovery has already been attempted the maximum number of times
+  /// for this operation. Further automatic attempts are stopped (terminal
+  /// state) so the app never retries a persistent failure forever; the
+  /// metadata and snapshot are retained for manual action.
+  recoveryLimitReached,
 }
 
 /// Detects and recovers an interrupted restore on app startup.
@@ -31,9 +37,16 @@ enum RestoreInterruptedRecoveryResult {
 /// database, reinitializes services and verifies. Because the snapshot is the
 /// ground truth of the pre-restore state, this is safe regardless of whether
 /// the interruption happened before or during the live replacement.
+///
+/// Recovery is attempted at most [maxRecoveryAttempts] times per operation;
+/// afterwards the operation reaches a terminal state and is no longer retried.
 class RestoreInterruptedRecoveryService {
   final RestoreEnvironment environment;
   final RestoreRecoveryStore recoveryStore;
+
+  /// Maximum automatic recovery attempts per interrupted operation before the
+  /// recovery enters a terminal state.
+  static const int maxRecoveryAttempts = 3;
 
   RestoreInterruptedRecoveryService({
     required this.environment,
@@ -66,6 +79,11 @@ class RestoreInterruptedRecoveryService {
     }
     if (target == null) return RestoreInterruptedRecoveryResult.none;
 
+    // Terminal state: further automatic attempts are deliberately skipped.
+    if (target.attemptCount >= maxRecoveryAttempts) {
+      return RestoreInterruptedRecoveryResult.recoveryLimitReached;
+    }
+
     return await _recoverOne(target);
   }
 
@@ -78,6 +96,7 @@ class RestoreInterruptedRecoveryService {
     if (!await workspace.exists() ||
         !await snapshot.databaseFile.exists()) {
       // Cannot recover automatically: the workspace/snapshot is gone.
+      await _recordAttempt(metadata);
       return RestoreInterruptedRecoveryResult.failed;
     }
 
@@ -108,7 +127,10 @@ class RestoreInterruptedRecoveryService {
       await environment.reopenDatabase();
       await environment.reinitializeProviders();
       final ok = await RestoreReinitializer(environment).verifyRestoredState();
-      if (!ok) return RestoreInterruptedRecoveryResult.failed;
+      if (!ok) {
+        await _recordAttempt(metadata);
+        return RestoreInterruptedRecoveryResult.failed;
+      }
 
       await recoveryStore.clear(metadata.operationId);
       try {
@@ -116,7 +138,29 @@ class RestoreInterruptedRecoveryService {
       } catch (_) {}
       return RestoreInterruptedRecoveryResult.recovered;
     } catch (_) {
+      await _recordAttempt(metadata);
       return RestoreInterruptedRecoveryResult.failed;
+    }
+  }
+
+  /// Persists an incremented attempt counter so the next launch can decide
+  /// whether to keep retrying. Best-effort.
+  Future<void> _recordAttempt(RestoreRecoveryMetadata metadata) async {
+    try {
+      await recoveryStore.write(
+        RestoreRecoveryMetadata(
+          operationId: metadata.operationId,
+          phase: metadata.phase,
+          workspacePath: metadata.workspacePath,
+          databaseSwapStarted: metadata.databaseSwapStarted,
+          fileSwapStarted: metadata.fileSwapStarted,
+          preferencesApplied: metadata.preferencesApplied,
+          finalized: metadata.finalized,
+          attemptCount: metadata.attemptCount + 1,
+        ),
+      );
+    } catch (_) {
+      // Best-effort.
     }
   }
 

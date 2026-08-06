@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'package:rehab_track/data/database/app_database.dart';
 import 'package:rehab_track/data/services/backup/preferences_exporter.dart';
 import 'package:rehab_track/data/services/restore/app_settings_writer.dart';
 import 'package:rehab_track/data/services/restore/restore_environment.dart';
+import 'package:rehab_track/data/services/restore/restore_state_verifier.dart';
 import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
@@ -77,13 +79,28 @@ class RestoreAppEnvironment implements RestoreEnvironment {
     // The database invalidation above cascades to every database-backed
     // repository and provider. Image services do not depend on the database
     // and are invalidated explicitly so they re-resolve the documents dir.
+    // The notification bridge holds repository references; it must be
+    // recreated so it uses the new database connections.
     _container.invalidate(profileImageServiceProvider);
     _container.invalidate(careContactImageServiceProvider);
+    _container.invalidate(notificationActionBridgeProvider);
   }
 
   @override
   Future<bool> verifyRestoredState() async {
     try {
+      final docs = await _documentsDirectory();
+      final dbFile = File(p.join(docs.path, liveDatabaseFileName));
+      // Deep verification: SQLite header, schema version, core tables and
+      // read-only sample queries on the actual restored file.
+      final verifier = const RestoreStateVerifier();
+      final ok = await verifier.verify(
+        databasePath: dbFile.path,
+        expectedSchemaVersion: AppDatabase.currentSchemaVersion,
+        managedFilesRoot: docs.path,
+      );
+      if (!ok) return false;
+      // Plus the live container is queryable and settings read back.
       final db = _container.read(databaseProvider);
       await db.customStatement('SELECT 1');
       await _container.read(settingsRepositoryProvider).getAll();
@@ -107,6 +124,19 @@ class RestoreAppEnvironment implements RestoreEnvironment {
       return await bridge.recoverAll(profileId);
     } catch (_) {
       throw const RestoreEnvironmentFailure(reason: 'reminder-rebuild');
+    }
+  }
+
+  @override
+  Future<bool> verifyScheduledNotificationsNoDuplicates() async {
+    try {
+      final service = _container.read(notificationServiceProvider);
+      final pending = await service.getPendingNotifications();
+      final ids = pending.map((n) => n.id);
+      return ids.toSet().length == ids.length;
+    } catch (_) {
+      // Cannot determine: do not fail a completed restore on this check.
+      return true;
     }
   }
 }

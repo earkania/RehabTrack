@@ -51,6 +51,12 @@ class BackupOperationController extends StateNotifier<BackupOperationState> {
         AppConstants.lastSuccessfulBackupKey,
         DateTime.now().toIso8601String(),
       );
+      if (outcome.savedFileName != null) {
+        await _settingsRepository.setValue(
+          AppConstants.lastBackupDisplayNameKey,
+          outcome.savedFileName!,
+        );
+      }
       state = BackupOperationState(
         phase: BackupPhase.done,
         warnings: outcome.warnings,
@@ -86,4 +92,12 @@ final lastBackupAtProvider = FutureProvider<DateTime?>((ref) async {
       );
   final parsed = raw == null ? null : DateTime.tryParse(raw);
   return parsed?.toLocal();
+});
+
+/// Display name of the last successful backup file as reported by the document
+/// provider, when available.
+final lastBackupDisplayNameProvider = FutureProvider<String?>((ref) async {
+  return ref.watch(settingsRepositoryProvider).getValue(
+        AppConstants.lastBackupDisplayNameKey,
+      );
 });

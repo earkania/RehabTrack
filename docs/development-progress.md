@@ -4012,3 +4012,150 @@ Known limitation: automated migration fixtures currently exercise the v13→v14
 step (the last cumulative step); older historical steps reuse the identical
 production `onUpgrade` code and are covered by the existing in-app upgrade path,
 but a full fixture matrix (v1→v14) is a documented follow-up.
+
+## Phase 9F — Backup & Restore: Polish, Hardening & Final Verification (2026-08-06)
+
+**Goal:** Implement Phase 5 of Backup & Restore — harden the backup and restore
+flows (archive self-check, storage guards, filename handling, stale-temp
+cleanup, recovery retry limits, deeper verification, duplicate-notification
+detection), surface Last Backup / Last Restore metadata, polish the screens and
+accessibility, and validate the whole feature. No automatic backups, no cloud,
+no merge/selective restore, no encryption (all explicit non-goals).
+
+### Key decisions
+
+- **Archive self-check after writing, before saving.** `BackupService` reopens
+  the just-written archive with `BackupArchiveReader` and validates entries,
+  paths, manifest, `checksumsComplete` and a SHA-256 spot-check. Failure maps to
+  `BackupResult.archiveFailure` and the picker save is never offered, so a
+  corrupt archive can never reach the user's documents.
+- **Storage-space guard on both sides.**
+  - Backup: `StorageInspector.freeBytes()` (native `StatFs` on the app cache
+    dir, channel `com.earkania.rehabtrack/backup` method `freeBytes`) is compared
+    against 2× the archive size → `BackupResult.notEnoughStorage`.
+  - Restore: before any live change, the restore workspace size × 2 is compared
+    against free space → `RestoreResult.insufficientStorage`, mapped in the
+    preview screen to `restoreNotEnoughStorage`. A guard failure leaves the live
+    state fully intact (no snapshot, no pause).
+- **Filename handling.** `BackupService._sanitizeFileName` strips
+  `[\\/:*?"<>|\x00-\x1f]` before suggesting
+  `RehabTrack-Backup-yyyy-MM-dd_HH-mm.rtb`; the document provider may rename the
+  file, and `BackupStorageGateway.save` now returns
+  `BackupSaveResult{result, path, displayName}` (native `createDocument` resolves
+  the display name via `OpenableColumns.DISPLAY_NAME` and returns a JSON
+  `{uri, displayName}` payload). The provider-reported name is stored as the
+  Last Backup display name.
+- **Last Backup / Last Restore metadata.** New settings keys
+  `last_backup_at` (already existed), `last_backup_display_name`,
+  `last_restore_at`. `last_restore_at` is written **only after** the restored
+  state and reminder rebuild finalize — never after a rollback or cancellation —
+  and restoring never overwrites the last-backup marker. The backup screen shows
+  localized "Last backup created: …" + "Stored as: …" and a "Last restore
+  completed: …" tile.
+- **Startup cleanup** (`RestoreStaleWorkspaceCleaner`): removes
+  `restore-workspace` directories not referenced by any `needsRecovery` marker
+  (a real interrupted restore is never wiped), abandoned `rehabtrack_backup_*`
+  temp dirs, and a stale `pending-restore` copy. Runs from
+  `runStartupRestoreRecovery` after recovery.
+- **Recovery retry limit.** `RestoreInterruptedRecoveryService` records an
+  `attemptCount` in the recovery metadata and stops automatic retries after
+  `maxRecoveryAttempts = 3` (`RestoreInterruptedRecoveryResult.recoveryLimitReached`,
+  terminal state) so a persistent failure is never retried forever; metadata and
+  snapshot are retained for manual action.
+- **Deeper restore verification** (`RestoreStateVerifier`, wired into
+  `RestoreAppEnvironment.verifyRestoredState`): SQLite header magic, exact
+  `userVersion`, presence of all core tables, `COUNT(*)` on each, and the
+  managed-files root existing. It never logs row values.
+- **Notification duplicate-prevention audit.** `RestoreEnvironment` gained
+  `verifyScheduledNotificationsNoDuplicates()`; `RestoreService` detects
+  duplicate scheduled notification IDs after the rebuild and downgrades the
+  verdict to `successWithReminderWarning` (data is never rolled back for a
+  reminder issue).
+- **Accessibility & localization.** Semantics live regions on the backup and
+  restore progress dialogs, semantics labels for the progress/operations tiles,
+  localized date formatting (`LocalizedDateFormat.fullMonthDayYear` +
+  `hourMinute`), and five new ARB keys (`backupLastCreated`,
+  `restoreLastCompleted`, `restoreCancellationUnavailable`,
+  `restoreNotEnoughStorage`, `backupStoredAs`) in en + ka.
+- **Negative scope (unchanged):** no automatic backups, no cloud backup, no
+  merge/selective restore, no backup encryption.
+
+### New/changed files
+
+- `lib/core/constants/app_constants.dart` — `last_backup_display_name`,
+  `last_restore_at` keys.
+- `lib/data/services/storage/storage_inspector.dart` (new) — `freeBytes`.
+- `lib/data/services/backup/backup_service.dart` — self-check, storage guard,
+  filename sanitize, `savedFileName`.
+- `lib/data/services/backup/backup_storage_gateway.dart` — `displayName` in
+  `BackupSaveResult`, JSON `{uri, displayName}` decode.
+- `android/.../MainActivity.kt` — `createDocument` returns JSON payload with
+  display name; `freeBytes` method.
+- `lib/data/services/restore/restore_state_verifier.dart` (new) — deep verifier.
+- `lib/data/services/restore/restore_stale_workspace_cleaner.dart` (new).
+- `lib/data/services/restore/restore_interrupted_recovery_service.dart` +
+  `restore_recovery_metadata.dart` — `attemptCount`, `maxRecoveryAttempts`,
+  `recoveryLimitReached`.
+- `lib/data/services/restore/restore_service.dart` — storage guard,
+  duplicate-ID detection, `_directoryBytes`.
+- `lib/data/services/restore/restore_environment.dart` +
+  `restore_app_environment.dart` — `verifyScheduledNotificationsNoDuplicates()`,
+  verifier-backed `verifyRestoredState()`.
+- `lib/domain/restore/restore_result.dart` — `insufficientStorage`.
+- `lib/presentation/providers/restore_apply_provider.dart` — controller writes
+  `last_restore_at` on success, `lastRestoreAtProvider`,
+  `runStartupRestoreRecovery` cleanup wiring.
+- `lib/presentation/providers/backup_provider.dart` — stores
+  `last_backup_display_name`, `lastBackupDisplayNameProvider`.
+- `lib/presentation/screens/settings/backup_and_restore_screen.dart`,
+  `backup_preview_screen.dart` — tiles, wording, a11y, error mapping.
+- Localization: 5 new keys in `app_en.arb`/`app_ka.arb`; `flutter gen-l10n` run.
+
+### Tests
+
+- `test/backup_restore_integration_test.dart` (new) — real end-to-end cycle
+  (BackupService archive → RestoreService over different live data), a second
+  full cycle restoring the newest backup, and no recovery/leftover markers.
+- `test/restore_hardening_test.dart` (new) — `RestoreStateVerifier` (valid db,
+  missing file, mismatched schema, non-SQLite, missing core table, managed root)
+  and `RestoreStaleWorkspaceCleaner` (keeps active workspaces, removes abandoned
+  ones + backup temps + stale pending-restore, never touches unrelated cache).
+- `test/restore_apply_metadata_test.dart` (new) — `last_restore_at` written only
+  on success, never on failure or cancellation.
+- `test/backup_service_test.dart` — self-check failure → `archiveFailure` and no
+  save; low free space → `notEnoughStorage` and no save; sanitized filename;
+  provider-renamed display name exposure.
+- `test/restore_service_test.dart` — low free space aborts with
+  `insufficientStorage` before any swap; duplicate notification IDs →
+  `successWithReminderWarning`.
+- `test/restore_interrupted_recovery_service_test.dart` — terminal
+  `recoveryLimitReached` state and attempt-counter increments across launches.
+- `test/restore_apply_ui_test.dart` — `insufficientStorage` localized message.
+- `test/backup_screen_test.dart` — stored-as filename, last-restore tile.
+- `test/helpers/restore_test_utils.dart` — `FakeRestoreEnvironment` gained
+  `verifyScheduledNotificationsNoDuplicates`, `hasDuplicateNotificationIds`,
+  `reopenDatabaseCalls`; test SQLite builder now creates all verifier core tables.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1199/1199 passed (full suite) |
+| Pixel 7 manual | Not yet run for the Phase 5 flow (planned below) |
+
+### Remaining manual verification on Pixel 7
+
+1. Create a backup with several photos + reminders; confirm the picker save, the
+   success dialog, the "Stored as: …" name, and the Last Backup timestamp.
+2. Cancel the backup picker → cancelled dialog; cancel during a safe restore
+   phase → "Restore cancelled" (and no cancel button once the swap begins).
+3. Restore the current-schema backup; confirm reminders are rebuilt (all three
+   types), Last Restore tile updates, and force-close/reopen shows no duplicate
+   reminders.
+4. Restore an older-schema fixture (v13) → migration path.
+5. Corrupt/truncate a `.rtb` → rejected before any change, original data intact.
+6. en/ka, light/dark, and screen-reader (TalkBack) pass on the backup screens.
+7. Storage-full scenario on the test device (free space below the guard) →
+   `notEnoughStorage` / `insufficientStorage` messages and untouched data.

@@ -31,6 +31,16 @@ class AppConstants {
   static const String showDetailsOnLockScreenKey = 'show_details_on_lock_screen';
 
   /// Settings key holding the ISO 8601 timestamp of the last successful backup.
-  /// Written only after the archive has been stored at its destination.
+  /// Written only after the archive has been stored AND passed its integrity
+  /// self-check. Never overwritten by a restore.
   static const String lastSuccessfulBackupKey = 'last_backup_at';
+
+  /// Settings key holding the display name the document provider assigned to
+  /// the last successful backup file, when one is available.
+  static const String lastBackupDisplayNameKey = 'last_backup_display_name';
+
+  /// Settings key holding the ISO 8601 timestamp of the last completed restore,
+  /// written only after the restored state and reminders were finalized. Never
+  /// written after a rollback.
+  static const String lastSuccessfulRestoreKey = 'last_restore_at';
 }

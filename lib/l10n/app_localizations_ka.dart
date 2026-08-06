@@ -2184,4 +2184,27 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get contactReferencedByVisits =>
       'ეს კონტაქტი გამოიყენება ექიმთან ვიზიტში და მისი სამუდამოდ წაშლა შეუძლებელია.';
+
+  @override
+  String backupLastCreated(Object time) {
+    return 'ბოლო სარეზერვო ასლი შეიქმნა: $time';
+  }
+
+  @override
+  String restoreLastCompleted(Object time) {
+    return 'ბოლო აღდგენა დასრულდა: $time';
+  }
+
+  @override
+  String get restoreCancellationUnavailable =>
+      'აღდგენა მიმდინარეობს და ამ მომენტში მისი გაუქმება შეუძლებელია.';
+
+  @override
+  String get restoreNotEnoughStorage =>
+      'აღდგენის შესასრულებლად საკმარისი თავისუფალი ადგილი არ არის. მონაცემები არ შეცვლილა.';
+
+  @override
+  String backupStoredAs(Object name) {
+    return 'შენახულია როგორც: $name';
+  }
 }
