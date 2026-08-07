@@ -4,7 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 
 import 'package:rehab_track/core/router/app_routes.dart';
-import 'package:rehab_track/presentation/screens/common/module_placeholder_screen.dart';
+import 'package:rehab_track/presentation/screens/records/lab_analyses_screen.dart';
+import 'package:rehab_track/presentation/screens/records/lab_analysis_form_screen.dart';
+import 'package:rehab_track/presentation/screens/records/lab_analysis_details_screen.dart';
+import 'package:rehab_track/presentation/screens/records/archived_lab_analyses_screen.dart';
 import 'package:rehab_track/presentation/screens/today/today_screen.dart';
 import 'package:rehab_track/presentation/screens/health/health_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurements_screen.dart';
@@ -39,6 +42,7 @@ import 'package:rehab_track/presentation/screens/settings/backup_and_restore_scr
 import 'package:rehab_track/presentation/screens/settings/patient_profile_view_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_edit_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/notification_diagnostics_screen.dart';
+import 'package:rehab_track/presentation/screens/common/module_placeholder_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -116,10 +120,35 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Records
       GoRoute(
         path: AppRoutes.recordsLabAnalyses,
-        builder: (context, state) => ModulePlaceholderScreen(
-          icon: Icons.science_outlined,
-          title: AppLocalizations.of(context)!.labAnalyses,
-        ),
+        builder: (context, state) => const LabAnalysesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.recordsLabAnalysesAdd,
+        builder: (context, state) => const LabAnalysisFormScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.recordsLabAnalysesArchived,
+        builder: (context, state) => const ArchivedLabAnalysesScreen(),
+      ),
+      GoRoute(
+        path: '/records/lab-analyses/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return LabAnalysisDetailsScreen(analysisId: id);
+        },
+      ),
+      GoRoute(
+        path: '/records/lab-analyses/:id/edit',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return LabAnalysisFormScreen(analysisId: id);
+        },
       ),
       GoRoute(
         path: AppRoutes.recordsDoctorVisits,

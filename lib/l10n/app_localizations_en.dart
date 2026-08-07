@@ -2218,4 +2218,242 @@ class AppLocalizationsEn extends AppLocalizations {
   String backupStoredAs(Object name) {
     return 'Stored as: $name';
   }
+
+  @override
+  String get addLabAnalysis => 'Add Lab Analysis';
+
+  @override
+  String get editLabAnalysis => 'Edit Lab Analysis';
+
+  @override
+  String get labAnalysisDetails => 'Lab Analysis Details';
+
+  @override
+  String get analysisTitle => 'Title';
+
+  @override
+  String get analysisTitleHint => 'e.g., Blood test, MRI report, ECG';
+
+  @override
+  String get analysisCategory => 'Category';
+
+  @override
+  String get analysisDate => 'Analysis Date';
+
+  @override
+  String get resultReceivedDate => 'Result Received Date';
+
+  @override
+  String get laboratoryOrClinic => 'Laboratory / Clinic';
+
+  @override
+  String get orderingDoctor => 'Ordering Doctor';
+
+  @override
+  String get relatedDoctorVisit => 'Related Doctor Visit';
+
+  @override
+  String get analysisNotes => 'Notes';
+
+  @override
+  String get analysisNotesHint => 'Optional notes about this analysis';
+
+  @override
+  String get attachments => 'Attachments';
+
+  @override
+  String get addAttachment => 'Add Attachment';
+
+  @override
+  String get addPdf => 'Add PDF';
+
+  @override
+  String get addImage => 'Add Image';
+
+  @override
+  String get openAttachment => 'Open';
+
+  @override
+  String get shareAttachment => 'Share';
+
+  @override
+  String get removeAttachment => 'Remove';
+
+  @override
+  String get renameAttachment => 'Rename';
+
+  @override
+  String get pdf => 'PDF';
+
+  @override
+  String get image => 'Image';
+
+  @override
+  String get cardiology => 'Cardiology';
+
+  @override
+  String get imaging => 'Imaging';
+
+  @override
+  String get pathology => 'Pathology';
+
+  @override
+  String get allAnalyses => 'All Analyses';
+
+  @override
+  String get archivedAnalyses => 'Archived Analyses';
+
+  @override
+  String get noLabAnalyses => 'No lab analyses yet';
+
+  @override
+  String get noLabAnalysesDesc =>
+      'Add PDFs, scans, or photos of your medical analyses.';
+
+  @override
+  String get noArchivedAnalyses => 'No archived analyses';
+
+  @override
+  String get noArchivedAnalysesDesc => 'Archived analyses will appear here.';
+
+  @override
+  String get analysisSaved => 'Analysis saved';
+
+  @override
+  String get analysisUpdated => 'Analysis updated';
+
+  @override
+  String get analysisArchived => 'Analysis archived';
+
+  @override
+  String get analysisRestored => 'Analysis restored';
+
+  @override
+  String get analysisDeleted => 'Analysis deleted';
+
+  @override
+  String get unsupportedFileType =>
+      'Unsupported file type. Please select a PDF, JPG, JPEG, or PNG file.';
+
+  @override
+  String get attachmentMissing => 'Attachment file is missing';
+
+  @override
+  String get couldNotOpenAttachment => 'Could not open attachment';
+
+  @override
+  String get couldNotShareAttachment => 'Could not share attachment';
+
+  @override
+  String get confirmRemoveAttachment => 'Remove this attachment?';
+
+  @override
+  String get confirmDeleteAnalysis =>
+      'Delete this analysis permanently? All attachments will be removed.';
+
+  @override
+  String get deleteAnalysisAndAttachments =>
+      'Delete analysis and all attachments';
+
+  @override
+  String get newestFirst => 'Newest first';
+
+  @override
+  String get oldestFirst => 'Oldest first';
+
+  @override
+  String get titleAscending => 'Title (A–Z)';
+
+  @override
+  String get contactNoLongerAvailable => 'Contact no longer available';
+
+  @override
+  String get visitNoLongerAvailable => 'Visit no longer available';
+
+  @override
+  String get analysisTitleRequired => 'Title is required';
+
+  @override
+  String get resultDateBeforeAnalysisDate =>
+      'Result received date cannot be before analysis date';
+
+  @override
+  String get existingAttachments => 'Existing Attachments';
+
+  @override
+  String get newAttachments => 'New Attachments';
+
+  @override
+  String get activeAnalyses => 'Active Analyses';
+
+  @override
+  String get archiveAnalysis => 'Archive Analysis';
+
+  @override
+  String get archiveAnalysisConfirmation =>
+      'Archive this analysis? It will be moved to the archived list but can be restored.';
+
+  @override
+  String get restoreAnalysis => 'Restore Analysis';
+
+  @override
+  String get deleteLabAnalysis => 'Delete Lab Analysis';
+
+  @override
+  String get selectFile => 'Select file';
+
+  @override
+  String get failedToSaveAnalysis => 'Failed to save analysis';
+
+  @override
+  String get analysisAlreadyInProgress => 'A restore is already in progress.';
+
+  @override
+  String get openPdf => 'Open PDF';
+
+  @override
+  String get openImage => 'Open Image';
+
+  @override
+  String get notSet => 'Not set';
+
+  @override
+  String get selectContact => 'Select contact';
+
+  @override
+  String get selectDoctorVisit => 'Select doctor visit';
+
+  @override
+  String get clearSelection => 'Clear selection';
+
+  @override
+  String get updateLabAnalysis => 'Update Lab Analysis';
+
+  @override
+  String get saveLabAnalysis => 'Save Lab Analysis';
+
+  @override
+  String get noActiveProfile => 'No active profile';
+
+  @override
+  String get createProfileFirst =>
+      'Create a patient profile first to get started.';
+
+  @override
+  String get errorLoadingAnalyses => 'Couldn\'t load lab analyses';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get searchAnalyses => 'Search lab analyses';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get tomorrow => 'Tomorrow';
+
+  @override
+  String get newAttachment => 'New attachment';
 }

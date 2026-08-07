@@ -20,6 +20,10 @@ class AppRoutes {
 
   // Records
   static const recordsLabAnalyses = '/records/lab-analyses';
+  static const recordsLabAnalysesAdd = '/records/lab-analyses/new';
+  static const recordsLabAnalysesArchived = '/records/lab-analyses/archived';
+  static String recordsLabAnalysesDetails(int id) => '/records/lab-analyses/$id';
+  static String recordsLabAnalysesEdit(int id) => '/records/lab-analyses/$id/edit';
   static const recordsDoctorVisits = '/records/doctor-visits';
   static const recordsReports = '/records/reports';
 

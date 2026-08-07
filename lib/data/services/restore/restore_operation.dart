@@ -29,8 +29,8 @@ class RestoreOperation {
   RestoreOperation({
     required RestoreService service,
     required SettingsRepository settingsRepository,
-  })  : _service = service,
-        _settingsRepository = settingsRepository;
+  })  : _service = service, // ignore: prefer_initializing_formals -- public named params, private fields
+        _settingsRepository = settingsRepository; // ignore: prefer_initializing_formals -- public named params, private fields
 
   Stream<RestoreOperationState> get stateStream => _stateController.stream;
   RestoreOperationState get state => _state;

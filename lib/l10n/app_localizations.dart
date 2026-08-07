@@ -4195,6 +4195,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stored as: {name}'**
   String backupStoredAs(Object name);
+
+  /// No description provided for @addLabAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Lab Analysis'**
+  String get addLabAnalysis;
+
+  /// No description provided for @editLabAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Lab Analysis'**
+  String get editLabAnalysis;
+
+  /// No description provided for @labAnalysisDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Lab Analysis Details'**
+  String get labAnalysisDetails;
+
+  /// No description provided for @analysisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get analysisTitle;
+
+  /// No description provided for @analysisTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Blood test, MRI report, ECG'**
+  String get analysisTitleHint;
+
+  /// No description provided for @analysisCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get analysisCategory;
+
+  /// No description provided for @analysisDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis Date'**
+  String get analysisDate;
+
+  /// No description provided for @resultReceivedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Result Received Date'**
+  String get resultReceivedDate;
+
+  /// No description provided for @laboratoryOrClinic.
+  ///
+  /// In en, this message translates to:
+  /// **'Laboratory / Clinic'**
+  String get laboratoryOrClinic;
+
+  /// No description provided for @orderingDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Ordering Doctor'**
+  String get orderingDoctor;
+
+  /// No description provided for @relatedDoctorVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Related Doctor Visit'**
+  String get relatedDoctorVisit;
+
+  /// No description provided for @analysisNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get analysisNotes;
+
+  /// No description provided for @analysisNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional notes about this analysis'**
+  String get analysisNotesHint;
+
+  /// No description provided for @attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachments;
+
+  /// No description provided for @addAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Attachment'**
+  String get addAttachment;
+
+  /// No description provided for @addPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Add PDF'**
+  String get addPdf;
+
+  /// No description provided for @addImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Image'**
+  String get addImage;
+
+  /// No description provided for @openAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get openAttachment;
+
+  /// No description provided for @shareAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareAttachment;
+
+  /// No description provided for @removeAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeAttachment;
+
+  /// No description provided for @renameAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get renameAttachment;
+
+  /// No description provided for @pdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get pdf;
+
+  /// No description provided for @image.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get image;
+
+  /// No description provided for @cardiology.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardiology'**
+  String get cardiology;
+
+  /// No description provided for @imaging.
+  ///
+  /// In en, this message translates to:
+  /// **'Imaging'**
+  String get imaging;
+
+  /// No description provided for @pathology.
+  ///
+  /// In en, this message translates to:
+  /// **'Pathology'**
+  String get pathology;
+
+  /// No description provided for @allAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'All Analyses'**
+  String get allAnalyses;
+
+  /// No description provided for @archivedAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived Analyses'**
+  String get archivedAnalyses;
+
+  /// No description provided for @noLabAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'No lab analyses yet'**
+  String get noLabAnalyses;
+
+  /// No description provided for @noLabAnalysesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add PDFs, scans, or photos of your medical analyses.'**
+  String get noLabAnalysesDesc;
+
+  /// No description provided for @noArchivedAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived analyses'**
+  String get noArchivedAnalyses;
+
+  /// No description provided for @noArchivedAnalysesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived analyses will appear here.'**
+  String get noArchivedAnalysesDesc;
+
+  /// No description provided for @analysisSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis saved'**
+  String get analysisSaved;
+
+  /// No description provided for @analysisUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis updated'**
+  String get analysisUpdated;
+
+  /// No description provided for @analysisArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis archived'**
+  String get analysisArchived;
+
+  /// No description provided for @analysisRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis restored'**
+  String get analysisRestored;
+
+  /// No description provided for @analysisDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis deleted'**
+  String get analysisDeleted;
+
+  /// No description provided for @unsupportedFileType.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported file type. Please select a PDF, JPG, JPEG, or PNG file.'**
+  String get unsupportedFileType;
+
+  /// No description provided for @attachmentMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment file is missing'**
+  String get attachmentMissing;
+
+  /// No description provided for @couldNotOpenAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open attachment'**
+  String get couldNotOpenAttachment;
+
+  /// No description provided for @couldNotShareAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not share attachment'**
+  String get couldNotShareAttachment;
+
+  /// No description provided for @confirmRemoveAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this attachment?'**
+  String get confirmRemoveAttachment;
+
+  /// No description provided for @confirmDeleteAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this analysis permanently? All attachments will be removed.'**
+  String get confirmDeleteAnalysis;
+
+  /// No description provided for @deleteAnalysisAndAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete analysis and all attachments'**
+  String get deleteAnalysisAndAttachments;
+
+  /// No description provided for @newestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest first'**
+  String get newestFirst;
+
+  /// No description provided for @oldestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest first'**
+  String get oldestFirst;
+
+  /// No description provided for @titleAscending.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (A–Z)'**
+  String get titleAscending;
+
+  /// No description provided for @contactNoLongerAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact no longer available'**
+  String get contactNoLongerAvailable;
+
+  /// No description provided for @visitNoLongerAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit no longer available'**
+  String get visitNoLongerAvailable;
+
+  /// No description provided for @analysisTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get analysisTitleRequired;
+
+  /// No description provided for @resultDateBeforeAnalysisDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Result received date cannot be before analysis date'**
+  String get resultDateBeforeAnalysisDate;
+
+  /// No description provided for @existingAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing Attachments'**
+  String get existingAttachments;
+
+  /// No description provided for @newAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'New Attachments'**
+  String get newAttachments;
+
+  /// No description provided for @activeAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Analyses'**
+  String get activeAnalyses;
+
+  /// No description provided for @archiveAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Analysis'**
+  String get archiveAnalysis;
+
+  /// No description provided for @archiveAnalysisConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this analysis? It will be moved to the archived list but can be restored.'**
+  String get archiveAnalysisConfirmation;
+
+  /// No description provided for @restoreAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Analysis'**
+  String get restoreAnalysis;
+
+  /// No description provided for @deleteLabAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Lab Analysis'**
+  String get deleteLabAnalysis;
+
+  /// No description provided for @selectFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select file'**
+  String get selectFile;
+
+  /// No description provided for @failedToSaveAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save analysis'**
+  String get failedToSaveAnalysis;
+
+  /// No description provided for @analysisAlreadyInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'A restore is already in progress.'**
+  String get analysisAlreadyInProgress;
+
+  /// No description provided for @openPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Open PDF'**
+  String get openPdf;
+
+  /// No description provided for @openImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Image'**
+  String get openImage;
+
+  /// No description provided for @notSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get notSet;
+
+  /// No description provided for @selectContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Select contact'**
+  String get selectContact;
+
+  /// No description provided for @selectDoctorVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Select doctor visit'**
+  String get selectDoctorVisit;
+
+  /// No description provided for @clearSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear selection'**
+  String get clearSelection;
+
+  /// No description provided for @updateLabAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Lab Analysis'**
+  String get updateLabAnalysis;
+
+  /// No description provided for @saveLabAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Lab Analysis'**
+  String get saveLabAnalysis;
+
+  /// No description provided for @noActiveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'No active profile'**
+  String get noActiveProfile;
+
+  /// No description provided for @createProfileFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a patient profile first to get started.'**
+  String get createProfileFirst;
+
+  /// No description provided for @errorLoadingAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load lab analyses'**
+  String get errorLoadingAnalyses;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @searchAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'Search lab analyses'**
+  String get searchAnalyses;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// No description provided for @newAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'New attachment'**
+  String get newAttachment;
 }
 
 class _AppLocalizationsDelegate

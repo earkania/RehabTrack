@@ -96,7 +96,7 @@ void main() {
         )
         .isNotEmpty;
     db.close();
-    expect(version, 14);
+    expect(version, 15);
     expect(hasVisitRecords, isTrue);
   });
 
@@ -287,7 +287,7 @@ class _Fixture {
       validator: const BackupValidator(),
       recoveryStore: recoveryStore,
       tempBaseDir: tempBaseDir,
-      currentDatabaseSchemaVersion: 14,
+      currentDatabaseSchemaVersion: 15,
       currentAppVersion: '1.2.0',
       storageInspector: storageInspector ?? const StorageInspector(),
       random: Random(7),
@@ -295,7 +295,7 @@ class _Fixture {
 
     // Live state A: 2 profiles, ka locale, one photo.
     final aDb = buildRestorableSqliteBytes(
-      schema: 14,
+      schema: 15,
       profiles: 2,
       settings: const {'app_language': 'ka'},
       profilePhotoPath: '/device/docs/profile_images/photoA.jpg',
@@ -305,13 +305,13 @@ class _Fixture {
 
     // Backup B: 1 profile, en locale, a different photo.
     final bDb = buildRestorableSqliteBytes(
-      schema: 14,
+      schema: 15,
       profiles: 1,
       settings: const {'app_language': 'en'},
       profilePhotoPath: '/other/device/profile_images/photoB.jpg',
     );
     final archive = buildRestorableBackupZip(
-      schema: 14,
+      schema: 15,
       database: bDb,
       preferences: const {'app_language': 'en'},
       files: {
@@ -337,7 +337,7 @@ class _Fixture {
     final outcome = await const BackupValidator().validate(
       handle: read.handle!,
       tempDir: tempBaseDir,
-      currentDatabaseSchemaVersion: 14,
+      currentDatabaseSchemaVersion: 15,
       currentAppVersion: '1.2.0',
     );
     expect(outcome.preview, isNotNull);

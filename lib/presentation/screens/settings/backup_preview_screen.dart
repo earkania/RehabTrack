@@ -12,7 +12,6 @@ import 'package:rehab_track/domain/restore/restore_failure.dart';
 import 'package:rehab_track/domain/restore/restore_result.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/restore_apply_provider.dart';
-import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
@@ -199,12 +198,14 @@ Future<void> _runRestore(BuildContext context) async {
 
     // Capture navigator before any async operations to avoid stale context.
     final navigator = Navigator.of(context);
+    final container = ProviderScope.containerOf(context);
 
     // Create a completely independent RestoreOperation that doesn't
     // depend on Riverpod providers. This isolates it from the main
     // container's provider invalidation during database reinitialization.
-    final operation = await createRestoreOperation(ProviderScope.containerOf(context));
+    final operation = await createRestoreOperation(container);
 
+    if (!context.mounted) return;
     unawaited(showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -344,59 +345,6 @@ Future<void> _runRestore(BuildContext context) async {
       RestoreResult.insufficientStorage => l10n.restoreNotEnoughStorage,
       _ => l10n.restoreFailedGeneric,
     };
-  }
-
-  Future<void> _showReminderWarningDialog(
-    BuildContext context,
-    String date,
-  ) async {
-    await showDialog<void>(
-      context: context,
-      builder: (ctx) {
-        final dialogL10n = AppLocalizations.of(ctx)!;
-        return AlertDialog(
-          title: Text(dialogL10n.restoreCompletedTitle),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(dialogL10n.restoreCompletedMessage(date)),
-              const SizedBox(height: 12),
-              Text(dialogL10n.restoreCompletedRemindersPending),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(dialogL10n.ok),
-            ),
-            FilledButton(
-              onPressed: () async {
-                final ok = await ref
-                    .read(restoreApplyProvider.notifier)
-                    .retryReminderRebuild();
-                if (!ctx.mounted) return;
-                Navigator.of(ctx).pop();
-                await _showRetryResult(context, ok);
-              },
-              child: Text(dialogL10n.retryReminderRebuild),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showRetryResult(BuildContext context, bool succeeded) async {
-    final l10n = AppLocalizations.of(context)!;
-    await _showAlertDialog(
-      title: succeeded
-          ? l10n.restoreCompletedTitle
-          : l10n.restoreFailedTitle,
-      message: succeeded
-          ? l10n.restoreCompletedRemindersPending
-          : l10n.restoreReminderRebuildFailed,
-    );
   }
 
   Future<void> _showAlertDialog({

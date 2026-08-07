@@ -13,7 +13,7 @@ Future<File> _dbWith(
   Map<String, String> settings,
 ) async {
   final bytes = buildRestorableSqliteBytes(
-    schema: 14,
+    schema: 15,
     profiles: 0,
     settings: settings,
     withCareContacts: false,

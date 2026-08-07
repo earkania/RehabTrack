@@ -57,7 +57,7 @@ class _StubApplyService extends RestoreService {
             Directory.systemTemp.createTempSync('meta_recovery_'),
           ),
           tempBaseDir: Directory.systemTemp,
-          currentDatabaseSchemaVersion: 14,
+          currentDatabaseSchemaVersion: 15,
           currentAppVersion: '1.2.0',
         );
 
@@ -77,7 +77,7 @@ BackupPreview _preview() => BackupPreview(
       appVersion: '1.2.0',
       backupFormatVersion: 1,
       databaseSchemaVersion: 14,
-      currentDatabaseSchemaVersion: 14,
+      currentDatabaseSchemaVersion: 15,
       compatibility: BackupCompatibility.compatible,
       migrationRequired: false,
       profileCount: 2,

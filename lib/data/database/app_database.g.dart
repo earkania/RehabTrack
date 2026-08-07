@@ -15867,6 +15867,1543 @@ class ProfileReferenceRangesCompanion
   }
 }
 
+class $LabAnalysesTable extends LabAnalyses
+    with TableInfo<$LabAnalysesTable, LabAnalyse> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LabAnalysesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _analysisDateMeta = const VerificationMeta(
+    'analysisDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> analysisDate = GeneratedColumn<DateTime>(
+    'analysis_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _resultReceivedDateMeta =
+      const VerificationMeta('resultReceivedDate');
+  @override
+  late final GeneratedColumn<DateTime> resultReceivedDate =
+      GeneratedColumn<DateTime>(
+        'result_received_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _laboratoryContactIdMeta =
+      const VerificationMeta('laboratoryContactId');
+  @override
+  late final GeneratedColumn<int> laboratoryContactId = GeneratedColumn<int>(
+    'laboratory_contact_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES care_contacts (id) ON DELETE SET NULL',
+    ),
+  );
+  static const VerificationMeta _orderingDoctorContactIdMeta =
+      const VerificationMeta('orderingDoctorContactId');
+  @override
+  late final GeneratedColumn<int> orderingDoctorContactId =
+      GeneratedColumn<int>(
+        'ordering_doctor_contact_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES care_contacts (id) ON DELETE SET NULL',
+        ),
+      );
+  static const VerificationMeta _relatedDoctorVisitIdMeta =
+      const VerificationMeta('relatedDoctorVisitId');
+  @override
+  late final GeneratedColumn<int> relatedDoctorVisitId = GeneratedColumn<int>(
+    'related_doctor_visit_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES doctor_visit_records (id) ON DELETE SET NULL',
+    ),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    title,
+    category,
+    analysisDate,
+    resultReceivedDate,
+    laboratoryContactId,
+    orderingDoctorContactId,
+    relatedDoctorVisitId,
+    notes,
+    isArchived,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'lab_analyses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LabAnalyse> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('analysis_date')) {
+      context.handle(
+        _analysisDateMeta,
+        analysisDate.isAcceptableOrUnknown(
+          data['analysis_date']!,
+          _analysisDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_analysisDateMeta);
+    }
+    if (data.containsKey('result_received_date')) {
+      context.handle(
+        _resultReceivedDateMeta,
+        resultReceivedDate.isAcceptableOrUnknown(
+          data['result_received_date']!,
+          _resultReceivedDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('laboratory_contact_id')) {
+      context.handle(
+        _laboratoryContactIdMeta,
+        laboratoryContactId.isAcceptableOrUnknown(
+          data['laboratory_contact_id']!,
+          _laboratoryContactIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ordering_doctor_contact_id')) {
+      context.handle(
+        _orderingDoctorContactIdMeta,
+        orderingDoctorContactId.isAcceptableOrUnknown(
+          data['ordering_doctor_contact_id']!,
+          _orderingDoctorContactIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('related_doctor_visit_id')) {
+      context.handle(
+        _relatedDoctorVisitIdMeta,
+        relatedDoctorVisitId.isAcceptableOrUnknown(
+          data['related_doctor_visit_id']!,
+          _relatedDoctorVisitIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LabAnalyse map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LabAnalyse(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      analysisDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}analysis_date'],
+      )!,
+      resultReceivedDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}result_received_date'],
+      ),
+      laboratoryContactId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}laboratory_contact_id'],
+      ),
+      orderingDoctorContactId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ordering_doctor_contact_id'],
+      ),
+      relatedDoctorVisitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}related_doctor_visit_id'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $LabAnalysesTable createAlias(String alias) {
+    return $LabAnalysesTable(attachedDatabase, alias);
+  }
+}
+
+class LabAnalyse extends DataClass implements Insertable<LabAnalyse> {
+  final int id;
+  final int profileId;
+  final String title;
+  final String category;
+  final DateTime analysisDate;
+  final DateTime? resultReceivedDate;
+  final int? laboratoryContactId;
+  final int? orderingDoctorContactId;
+  final int? relatedDoctorVisitId;
+  final String? notes;
+  final bool isArchived;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const LabAnalyse({
+    required this.id,
+    required this.profileId,
+    required this.title,
+    required this.category,
+    required this.analysisDate,
+    this.resultReceivedDate,
+    this.laboratoryContactId,
+    this.orderingDoctorContactId,
+    this.relatedDoctorVisitId,
+    this.notes,
+    required this.isArchived,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['title'] = Variable<String>(title);
+    map['category'] = Variable<String>(category);
+    map['analysis_date'] = Variable<DateTime>(analysisDate);
+    if (!nullToAbsent || resultReceivedDate != null) {
+      map['result_received_date'] = Variable<DateTime>(resultReceivedDate);
+    }
+    if (!nullToAbsent || laboratoryContactId != null) {
+      map['laboratory_contact_id'] = Variable<int>(laboratoryContactId);
+    }
+    if (!nullToAbsent || orderingDoctorContactId != null) {
+      map['ordering_doctor_contact_id'] = Variable<int>(
+        orderingDoctorContactId,
+      );
+    }
+    if (!nullToAbsent || relatedDoctorVisitId != null) {
+      map['related_doctor_visit_id'] = Variable<int>(relatedDoctorVisitId);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['is_archived'] = Variable<bool>(isArchived);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  LabAnalysesCompanion toCompanion(bool nullToAbsent) {
+    return LabAnalysesCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      title: Value(title),
+      category: Value(category),
+      analysisDate: Value(analysisDate),
+      resultReceivedDate: resultReceivedDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(resultReceivedDate),
+      laboratoryContactId: laboratoryContactId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(laboratoryContactId),
+      orderingDoctorContactId: orderingDoctorContactId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(orderingDoctorContactId),
+      relatedDoctorVisitId: relatedDoctorVisitId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relatedDoctorVisitId),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      isArchived: Value(isArchived),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory LabAnalyse.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LabAnalyse(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      title: serializer.fromJson<String>(json['title']),
+      category: serializer.fromJson<String>(json['category']),
+      analysisDate: serializer.fromJson<DateTime>(json['analysisDate']),
+      resultReceivedDate: serializer.fromJson<DateTime?>(
+        json['resultReceivedDate'],
+      ),
+      laboratoryContactId: serializer.fromJson<int?>(
+        json['laboratoryContactId'],
+      ),
+      orderingDoctorContactId: serializer.fromJson<int?>(
+        json['orderingDoctorContactId'],
+      ),
+      relatedDoctorVisitId: serializer.fromJson<int?>(
+        json['relatedDoctorVisitId'],
+      ),
+      notes: serializer.fromJson<String?>(json['notes']),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'title': serializer.toJson<String>(title),
+      'category': serializer.toJson<String>(category),
+      'analysisDate': serializer.toJson<DateTime>(analysisDate),
+      'resultReceivedDate': serializer.toJson<DateTime?>(resultReceivedDate),
+      'laboratoryContactId': serializer.toJson<int?>(laboratoryContactId),
+      'orderingDoctorContactId': serializer.toJson<int?>(
+        orderingDoctorContactId,
+      ),
+      'relatedDoctorVisitId': serializer.toJson<int?>(relatedDoctorVisitId),
+      'notes': serializer.toJson<String?>(notes),
+      'isArchived': serializer.toJson<bool>(isArchived),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  LabAnalyse copyWith({
+    int? id,
+    int? profileId,
+    String? title,
+    String? category,
+    DateTime? analysisDate,
+    Value<DateTime?> resultReceivedDate = const Value.absent(),
+    Value<int?> laboratoryContactId = const Value.absent(),
+    Value<int?> orderingDoctorContactId = const Value.absent(),
+    Value<int?> relatedDoctorVisitId = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    bool? isArchived,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => LabAnalyse(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    title: title ?? this.title,
+    category: category ?? this.category,
+    analysisDate: analysisDate ?? this.analysisDate,
+    resultReceivedDate: resultReceivedDate.present
+        ? resultReceivedDate.value
+        : this.resultReceivedDate,
+    laboratoryContactId: laboratoryContactId.present
+        ? laboratoryContactId.value
+        : this.laboratoryContactId,
+    orderingDoctorContactId: orderingDoctorContactId.present
+        ? orderingDoctorContactId.value
+        : this.orderingDoctorContactId,
+    relatedDoctorVisitId: relatedDoctorVisitId.present
+        ? relatedDoctorVisitId.value
+        : this.relatedDoctorVisitId,
+    notes: notes.present ? notes.value : this.notes,
+    isArchived: isArchived ?? this.isArchived,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  LabAnalyse copyWithCompanion(LabAnalysesCompanion data) {
+    return LabAnalyse(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      title: data.title.present ? data.title.value : this.title,
+      category: data.category.present ? data.category.value : this.category,
+      analysisDate: data.analysisDate.present
+          ? data.analysisDate.value
+          : this.analysisDate,
+      resultReceivedDate: data.resultReceivedDate.present
+          ? data.resultReceivedDate.value
+          : this.resultReceivedDate,
+      laboratoryContactId: data.laboratoryContactId.present
+          ? data.laboratoryContactId.value
+          : this.laboratoryContactId,
+      orderingDoctorContactId: data.orderingDoctorContactId.present
+          ? data.orderingDoctorContactId.value
+          : this.orderingDoctorContactId,
+      relatedDoctorVisitId: data.relatedDoctorVisitId.present
+          ? data.relatedDoctorVisitId.value
+          : this.relatedDoctorVisitId,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LabAnalyse(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('title: $title, ')
+          ..write('category: $category, ')
+          ..write('analysisDate: $analysisDate, ')
+          ..write('resultReceivedDate: $resultReceivedDate, ')
+          ..write('laboratoryContactId: $laboratoryContactId, ')
+          ..write('orderingDoctorContactId: $orderingDoctorContactId, ')
+          ..write('relatedDoctorVisitId: $relatedDoctorVisitId, ')
+          ..write('notes: $notes, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    title,
+    category,
+    analysisDate,
+    resultReceivedDate,
+    laboratoryContactId,
+    orderingDoctorContactId,
+    relatedDoctorVisitId,
+    notes,
+    isArchived,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LabAnalyse &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.title == this.title &&
+          other.category == this.category &&
+          other.analysisDate == this.analysisDate &&
+          other.resultReceivedDate == this.resultReceivedDate &&
+          other.laboratoryContactId == this.laboratoryContactId &&
+          other.orderingDoctorContactId == this.orderingDoctorContactId &&
+          other.relatedDoctorVisitId == this.relatedDoctorVisitId &&
+          other.notes == this.notes &&
+          other.isArchived == this.isArchived &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class LabAnalysesCompanion extends UpdateCompanion<LabAnalyse> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> title;
+  final Value<String> category;
+  final Value<DateTime> analysisDate;
+  final Value<DateTime?> resultReceivedDate;
+  final Value<int?> laboratoryContactId;
+  final Value<int?> orderingDoctorContactId;
+  final Value<int?> relatedDoctorVisitId;
+  final Value<String?> notes;
+  final Value<bool> isArchived;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const LabAnalysesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.category = const Value.absent(),
+    this.analysisDate = const Value.absent(),
+    this.resultReceivedDate = const Value.absent(),
+    this.laboratoryContactId = const Value.absent(),
+    this.orderingDoctorContactId = const Value.absent(),
+    this.relatedDoctorVisitId = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  LabAnalysesCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String title,
+    required String category,
+    required DateTime analysisDate,
+    this.resultReceivedDate = const Value.absent(),
+    this.laboratoryContactId = const Value.absent(),
+    this.orderingDoctorContactId = const Value.absent(),
+    this.relatedDoctorVisitId = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : profileId = Value(profileId),
+       title = Value(title),
+       category = Value(category),
+       analysisDate = Value(analysisDate),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<LabAnalyse> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? title,
+    Expression<String>? category,
+    Expression<DateTime>? analysisDate,
+    Expression<DateTime>? resultReceivedDate,
+    Expression<int>? laboratoryContactId,
+    Expression<int>? orderingDoctorContactId,
+    Expression<int>? relatedDoctorVisitId,
+    Expression<String>? notes,
+    Expression<bool>? isArchived,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (title != null) 'title': title,
+      if (category != null) 'category': category,
+      if (analysisDate != null) 'analysis_date': analysisDate,
+      if (resultReceivedDate != null)
+        'result_received_date': resultReceivedDate,
+      if (laboratoryContactId != null)
+        'laboratory_contact_id': laboratoryContactId,
+      if (orderingDoctorContactId != null)
+        'ordering_doctor_contact_id': orderingDoctorContactId,
+      if (relatedDoctorVisitId != null)
+        'related_doctor_visit_id': relatedDoctorVisitId,
+      if (notes != null) 'notes': notes,
+      if (isArchived != null) 'is_archived': isArchived,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  LabAnalysesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? profileId,
+    Value<String>? title,
+    Value<String>? category,
+    Value<DateTime>? analysisDate,
+    Value<DateTime?>? resultReceivedDate,
+    Value<int?>? laboratoryContactId,
+    Value<int?>? orderingDoctorContactId,
+    Value<int?>? relatedDoctorVisitId,
+    Value<String?>? notes,
+    Value<bool>? isArchived,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return LabAnalysesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      title: title ?? this.title,
+      category: category ?? this.category,
+      analysisDate: analysisDate ?? this.analysisDate,
+      resultReceivedDate: resultReceivedDate ?? this.resultReceivedDate,
+      laboratoryContactId: laboratoryContactId ?? this.laboratoryContactId,
+      orderingDoctorContactId:
+          orderingDoctorContactId ?? this.orderingDoctorContactId,
+      relatedDoctorVisitId: relatedDoctorVisitId ?? this.relatedDoctorVisitId,
+      notes: notes ?? this.notes,
+      isArchived: isArchived ?? this.isArchived,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (analysisDate.present) {
+      map['analysis_date'] = Variable<DateTime>(analysisDate.value);
+    }
+    if (resultReceivedDate.present) {
+      map['result_received_date'] = Variable<DateTime>(
+        resultReceivedDate.value,
+      );
+    }
+    if (laboratoryContactId.present) {
+      map['laboratory_contact_id'] = Variable<int>(laboratoryContactId.value);
+    }
+    if (orderingDoctorContactId.present) {
+      map['ordering_doctor_contact_id'] = Variable<int>(
+        orderingDoctorContactId.value,
+      );
+    }
+    if (relatedDoctorVisitId.present) {
+      map['related_doctor_visit_id'] = Variable<int>(
+        relatedDoctorVisitId.value,
+      );
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LabAnalysesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('title: $title, ')
+          ..write('category: $category, ')
+          ..write('analysisDate: $analysisDate, ')
+          ..write('resultReceivedDate: $resultReceivedDate, ')
+          ..write('laboratoryContactId: $laboratoryContactId, ')
+          ..write('orderingDoctorContactId: $orderingDoctorContactId, ')
+          ..write('relatedDoctorVisitId: $relatedDoctorVisitId, ')
+          ..write('notes: $notes, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LabAnalysisAttachmentsTable extends LabAnalysisAttachments
+    with TableInfo<$LabAnalysisAttachmentsTable, LabAnalysisAttachment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LabAnalysisAttachmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _analysisIdMeta = const VerificationMeta(
+    'analysisId',
+  );
+  @override
+  late final GeneratedColumn<int> analysisId = GeneratedColumn<int>(
+    'analysis_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES lab_analyses (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _fileTypeMeta = const VerificationMeta(
+    'fileType',
+  );
+  @override
+  late final GeneratedColumn<String> fileType = GeneratedColumn<String>(
+    'file_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _managedRelativePathMeta =
+      const VerificationMeta('managedRelativePath');
+  @override
+  late final GeneratedColumn<String> managedRelativePath =
+      GeneratedColumn<String>(
+        'managed_relative_path',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _originalFileNameMeta = const VerificationMeta(
+    'originalFileName',
+  );
+  @override
+  late final GeneratedColumn<String> originalFileName = GeneratedColumn<String>(
+    'original_file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+    'display_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mimeTypeMeta = const VerificationMeta(
+    'mimeType',
+  );
+  @override
+  late final GeneratedColumn<String> mimeType = GeneratedColumn<String>(
+    'mime_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fileSizeMeta = const VerificationMeta(
+    'fileSize',
+  );
+  @override
+  late final GeneratedColumn<int> fileSize = GeneratedColumn<int>(
+    'file_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    analysisId,
+    profileId,
+    fileType,
+    managedRelativePath,
+    originalFileName,
+    displayName,
+    mimeType,
+    fileSize,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'lab_analysis_attachments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LabAnalysisAttachment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('analysis_id')) {
+      context.handle(
+        _analysisIdMeta,
+        analysisId.isAcceptableOrUnknown(data['analysis_id']!, _analysisIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_analysisIdMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('file_type')) {
+      context.handle(
+        _fileTypeMeta,
+        fileType.isAcceptableOrUnknown(data['file_type']!, _fileTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fileTypeMeta);
+    }
+    if (data.containsKey('managed_relative_path')) {
+      context.handle(
+        _managedRelativePathMeta,
+        managedRelativePath.isAcceptableOrUnknown(
+          data['managed_relative_path']!,
+          _managedRelativePathMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_managedRelativePathMeta);
+    }
+    if (data.containsKey('original_file_name')) {
+      context.handle(
+        _originalFileNameMeta,
+        originalFileName.isAcceptableOrUnknown(
+          data['original_file_name']!,
+          _originalFileNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originalFileNameMeta);
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_displayNameMeta);
+    }
+    if (data.containsKey('mime_type')) {
+      context.handle(
+        _mimeTypeMeta,
+        mimeType.isAcceptableOrUnknown(data['mime_type']!, _mimeTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mimeTypeMeta);
+    }
+    if (data.containsKey('file_size')) {
+      context.handle(
+        _fileSizeMeta,
+        fileSize.isAcceptableOrUnknown(data['file_size']!, _fileSizeMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LabAnalysisAttachment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LabAnalysisAttachment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      analysisId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}analysis_id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      fileType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}file_type'],
+      )!,
+      managedRelativePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}managed_relative_path'],
+      )!,
+      originalFileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}original_file_name'],
+      )!,
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      )!,
+      mimeType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mime_type'],
+      )!,
+      fileSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}file_size'],
+      ),
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $LabAnalysisAttachmentsTable createAlias(String alias) {
+    return $LabAnalysisAttachmentsTable(attachedDatabase, alias);
+  }
+}
+
+class LabAnalysisAttachment extends DataClass
+    implements Insertable<LabAnalysisAttachment> {
+  final int id;
+  final int analysisId;
+  final int profileId;
+  final String fileType;
+  final String managedRelativePath;
+  final String originalFileName;
+  final String displayName;
+  final String mimeType;
+  final int? fileSize;
+  final int sortOrder;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const LabAnalysisAttachment({
+    required this.id,
+    required this.analysisId,
+    required this.profileId,
+    required this.fileType,
+    required this.managedRelativePath,
+    required this.originalFileName,
+    required this.displayName,
+    required this.mimeType,
+    this.fileSize,
+    required this.sortOrder,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['analysis_id'] = Variable<int>(analysisId);
+    map['profile_id'] = Variable<int>(profileId);
+    map['file_type'] = Variable<String>(fileType);
+    map['managed_relative_path'] = Variable<String>(managedRelativePath);
+    map['original_file_name'] = Variable<String>(originalFileName);
+    map['display_name'] = Variable<String>(displayName);
+    map['mime_type'] = Variable<String>(mimeType);
+    if (!nullToAbsent || fileSize != null) {
+      map['file_size'] = Variable<int>(fileSize);
+    }
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  LabAnalysisAttachmentsCompanion toCompanion(bool nullToAbsent) {
+    return LabAnalysisAttachmentsCompanion(
+      id: Value(id),
+      analysisId: Value(analysisId),
+      profileId: Value(profileId),
+      fileType: Value(fileType),
+      managedRelativePath: Value(managedRelativePath),
+      originalFileName: Value(originalFileName),
+      displayName: Value(displayName),
+      mimeType: Value(mimeType),
+      fileSize: fileSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fileSize),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory LabAnalysisAttachment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LabAnalysisAttachment(
+      id: serializer.fromJson<int>(json['id']),
+      analysisId: serializer.fromJson<int>(json['analysisId']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      fileType: serializer.fromJson<String>(json['fileType']),
+      managedRelativePath: serializer.fromJson<String>(
+        json['managedRelativePath'],
+      ),
+      originalFileName: serializer.fromJson<String>(json['originalFileName']),
+      displayName: serializer.fromJson<String>(json['displayName']),
+      mimeType: serializer.fromJson<String>(json['mimeType']),
+      fileSize: serializer.fromJson<int?>(json['fileSize']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'analysisId': serializer.toJson<int>(analysisId),
+      'profileId': serializer.toJson<int>(profileId),
+      'fileType': serializer.toJson<String>(fileType),
+      'managedRelativePath': serializer.toJson<String>(managedRelativePath),
+      'originalFileName': serializer.toJson<String>(originalFileName),
+      'displayName': serializer.toJson<String>(displayName),
+      'mimeType': serializer.toJson<String>(mimeType),
+      'fileSize': serializer.toJson<int?>(fileSize),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  LabAnalysisAttachment copyWith({
+    int? id,
+    int? analysisId,
+    int? profileId,
+    String? fileType,
+    String? managedRelativePath,
+    String? originalFileName,
+    String? displayName,
+    String? mimeType,
+    Value<int?> fileSize = const Value.absent(),
+    int? sortOrder,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => LabAnalysisAttachment(
+    id: id ?? this.id,
+    analysisId: analysisId ?? this.analysisId,
+    profileId: profileId ?? this.profileId,
+    fileType: fileType ?? this.fileType,
+    managedRelativePath: managedRelativePath ?? this.managedRelativePath,
+    originalFileName: originalFileName ?? this.originalFileName,
+    displayName: displayName ?? this.displayName,
+    mimeType: mimeType ?? this.mimeType,
+    fileSize: fileSize.present ? fileSize.value : this.fileSize,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  LabAnalysisAttachment copyWithCompanion(
+    LabAnalysisAttachmentsCompanion data,
+  ) {
+    return LabAnalysisAttachment(
+      id: data.id.present ? data.id.value : this.id,
+      analysisId: data.analysisId.present
+          ? data.analysisId.value
+          : this.analysisId,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      fileType: data.fileType.present ? data.fileType.value : this.fileType,
+      managedRelativePath: data.managedRelativePath.present
+          ? data.managedRelativePath.value
+          : this.managedRelativePath,
+      originalFileName: data.originalFileName.present
+          ? data.originalFileName.value
+          : this.originalFileName,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
+      mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
+      fileSize: data.fileSize.present ? data.fileSize.value : this.fileSize,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LabAnalysisAttachment(')
+          ..write('id: $id, ')
+          ..write('analysisId: $analysisId, ')
+          ..write('profileId: $profileId, ')
+          ..write('fileType: $fileType, ')
+          ..write('managedRelativePath: $managedRelativePath, ')
+          ..write('originalFileName: $originalFileName, ')
+          ..write('displayName: $displayName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('fileSize: $fileSize, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    analysisId,
+    profileId,
+    fileType,
+    managedRelativePath,
+    originalFileName,
+    displayName,
+    mimeType,
+    fileSize,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LabAnalysisAttachment &&
+          other.id == this.id &&
+          other.analysisId == this.analysisId &&
+          other.profileId == this.profileId &&
+          other.fileType == this.fileType &&
+          other.managedRelativePath == this.managedRelativePath &&
+          other.originalFileName == this.originalFileName &&
+          other.displayName == this.displayName &&
+          other.mimeType == this.mimeType &&
+          other.fileSize == this.fileSize &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class LabAnalysisAttachmentsCompanion
+    extends UpdateCompanion<LabAnalysisAttachment> {
+  final Value<int> id;
+  final Value<int> analysisId;
+  final Value<int> profileId;
+  final Value<String> fileType;
+  final Value<String> managedRelativePath;
+  final Value<String> originalFileName;
+  final Value<String> displayName;
+  final Value<String> mimeType;
+  final Value<int?> fileSize;
+  final Value<int> sortOrder;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const LabAnalysisAttachmentsCompanion({
+    this.id = const Value.absent(),
+    this.analysisId = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.fileType = const Value.absent(),
+    this.managedRelativePath = const Value.absent(),
+    this.originalFileName = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.fileSize = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  LabAnalysisAttachmentsCompanion.insert({
+    this.id = const Value.absent(),
+    required int analysisId,
+    required int profileId,
+    required String fileType,
+    required String managedRelativePath,
+    required String originalFileName,
+    required String displayName,
+    required String mimeType,
+    this.fileSize = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : analysisId = Value(analysisId),
+       profileId = Value(profileId),
+       fileType = Value(fileType),
+       managedRelativePath = Value(managedRelativePath),
+       originalFileName = Value(originalFileName),
+       displayName = Value(displayName),
+       mimeType = Value(mimeType),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<LabAnalysisAttachment> custom({
+    Expression<int>? id,
+    Expression<int>? analysisId,
+    Expression<int>? profileId,
+    Expression<String>? fileType,
+    Expression<String>? managedRelativePath,
+    Expression<String>? originalFileName,
+    Expression<String>? displayName,
+    Expression<String>? mimeType,
+    Expression<int>? fileSize,
+    Expression<int>? sortOrder,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (analysisId != null) 'analysis_id': analysisId,
+      if (profileId != null) 'profile_id': profileId,
+      if (fileType != null) 'file_type': fileType,
+      if (managedRelativePath != null)
+        'managed_relative_path': managedRelativePath,
+      if (originalFileName != null) 'original_file_name': originalFileName,
+      if (displayName != null) 'display_name': displayName,
+      if (mimeType != null) 'mime_type': mimeType,
+      if (fileSize != null) 'file_size': fileSize,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  LabAnalysisAttachmentsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? analysisId,
+    Value<int>? profileId,
+    Value<String>? fileType,
+    Value<String>? managedRelativePath,
+    Value<String>? originalFileName,
+    Value<String>? displayName,
+    Value<String>? mimeType,
+    Value<int?>? fileSize,
+    Value<int>? sortOrder,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return LabAnalysisAttachmentsCompanion(
+      id: id ?? this.id,
+      analysisId: analysisId ?? this.analysisId,
+      profileId: profileId ?? this.profileId,
+      fileType: fileType ?? this.fileType,
+      managedRelativePath: managedRelativePath ?? this.managedRelativePath,
+      originalFileName: originalFileName ?? this.originalFileName,
+      displayName: displayName ?? this.displayName,
+      mimeType: mimeType ?? this.mimeType,
+      fileSize: fileSize ?? this.fileSize,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (analysisId.present) {
+      map['analysis_id'] = Variable<int>(analysisId.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (fileType.present) {
+      map['file_type'] = Variable<String>(fileType.value);
+    }
+    if (managedRelativePath.present) {
+      map['managed_relative_path'] = Variable<String>(
+        managedRelativePath.value,
+      );
+    }
+    if (originalFileName.present) {
+      map['original_file_name'] = Variable<String>(originalFileName.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (mimeType.present) {
+      map['mime_type'] = Variable<String>(mimeType.value);
+    }
+    if (fileSize.present) {
+      map['file_size'] = Variable<int>(fileSize.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LabAnalysisAttachmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('analysisId: $analysisId, ')
+          ..write('profileId: $profileId, ')
+          ..write('fileType: $fileType, ')
+          ..write('managedRelativePath: $managedRelativePath, ')
+          ..write('originalFileName: $originalFileName, ')
+          ..write('displayName: $displayName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('fileSize: $fileSize, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -15912,6 +17449,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $ProfileReferenceRangesTable profileReferenceRanges =
       $ProfileReferenceRangesTable(this);
+  late final $LabAnalysesTable labAnalyses = $LabAnalysesTable(this);
+  late final $LabAnalysisAttachmentsTable labAnalysisAttachments =
+      $LabAnalysisAttachmentsTable(this);
   late final Index careContactsProfileIdx = Index(
     'care_contacts_profile_idx',
     'CREATE INDEX care_contacts_profile_idx ON care_contacts (profile_id)',
@@ -15956,6 +17496,42 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'doctor_visit_records_archived_idx',
     'CREATE INDEX doctor_visit_records_archived_idx ON doctor_visit_records (is_archived)',
   );
+  late final Index labAnalysesProfileIdx = Index(
+    'lab_analyses_profile_idx',
+    'CREATE INDEX lab_analyses_profile_idx ON lab_analyses (profile_id)',
+  );
+  late final Index labAnalysesDateIdx = Index(
+    'lab_analyses_date_idx',
+    'CREATE INDEX lab_analyses_date_idx ON lab_analyses (analysis_date)',
+  );
+  late final Index labAnalysesCategoryIdx = Index(
+    'lab_analyses_category_idx',
+    'CREATE INDEX lab_analyses_category_idx ON lab_analyses (category)',
+  );
+  late final Index labAnalysesArchivedIdx = Index(
+    'lab_analyses_archived_idx',
+    'CREATE INDEX lab_analyses_archived_idx ON lab_analyses (is_archived)',
+  );
+  late final Index labAnalysesLaboratoryIdx = Index(
+    'lab_analyses_laboratory_idx',
+    'CREATE INDEX lab_analyses_laboratory_idx ON lab_analyses (laboratory_contact_id)',
+  );
+  late final Index labAnalysesOrderingDoctorIdx = Index(
+    'lab_analyses_ordering_doctor_idx',
+    'CREATE INDEX lab_analyses_ordering_doctor_idx ON lab_analyses (ordering_doctor_contact_id)',
+  );
+  late final Index labAnalysesVisitIdx = Index(
+    'lab_analyses_visit_idx',
+    'CREATE INDEX lab_analyses_visit_idx ON lab_analyses (related_doctor_visit_id)',
+  );
+  late final Index labAnalysisAttachmentsAnalysisIdx = Index(
+    'lab_analysis_attachments_analysis_idx',
+    'CREATE INDEX lab_analysis_attachments_analysis_idx ON lab_analysis_attachments (analysis_id)',
+  );
+  late final Index labAnalysisAttachmentsProfileIdx = Index(
+    'lab_analysis_attachments_profile_idx',
+    'CREATE INDEX lab_analysis_attachments_profile_idx ON lab_analysis_attachments (profile_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -15987,6 +17563,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     healthTemplates,
     appSettings,
     profileReferenceRanges,
+    labAnalyses,
+    labAnalysisAttachments,
     careContactsProfileIdx,
     careContactsTypeIdx,
     careContactsArchivedIdx,
@@ -15998,7 +17576,65 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     doctorVisitRecordsDoctorIdx,
     doctorVisitRecordsOrgIdx,
     doctorVisitRecordsArchivedIdx,
+    labAnalysesProfileIdx,
+    labAnalysesDateIdx,
+    labAnalysesCategoryIdx,
+    labAnalysesArchivedIdx,
+    labAnalysesLaboratoryIdx,
+    labAnalysesOrderingDoctorIdx,
+    labAnalysesVisitIdx,
+    labAnalysisAttachmentsAnalysisIdx,
+    labAnalysisAttachmentsProfileIdx,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('lab_analyses', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'care_contacts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('lab_analyses', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'care_contacts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('lab_analyses', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'doctor_visit_records',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('lab_analyses', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'lab_analyses',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('lab_analysis_attachments', kind: UpdateKind.delete),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('lab_analysis_attachments', kind: UpdateKind.delete),
+      ],
+    ),
+  ]);
 }
 
 typedef $$ProfilesTableCreateCompanionBuilder =
@@ -16329,6 +17965,49 @@ final class $$ProfilesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _profileReferenceRangesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$LabAnalysesTable, List<LabAnalyse>>
+  _labAnalysesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.labAnalyses,
+    aliasName: 'profiles__id__lab_analyses__profile_id',
+  );
+
+  $$LabAnalysesTableProcessedTableManager get labAnalysesRefs {
+    final manager = $$LabAnalysesTableTableManager(
+      $_db,
+      $_db.labAnalyses,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_labAnalysesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $LabAnalysisAttachmentsTable,
+    List<LabAnalysisAttachment>
+  >
+  _labAnalysisAttachmentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.labAnalysisAttachments,
+        aliasName: 'profiles__id__lab_analysis_attachments__profile_id',
+      );
+
+  $$LabAnalysisAttachmentsTableProcessedTableManager
+  get labAnalysisAttachmentsRefs {
+    final manager = $$LabAnalysisAttachmentsTableTableManager(
+      $_db,
+      $_db.labAnalysisAttachments,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _labAnalysisAttachmentsRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -16792,6 +18471,57 @@ class $$ProfilesTableFilterComposer
               }) => $$ProfileReferenceRangesTableFilterComposer(
                 $db: $db,
                 $table: $db.profileReferenceRanges,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> labAnalysesRefs(
+    Expression<bool> Function($$LabAnalysesTableFilterComposer f) f,
+  ) {
+    final $$LabAnalysesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.labAnalyses,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LabAnalysesTableFilterComposer(
+            $db: $db,
+            $table: $db.labAnalyses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> labAnalysisAttachmentsRefs(
+    Expression<bool> Function($$LabAnalysisAttachmentsTableFilterComposer f) f,
+  ) {
+    final $$LabAnalysisAttachmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.labAnalysisAttachments,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LabAnalysisAttachmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.labAnalysisAttachments,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -17349,6 +19079,57 @@ class $$ProfilesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> labAnalysesRefs<T extends Object>(
+    Expression<T> Function($$LabAnalysesTableAnnotationComposer a) f,
+  ) {
+    final $$LabAnalysesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.labAnalyses,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LabAnalysesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.labAnalyses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> labAnalysisAttachmentsRefs<T extends Object>(
+    Expression<T> Function($$LabAnalysisAttachmentsTableAnnotationComposer a) f,
+  ) {
+    final $$LabAnalysisAttachmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.labAnalysisAttachments,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LabAnalysisAttachmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.labAnalysisAttachments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -17379,6 +19160,8 @@ class $$ProfilesTableTableManager
             bool documentAttachmentsRefs,
             bool dietPlansRefs,
             bool profileReferenceRangesRefs,
+            bool labAnalysesRefs,
+            bool labAnalysisAttachmentsRefs,
           })
         > {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
@@ -17508,6 +19291,8 @@ class $$ProfilesTableTableManager
                 documentAttachmentsRefs = false,
                 dietPlansRefs = false,
                 profileReferenceRangesRefs = false,
+                labAnalysesRefs = false,
+                labAnalysisAttachmentsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -17526,6 +19311,8 @@ class $$ProfilesTableTableManager
                     if (documentAttachmentsRefs) db.documentAttachments,
                     if (dietPlansRefs) db.dietPlans,
                     if (profileReferenceRangesRefs) db.profileReferenceRanges,
+                    if (labAnalysesRefs) db.labAnalyses,
+                    if (labAnalysisAttachmentsRefs) db.labAnalysisAttachments,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -17824,6 +19611,48 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (labAnalysesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          LabAnalyse
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._labAnalysesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).labAnalysesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (labAnalysisAttachmentsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          LabAnalysisAttachment
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._labAnalysisAttachmentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).labAnalysisAttachmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -17859,6 +19688,8 @@ typedef $$ProfilesTableProcessedTableManager =
         bool documentAttachmentsRefs,
         bool dietPlansRefs,
         bool profileReferenceRangesRefs,
+        bool labAnalysesRefs,
+        bool labAnalysisAttachmentsRefs,
       })
     >;
 typedef $$MedicationsTableCreateCompanionBuilder =
@@ -27683,6 +29514,25 @@ final class $$DoctorVisitRecordsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$LabAnalysesTable, List<LabAnalyse>>
+  _labAnalysesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.labAnalyses,
+    aliasName:
+        'doctor_visit_records__id__lab_analyses__related_doctor_visit_id',
+  );
+
+  $$LabAnalysesTableProcessedTableManager get labAnalysesRefs {
+    final manager = $$LabAnalysesTableTableManager($_db, $_db.labAnalyses)
+        .filter(
+          (f) => f.relatedDoctorVisitId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_labAnalysesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$DoctorVisitRecordsTableFilterComposer
@@ -27816,6 +29666,31 @@ class $$DoctorVisitRecordsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> labAnalysesRefs(
+    Expression<bool> Function($$LabAnalysesTableFilterComposer f) f,
+  ) {
+    final $$LabAnalysesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.labAnalyses,
+      getReferencedColumn: (t) => t.relatedDoctorVisitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LabAnalysesTableFilterComposer(
+            $db: $db,
+            $table: $db.labAnalyses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -28071,6 +29946,31 @@ class $$DoctorVisitRecordsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> labAnalysesRefs<T extends Object>(
+    Expression<T> Function($$LabAnalysesTableAnnotationComposer a) f,
+  ) {
+    final $$LabAnalysesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.labAnalyses,
+      getReferencedColumn: (t) => t.relatedDoctorVisitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LabAnalysesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.labAnalyses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$DoctorVisitRecordsTableTableManager
@@ -28090,6 +29990,7 @@ class $$DoctorVisitRecordsTableTableManager
             bool profileId,
             bool doctorContactId,
             bool organizationContactId,
+            bool labAnalysesRefs,
           })
         > {
   $$DoctorVisitRecordsTableTableManager(
@@ -28185,10 +30086,13 @@ class $$DoctorVisitRecordsTableTableManager
                 profileId = false,
                 doctorContactId = false,
                 organizationContactId = false,
+                labAnalysesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [],
+                  explicitlyWatchedTables: [
+                    if (labAnalysesRefs) db.labAnalyses,
+                  ],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -28254,7 +30158,29 @@ class $$DoctorVisitRecordsTableTableManager
                         return state;
                       },
                   getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return [
+                      if (labAnalysesRefs)
+                        await $_getPrefetchedData<
+                          DoctorVisitRecord,
+                          $DoctorVisitRecordsTable,
+                          LabAnalyse
+                        >(
+                          currentTable: table,
+                          referencedTable: $$DoctorVisitRecordsTableReferences
+                              ._labAnalysesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$DoctorVisitRecordsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).labAnalysesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.relatedDoctorVisitId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
                 );
               },
@@ -28278,6 +30204,7 @@ typedef $$DoctorVisitRecordsTableProcessedTableManager =
         bool profileId,
         bool doctorContactId,
         bool organizationContactId,
+        bool labAnalysesRefs,
       })
     >;
 typedef $$DocumentAttachmentsTableCreateCompanionBuilder =
@@ -30190,6 +32117,1433 @@ typedef $$ProfileReferenceRangesTableProcessedTableManager =
       ProfileReferenceRange,
       PrefetchHooks Function({bool profileId})
     >;
+typedef $$LabAnalysesTableCreateCompanionBuilder =
+    LabAnalysesCompanion Function({
+      Value<int> id,
+      required int profileId,
+      required String title,
+      required String category,
+      required DateTime analysisDate,
+      Value<DateTime?> resultReceivedDate,
+      Value<int?> laboratoryContactId,
+      Value<int?> orderingDoctorContactId,
+      Value<int?> relatedDoctorVisitId,
+      Value<String?> notes,
+      Value<bool> isArchived,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$LabAnalysesTableUpdateCompanionBuilder =
+    LabAnalysesCompanion Function({
+      Value<int> id,
+      Value<int> profileId,
+      Value<String> title,
+      Value<String> category,
+      Value<DateTime> analysisDate,
+      Value<DateTime?> resultReceivedDate,
+      Value<int?> laboratoryContactId,
+      Value<int?> orderingDoctorContactId,
+      Value<int?> relatedDoctorVisitId,
+      Value<String?> notes,
+      Value<bool> isArchived,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$LabAnalysesTableReferences
+    extends BaseReferences<_$AppDatabase, $LabAnalysesTable, LabAnalyse> {
+  $$LabAnalysesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('lab_analyses__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CareContactsTable _laboratoryContactIdTable(_$AppDatabase db) => db
+      .careContacts
+      .createAlias('lab_analyses__laboratory_contact_id__care_contacts__id');
+
+  $$CareContactsTableProcessedTableManager? get laboratoryContactId {
+    final $_column = $_itemColumn<int>('laboratory_contact_id');
+    if ($_column == null) return null;
+    final manager = $$CareContactsTableTableManager(
+      $_db,
+      $_db.careContacts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_laboratoryContactIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CareContactsTable _orderingDoctorContactIdTable(_$AppDatabase db) =>
+      db.careContacts.createAlias(
+        'lab_analyses__ordering_doctor_contact_id__care_contacts__id',
+      );
+
+  $$CareContactsTableProcessedTableManager? get orderingDoctorContactId {
+    final $_column = $_itemColumn<int>('ordering_doctor_contact_id');
+    if ($_column == null) return null;
+    final manager = $$CareContactsTableTableManager(
+      $_db,
+      $_db.careContacts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _orderingDoctorContactIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $DoctorVisitRecordsTable _relatedDoctorVisitIdTable(
+    _$AppDatabase db,
+  ) => db.doctorVisitRecords.createAlias(
+    'lab_analyses__related_doctor_visit_id__doctor_visit_records__id',
+  );
+
+  $$DoctorVisitRecordsTableProcessedTableManager? get relatedDoctorVisitId {
+    final $_column = $_itemColumn<int>('related_doctor_visit_id');
+    if ($_column == null) return null;
+    final manager = $$DoctorVisitRecordsTableTableManager(
+      $_db,
+      $_db.doctorVisitRecords,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _relatedDoctorVisitIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $LabAnalysisAttachmentsTable,
+    List<LabAnalysisAttachment>
+  >
+  _labAnalysisAttachmentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.labAnalysisAttachments,
+        aliasName: 'lab_analyses__id__lab_analysis_attachments__analysis_id',
+      );
+
+  $$LabAnalysisAttachmentsTableProcessedTableManager
+  get labAnalysisAttachmentsRefs {
+    final manager = $$LabAnalysisAttachmentsTableTableManager(
+      $_db,
+      $_db.labAnalysisAttachments,
+    ).filter((f) => f.analysisId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _labAnalysisAttachmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$LabAnalysesTableFilterComposer
+    extends Composer<_$AppDatabase, $LabAnalysesTable> {
+  $$LabAnalysesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get analysisDate => $composableBuilder(
+    column: $table.analysisDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get resultReceivedDate => $composableBuilder(
+    column: $table.resultReceivedDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableFilterComposer get laboratoryContactId {
+    final $$CareContactsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.laboratoryContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableFilterComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableFilterComposer get orderingDoctorContactId {
+    final $$CareContactsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.orderingDoctorContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableFilterComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$DoctorVisitRecordsTableFilterComposer get relatedDoctorVisitId {
+    final $$DoctorVisitRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.relatedDoctorVisitId,
+      referencedTable: $db.doctorVisitRecords,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DoctorVisitRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.doctorVisitRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> labAnalysisAttachmentsRefs(
+    Expression<bool> Function($$LabAnalysisAttachmentsTableFilterComposer f) f,
+  ) {
+    final $$LabAnalysisAttachmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.labAnalysisAttachments,
+          getReferencedColumn: (t) => t.analysisId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LabAnalysisAttachmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.labAnalysisAttachments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$LabAnalysesTableOrderingComposer
+    extends Composer<_$AppDatabase, $LabAnalysesTable> {
+  $$LabAnalysesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get analysisDate => $composableBuilder(
+    column: $table.analysisDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get resultReceivedDate => $composableBuilder(
+    column: $table.resultReceivedDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableOrderingComposer get laboratoryContactId {
+    final $$CareContactsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.laboratoryContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableOrderingComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableOrderingComposer get orderingDoctorContactId {
+    final $$CareContactsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.orderingDoctorContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableOrderingComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$DoctorVisitRecordsTableOrderingComposer get relatedDoctorVisitId {
+    final $$DoctorVisitRecordsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.relatedDoctorVisitId,
+      referencedTable: $db.doctorVisitRecords,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DoctorVisitRecordsTableOrderingComposer(
+            $db: $db,
+            $table: $db.doctorVisitRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LabAnalysesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LabAnalysesTable> {
+  $$LabAnalysesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get analysisDate => $composableBuilder(
+    column: $table.analysisDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get resultReceivedDate => $composableBuilder(
+    column: $table.resultReceivedDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableAnnotationComposer get laboratoryContactId {
+    final $$CareContactsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.laboratoryContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CareContactsTableAnnotationComposer get orderingDoctorContactId {
+    final $$CareContactsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.orderingDoctorContactId,
+      referencedTable: $db.careContacts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CareContactsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.careContacts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$DoctorVisitRecordsTableAnnotationComposer get relatedDoctorVisitId {
+    final $$DoctorVisitRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.relatedDoctorVisitId,
+          referencedTable: $db.doctorVisitRecords,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DoctorVisitRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.doctorVisitRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> labAnalysisAttachmentsRefs<T extends Object>(
+    Expression<T> Function($$LabAnalysisAttachmentsTableAnnotationComposer a) f,
+  ) {
+    final $$LabAnalysisAttachmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.labAnalysisAttachments,
+          getReferencedColumn: (t) => t.analysisId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LabAnalysisAttachmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.labAnalysisAttachments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$LabAnalysesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LabAnalysesTable,
+          LabAnalyse,
+          $$LabAnalysesTableFilterComposer,
+          $$LabAnalysesTableOrderingComposer,
+          $$LabAnalysesTableAnnotationComposer,
+          $$LabAnalysesTableCreateCompanionBuilder,
+          $$LabAnalysesTableUpdateCompanionBuilder,
+          (LabAnalyse, $$LabAnalysesTableReferences),
+          LabAnalyse,
+          PrefetchHooks Function({
+            bool profileId,
+            bool laboratoryContactId,
+            bool orderingDoctorContactId,
+            bool relatedDoctorVisitId,
+            bool labAnalysisAttachmentsRefs,
+          })
+        > {
+  $$LabAnalysesTableTableManager(_$AppDatabase db, $LabAnalysesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LabAnalysesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LabAnalysesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LabAnalysesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<DateTime> analysisDate = const Value.absent(),
+                Value<DateTime?> resultReceivedDate = const Value.absent(),
+                Value<int?> laboratoryContactId = const Value.absent(),
+                Value<int?> orderingDoctorContactId = const Value.absent(),
+                Value<int?> relatedDoctorVisitId = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => LabAnalysesCompanion(
+                id: id,
+                profileId: profileId,
+                title: title,
+                category: category,
+                analysisDate: analysisDate,
+                resultReceivedDate: resultReceivedDate,
+                laboratoryContactId: laboratoryContactId,
+                orderingDoctorContactId: orderingDoctorContactId,
+                relatedDoctorVisitId: relatedDoctorVisitId,
+                notes: notes,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int profileId,
+                required String title,
+                required String category,
+                required DateTime analysisDate,
+                Value<DateTime?> resultReceivedDate = const Value.absent(),
+                Value<int?> laboratoryContactId = const Value.absent(),
+                Value<int?> orderingDoctorContactId = const Value.absent(),
+                Value<int?> relatedDoctorVisitId = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => LabAnalysesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                title: title,
+                category: category,
+                analysisDate: analysisDate,
+                resultReceivedDate: resultReceivedDate,
+                laboratoryContactId: laboratoryContactId,
+                orderingDoctorContactId: orderingDoctorContactId,
+                relatedDoctorVisitId: relatedDoctorVisitId,
+                notes: notes,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$LabAnalysesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                profileId = false,
+                laboratoryContactId = false,
+                orderingDoctorContactId = false,
+                relatedDoctorVisitId = false,
+                labAnalysisAttachmentsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (labAnalysisAttachmentsRefs) db.labAnalysisAttachments,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$LabAnalysesTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$LabAnalysesTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (laboratoryContactId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.laboratoryContactId,
+                                    referencedTable:
+                                        $$LabAnalysesTableReferences
+                                            ._laboratoryContactIdTable(db),
+                                    referencedColumn:
+                                        $$LabAnalysesTableReferences
+                                            ._laboratoryContactIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (orderingDoctorContactId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn:
+                                        table.orderingDoctorContactId,
+                                    referencedTable:
+                                        $$LabAnalysesTableReferences
+                                            ._orderingDoctorContactIdTable(db),
+                                    referencedColumn:
+                                        $$LabAnalysesTableReferences
+                                            ._orderingDoctorContactIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (relatedDoctorVisitId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.relatedDoctorVisitId,
+                                    referencedTable:
+                                        $$LabAnalysesTableReferences
+                                            ._relatedDoctorVisitIdTable(db),
+                                    referencedColumn:
+                                        $$LabAnalysesTableReferences
+                                            ._relatedDoctorVisitIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (labAnalysisAttachmentsRefs)
+                        await $_getPrefetchedData<
+                          LabAnalyse,
+                          $LabAnalysesTable,
+                          LabAnalysisAttachment
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LabAnalysesTableReferences
+                              ._labAnalysisAttachmentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LabAnalysesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).labAnalysisAttachmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.analysisId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$LabAnalysesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LabAnalysesTable,
+      LabAnalyse,
+      $$LabAnalysesTableFilterComposer,
+      $$LabAnalysesTableOrderingComposer,
+      $$LabAnalysesTableAnnotationComposer,
+      $$LabAnalysesTableCreateCompanionBuilder,
+      $$LabAnalysesTableUpdateCompanionBuilder,
+      (LabAnalyse, $$LabAnalysesTableReferences),
+      LabAnalyse,
+      PrefetchHooks Function({
+        bool profileId,
+        bool laboratoryContactId,
+        bool orderingDoctorContactId,
+        bool relatedDoctorVisitId,
+        bool labAnalysisAttachmentsRefs,
+      })
+    >;
+typedef $$LabAnalysisAttachmentsTableCreateCompanionBuilder =
+    LabAnalysisAttachmentsCompanion Function({
+      Value<int> id,
+      required int analysisId,
+      required int profileId,
+      required String fileType,
+      required String managedRelativePath,
+      required String originalFileName,
+      required String displayName,
+      required String mimeType,
+      Value<int?> fileSize,
+      Value<int> sortOrder,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$LabAnalysisAttachmentsTableUpdateCompanionBuilder =
+    LabAnalysisAttachmentsCompanion Function({
+      Value<int> id,
+      Value<int> analysisId,
+      Value<int> profileId,
+      Value<String> fileType,
+      Value<String> managedRelativePath,
+      Value<String> originalFileName,
+      Value<String> displayName,
+      Value<String> mimeType,
+      Value<int?> fileSize,
+      Value<int> sortOrder,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$LabAnalysisAttachmentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $LabAnalysisAttachmentsTable,
+          LabAnalysisAttachment
+        > {
+  $$LabAnalysisAttachmentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $LabAnalysesTable _analysisIdTable(_$AppDatabase db) => db.labAnalyses
+      .createAlias('lab_analysis_attachments__analysis_id__lab_analyses__id');
+
+  $$LabAnalysesTableProcessedTableManager get analysisId {
+    final $_column = $_itemColumn<int>('analysis_id')!;
+
+    final manager = $$LabAnalysesTableTableManager(
+      $_db,
+      $_db.labAnalyses,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_analysisIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) => db.profiles
+      .createAlias('lab_analysis_attachments__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LabAnalysisAttachmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $LabAnalysisAttachmentsTable> {
+  $$LabAnalysisAttachmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fileType => $composableBuilder(
+    column: $table.fileType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get managedRelativePath => $composableBuilder(
+    column: $table.managedRelativePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originalFileName => $composableBuilder(
+    column: $table.originalFileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get fileSize => $composableBuilder(
+    column: $table.fileSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$LabAnalysesTableFilterComposer get analysisId {
+    final $$LabAnalysesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.analysisId,
+      referencedTable: $db.labAnalyses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LabAnalysesTableFilterComposer(
+            $db: $db,
+            $table: $db.labAnalyses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LabAnalysisAttachmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $LabAnalysisAttachmentsTable> {
+  $$LabAnalysisAttachmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fileType => $composableBuilder(
+    column: $table.fileType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get managedRelativePath => $composableBuilder(
+    column: $table.managedRelativePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originalFileName => $composableBuilder(
+    column: $table.originalFileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get fileSize => $composableBuilder(
+    column: $table.fileSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$LabAnalysesTableOrderingComposer get analysisId {
+    final $$LabAnalysesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.analysisId,
+      referencedTable: $db.labAnalyses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LabAnalysesTableOrderingComposer(
+            $db: $db,
+            $table: $db.labAnalyses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LabAnalysisAttachmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LabAnalysisAttachmentsTable> {
+  $$LabAnalysisAttachmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fileType =>
+      $composableBuilder(column: $table.fileType, builder: (column) => column);
+
+  GeneratedColumn<String> get managedRelativePath => $composableBuilder(
+    column: $table.managedRelativePath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get originalFileName => $composableBuilder(
+    column: $table.originalFileName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get mimeType =>
+      $composableBuilder(column: $table.mimeType, builder: (column) => column);
+
+  GeneratedColumn<int> get fileSize =>
+      $composableBuilder(column: $table.fileSize, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$LabAnalysesTableAnnotationComposer get analysisId {
+    final $$LabAnalysesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.analysisId,
+      referencedTable: $db.labAnalyses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LabAnalysesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.labAnalyses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LabAnalysisAttachmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LabAnalysisAttachmentsTable,
+          LabAnalysisAttachment,
+          $$LabAnalysisAttachmentsTableFilterComposer,
+          $$LabAnalysisAttachmentsTableOrderingComposer,
+          $$LabAnalysisAttachmentsTableAnnotationComposer,
+          $$LabAnalysisAttachmentsTableCreateCompanionBuilder,
+          $$LabAnalysisAttachmentsTableUpdateCompanionBuilder,
+          (LabAnalysisAttachment, $$LabAnalysisAttachmentsTableReferences),
+          LabAnalysisAttachment,
+          PrefetchHooks Function({bool analysisId, bool profileId})
+        > {
+  $$LabAnalysisAttachmentsTableTableManager(
+    _$AppDatabase db,
+    $LabAnalysisAttachmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LabAnalysisAttachmentsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$LabAnalysisAttachmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$LabAnalysisAttachmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> analysisId = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<String> fileType = const Value.absent(),
+                Value<String> managedRelativePath = const Value.absent(),
+                Value<String> originalFileName = const Value.absent(),
+                Value<String> displayName = const Value.absent(),
+                Value<String> mimeType = const Value.absent(),
+                Value<int?> fileSize = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => LabAnalysisAttachmentsCompanion(
+                id: id,
+                analysisId: analysisId,
+                profileId: profileId,
+                fileType: fileType,
+                managedRelativePath: managedRelativePath,
+                originalFileName: originalFileName,
+                displayName: displayName,
+                mimeType: mimeType,
+                fileSize: fileSize,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int analysisId,
+                required int profileId,
+                required String fileType,
+                required String managedRelativePath,
+                required String originalFileName,
+                required String displayName,
+                required String mimeType,
+                Value<int?> fileSize = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => LabAnalysisAttachmentsCompanion.insert(
+                id: id,
+                analysisId: analysisId,
+                profileId: profileId,
+                fileType: fileType,
+                managedRelativePath: managedRelativePath,
+                originalFileName: originalFileName,
+                displayName: displayName,
+                mimeType: mimeType,
+                fileSize: fileSize,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$LabAnalysisAttachmentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({analysisId = false, profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (analysisId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.analysisId,
+                                referencedTable:
+                                    $$LabAnalysisAttachmentsTableReferences
+                                        ._analysisIdTable(db),
+                                referencedColumn:
+                                    $$LabAnalysisAttachmentsTableReferences
+                                        ._analysisIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$LabAnalysisAttachmentsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$LabAnalysisAttachmentsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LabAnalysisAttachmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LabAnalysisAttachmentsTable,
+      LabAnalysisAttachment,
+      $$LabAnalysisAttachmentsTableFilterComposer,
+      $$LabAnalysisAttachmentsTableOrderingComposer,
+      $$LabAnalysisAttachmentsTableAnnotationComposer,
+      $$LabAnalysisAttachmentsTableCreateCompanionBuilder,
+      $$LabAnalysisAttachmentsTableUpdateCompanionBuilder,
+      (LabAnalysisAttachment, $$LabAnalysisAttachmentsTableReferences),
+      LabAnalysisAttachment,
+      PrefetchHooks Function({bool analysisId, bool profileId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -30261,5 +33615,12 @@ class $AppDatabaseManager {
       $$ProfileReferenceRangesTableTableManager(
         _db,
         _db.profileReferenceRanges,
+      );
+  $$LabAnalysesTableTableManager get labAnalyses =>
+      $$LabAnalysesTableTableManager(_db, _db.labAnalyses);
+  $$LabAnalysisAttachmentsTableTableManager get labAnalysisAttachments =>
+      $$LabAnalysisAttachmentsTableTableManager(
+        _db,
+        _db.labAnalysisAttachments,
       );
 }
