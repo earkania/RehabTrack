@@ -4,6 +4,10 @@ class AppConstants {
   static const String appName = 'RehabTrack';
   static const String defaultLanguage = 'en';
 
+  /// Application version recorded in backup manifests. Keep in sync with
+  /// `pubspec.yaml`.
+  static const String appVersion = '1.0.0';
+
   /// Settings key for the user-selected app language.
   ///
   /// Persisted values are the storage codes defined in [AppLocale]'s
@@ -25,4 +29,18 @@ class AppConstants {
   static const String defaultSnoozeDurationKey = 'default_snooze_duration';
   static const String showPatientNameInNotificationsKey = 'show_patient_name_in_notifications';
   static const String showDetailsOnLockScreenKey = 'show_details_on_lock_screen';
+
+  /// Settings key holding the ISO 8601 timestamp of the last successful backup.
+  /// Written only after the archive has been stored AND passed its integrity
+  /// self-check. Never overwritten by a restore.
+  static const String lastSuccessfulBackupKey = 'last_backup_at';
+
+  /// Settings key holding the display name the document provider assigned to
+  /// the last successful backup file, when one is available.
+  static const String lastBackupDisplayNameKey = 'last_backup_display_name';
+
+  /// Settings key holding the ISO 8601 timestamp of the last completed restore,
+  /// written only after the restored state and reminders were finalized. Never
+  /// written after a rollback.
+  static const String lastSuccessfulRestoreKey = 'last_restore_at';
 }

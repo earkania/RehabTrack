@@ -781,3 +781,290 @@ Activities / Diet / attachments / cloud / spoken reminders are out of scope.
 - Notification-regression rule: Settings navigation must never recreate the
   ProviderScope, notification services, or navigator keys; the dashboard and
   its children only read existing providers.
+
+## Backup & Restore — Approved Design (2026-08-04)
+
+Phase 1 implements **manual backup only**. Restore is deferred; the screen shows
+it as coming soon.
+
+### Archive format (`.rtb`, format version 1)
+
+A `.rtb` file is a standard ZIP archive (readable by any unzip tool) with a
+versioned layout:
+
+- `manifest.json` — `backupFormatVersion` (1), `appVersion`,
+  `databaseSchemaVersion`, `createdAt` (UTC ISO 8601), `platform`,
+  `databaseFileName`, `preferencesFileName`, `fileCount`,
+  `totalUncompressedSize`, `checksums` (SHA-256 per entry keyed by archive path).
+- `database.sqlite` — consistent SQLite snapshot.
+- `preferences.json` — allowlisted user settings (`{key: storedValue}`).
+- `files/profile_images/…` and `files/care_contact_images/…` — managed photos.
+
+Format version is independent of the database schema version. The manifest is
+validated on parse (unknown format version, empty app version, non-positive
+schema version, unsafe checksum paths, empty digests).
+
+### Approved decisions
+
+- **Snapshot strategy:** `VACUUM INTO '<temp path>'` while the live Drift
+  connection stays open (validated in a scratch test against this project's
+  drift version). Fallback consideration documented: checkpoint + copy + reopen.
+  Current device `journal_mode` is `delete` (no WAL sidecar), but `VACUUM INTO`
+  is safe regardless.
+- **Destination:** SAF `ACTION_CREATE_DOCUMENT` via `file_picker.saveFile`
+  (`FileType.custom`, allowed extensions `['rtb']`). No broad storage
+  permission. Passing `bytes` writes the archive during document creation.
+  Suggested filename `RehabTrack-Backup-yyyy-MM-dd_HH-mm.rtb`; no patient names
+  in the filename. The user is asked for a destination every time (destinations
+  are never remembered).
+- **Preferences export:** only user-facing settings (language, grace period,
+  reminders on/off, sound, vibration, snooze, notification content). Raw stored
+  values are exported verbatim (`en|ka|system`, integer minutes, `true|false`).
+  Operational metadata (`last_backup_at`, plugin/internal keys) is excluded via
+  an explicit allowlist.
+- **Managed files:** scan the whole `profile_images/` and `care_contact_images/`
+  directories under the app documents directory (includes orphans). Archive
+  paths mirror on-disk directory names (`files/profile_images/…`) so restore
+  needs no renaming. DB-referenced photos missing on disk are tolerated and
+  surfaced as non-sensitive warnings (count only — never patient data).
+- **Path safety:** archive entry names must not be absolute, must not traverse
+  (`..`, `.`), must not contain backslashes, and must be one of
+  `manifest.json`/`database.sqlite`/`preferences.json` or under `files/`.
+- **Last-backup metadata:** `last_backup_at` (ISO 8601) is written to app
+  settings only after the archive is successfully stored. The backup screen
+  shows the last successful backup time.
+- **Results:** a structured enum drives the UI:
+  `success`, `cancelled`, `storageFailure`, `databaseFailure`, `archiveFailure`,
+  `permissionDenied`, `notEnoughStorage`, `operationAlreadyInProgress`,
+  `unexpectedFailure`.
+- **Operation state:** the controller exposes a `BackupPhase`
+  (collecting → snapshotting → archiving → writing → done) so the screen can
+  show progress and disable the button while running.
+- **Exclusions:** cache/temp/logs, Android notification state, permissions,
+  channels, and plugin preferences are not included in the backup.
+- **Memory:** the database and managed files are streamed from disk by
+  `ZipFileEncoder`; the archive is read as bytes only when handing it to
+  `file_picker` for the SAF write.
+
+## Backup & Restore — Restore Foundation — Approved Design (2026-08-05)
+
+Phase 2 (Restore Foundation) selects and validates a `.rtb` backup and shows a
+safe preview. **It does not modify any data** — the restore engine is deferred.
+
+### Approved decisions
+
+- **SAF selection:** `ACTION_OPEN_DOCUMENT` with `application/octet-stream`
+  (+`application/zip` as extra MIME). `.rtb` extension is never trusted; entry
+  integrity, paths and checksums are validated independently. The selected
+  document is copied into an app-owned temp file through the content resolver —
+  `content://` URIs are never converted to filesystem paths and never exposed.
+  Cancelling the picker is a normal outcome, not an error.
+- **Full validation before preview:** the archive must pass every check
+  (structure, manifest, checksums, format/schema compatibility, read-only
+  database and preferences) before a preview is shown.
+- **Compatibility:** `.rtb` format must be exactly 1 (>1 rejected, <1 invalid).
+  DB schema ≤ current accepted (equal → compatible, older → migration required);
+  schema > current or < min (1) rejected. `AppDatabase.currentSchemaVersion`
+  is the canonical constant.
+- **Safety:** reject unsafe paths, duplicate entries, missing/bad checksums,
+  oversized/inflated archives (limits above), and non-SQLite databases; validate
+  known preference-value types while tolerating unknown future keys.
+- **Preview is non-sensitive:** no profiles, medications, measurements,
+  diagnoses, notes, contacts, phones, emails, addresses, policy numbers, or
+  internal file paths. Only metadata (date, app/format/db versions, profile
+  count when safely determinable, file count, size, warnings).
+- **Read-only validation:** `database.sqlite` is written to a temp file, opened
+  `OpenMode.readOnly`, closed, and deleted; the live database is never touched.
+  No migrations, no table-content exposure.
+- **No data change in this phase:** no DB replacement, no preferences/files
+  restore, no notification rebuild, no rollback, no auto commit/push.
+
+## Backup & Restore — Restore Engine — Approved Design (2026-08-05)
+
+Phase 3 (Restore Engine) applies a validated backup: replace-style, all-or-nothing,
+with a private safety snapshot, staged preparation, an atomic-ish live swap,
+reinitialization, verification, full rollback on failure, and startup recovery
+for interrupted operations.
+
+### Approved decisions
+
+- **Replace-style only:** live state (DB + managed files + preferences) mirrors
+  the backup exactly. No merge, no selective/partial restore. Old content that
+  is absent from the backup is removed.
+- **Safety snapshot before the first live change:** the live `rehabtrack.sqlite`,
+  allowlisted preferences and managed image roots are copied into the workspace
+  (`safety-snapshot/`). It is the ground truth for rollback and interrupted-
+  operation recovery, retained until verification succeeds and only then deleted.
+- **Re-validation immediately before swap:** the prepared database is checked
+  again (SQLite header, `user_version`, core tables, read-only count query) and
+  every managed file's SHA-256 is re-verified against the manifest during
+  extraction. Cached Phase 2 validation is never trusted.
+- **Rename-based swap with sidecars:** the live DB and its `-wal`/`-shm`/`-journal`
+  sidecars move aside into the rollback workspace; the prepared DB is renamed
+  into place. Partial-move failures move already-aside items back before rethrowing.
+- **Standalone preference writes:** restored preferences are upserted/removed in
+  the live `app_settings` table by `AppSettingsWriter` (a plain read-write
+  sqlite3 session), decoupled from the app connection lifecycle so it works
+  during swap, rollback and recovery. Allowlist-only, same policy as the exporter.
+- **Portable photo paths:** `profiles.photoPath` / `care_contacts.photoPath` are
+  rewritten to `<liveDocumentsDir>/<root>/<basename>` on the prepared database.
+- **Rollback contract:** post-swap failures restore DB, files and preferences
+  from the safety snapshot, reopen/reinitialize and verify. `rollbackSucceeded`
+  → workspace + metadata deleted; `rollbackFailed` → both retained for recovery.
+  Pre-swap failures never touch live data and report `rollbackSucceeded`.
+- **Migration gate:** backups requiring migration (older schema) never start the
+  engine; the UI shows a "migration not available yet" message (Phase 4 adds
+  migrations). Newer schemas remain rejected in Phase 2. **Superseded by Phase 4E**
+  (older schemas are now migrated and restored).
+- **Notifications:** on success, scheduled notifications are cancelled (best-effort,
+  does not fail the restore) and the user is told reminders must be rebuilt in a
+  later version. Permission state is untouched. **Superseded by Phase 4E**
+  (reminders are rebuilt automatically on success).
+- **Interrupted recovery:** minimal non-sensitive metadata (operation id, phase,
+  workspace path, swap flags) is persisted before the critical section. On
+  startup `runStartupRestoreRecovery` rolls a non-finalized operation back to the
+  safety snapshot, reopens and verifies; a missing workspace/snapshot or failed
+  verification keeps the metadata for the next attempt.
+- **Cancellation only pre-swap:** Cancel is offered only from `preparingRestore`
+  through `preparingPreferences`; once the live replacement begins the restore
+  either succeeds or rolls back.
+- **Privacy:** UI/logs expose only the operation/recovery id, phase, format/schema
+  versions, counts, sizes and status — never personal data or full internal paths.
+- **Mutual exclusion:** while a restore runs, Create Backup, Restore Backup and a
+  second restore are disabled, and normal DB writes are blocked during the
+  critical swap.
+- **Phase 3 exclusions:** no notification rebuild, no auto backups, no merge,
+  no cloud/encryption, no commit/push.
+
+
+## Backup & Restore — Compatibility, Path Repair & Reminder Rebuild — Approved Design (2026-08-06)
+
+Phase 4E lifts the two Phase 3 exclusions: backups with an older schema are now
+restored (migrated on a temp copy), and reminders are rebuilt on success. It
+also hardens path repair.
+
+### Approved decisions
+
+- **Canonical version policy** in `lib/domain/backup/backup_version_policy.dart`
+  as the single source of truth (`BackupVersionPolicy`): current schema,
+  oldest restore-compatible schema (1), supported format version (1). Both the
+  validator and the restore engine read from it so they can never drift apart.
+- **Migrate only the prepared temp copy, never the live DB.** A future restore
+  at schema `1..13` opens the workspace copy through
+  `AppDatabase.forTesting(NativeDatabase.createInBackground(...))`, and Drift
+  replays the exact cumulative `onUpgrade` blocks the app uses in production to
+  reach the current schema. After migration the copy is validated (header,
+  schema version, core tables, read-only sample query, `PRAGMA foreign_key_check`)
+  before any live change. A backed-up DB newer than the current schema remains
+  rejected; migration failure aborts with `migrationFailure` and leaves live
+  data untouched.
+- **Canonical portable photo path** `<managedRoot>/<dir>/<basename>` is retained,
+  and path repair now also: resolves `content://` URIs to a usable basename,
+  refuses unusable/empty basenames, clears a reference whose file is absent from
+  the restored archive (avatar/initial fallback, never a crash), reports missing
+  optional files (`successWithMissingOptionalFiles`), and only ever touches the
+  `photoPath` columns (`website` etc. are never rewritten).
+- **Reminder rebuild via the normal scheduler.** `RestoreEnvironment` exposes
+  `rebuildScheduledNotifications()`; `RestoreAppEnvironment` routes it through
+  `NotificationActionBridge.recoverAll(profileId)` so medication, measurement,
+  doctor-visit reminders are rescheduled with the app's existing scheduler and
+  notification-ID scheme (each reminder few minutes in the future). The bridge's
+  recovery methods return per-type counts. A rebuild failure yields
+  `successWithReminderWarning` — the restored data is *not* rolled back — and the
+  UI offers `retryReminderRebuild`.
+- **Durable completion marker.** Recovery metadata is written `finalized:true`
+  immediately after verification. An interruption during reminder rebuilding
+  therefore never rolls back restored medical data; the existing
+  `notificationInitializerProvider.recoverAll` re-schedules on next launch.
+- **Interrupted reminder rebuild** is recovered automatically out-of-band on
+  start, so a kill during rebuild does not strand the user without reminders.
+- **Phase 4E exclusions (unchanged from engine via build file):** no cloud,
+  no encryption, no auto backups, no commit/push.
+
+## Backup & Restore — Polish & Hardening — Approved Design (2026-08-06)
+
+Phase 5 hardens the completed backup/restore feature and adds Last Backup / Last
+Restore metadata and UX polish. It intentionally adds **no new backup types**.
+
+### Archive self-check (backup)
+
+- After `BackupArchiveWriter` produces the temp archive and **before** the
+  picker save, `BackupService` reopens it with `BackupArchiveReader` and checks:
+  entry presence, path safety, manifest parseability, `checksumsComplete`, and a
+  SHA-256 sample against the manifest.
+- Any failure → `BackupResult.archiveFailure`; the user is never offered a save
+  of a corrupt file, so a damaged archive cannot land in the documents provider.
+
+### Storage-space guards
+
+- **Backup:** `StorageInspector.freeBytes` (native `StatFs` on the app-cache
+  dir via the existing `com.earkania.rehabtrack/backup` channel) vs 2× archive
+  size → `notEnoughStorage`.
+- **Restore:** before the first live change, the workspace size × 2 vs free
+  space → `RestoreResult.insufficientStorage` (mapped to a localized message in
+  the preview screen). A failed guard touches nothing: no snapshot, no pause,
+  no swap, no recovery marker.
+- If the native call is unavailable (`freeBytes` returns null) the guard is
+  skipped — a degraded check is better than a false "out of space".
+
+### Filename handling
+
+- `_sanitizeFileName` strips `\ / : * ? " < > |` and control characters before
+  suggesting `RehabTrack-Backup-yyyy-MM-dd_HH-mm.rtb`.
+- The provider may rename the file; the native `createDocument` now resolves the
+  real display name (`OpenableColumns.DISPLAY_NAME`) and returns JSON
+  `{uri, displayName}`. `BackupSaveResult` carries it as `displayName`, stored as
+  the "Stored as: …" Last Backup display name. Unknown/missing display names fall
+  back to the suggested sanitized name.
+
+### Last Backup / Last Restore metadata
+
+- `last_backup_at` (existing), `last_backup_display_name`, `last_restore_at`.
+- `last_restore_at` is written **only** after the restore, verification and
+  reminder rebuild all finalize — never on rollback or cancellation. Restore
+  never overwrites the last-backup marker. Settings writes are best-effort
+  (a metadata write failure never fails an otherwise-successful operation).
+
+### Startup stale-temp cleanup
+
+- `RestoreStaleWorkspaceCleaner` deletes restore workspaces **not referenced by
+  any `needsRecovery` marker**, abandoned `rehabtrack_backup_*` temp dirs, and a
+  stale `pending-restore` copy — but never a workspace still tied to an active
+  interrupted restore, and never unrelated cache. It runs from
+  `runStartupRestoreRecovery` after recovery.
+
+### Recovery retry limit
+
+- Recovery metadata gains `attemptCount`. `RestoreInterruptedRecoveryService`
+  stops after `maxRecoveryAttempts = 3`, returning
+  `RestoreInterruptedRecoveryResult.recoveryLimitReached` (terminal state): a
+  persistent failure is never retried every launch; the metadata and safety
+  snapshot are retained for manual action.
+
+### Deeper restore verification
+
+- `RestoreStateVerifier` checks, in addition to "it opens": SQLite header magic,
+  exact `userVersion`, presence of all core tables, a read-only `COUNT(*)` on
+  each, and the managed-files root existing. Row values are never read, logged
+  or returned. Wired into `RestoreAppEnvironment.verifyRestoredState`.
+
+### Notification duplicate-prevention audit
+
+- `RestoreEnvironment.verifyScheduledNotificationsNoDuplicates()` checks the
+  pending notification IDs after the rebuild; duplicate IDs downgrade the verdict
+  to `successWithReminderWarning`. Reminder issues never roll back restored data.
+- Reminder rebuild remains exactly-once per restore via the durable finalized
+  marker + startup `recoverAll`.
+
+### Accessibility & localization
+
+- Semantics live regions on the backup and restore progress dialogs; semantics
+  labels on the backup/operations tiles.
+- Localized date rendering (`fullMonthDayYear` + `hourMinute`).
+- New keys (en + ka): `backupLastCreated`, `restoreLastCompleted`,
+  `restoreCancellationUnavailable`, `restoreNotEnoughStorage`, `backupStoredAs`.
+
+### Non-goals (unchanged)
+
+No automatic backups, no cloud, no merge/selective restore, no encryption, no
+commit/push.

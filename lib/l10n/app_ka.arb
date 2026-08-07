@@ -13,6 +13,184 @@
   "createBackup": "სარეზერვო ასლის შექმნა",
   "restoreBackup": "სარეზერვო ასლიდან აღდგენა",
   "backupInformation": "ინფორმაცია სარეზერვო ასლის შესახებ",
+  "backupScreenDescription": "შექმენით თქვენი მონაცემების ასლი და შეინახეთ ფაილად, რომელსაც თქვენ ფლობთ. შედის ფოტოებიც და აპლიკაციის პარამეტრებიც.",
+  "backupIncludes": "რა შედის",
+  "backupIncludesDatabase": "ყველა თქვენი ჯანმრთელობის ჩანაწერი და ისტორია",
+  "backupIncludesPhotos": "პროფილისა და კონტაქტის ფოტოები",
+  "backupIncludesSettings": "აპლიკაციის პარამეტრები და არჩევნები",
+  "backupRestoreNotAvailable": "აღდგენა ხელმისაწვდომი იქნება მომავალ განახლებაში.",
+  "backupLastSuccessful": "ბოლო წარმატებული სარეზერვო ასლი: {time}",
+  "@backupLastSuccessful": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "backupLastNever": "სარეზერვო ასლი ჯერ არ არის შექმნილი",
+  "backupInProgress": "სარეზერვო ასლის შექმნა…",
+  "backupSuccessTitle": "სარეზერვო ასლი შეიქმნა",
+  "backupSuccessMessage": "თქვენი სარეზერვო ფაილი შენახულია არჩეულ ადგილას.",
+  "backupMissingFilesMessage": "ზოგიერთი ფოტო, რომელზეც მონაცემები მიუთითებს, აკლია და ამ ასლში არ შედის.",
+  "backupCancelledTitle": "სარეზერვო ასლი გაუქმდა",
+  "backupCancelledMessage": "სარეზერვო ასლი არ შექმნილა.",
+  "backupFailedTitle": "შეცდომა სარეზერვო ასლის შექმნისას",
+  "backupStorageFailure": "ვერ მოხერხდა სარეზერვო ასლის ჩაწერა არჩეულ ადგილას. სცადეთ თავიდან ან აირჩიეთ სხვა ადგილი.",
+  "backupDatabaseFailure": "აპლიკაციის მონაცემთა ბაზის წაკითხვა ვერ მოხერხდა. სცადეთ თავიდან.",
+  "backupArchiveFailure": "სარეზერვო ფაილის შექმნა ვერ მოხერხდა. სცადეთ თავიდან.",
+  "backupPermissionDenied": "უარი ეთქვა სარეზერვო ასლის შენახვის ნებართვაზე.",
+  "backupNotEnoughStorage": "არჩეულ ადგილას საკმარისი თავისუფალი ადგილი არ არის.",
+  "backupOperationInProgress": "სარეზერვო ასლი უკვე მიმდინარეობს. გთხოვთ, დაელოდოთ.",
+  "backupUnexpectedFailure": "რაღაც არასწორად წარიმართა. გთხოვთ, სცადოთ თავიდან.",
+  "selectBackupFile": "აირჩიეთ სარეზერვო ფაილი",
+  "selectingBackup": "სარეზერვო ფაილის არჩევა…",
+  "readingBackup": "სარეზერვო ასლის წაკითხვა…",
+  "validatingBackup": "სარეზერვო ასლის შემოწმება…",
+  "verifyingChecksums": "შემოწმების თანხების (checksum) დადასტურება…",
+  "checkingCompatibility": "თავსებადობის შემოწმება…",
+  "backupPreview": "სარეზერვო ასლის შინაარსის გადახედვა",
+  "backupDetails": "სარეზერვო ასლის დეტალები",
+  "backupDate": "ასლის თარიღი: {date}",
+  "@backupDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backupAppVersion": "აპლიკაციის ვერსია: {version}",
+  "@backupAppVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "backupFormatVersion": "ასლის ფორმატის ვერსია: {version}",
+  "@backupFormatVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseVersion": "მონაცემთა ბაზის ვერსია: {version}",
+  "@databaseVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "currentDatabaseVersion": "მიმდინარე მონაცემთა ბაზის ვერსია: {version}",
+  "@currentDatabaseVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profilesCount": "პროფილები: {count}",
+  "@profilesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filesCount": "ფაილები: {count}",
+  "@filesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupSize": "ასლის ზომა",
+  "compatibleBackup": "თავსებადი",
+  "compatibleMigrationRequired": "თავსებადი, საჭიროა მიგრაცია",
+  "incompatibleBackup": "თავსებადი არ არის",
+  "migrationRequired": "აღდგენამდე საჭირო იქნება მიგრაცია.",
+  "restoreWillReplaceData": "ამ სარეზერვო ასლის აღდგენა შეცვლის მიმდინარე RehabTrack-ის მონაცემებს ამ მოწყობილობაზე. ფოტოები, პარამეტრები და ყველა ჩანაწერი გადაიწერება.",
+  "continueRestore": "გაგრძელება",
+  "cancelRestore": "გაუქმება",
+  "restoreNotImplementedYet": "სარეზერვო ასლის შემოწმება წარმატებით დასრულდა. აღდგენა ჯერ არ არის ხელმისაწვდომი.",
+  "restoreCompletedTitle": "აღდგენა დასრულდა",
+  "restoreFailedTitle": "აღდგენა ვერ მოხერხდა",
+  "restoreCancelledTitle": "აღდგენა გაუქმდა",
+  "restoreInProgressTitle": "მონაცემების აღდგენა",
+  "restoreCompletedMessage": "თქვენი მონაცემები აღდგენილია {date} სარეზერვო ასლიდან.",
+  "@restoreCompletedMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "originalDataRecovered": "თქვენი თავდაპირველი მონაცემები აღდგენილია.",
+  "criticalRestoreRecoveryRequired": "ავტომატური აღდგენა ვერ დასრულდა. არ დახუროთ აპლიკაცია — დაუკავშირდით მხარდაჭერას კოდით: {code}.",
+  "@criticalRestoreRecoveryRequired": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "restoreInterrupted": "წინა აღდგენა შეწყდა.",
+  "recoveringInterruptedRestore": "თქვენი წინა მონაცემების აღდგენა…",
+  "restoreMigrationRequired": "საჭიროა მიგრაცია",
+  "restoreMigrationNotAvailableYet": "ეს სარეზერვო ასლი იყენებს მონაცემთა ბაზის ძველ ფორმატს. მისი აღდგენა მოითხოვს მიგრაციას, რომელიც ჯერ არ არის ხელმისაწვდომი. მონაცემები არ შეცვლილა.",
+  "remindersNeedRebuilding": "დაგეგმილი შეხსენებები გაუქმდა. ისინი აღდგება შემდეგ ვერსიაში.",
+  "cannotCancelRestoreNow": "აღდგენის გაუქმება ახლა შეუძლებელია.",
+  "restoreOperationAlreadyInProgress": "აღდგენა უკვე მიმდინარეობს.",
+  "restoreSafetySnapshotFailed": "უსაფრთხოების სნეფშოტის შექმნა ვერ მოხერხდა. აღდგენა შეჩერებულია და მონაცემები არ შეცვლილა.",
+  "restoreDatabaseReplacementFailed": "მონაცემთა ბაზის ჩანაცვლება ვერ მოხერხდა.",
+  "restoreFilesFailed": "აღდგენილი ფაილების განთავსება ვერ მოხერხდა.",
+  "restorePreferencesFailed": "აღდგენილი პარამეტრების გამოყენება ვერ მოხერხდა.",
+  "restoreReinitializationFailed": "აპლიკაციის ხელახლა ინიციალიზაცია აღდგენის შემდეგ ვერ მოხერხდა.",
+  "restoreVerificationFailed": "აღდგენილი მონაცემების შემოწმება ვერ მოხერხდა.",
+  "restoreFailedGeneric": "აღდგენა ვერ დასრულდა.",
+  "restoreCancelled": "აღდგენა გაუქმდა. მონაცემები არ შეცვლილა.",
+  "preparingRestore": "აღდგენისთვის მომზადება",
+  "creatingSafetySnapshot": "უსაფრთხოების სნეფშოტის შექმნა",
+  "preparingRestoredDatabase": "აღდგენილი მონაცემთა ბაზის მომზადება",
+  "preparingRestoredFiles": "აღდგენილი ფაილების მომზადება",
+  "preparingRestoredPreferences": "აღდგენილი პარამეტრების მომზადება",
+  "pausingApplicationServices": "აპლიკაციის სერვისების შეჩერება",
+  "replacingDatabase": "მონაცემთა ბაზის ჩანაცვლება",
+  "restoringFiles": "ფაილების აღდგენა",
+  "restoringPreferences": "პარამეტრების აღდგენა",
+  "reinitializingApplication": "აპლიკაციის ხელახლა ინიციალიზაცია",
+  "verifyingRestoredData": "აღდგენილი მონაცემების შემოწმება",
+  "rollingBackRestore": "აღდგენის უკან დაბრუნება",
+  "finalizingRestore": "აღდგენის დასრულება",
+  "migratingDatabase": "მონაცემთა ბაზის მიგრაცია მიმდინარე ვერსიაზე",
+  "validatingMigratedDatabase": "მიგრირებული მონაცემთა ბაზის შემოწმება",
+  "repairingFilePaths": "ფაილების ბილიკების შეკეთება",
+  "rebuildingReminders": "შეხსენებების აღდგენა",
+  "restoreMigrationFailed": "ასლის მონაცემთა ბაზის მიმდინარე ვერსიაზე მიგრაცია ვერ მოხერხდა. მონაცემები არ შეცვლილა.",
+  "restorePathRepairFailed": "აღდგენილი ფაილების ბილიკების შეკეთება ვერ მოხერდა.",
+  "restoreDatabaseVerificationFailed": "აღდგენილი მონაცემთა ბაზის შემოწმება ვერ მოხერდა.",
+  "restoreReminderRebuildFailed": "აღდგენილი შეხსენებების თავიდან აგება ვერ მოხერდა.",
+  "restoreCompletedRemindersPending": "მონაცემები აღდგა. შეხსნებების სრულად აღდგენა ვერ მოხერდა და ისინი ხელახლა დაიგეგმება.",
+  "retryReminderRebuild": "შეხსენებების ხელახლა აღდგენა",
+  "someOptionalFilesMissing": "ასლში მოხსენიებული ზოგიერთი არასავალდებულო ფაილი (მაგ. ფოტო) აკლია და გასსუფთავდა.",
+  "invalidBackupFile": "ეს ფაილი არ არის სწორი RehabTrack-ის სარეზერვო ასლი.",
+  "corruptedBackup": "სარეზერვო არქივი დაზიანებულია და ვერ წაიკითხება.",
+  "missingBackupManifest": "ასლს აკლია მანიფესტი.",
+  "invalidBackupManifest": "ასლის მანიფესტი არასწორია.",
+  "missingBackupDatabase": "ასლს აკლია მონაცემთა ბაზა.",
+  "missingBackupPreferences": "ასლს აკლია პარამეტრები.",
+  "checksumMismatch": "ასლმა ვერ გაიარა შემოწმება და შესაძლოა დაზიანებული იყოს.",
+  "unsafeBackupArchive": "ასლი შეიცავს სახიფათო ფაილის ბილიკებს და ვერ აღდგება.",
+  "backupTooLarge": "ასლი ძალიან დიდია უსაფრთხო შესამოწმებლად.",
+  "newerBackupVersion": "ასლი შექმნილია RehabTrack-ის ახალ, არმხარდაჭერილ ვერსიაში.",
+  "newerDatabaseVersion": "ასლის მონაცემთა ბაზა უფრო ახალია, ვიდრე ამ აპლიკაციას შეუძლია.",
+  "unsupportedOldDatabaseVersion": "ასლის მონაცემთა ბაზა ძალიან ძველია და მისი მიგრაცია შეუძლებელია.",
+  "invalidBackupDatabase": "ასლის მონაცემთა ბაზა არასწორია.",
+  "invalidBackupPreferences": "ასლის პარამეტრები არასწორია.",
+  "backupValidationFailed": "ასლის შემოწმება ვერ მოხერხდა",
+  "operationAlreadyInProgress": "სხვა ოპერაცია უკვე მიმდინარეობს. გთხოვთ, დაელოდოთ.",
+  "backupWarningOlderAppVersion": "ასლი შექმნილია აპლიკაციის სხვა ვერსიით.",
+  "backupWarningMigrationRequired": "აღდგენამდე საჭირო იქნება მიგრაცია.",
   "profile": "პროფილი",
   "diet": "დიეტა",
   "labAnalyses": "ლაბორატორიული ანალიზები",
@@ -71,7 +249,7 @@
   "adherence": "მიყოლა",
   "taken": "მიღებული",
   "missed": "გამოტოვილი",
-  "skipped": "გაცდენილი",
+  "skipped": "გამოტოვებული",
   "pending": "მოლოდინში",
   "noMedicationsYet": "მედიკამენტები ჯერ არ არის",
   "addFirstMedication": "დაამატეთ თქვენი პირველი მედიკამენტი",
@@ -88,14 +266,20 @@
   "dailyAt": "ყოველდღიურად {times}",
   "@dailyAt": {
     "placeholders": {
-      "times": {"type": "String"}
+      "times": {
+        "type": "String"
+      }
     }
   },
   "everyNDays": "ყოველ {count} დღეში {times}",
   "@everyNDays": {
     "placeholders": {
-      "count": {"type": "int"},
-      "times": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "times": {
+        "type": "String"
+      }
     }
   },
   "intakeQuantity": "მიღების რაოდენობა",
@@ -132,20 +316,20 @@
   "confirmDeactivate": "მედიკამენტი დეაქტივირდება. გრაფიკები და ისტორია შენარჩუნდება.",
   "invalidRoute": "არასწორი გვერდი",
   "schedules": "გრაფიკები",
-  "deleteSchedule": "გრაფიკის წაშლა",
-  "deleteScheduleConfirmation": "წაშალოთ ეს გრაფიკი? შეტყობინებები გაუქმდება.",
+  "deleteSchedule": "წაშალეთ გრაფიკი",
+  "deleteScheduleConfirmation": "დარწმუნებული ხართ რომ გსურთ ამ გრაფიკის წაშლა?",
   "selectTime": "აირჩიეთ დრო",
   "addTime": "დროის დამატება",
   "scheduledTime": "დაგეგმილი დრო",
   "removeTime": "წაშლა",
-  "intervalDays": "ინტერვალი (დღე)",
+  "intervalDays": "ინტერვალი (დღეები)",
   "atLeastOneTimeRequired": "სულ მცირე ერთი დრო საჭიროა",
   "duplicateTimesNotAllowed": "დუბლიკატი დროები არ დაიშვება",
   "invalidInterval": "ინტერვალი უნდა იყოს 1-დან 30-მდე",
   "failedToSaveSchedule": "გრაფიკის შენახვა ვერ მოხერხდა",
   "failedToDeleteSchedule": "გრაფიკის წაშლა ვერ მოხერხდა",
   "schedulesSection": "გრაფიკები",
-  "addScheduleSubtitle": "დააყენეთ შეხსენებები ამ მედიკამენტისთვის",
+  "addScheduleSubtitle": "დაამატეთ გრაფიკი შეხსენებებისთვის",
   "editAlternative": "ალტერნატივის რედაქტირება",
   "deleteAlternative": "ალტერნატივის წაშლა",
   "deleteAlternativeConfirmation": "წაშალოთ ეს ალტერნატივა? ეს არ იმოქმედებს მედიკამენტზე ან მის გრაფიკებზე.",
@@ -161,11 +345,13 @@
   "historyScreenTitle": "მედიკამენტის ისტორია",
   "last7Days": "ბოლო 7 დღე",
   "last30Days": "ბოლო 30 დღე",
-  "allTime": "მთელი დრო",
+  "allTime": "ყველა დრო",
   "adherencePercentage": "{percentage}%",
   "@adherencePercentage": {
     "placeholders": {
-      "percentage": {"type": "double"}
+      "percentage": {
+        "type": "double"
+      }
     }
   },
   "noLogsYet": "ჩანაწერები ჯერ არ არის",
@@ -184,13 +370,17 @@
   "scheduledFor": "დაგეგმილია {time}",
   "@scheduledFor": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "takenAt": "მიღებულია {time}",
   "@takenAt": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "nameRequired": "სახელი საჭიროა",
@@ -224,7 +414,6 @@
   "irregularHeartbeat": "არარეგულარული გულისცემა",
   "pulseLabel": "პულსი",
   "fieldName": "ველის სახელი",
-  "unit": "ერთეული",
   "requiredField": "სავალდებულო",
   "minimumValue": "მინიმალური მნიშვნელობა",
   "maximumValue": "მაქსიმალური მნიშვნელობა",
@@ -244,7 +433,7 @@
   "selectMeasurementType": "აირჩიეთ გაზომვის ტიპი",
   "addReading": "ჩანაწერის დამატება",
   "addReadingTooltip": "ჩანაწერის დამატება",
-  "viewHistory": "ისტორიის ნახვა",
+  "viewHistory": "ისტორია",
   "valueRequired": "მნიშვნელობა საჭიროა",
   "mustBePositive": "მნიშვნელობა უნდა იყოს დადებითი",
   "systolicGreaterThanDiastolic": "სისტოლური უნდა აღემატებოდეს დიასტოლურს",
@@ -270,16 +459,17 @@
   "referenceRangeCount": "{count} ცნობილი დიაპაზონი",
   "@referenceRangeCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "trends": "ტრენდები",
   "measurementTrends": "გაზომვის ტრენდები",
-  "viewTrends": "ტრენდების ნახვა",
+  "viewTrends": "ტრენდები",
   "lastSevenDays": "ბოლო 7 დღე",
   "lastThirtyDays": "ბოლო 30 დღე",
   "lastNinetyDays": "ბოლო 90 დღე",
-  "allTime": "ყველა დრო",
   "latest": "უახლესი",
   "average": "საშუალო",
   "minimum": "მინიმუმი",
@@ -314,19 +504,25 @@
   "componentStatusSystolic": "სისტოლური {status}",
   "@componentStatusSystolic": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "componentStatusDiastolic": "დიასტოლური {status}",
   "@componentStatusDiastolic": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "componentStatusPulse": "პულსი {status}",
   "@componentStatusPulse": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "measurementSchedules": "გაზომვების გრაფიკი",
@@ -334,36 +530,30 @@
   "editMeasurementSchedule": "შეცვალეთ გაზომვის გრაფიკი",
   "noMeasurementSchedules": "გაზომვების გრაფიკი არ არსებობს",
   "noMeasurementSchedulesDescription": "დაამატეთ გრაფიკი შეხსენებებისთვის",
-  "schedulesSection": "გრაფიკები",
-  "addScheduleSubtitle": "დაამატეთ გრაფიკი შეხსენებებისთვის",
   "daily": "ყოველდღიური",
   "everyNDaysLabel": "ყოველ N დღეში",
-  "intervalDays": "ინტერვალი (დღეები)",
   "everyNDaysRequiresStartDate": "ყოველ N დღეში საჭიროებს დაწყების თარიღს",
-  "recordNow": "ჩაწერეთ ახლა",
+  "recordNow": "ჩაწერე ახლა",
   "measurementReminder": "გაზომვის შეხსენება",
   "measurementReminders": "გაზომვების შეხსენებები",
   "timeToRecordMeasurement": "დროა ჩაწეროთ {name}",
   "@timeToRecordMeasurement": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "reminderScheduled": "შეხსენება დაგეგმილია",
   "reminderUpdated": "შეხსენება განახლდა",
   "reminderDeleted": "შეხსენება წაიშალა",
-  "failedToSaveSchedule": "გრაფიკის შენახვა ვერ მოხერხდა",
   "scheduleRecovered": "გრაფიკი აღდგენილია",
   "measurementsDueToday": "დღეს გასაკეთებელი გაზომვები",
   "noRemindersToday": "დღეს შეხსენებები არ არის დაგეგმილი",
   "upcoming": "მომდევნო",
   "overdue": "ვადაგასული",
   "completed": "დასრულებული",
-  "skipped": "გამოტოვებული",
   "snoozed": "გადადებული",
-  "schedules": "გრაფიკები",
-  "deleteSchedule": "წაშალეთ გრაფიკი",
-  "deleteScheduleConfirmation": "დარწმუნებული ხართ რომ გსურთ ამ გრაფიკის წაშლა?",
   "todaysProgress": "დღევანდელი პროგრესი",
   "todaysPlan": "დღევანდელი გეგმა",
   "nothingScheduledToday": "დღეს არაფერია დაგეგმილი",
@@ -372,7 +562,6 @@
   "measurementsToday": "გაზომვები",
   "completedAndSkipped": "დასრულებული და გამოტოვებული",
   "markTaken": "მიღებულია",
-  "recordNow": "ჩაწერე ახლა",
   "snooze10min": "გადადე 10 წუთით",
   "due": "დროა",
   "dueSoon": "მალე დროა",
@@ -385,8 +574,6 @@
   "moreActions": "დამატებითი მოქმედებები",
   "skip": "გამოტოვება",
   "openDetails": "დეტალები",
-  "viewHistory": "ისტორია",
-  "viewTrends": "ტრენდები",
   "failedToUpdateItem": "ელემენტის განახლება ვერ მოხერხდა",
   "changeToSkipped": "შეცვალეთ გამოტოვებულზე",
   "changeToTaken": "შეცვალეთ მიღებულზე",
@@ -399,7 +586,6 @@
   "nothingScheduledForThisDay": "ამ დღისთვის არაფერია დაგეგმილი",
   "firstPlannedItem": "პირველი დაგეგმილი ელემენტი",
   "scheduledAt": "დაგეგმილია {time}",
-  "history": "ისტორია",
   "medicationsMissed": "გამოტოვებული მედიკამენტები",
   "measurementsMissed": "გამოტოვებული გაზომვები",
   "dailySummary": "დღის შეჯამება",
@@ -441,7 +627,9 @@
   "yearsOld": "{years} წლის",
   "@yearsOld": {
     "placeholders": {
-      "years": {"type": "int"}
+      "years": {
+        "type": "int"
+      }
     }
   },
   "activeProfile": "აქტიური პროფილი",
@@ -469,7 +657,9 @@
   "minutesValue": "{minutes} წუთი",
   "@minutesValue": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "fiveMinutes": "5 წუთი",
@@ -479,7 +669,6 @@
   "sixtyMinutes": "60 წუთი",
   "reminders": "შეხსენებები",
   "medicationReminders": "მედიკამენტების შეხსენებები",
-  "measurementReminders": "გაზომვების შეხსენებები",
   "reminderSound": "ხმა",
   "reminderVibration": "ვიბრაცია",
   "defaultSnoozeDuration": "გადადების ხანგრძლივობა",
@@ -501,8 +690,6 @@
   "testReminderBody": "ეს არის ტესტური შეხსენება შეტყობინების ხმის, ვიბრაციის და გამოჩენის შესამოწმებლად.",
   "medicationReminder": "მედიკამენტის შეხსენება",
   "markAsTaken": "მიღებულია",
-  "recordNow": "ჩაწერე ახლა",
-  "skip": "გამოტოვება",
   "snooze": "გადადება",
   "scheduleSavedReminderFailed": "გრაფიკი შენახულია, მაგრამ შეხსენების დაგეგმვა ვერ მოხერხდა",
   "reminderSchedulingFailed": "შეხსენების დაგეგმვა ვერ მოხერხდა",
@@ -620,7 +807,9 @@
   "doctorVisitsUpcomingBadgeSemantics": "ექიმთან ვიზიტები, {count} მომავალი ვიზიტი",
   "@doctorVisitsUpcomingBadgeSemantics": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "visitHistory": "ისტორია",
@@ -635,7 +824,6 @@
   "saveVisitFailed": "ვიზიტის შენახვა ვერ მოხერხდა",
   "visitUpdated": "ვიზიტი განახლდა",
   "visitSaved": "ვიზიტი შეინახა",
-  "reminderSchedulingFailed": "შეხსენების დაგეგმვა ვერ მოხერხდა",
   "doctorVisitDetails": "ვიზიტის დეტალები",
   "visitNeedsAttention": "ვიზიტის ვადა გავიდა — მონიშნეთ დასრულებულად, გააუქმეთ ან მონიშნეთ გამოტოვებულად.",
   "markCompleted": "დასრულებულად მონიშვნა",
@@ -654,5 +842,10 @@
   "selectDoctor": "აირჩიეთ ექიმი",
   "selectClinicOrHospital": "აირჩიეთ კლინიკა ან საავადმყოფო",
   "noEligibleContacts": "შესაფერისი კონტაქტი არ არის. ჯერ დაამატეთ კონტაქტი.",
-  "contactReferencedByVisits": "ეს კონტაქტი გამოიყენება ექიმთან ვიზიტში და მისი სამუდამოდ წაშლა შეუძლებელია."
+  "contactReferencedByVisits": "ეს კონტაქტი გამოიყენება ექიმთან ვიზიტში და მისი სამუდამოდ წაშლა შეუძლებელია.",
+  "backupLastCreated": "ბოლო სარეზერვო ასლი შეიქმნა: {time}",
+  "restoreLastCompleted": "ბოლო აღდგენა დასრულდა: {time}",
+  "restoreCancellationUnavailable": "აღდგენა მიმდინარეობს და ამ მომენტში მისი გაუქმება შეუძლებელია.",
+  "restoreNotEnoughStorage": "აღდგენის შესასრულებლად საკმარისი თავისუფალი ადგილი არ არის. მონაცემები არ შეცვლილა.",
+  "backupStoredAs": "შენახულია როგორც: {name}"
 }

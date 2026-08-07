@@ -49,6 +49,397 @@ class AppLocalizationsKa extends AppLocalizations {
   String get backupInformation => 'ინფორმაცია სარეზერვო ასლის შესახებ';
 
   @override
+  String get backupScreenDescription =>
+      'შექმენით თქვენი მონაცემების ასლი და შეინახეთ ფაილად, რომელსაც თქვენ ფლობთ. შედის ფოტოებიც და აპლიკაციის პარამეტრებიც.';
+
+  @override
+  String get backupIncludes => 'რა შედის';
+
+  @override
+  String get backupIncludesDatabase =>
+      'ყველა თქვენი ჯანმრთელობის ჩანაწერი და ისტორია';
+
+  @override
+  String get backupIncludesPhotos => 'პროფილისა და კონტაქტის ფოტოები';
+
+  @override
+  String get backupIncludesSettings => 'აპლიკაციის პარამეტრები და არჩევნები';
+
+  @override
+  String get backupRestoreNotAvailable =>
+      'აღდგენა ხელმისაწვდომი იქნება მომავალ განახლებაში.';
+
+  @override
+  String backupLastSuccessful(Object time) {
+    return 'ბოლო წარმატებული სარეზერვო ასლი: $time';
+  }
+
+  @override
+  String get backupLastNever => 'სარეზერვო ასლი ჯერ არ არის შექმნილი';
+
+  @override
+  String get backupInProgress => 'სარეზერვო ასლის შექმნა…';
+
+  @override
+  String get backupSuccessTitle => 'სარეზერვო ასლი შეიქმნა';
+
+  @override
+  String get backupSuccessMessage =>
+      'თქვენი სარეზერვო ფაილი შენახულია არჩეულ ადგილას.';
+
+  @override
+  String get backupMissingFilesMessage =>
+      'ზოგიერთი ფოტო, რომელზეც მონაცემები მიუთითებს, აკლია და ამ ასლში არ შედის.';
+
+  @override
+  String get backupCancelledTitle => 'სარეზერვო ასლი გაუქმდა';
+
+  @override
+  String get backupCancelledMessage => 'სარეზერვო ასლი არ შექმნილა.';
+
+  @override
+  String get backupFailedTitle => 'შეცდომა სარეზერვო ასლის შექმნისას';
+
+  @override
+  String get backupStorageFailure =>
+      'ვერ მოხერხდა სარეზერვო ასლის ჩაწერა არჩეულ ადგილას. სცადეთ თავიდან ან აირჩიეთ სხვა ადგილი.';
+
+  @override
+  String get backupDatabaseFailure =>
+      'აპლიკაციის მონაცემთა ბაზის წაკითხვა ვერ მოხერხდა. სცადეთ თავიდან.';
+
+  @override
+  String get backupArchiveFailure =>
+      'სარეზერვო ფაილის შექმნა ვერ მოხერხდა. სცადეთ თავიდან.';
+
+  @override
+  String get backupPermissionDenied =>
+      'უარი ეთქვა სარეზერვო ასლის შენახვის ნებართვაზე.';
+
+  @override
+  String get backupNotEnoughStorage =>
+      'არჩეულ ადგილას საკმარისი თავისუფალი ადგილი არ არის.';
+
+  @override
+  String get backupOperationInProgress =>
+      'სარეზერვო ასლი უკვე მიმდინარეობს. გთხოვთ, დაელოდოთ.';
+
+  @override
+  String get backupUnexpectedFailure =>
+      'რაღაც არასწორად წარიმართა. გთხოვთ, სცადოთ თავიდან.';
+
+  @override
+  String get selectBackupFile => 'აირჩიეთ სარეზერვო ფაილი';
+
+  @override
+  String get selectingBackup => 'სარეზერვო ფაილის არჩევა…';
+
+  @override
+  String get readingBackup => 'სარეზერვო ასლის წაკითხვა…';
+
+  @override
+  String get validatingBackup => 'სარეზერვო ასლის შემოწმება…';
+
+  @override
+  String get verifyingChecksums =>
+      'შემოწმების თანხების (checksum) დადასტურება…';
+
+  @override
+  String get checkingCompatibility => 'თავსებადობის შემოწმება…';
+
+  @override
+  String get backupPreview => 'სარეზერვო ასლის შინაარსის გადახედვა';
+
+  @override
+  String get backupDetails => 'სარეზერვო ასლის დეტალები';
+
+  @override
+  String backupDate(String date) {
+    return 'ასლის თარიღი: $date';
+  }
+
+  @override
+  String backupAppVersion(String version) {
+    return 'აპლიკაციის ვერსია: $version';
+  }
+
+  @override
+  String backupFormatVersion(String version) {
+    return 'ასლის ფორმატის ვერსია: $version';
+  }
+
+  @override
+  String databaseVersion(String version) {
+    return 'მონაცემთა ბაზის ვერსია: $version';
+  }
+
+  @override
+  String currentDatabaseVersion(String version) {
+    return 'მიმდინარე მონაცემთა ბაზის ვერსია: $version';
+  }
+
+  @override
+  String profilesCount(int count) {
+    return 'პროფილები: $count';
+  }
+
+  @override
+  String filesCount(int count) {
+    return 'ფაილები: $count';
+  }
+
+  @override
+  String get backupSize => 'ასლის ზომა';
+
+  @override
+  String get compatibleBackup => 'თავსებადი';
+
+  @override
+  String get compatibleMigrationRequired => 'თავსებადი, საჭიროა მიგრაცია';
+
+  @override
+  String get incompatibleBackup => 'თავსებადი არ არის';
+
+  @override
+  String get migrationRequired => 'აღდგენამდე საჭირო იქნება მიგრაცია.';
+
+  @override
+  String get restoreWillReplaceData =>
+      'ამ სარეზერვო ასლის აღდგენა შეცვლის მიმდინარე RehabTrack-ის მონაცემებს ამ მოწყობილობაზე. ფოტოები, პარამეტრები და ყველა ჩანაწერი გადაიწერება.';
+
+  @override
+  String get continueRestore => 'გაგრძელება';
+
+  @override
+  String get cancelRestore => 'გაუქმება';
+
+  @override
+  String get restoreNotImplementedYet =>
+      'სარეზერვო ასლის შემოწმება წარმატებით დასრულდა. აღდგენა ჯერ არ არის ხელმისაწვდომი.';
+
+  @override
+  String get restoreCompletedTitle => 'აღდგენა დასრულდა';
+
+  @override
+  String get restoreFailedTitle => 'აღდგენა ვერ მოხერხდა';
+
+  @override
+  String get restoreCancelledTitle => 'აღდგენა გაუქმდა';
+
+  @override
+  String get restoreInProgressTitle => 'მონაცემების აღდგენა';
+
+  @override
+  String restoreCompletedMessage(String date) {
+    return 'თქვენი მონაცემები აღდგენილია $date სარეზერვო ასლიდან.';
+  }
+
+  @override
+  String get originalDataRecovered =>
+      'თქვენი თავდაპირველი მონაცემები აღდგენილია.';
+
+  @override
+  String criticalRestoreRecoveryRequired(String code) {
+    return 'ავტომატური აღდგენა ვერ დასრულდა. არ დახუროთ აპლიკაცია — დაუკავშირდით მხარდაჭერას კოდით: $code.';
+  }
+
+  @override
+  String get restoreInterrupted => 'წინა აღდგენა შეწყდა.';
+
+  @override
+  String get recoveringInterruptedRestore => 'თქვენი წინა მონაცემების აღდგენა…';
+
+  @override
+  String get restoreMigrationRequired => 'საჭიროა მიგრაცია';
+
+  @override
+  String get restoreMigrationNotAvailableYet =>
+      'ეს სარეზერვო ასლი იყენებს მონაცემთა ბაზის ძველ ფორმატს. მისი აღდგენა მოითხოვს მიგრაციას, რომელიც ჯერ არ არის ხელმისაწვდომი. მონაცემები არ შეცვლილა.';
+
+  @override
+  String get remindersNeedRebuilding =>
+      'დაგეგმილი შეხსენებები გაუქმდა. ისინი აღდგება შემდეგ ვერსიაში.';
+
+  @override
+  String get cannotCancelRestoreNow => 'აღდგენის გაუქმება ახლა შეუძლებელია.';
+
+  @override
+  String get restoreOperationAlreadyInProgress => 'აღდგენა უკვე მიმდინარეობს.';
+
+  @override
+  String get restoreSafetySnapshotFailed =>
+      'უსაფრთხოების სნეფშოტის შექმნა ვერ მოხერხდა. აღდგენა შეჩერებულია და მონაცემები არ შეცვლილა.';
+
+  @override
+  String get restoreDatabaseReplacementFailed =>
+      'მონაცემთა ბაზის ჩანაცვლება ვერ მოხერხდა.';
+
+  @override
+  String get restoreFilesFailed =>
+      'აღდგენილი ფაილების განთავსება ვერ მოხერხდა.';
+
+  @override
+  String get restorePreferencesFailed =>
+      'აღდგენილი პარამეტრების გამოყენება ვერ მოხერხდა.';
+
+  @override
+  String get restoreReinitializationFailed =>
+      'აპლიკაციის ხელახლა ინიციალიზაცია აღდგენის შემდეგ ვერ მოხერხდა.';
+
+  @override
+  String get restoreVerificationFailed =>
+      'აღდგენილი მონაცემების შემოწმება ვერ მოხერხდა.';
+
+  @override
+  String get restoreFailedGeneric => 'აღდგენა ვერ დასრულდა.';
+
+  @override
+  String get restoreCancelled => 'აღდგენა გაუქმდა. მონაცემები არ შეცვლილა.';
+
+  @override
+  String get preparingRestore => 'აღდგენისთვის მომზადება';
+
+  @override
+  String get creatingSafetySnapshot => 'უსაფრთხოების სნეფშოტის შექმნა';
+
+  @override
+  String get preparingRestoredDatabase => 'აღდგენილი მონაცემთა ბაზის მომზადება';
+
+  @override
+  String get preparingRestoredFiles => 'აღდგენილი ფაილების მომზადება';
+
+  @override
+  String get preparingRestoredPreferences => 'აღდგენილი პარამეტრების მომზადება';
+
+  @override
+  String get pausingApplicationServices => 'აპლიკაციის სერვისების შეჩერება';
+
+  @override
+  String get replacingDatabase => 'მონაცემთა ბაზის ჩანაცვლება';
+
+  @override
+  String get restoringFiles => 'ფაილების აღდგენა';
+
+  @override
+  String get restoringPreferences => 'პარამეტრების აღდგენა';
+
+  @override
+  String get reinitializingApplication => 'აპლიკაციის ხელახლა ინიციალიზაცია';
+
+  @override
+  String get verifyingRestoredData => 'აღდგენილი მონაცემების შემოწმება';
+
+  @override
+  String get rollingBackRestore => 'აღდგენის უკან დაბრუნება';
+
+  @override
+  String get finalizingRestore => 'აღდგენის დასრულება';
+
+  @override
+  String get migratingDatabase => 'მონაცემთა ბაზის მიგრაცია მიმდინარე ვერსიაზე';
+
+  @override
+  String get validatingMigratedDatabase =>
+      'მიგრირებული მონაცემთა ბაზის შემოწმება';
+
+  @override
+  String get repairingFilePaths => 'ფაილების ბილიკების შეკეთება';
+
+  @override
+  String get rebuildingReminders => 'შეხსენებების აღდგენა';
+
+  @override
+  String get restoreMigrationFailed =>
+      'ასლის მონაცემთა ბაზის მიმდინარე ვერსიაზე მიგრაცია ვერ მოხერხდა. მონაცემები არ შეცვლილა.';
+
+  @override
+  String get restorePathRepairFailed =>
+      'აღდგენილი ფაილების ბილიკების შეკეთება ვერ მოხერდა.';
+
+  @override
+  String get restoreDatabaseVerificationFailed =>
+      'აღდგენილი მონაცემთა ბაზის შემოწმება ვერ მოხერდა.';
+
+  @override
+  String get restoreReminderRebuildFailed =>
+      'აღდგენილი შეხსენებების თავიდან აგება ვერ მოხერდა.';
+
+  @override
+  String get restoreCompletedRemindersPending =>
+      'მონაცემები აღდგა. შეხსნებების სრულად აღდგენა ვერ მოხერდა და ისინი ხელახლა დაიგეგმება.';
+
+  @override
+  String get retryReminderRebuild => 'შეხსენებების ხელახლა აღდგენა';
+
+  @override
+  String get someOptionalFilesMissing =>
+      'ასლში მოხსენიებული ზოგიერთი არასავალდებულო ფაილი (მაგ. ფოტო) აკლია და გასსუფთავდა.';
+
+  @override
+  String get invalidBackupFile =>
+      'ეს ფაილი არ არის სწორი RehabTrack-ის სარეზერვო ასლი.';
+
+  @override
+  String get corruptedBackup =>
+      'სარეზერვო არქივი დაზიანებულია და ვერ წაიკითხება.';
+
+  @override
+  String get missingBackupManifest => 'ასლს აკლია მანიფესტი.';
+
+  @override
+  String get invalidBackupManifest => 'ასლის მანიფესტი არასწორია.';
+
+  @override
+  String get missingBackupDatabase => 'ასლს აკლია მონაცემთა ბაზა.';
+
+  @override
+  String get missingBackupPreferences => 'ასლს აკლია პარამეტრები.';
+
+  @override
+  String get checksumMismatch =>
+      'ასლმა ვერ გაიარა შემოწმება და შესაძლოა დაზიანებული იყოს.';
+
+  @override
+  String get unsafeBackupArchive =>
+      'ასლი შეიცავს სახიფათო ფაილის ბილიკებს და ვერ აღდგება.';
+
+  @override
+  String get backupTooLarge => 'ასლი ძალიან დიდია უსაფრთხო შესამოწმებლად.';
+
+  @override
+  String get newerBackupVersion =>
+      'ასლი შექმნილია RehabTrack-ის ახალ, არმხარდაჭერილ ვერსიაში.';
+
+  @override
+  String get newerDatabaseVersion =>
+      'ასლის მონაცემთა ბაზა უფრო ახალია, ვიდრე ამ აპლიკაციას შეუძლია.';
+
+  @override
+  String get unsupportedOldDatabaseVersion =>
+      'ასლის მონაცემთა ბაზა ძალიან ძველია და მისი მიგრაცია შეუძლებელია.';
+
+  @override
+  String get invalidBackupDatabase => 'ასლის მონაცემთა ბაზა არასწორია.';
+
+  @override
+  String get invalidBackupPreferences => 'ასლის პარამეტრები არასწორია.';
+
+  @override
+  String get backupValidationFailed => 'ასლის შემოწმება ვერ მოხერხდა';
+
+  @override
+  String get operationAlreadyInProgress =>
+      'სხვა ოპერაცია უკვე მიმდინარეობს. გთხოვთ, დაელოდოთ.';
+
+  @override
+  String get backupWarningOlderAppVersion =>
+      'ასლი შექმნილია აპლიკაციის სხვა ვერსიით.';
+
+  @override
+  String get backupWarningMigrationRequired =>
+      'აღდგენამდე საჭირო იქნება მიგრაცია.';
+
+  @override
   String get profile => 'პროფილი';
 
   @override
@@ -1793,4 +2184,27 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get contactReferencedByVisits =>
       'ეს კონტაქტი გამოიყენება ექიმთან ვიზიტში და მისი სამუდამოდ წაშლა შეუძლებელია.';
+
+  @override
+  String backupLastCreated(Object time) {
+    return 'ბოლო სარეზერვო ასლი შეიქმნა: $time';
+  }
+
+  @override
+  String restoreLastCompleted(Object time) {
+    return 'ბოლო აღდგენა დასრულდა: $time';
+  }
+
+  @override
+  String get restoreCancellationUnavailable =>
+      'აღდგენა მიმდინარეობს და ამ მომენტში მისი გაუქმება შეუძლებელია.';
+
+  @override
+  String get restoreNotEnoughStorage =>
+      'აღდგენის შესასრულებლად საკმარისი თავისუფალი ადგილი არ არის. მონაცემები არ შეცვლილა.';
+
+  @override
+  String backupStoredAs(Object name) {
+    return 'შენახულია როგორც: $name';
+  }
 }

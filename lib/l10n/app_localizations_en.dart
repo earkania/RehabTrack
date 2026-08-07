@@ -49,6 +49,395 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupInformation => 'Backup information';
 
   @override
+  String get backupScreenDescription =>
+      'Create a copy of all your data and save it as a file you control. Your photos and app settings are included.';
+
+  @override
+  String get backupIncludes => 'What\'s included';
+
+  @override
+  String get backupIncludesDatabase => 'All your health records and history';
+
+  @override
+  String get backupIncludesPhotos => 'Profile and care contact photos';
+
+  @override
+  String get backupIncludesSettings => 'App settings and preferences';
+
+  @override
+  String get backupRestoreNotAvailable =>
+      'Restore will be available in a future update.';
+
+  @override
+  String backupLastSuccessful(Object time) {
+    return 'Last successful backup: $time';
+  }
+
+  @override
+  String get backupLastNever => 'No backup created yet';
+
+  @override
+  String get backupInProgress => 'Creating backup…';
+
+  @override
+  String get backupSuccessTitle => 'Backup created';
+
+  @override
+  String get backupSuccessMessage =>
+      'Your backup file has been saved to the chosen location.';
+
+  @override
+  String get backupMissingFilesMessage =>
+      'Some photos referenced by your data were missing and are not included in this backup.';
+
+  @override
+  String get backupCancelledTitle => 'Backup cancelled';
+
+  @override
+  String get backupCancelledMessage => 'No backup was created.';
+
+  @override
+  String get backupFailedTitle => 'Backup failed';
+
+  @override
+  String get backupStorageFailure =>
+      'Could not write the backup to the selected location. Try again or choose a different location.';
+
+  @override
+  String get backupDatabaseFailure =>
+      'Could not read the app database. Try again.';
+
+  @override
+  String get backupArchiveFailure =>
+      'Could not create the backup file. Try again.';
+
+  @override
+  String get backupPermissionDenied =>
+      'Permission to save the backup was denied.';
+
+  @override
+  String get backupNotEnoughStorage =>
+      'Not enough free space on the selected location.';
+
+  @override
+  String get backupOperationInProgress =>
+      'A backup is already in progress. Please wait.';
+
+  @override
+  String get backupUnexpectedFailure =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get selectBackupFile => 'Select backup file';
+
+  @override
+  String get selectingBackup => 'Selecting backup…';
+
+  @override
+  String get readingBackup => 'Reading backup…';
+
+  @override
+  String get validatingBackup => 'Validating backup…';
+
+  @override
+  String get verifyingChecksums => 'Verifying checksums…';
+
+  @override
+  String get checkingCompatibility => 'Checking compatibility…';
+
+  @override
+  String get backupPreview => 'Backup preview';
+
+  @override
+  String get backupDetails => 'Backup details';
+
+  @override
+  String backupDate(String date) {
+    return 'Backup date: $date';
+  }
+
+  @override
+  String backupAppVersion(String version) {
+    return 'App version: $version';
+  }
+
+  @override
+  String backupFormatVersion(String version) {
+    return 'Backup format version: $version';
+  }
+
+  @override
+  String databaseVersion(String version) {
+    return 'Database version: $version';
+  }
+
+  @override
+  String currentDatabaseVersion(String version) {
+    return 'Current database version: $version';
+  }
+
+  @override
+  String profilesCount(int count) {
+    return 'Profiles: $count';
+  }
+
+  @override
+  String filesCount(int count) {
+    return 'Managed files: $count';
+  }
+
+  @override
+  String get backupSize => 'Backup size';
+
+  @override
+  String get compatibleBackup => 'Compatible';
+
+  @override
+  String get compatibleMigrationRequired => 'Compatible, migration required';
+
+  @override
+  String get incompatibleBackup => 'Incompatible';
+
+  @override
+  String get migrationRequired => 'Migration will be required before restore.';
+
+  @override
+  String get restoreWillReplaceData =>
+      'Restoring this backup will replace the current RehabTrack data on this device with the backup contents. Photos, settings and all records will be overwritten.';
+
+  @override
+  String get continueRestore => 'Continue';
+
+  @override
+  String get cancelRestore => 'Cancel';
+
+  @override
+  String get restoreNotImplementedYet =>
+      'Backup validation completed successfully. Restore is not available yet.';
+
+  @override
+  String get restoreCompletedTitle => 'Restore completed';
+
+  @override
+  String get restoreFailedTitle => 'Restore failed';
+
+  @override
+  String get restoreCancelledTitle => 'Restore cancelled';
+
+  @override
+  String get restoreInProgressTitle => 'Restoring your data';
+
+  @override
+  String restoreCompletedMessage(String date) {
+    return 'Your data was restored from the backup from $date.';
+  }
+
+  @override
+  String get originalDataRecovered => 'Your original data was recovered.';
+
+  @override
+  String criticalRestoreRecoveryRequired(String code) {
+    return 'Automatic recovery could not complete. Do not close the app — contact support with this code: $code.';
+  }
+
+  @override
+  String get restoreInterrupted => 'A previous restore was interrupted.';
+
+  @override
+  String get recoveringInterruptedRestore => 'Recovering your previous data…';
+
+  @override
+  String get restoreMigrationRequired => 'Migration required';
+
+  @override
+  String get restoreMigrationNotAvailableYet =>
+      'This backup uses an older database format. Restoring it requires a migration that is not available yet. No data was changed.';
+
+  @override
+  String get remindersNeedRebuilding =>
+      'Scheduled reminders were cancelled. They will be rebuilt in a later version.';
+
+  @override
+  String get cannotCancelRestoreNow => 'Restore cannot be cancelled now.';
+
+  @override
+  String get restoreOperationAlreadyInProgress =>
+      'A restore is already in progress.';
+
+  @override
+  String get restoreSafetySnapshotFailed =>
+      'A safety snapshot of your data could not be created. The restore was stopped and your data was not changed.';
+
+  @override
+  String get restoreDatabaseReplacementFailed =>
+      'The database could not be replaced.';
+
+  @override
+  String get restoreFilesFailed => 'The restored files could not be placed.';
+
+  @override
+  String get restorePreferencesFailed =>
+      'The restored settings could not be applied.';
+
+  @override
+  String get restoreReinitializationFailed =>
+      'The application could not be reinitialized after the restore.';
+
+  @override
+  String get restoreVerificationFailed =>
+      'The restored data could not be verified.';
+
+  @override
+  String get restoreFailedGeneric => 'The restore could not be completed.';
+
+  @override
+  String get restoreCancelled =>
+      'The restore was cancelled. No data was changed.';
+
+  @override
+  String get preparingRestore => 'Preparing to restore';
+
+  @override
+  String get creatingSafetySnapshot => 'Creating a safety snapshot';
+
+  @override
+  String get preparingRestoredDatabase => 'Preparing the restored database';
+
+  @override
+  String get preparingRestoredFiles => 'Preparing restored files';
+
+  @override
+  String get preparingRestoredPreferences => 'Preparing restored settings';
+
+  @override
+  String get pausingApplicationServices => 'Pausing application services';
+
+  @override
+  String get replacingDatabase => 'Replacing the database';
+
+  @override
+  String get restoringFiles => 'Restoring files';
+
+  @override
+  String get restoringPreferences => 'Restoring settings';
+
+  @override
+  String get reinitializingApplication => 'Reinitializing the application';
+
+  @override
+  String get verifyingRestoredData => 'Verifying restored data';
+
+  @override
+  String get rollingBackRestore => 'Rolling back the restore';
+
+  @override
+  String get finalizingRestore => 'Finalizing the restore';
+
+  @override
+  String get migratingDatabase =>
+      'Migrating the database to the current version';
+
+  @override
+  String get validatingMigratedDatabase => 'Validating the migrated database';
+
+  @override
+  String get repairingFilePaths => 'Repairing file paths';
+
+  @override
+  String get rebuildingReminders => 'Rebuilding reminders';
+
+  @override
+  String get restoreMigrationFailed =>
+      'The backup database could not be migrated to the current version. No data was changed.';
+
+  @override
+  String get restorePathRepairFailed =>
+      'The restored file paths could not be repaired.';
+
+  @override
+  String get restoreDatabaseVerificationFailed =>
+      'The restored database could not be verified.';
+
+  @override
+  String get restoreReminderRebuildFailed =>
+      'The restored reminders could not be rebuilt.';
+
+  @override
+  String get restoreCompletedRemindersPending =>
+      'Data was restored. Reminders could not be fully rebuilt and will be rescheduled.';
+
+  @override
+  String get retryReminderRebuild => 'Retry reminder rebuild';
+
+  @override
+  String get someOptionalFilesMissing =>
+      'Some optional files (such as photos) referenced by the backup are missing and were cleared.';
+
+  @override
+  String get invalidBackupFile => 'This file is not a valid RehabTrack backup.';
+
+  @override
+  String get corruptedBackup =>
+      'The backup archive is corrupted and could not be read.';
+
+  @override
+  String get missingBackupManifest => 'The backup is missing its manifest.';
+
+  @override
+  String get invalidBackupManifest => 'The backup manifest is invalid.';
+
+  @override
+  String get missingBackupDatabase => 'The backup is missing its database.';
+
+  @override
+  String get missingBackupPreferences =>
+      'The backup is missing its preferences.';
+
+  @override
+  String get checksumMismatch =>
+      'The backup failed checksum validation and may be damaged.';
+
+  @override
+  String get unsafeBackupArchive =>
+      'The backup contains unsafe file paths and cannot be restored.';
+
+  @override
+  String get backupTooLarge => 'The backup is too large to validate safely.';
+
+  @override
+  String get newerBackupVersion =>
+      'The backup was created by a newer, unsupported version of RehabTrack.';
+
+  @override
+  String get newerDatabaseVersion =>
+      'The backup database is newer than this app supports.';
+
+  @override
+  String get unsupportedOldDatabaseVersion =>
+      'The backup database is too old and cannot be migrated.';
+
+  @override
+  String get invalidBackupDatabase => 'The backup database is invalid.';
+
+  @override
+  String get invalidBackupPreferences => 'The backup preferences are invalid.';
+
+  @override
+  String get backupValidationFailed => 'Backup validation failed';
+
+  @override
+  String get operationAlreadyInProgress =>
+      'Another operation is already in progress. Please wait.';
+
+  @override
+  String get backupWarningOlderAppVersion =>
+      'Backup created with an older app version.';
+
+  @override
+  String get backupWarningMigrationRequired =>
+      'Migration will be required before restore.';
+
+  @override
   String get profile => 'Profile';
 
   @override
@@ -1806,4 +2195,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get contactReferencedByVisits =>
       'This contact is used by a doctor visit and cannot be permanently deleted.';
+
+  @override
+  String backupLastCreated(Object time) {
+    return 'Last backup created: $time';
+  }
+
+  @override
+  String restoreLastCompleted(Object time) {
+    return 'Last restore completed: $time';
+  }
+
+  @override
+  String get restoreCancellationUnavailable =>
+      'Restoring is in progress and cannot be cancelled right now.';
+
+  @override
+  String get restoreNotEnoughStorage =>
+      'There is not enough free storage space to run the restore. No data was changed.';
+
+  @override
+  String backupStoredAs(Object name) {
+    return 'Stored as: $name';
+  }
 }
