@@ -12,6 +12,7 @@ import 'package:rehab_track/data/services/restore/restore_environment.dart';
 import 'package:rehab_track/data/services/restore/restore_state_verifier.dart';
 import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
+import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
@@ -81,9 +82,12 @@ class RestoreAppEnvironment implements RestoreEnvironment {
     // and are invalidated explicitly so they re-resolve the documents dir.
     // The notification bridge holds repository references; it must be
     // recreated so it uses the new database connections.
+    // The locale provider is a StateNotifier that caches its locale from the
+    // old database, so it must be invalidated to reload the restored language.
     _container.invalidate(profileImageServiceProvider);
     _container.invalidate(careContactImageServiceProvider);
     _container.invalidate(notificationActionBridgeProvider);
+    _container.invalidate(localeProvider);
   }
 
   @override
