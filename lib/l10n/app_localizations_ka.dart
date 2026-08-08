@@ -2182,6 +2182,9 @@ class AppLocalizationsKa extends AppLocalizations {
       'შესაფერისი კონტაქტი არ არის. ჯერ დაამატეთ კონტაქტი.';
 
   @override
+  String get untitledContact => 'კონტაქტი უსახელოა';
+
+  @override
   String get contactReferencedByVisits =>
       'ეს კონტაქტი გამოიყენება ექიმთან ვიზიტში და მისი სამუდამოდ წაშლა შეუძლებელია.';
 
@@ -2221,7 +2224,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get analysisTitle => 'სათაური';
 
   @override
-  String get analysisTitleHint => 'მაგ.: გამოცდის დასახელება, მხარი, ეკგ';
+  String get analysisTitleHint => 'მაგ.: სისხლის ანალიზი, MRI, ეკგ';
 
   @override
   String get analysisCategory => 'კატეგორია';
@@ -2236,10 +2239,10 @@ class AppLocalizationsKa extends AppLocalizations {
   String get laboratoryOrClinic => 'ლაბორატორია / კლინიკა';
 
   @override
-  String get orderingDoctor => 'დახმარებული ექიმი';
+  String get orderingDoctor => 'დამკვეთი ექიმი';
 
   @override
-  String get relatedDoctorVisit => 'დაკავშირებული ექიმთან ვიზიტი';
+  String get relatedDoctorVisit => 'დაკავშირებული ექიმის ვიზიტი';
 
   @override
   String get analysisNotes => 'შენიშვნები';
@@ -2258,7 +2261,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get addPdf => 'PDF-ის დამატება';
 
   @override
-  String get addImage => 'უხატის დამატება';
+  String get addImage => 'სურათის დამატება';
 
   @override
   String get openAttachment => 'გახსნა';
@@ -2276,19 +2279,28 @@ class AppLocalizationsKa extends AppLocalizations {
   String get pdf => 'PDF';
 
   @override
-  String get image => 'უხატი';
+  String get image => 'სურათი';
 
   @override
   String get cardiology => 'კარდიოლოგია';
 
   @override
-  String get imaging => 'იმების დაიჭერა';
+  String get imaging => 'გამოსახულებითი დიაგნოსტიკა';
 
   @override
   String get pathology => 'პათოლოგია';
 
   @override
   String get allAnalyses => 'ყველა ანალიზი';
+
+  @override
+  String get seeArchivedAnalyses => 'არქივირებული ჩანაწერების ნახვა';
+
+  @override
+  String get filter => 'ფილტრი';
+
+  @override
+  String get sort => 'სორტირება';
 
   @override
   String get archivedAnalyses => 'არქივირებული ანალიზები';
@@ -2298,7 +2310,7 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get noLabAnalysesDesc =>
-      'დაამატეთ PDF, სკანები ან ფოტოები თქვენს სამედიცინო ანალიზებისთვის.';
+      'დაამატეთ PDF, სკანები ან ფოტოები თქვენი სამედიცინო ანალიზებისთვის.';
 
   @override
   String get noArchivedAnalyses => 'არქივირებული ანალიზები არ არის';
@@ -2313,20 +2325,20 @@ class AppLocalizationsKa extends AppLocalizations {
   String get analysisUpdated => 'ანალიზი განახლებულია';
 
   @override
-  String get analysisArchived => 'ანალიზი დაუქივებია';
+  String get analysisArchived => 'ანალიზი დაარქივდა';
 
   @override
   String get analysisRestored => 'ანალიზი აღდგენილია';
 
   @override
-  String get analysisDeleted => 'ანალიზი წაშლილია';
+  String get analysisDeleted => 'ანალიზი წაიშალა';
 
   @override
   String get unsupportedFileType =>
-      'არასაჯავშნარი ფაილის ტიპი. აირჩიეთ PDF, JPG, JPEG ან PNG ფაილი.';
+      'არასაშვარი ფაილის ტიპი. აირჩიეთ PDF, JPG, JPEG ან PNG ფაილი.';
 
   @override
-  String get attachmentMissing => 'დამატებითი ფაილი გაუმყოფილია';
+  String get attachmentMissing => 'დამატებითი ფაილი არ არსებობს';
 
   @override
   String get couldNotOpenAttachment => 'დამატებითი ფაილის გახსნა ვერ მოხერხდა';
@@ -2347,19 +2359,19 @@ class AppLocalizationsKa extends AppLocalizations {
       'ანალიზი და ყველა დამატებითი ფაილის წაშლა';
 
   @override
-  String get newestFirst => 'სახვდესletter novel-ი';
+  String get newestFirst => 'ყველაზე ახალი ჯერ';
 
   @override
-  String get oldestFirst => 'ყოველდღე უფრო ძველი';
+  String get oldestFirst => 'ყველაზე ძველი ჯერ';
 
   @override
   String get titleAscending => 'სათაური (ა–ზ)';
 
   @override
-  String get contactNoLongerAvailable => 'კონტაქტი više არ არის ხელმისაწვდომი';
+  String get contactNoLongerAvailable => 'კონტაქტი აღარ არის ხელმისაწვდომი';
 
   @override
-  String get visitNoLongerAvailable => 'ვიზიტი više არ არის ხელმისაწვდომი';
+  String get visitNoLongerAvailable => 'ვიზიტი აღარ არის ხელმისაწვდომი';
 
   @override
   String get analysisTitleRequired => 'სათაური სავალდებულოა';
@@ -2378,11 +2390,11 @@ class AppLocalizationsKa extends AppLocalizations {
   String get activeAnalyses => 'აქტიური ანალიზები';
 
   @override
-  String get archiveAnalysis => 'ანალიზის დაუქივება';
+  String get archiveAnalysis => 'დაარქივება';
 
   @override
   String get archiveAnalysisConfirmation =>
-      'ამ ანალიზის დაუქივება? ის გადაინაცვლება არქივში, მაგრამ შესაძლებელი იქნება აღდგენა.';
+      'დავაარქივოთ ეს ანალიზი? ის გადაინაცვლებს არქივში, მაგრამ შესაძლებელი იქნება აღდგენა.';
 
   @override
   String get restoreAnalysis => 'ანალიზის აღდგენა';
@@ -2403,7 +2415,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get openPdf => 'PDF-ის გახსნა';
 
   @override
-  String get openImage => 'უხატის გახსნა';
+  String get openImage => 'სურათის გახსნა';
 
   @override
   String get notSet => 'არ არის განსაზღვრული';

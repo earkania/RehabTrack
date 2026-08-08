@@ -71,6 +71,12 @@ dev_dependencies:
   json_serializable: ^6.9.2
   drift_dev: ^2.34.0
 
+# flutter_plugin_android_lifecycle 2.0.23+ compiles against a newer Android SDK
+# than file_picker 8.x, which breaks the AAR-metadata check. Pin it to the last
+# version that builds against android-34 (compatible with file_picker 8.x).
+dependency_overrides:
+  flutter_plugin_android_lifecycle: 2.0.22
+
 flutter:
   uses-material-design: true
   generate: true

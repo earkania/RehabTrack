@@ -157,11 +157,14 @@ class _AnalysisListTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: _CategoryIcon(category: analysis.category),
-        title: Text(
-          analysis.title,
-          style: theme.textTheme.titleMedium,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        title: Tooltip(
+          message: analysis.title,
+          child: Text(
+            analysis.title,
+            style: theme.textTheme.titleMedium,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,22 +206,21 @@ class _AnalysisListTile extends StatelessWidget {
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: 'restore',
-                  child: Row(
-                    children: [
-                      Icon(Icons.unarchive_outlined, size: 20),
-                      const SizedBox(width: 8),
-                      Text(AppLocalizations.of(context)!.restoreAnalysis),
-                    ],
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.unarchive_outlined, size: 20),
+                    title: Text(AppLocalizations.of(context)!.restoreAnalysis),
                   ),
                 ),
                 PopupMenuItem(
                   value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete_outlined, size: 20, color: Theme.of(context).colorScheme.error),
-                      const SizedBox(width: 8),
-                      Text(AppLocalizations.of(context)!.deleteLabAnalysis, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                    ],
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.delete_outlined, size: 20, color: Theme.of(context).colorScheme.error),
+                    title: Text(
+                      AppLocalizations.of(context)!.deleteLabAnalysis,
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
                   ),
                 ),
               ],

@@ -113,6 +113,7 @@ class LabAnalysis {
   LabAnalysesCompanion toUpdateCompanion() {
     return LabAnalysesCompanion(
       id: Value(id!),
+      profileId: Value(profileId),
       title: Value(title),
       category: Value(category),
       analysisDate: Value(analysisDate),
@@ -122,6 +123,7 @@ class LabAnalysis {
       relatedDoctorVisitId: Value(relatedDoctorVisitId),
       notes: Value(notes),
       isArchived: Value(isArchived),
+      createdAt: Value(createdAt),
       updatedAt: Value(DateTime.now()),
     );
   }

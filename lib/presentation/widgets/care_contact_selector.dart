@@ -78,10 +78,13 @@ class CareContactSelector extends ConsumerWidget {
                   suffixIcon: const Icon(Icons.arrow_drop_down),
                 ),
                 child: Text(
-                  selected?.displayName ??
-                      (allowEmpty
+                  selected?.effectiveDisplayName.isNotEmpty == true
+                      ? selected!.effectiveDisplayName
+                      : (allowEmpty
                           ? l10n.selectContact
                           : l10n.noEligibleContacts),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: selected != null
                             ? Theme.of(context).colorScheme.onSurface
@@ -209,12 +212,13 @@ class _ContactSelectionSheet extends StatelessWidget {
                     separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final contact = contacts[index];
+                      final name = contact.effectiveDisplayName;
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                           child: Text(
-                            contact.displayName.isNotEmpty
-                                ? contact.displayName[0].toUpperCase()
+                            name.isNotEmpty
+                                ? name[0].toUpperCase()
                                 : '?',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -222,8 +226,12 @@ class _ContactSelectionSheet extends StatelessWidget {
                             ),
                           ),
                         ),
-                        title: Text(contact.displayName),
-                        subtitle: Text(_contactTypeLabel(context, contact.contactType)),
+                        title: Text(
+                          name.isEmpty ? l10n.untitledContact : name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(_contactSubtitle(context, contact)),
 trailing: Icon(
   initialSelection == contact.id
       ? Icons.check_circle
@@ -280,5 +288,25 @@ onTap: () => Navigator.pop(context, contact.id),
       default:
         return l10n.other;
     }
+  }
+
+  String _contactSubtitle(BuildContext context, CareContact contact) {
+    final typeLabel = _contactTypeLabel(context, contact.contactType);
+    final secondary = <String>[
+      if (contact.contactType == CareContactType.doctor &&
+          contact.specialty != null &&
+          contact.specialty!.isNotEmpty)
+        contact.specialty!,
+      if (contact.organizationName != null &&
+          contact.organizationName!.isNotEmpty &&
+          contact.organizationName != contact.effectiveDisplayName)
+        contact.organizationName!,
+      if (contact.department != null && contact.department!.isNotEmpty)
+        contact.department!,
+      if (contact.primaryPhone != null && contact.primaryPhone!.isNotEmpty)
+        contact.primaryPhone!,
+    ];
+    if (secondary.isEmpty) return typeLabel;
+    return '$typeLabel · ${secondary.join(' · ')}';
   }
 }

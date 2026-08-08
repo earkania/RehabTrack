@@ -10,6 +10,7 @@ import android.os.StatFs
 import android.provider.OpenableColumns
 import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
@@ -43,6 +44,9 @@ class MainActivity : FlutterActivity() {
                 }
                 "getTimeZone" -> {
                     result.success(TimeZone.getDefault().id)
+                }
+                "openImageWithPhotos" -> {
+                    openImageWithPhotos(call, result)
                 }
                 else -> result.notImplemented()
             }
@@ -246,6 +250,41 @@ class MainActivity : FlutterActivity() {
             alarmManager.canScheduleExactAlarms()
         } else {
             true
+        }
+    }
+
+    /** Opens an image file directly in the Google Photos app, falling back to a generic viewer. */
+    private fun openImageWithPhotos(call: MethodCall, result: MethodChannel.Result) {
+        val path = call.argument<String>("path") ?: run {
+            result.error("INVALID_ARGUMENTS", "path is required", null)
+            return
+        }
+        val file = File(path)
+        if (!file.exists()) {
+            result.error("FILE_NOT_FOUND", "file does not exist", null)
+            return
+        }
+        try {
+            val authority = "${applicationContext.packageName}.fileProvider.com.crazecoder.openfile"
+            val uri = FileProvider.getUriForFile(applicationContext, authority, file)
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "image/*")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                setPackage("com.google.android.apps.photos")
+            }
+            val photosResolved = intent.resolveActivity(packageManager) != null
+            if (photosResolved) {
+                startActivity(intent)
+            } else {
+                val fallback = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "image/*")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                startActivity(Intent.createChooser(fallback, null))
+            }
+            result.success(photosResolved)
+        } catch (e: Exception) {
+            result.error("OPEN_IMAGE_ERROR", e.message, null)
         }
     }
 }

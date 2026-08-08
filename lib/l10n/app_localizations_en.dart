@@ -2193,6 +2193,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'No eligible contacts. Add a care contact first.';
 
   @override
+  String get untitledContact => 'Untitled contact';
+
+  @override
   String get contactReferencedByVisits =>
       'This contact is used by a doctor visit and cannot be permanently deleted.';
 
@@ -2299,6 +2302,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allAnalyses => 'All Analyses';
+
+  @override
+  String get seeArchivedAnalyses => 'See Archived Records';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get sort => 'Sort';
 
   @override
   String get archivedAnalyses => 'Archived Analyses';

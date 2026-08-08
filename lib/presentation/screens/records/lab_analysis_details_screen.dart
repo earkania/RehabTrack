@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -9,9 +10,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:open_filex/open_filex.dart';
 
 import 'package:rehab_track/core/router/app_routes.dart';
+import 'package:rehab_track/domain/entities/care_contact.dart';
+import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
 import 'package:rehab_track/domain/entities/lab_analysis.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/lab_analysis_provider.dart';
+import 'package:rehab_track/presentation/providers/doctor_visit_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
 /// Lab Analysis Details Screen
@@ -86,32 +90,29 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 'edit',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit_outlined, size: 20),
-                    const SizedBox(width: 8),
-                    Text(AppLocalizations.of(context)!.editLabAnalysis),
-                  ],
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.edit_outlined, size: 20),
+                  title: Text(AppLocalizations.of(context)!.editLabAnalysis),
                 ),
               ),
               PopupMenuItem(
                 value: 'archive',
-                child: Row(
-                  children: [
-                    Icon(Icons.archive_outlined, size: 20),
-                    const SizedBox(width: 8),
-                    Text(AppLocalizations.of(context)!.archiveAnalysis),
-                  ],
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.archive_outlined, size: 20),
+                  title: Text(AppLocalizations.of(context)!.archiveAnalysis),
                 ),
               ),
               PopupMenuItem(
                 value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(Icons.delete_outlined, size: 20, color: Theme.of(context).colorScheme.error),
-                    const SizedBox(width: 8),
-                    Text(AppLocalizations.of(context)!.deleteLabAnalysis, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                  ],
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.delete_outlined, size: 20, color: Theme.of(context).colorScheme.error),
+                  title: Text(
+                    AppLocalizations.of(context)!.deleteLabAnalysis,
+                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                  ),
                 ),
               ),
             ],
@@ -220,6 +221,14 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
     final analysis = _analysis!;
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final contactLookup = ref.watch(careContactLookupProvider);
+    final relatedVisit = analysis.relatedDoctorVisitId != null
+        ? ref.watch(doctorVisitByIdProvider(analysis.relatedDoctorVisitId!)).valueOrNull
+        : null;
+
+    final labName = _contactName(contactLookup[analysis.laboratoryContactId]);
+    final doctorName = _contactName(contactLookup[analysis.orderingDoctorContactId]);
+    final visitValue = _visitLabel(relatedVisit);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -233,31 +242,23 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
           ),
           const SizedBox(height: 8),
 
-          // Category and dates
+          // Category
           Row(
             children: [
               _CategoryIcon(category: analysis.category),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _CategoryChip(category: analysis.category),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${l10n.analysisDate}: ${_formatDate(context, analysis.analysisDate)}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _CategoryChip(category: analysis.category),
             ],
           ),
           const SizedBox(height: 16),
 
           // Details
+          _DetailRow(
+            label: AppLocalizations.of(context)!.analysisDate,
+            value: _formatDate(context, analysis.analysisDate),
+          ),
+          const SizedBox(height: 8),
+
           if (analysis.resultReceivedDate != null) ...[
             _DetailRow(
               label: AppLocalizations.of(context)!.resultReceivedDate,
@@ -269,7 +270,7 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
           if (analysis.laboratoryContactId != null) ...[
             _DetailRow(
               label: AppLocalizations.of(context)!.laboratoryOrClinic,
-              value: _getLabDisplayName(analysis.laboratoryContactId!),
+              value: labName,
             ),
             const SizedBox(height: 8),
           ],
@@ -277,7 +278,7 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
           if (analysis.orderingDoctorContactId != null) ...[
             _DetailRow(
               label: AppLocalizations.of(context)!.orderingDoctor,
-              value: _getDoctorDisplayName(analysis.orderingDoctorContactId!),
+              value: doctorName,
             ),
             const SizedBox(height: 8),
           ],
@@ -285,7 +286,7 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
           if (analysis.relatedDoctorVisitId != null) ...[
             _DetailRow(
               label: AppLocalizations.of(context)!.relatedDoctorVisit,
-              value: _getVisitDisplayName(analysis.relatedDoctorVisitId!),
+              value: visitValue,
             ),
             const SizedBox(height: 8),
           ],
@@ -327,32 +328,62 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
     return DateFormat.yMMMd().format(date);
   }
 
-  String _getLabDisplayName(int contactId) {
-    // TODO: Implement proper lookup
-    return 'Lab #$contactId';
+  String _contactName(CareContact? contact) {
+    final name = contact?.effectiveDisplayName.trim();
+    if (name != null && name.isNotEmpty) return name;
+    return AppLocalizations.of(context)!.contactNotAvailable;
   }
 
-  String _getDoctorDisplayName(int contactId) {
-    // TODO: Implement proper lookup
-    return 'Doctor #$contactId';
-  }
-
-  String _getVisitDisplayName(int visitId) {
-    // TODO: Implement proper lookup
-    return 'Visit #$visitId';
+  String _visitLabel(DoctorVisitRecord? visit) {
+    if (visit == null) {
+      return AppLocalizations.of(context)!.contactNotAvailable;
+    }
+    if (visit.reason != null && visit.reason!.trim().isNotEmpty) {
+      return visit.reason!;
+    }
+    final date = DateFormat.yMMMd().format(visit.scheduledDateTime);
+    final time = DateFormat.Hm().format(visit.scheduledDateTime);
+    return '$date $time';
   }
 
   Future<void> _openAttachment(LabAnalysisAttachment attachment) async {
     try {
       final file = await _resolveFile(attachment);
-      if (await file.exists()) {
-        await OpenFilex.open(file.path);
-      } else {
+      if (!await file.exists()) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(AppLocalizations.of(context)!.couldNotOpenAttachment)),
           );
         }
+        return;
+      }
+
+      if (attachment.fileType == 'image') {
+        const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+        try {
+          final openedInPhotos = await channel.invokeMethod<bool>('openImageWithPhotos', {
+            'path': file.path,
+          });
+          if (mounted && openedInPhotos != true) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(AppLocalizations.of(context)!.couldNotOpenAttachment)),
+            );
+          }
+          return;
+        } on PlatformException catch (_) {
+          // Fall through to default handler below.
+        }
+      }
+
+      final result = await OpenFilex.open(file.path);
+      if (mounted && result.type != ResultType.done) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.couldNotOpenAttachment,
+            ),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -417,7 +448,7 @@ class _DetailRow extends StatelessWidget {
           SizedBox(
             width: 120,
             child: Text(
-              label,
+              '$label:',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

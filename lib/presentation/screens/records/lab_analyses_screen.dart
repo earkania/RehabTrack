@@ -21,11 +21,22 @@ class LabAnalysesScreen extends ConsumerStatefulWidget {
 
 class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
   bool _showArchived = false;
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _showArchived = widget.startArchived;
+    _searchController.addListener(() {
+      ref.read(labAnalysisSearchQueryProvider.notifier).state =
+          _searchController.text;
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -39,77 +50,20 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_showArchived ? l10n.archivedAnalyses : l10n.labAnalyses),
+        title: Text(l10n.labAnalyses),
         actions: [
-          // Search
           IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => _showSearchDialog(),
-          ),
-          // Filters
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (value) {
-              ref.read(labAnalysisCategoryFilterProvider.notifier).state =
-                  value == 'all' ? null : value;
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'all',
-                child: Text(l10n.allAnalyses),
-              ),
-              PopupMenuItem(
-                value: 'laboratory',
-                child: Text(l10n.laboratory),
-              ),
-              PopupMenuItem(
-                value: 'cardiology',
-                child: Text(l10n.cardiology),
-              ),
-              PopupMenuItem(
-                value: 'imaging',
-                child: Text(l10n.imaging),
-              ),
-              PopupMenuItem(
-                value: 'pathology',
-                child: Text(l10n.pathology),
-              ),
-              PopupMenuItem(
-                value: 'other',
-                child: Text(l10n.other),
-              ),
-            ],
-          ),
-          // Archived toggle
-          IconButton(
-            icon: Icon(_showArchived ? Icons.archive : Icons.archive_outlined),
+            tooltip: _showArchived
+                ? l10n.activeAnalyses
+                : l10n.seeArchivedAnalyses,
             onPressed: () {
               setState(() {
                 _showArchived = !_showArchived;
               });
             },
-            tooltip: _showArchived ? l10n.activeAnalyses : l10n.archivedAnalyses,
-          ),
-          // Sort
-          PopupMenuButton<LabAnalysisSort>(
-            icon: const Icon(Icons.sort),
-            onSelected: (value) {
-              ref.read(labAnalysisSortProvider.notifier).state = value;
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: LabAnalysisSort.newestFirst,
-                child: Text(l10n.newestFirst),
-              ),
-              PopupMenuItem(
-                value: LabAnalysisSort.oldestFirst,
-                child: Text(l10n.oldestFirst),
-              ),
-              PopupMenuItem(
-                value: LabAnalysisSort.titleAscending,
-                child: Text(l10n.titleAscending),
-              ),
-            ],
+            icon: Icon(
+              _showArchived ? Icons.unarchive_outlined : Icons.archive_outlined,
+            ),
           ),
         ],
       ),
@@ -121,10 +75,98 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
             ),
       body: activeProfileId == null
           ? _buildNoProfile()
-          : analyses.when(
-              data: (analyses) => _buildList(analyses),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => _buildError(error),
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: l10n.searchAnalyses,
+                            prefixIcon: const Icon(Icons.search),
+                            border: const OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Filters
+                      _CircleMenuButton<String>(
+                        icon: Icons.filter_list,
+                        tooltip: l10n.filter,
+                        selected: ref.watch(labAnalysisCategoryFilterProvider) !=
+                            null,
+                        onSelected: (value) {
+                          ref.read(labAnalysisCategoryFilterProvider.notifier).state =
+                              value == 'all' ? null : value;
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'all',
+                            child: Text(l10n.allAnalyses),
+                          ),
+                          PopupMenuItem(
+                            value: 'laboratory',
+                            child: Text(l10n.laboratory),
+                          ),
+                          PopupMenuItem(
+                            value: 'cardiology',
+                            child: Text(l10n.cardiology),
+                          ),
+                          PopupMenuItem(
+                            value: 'imaging',
+                            child: Text(l10n.imaging),
+                          ),
+                          PopupMenuItem(
+                            value: 'pathology',
+                            child: Text(l10n.pathology),
+                          ),
+                          PopupMenuItem(
+                            value: 'other',
+                            child: Text(l10n.other),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+                      // Sort
+                      _CircleMenuButton<LabAnalysisSort>(
+                        icon: Icons.sort,
+                        tooltip: l10n.sort,
+                        selected: ref.watch(labAnalysisSortProvider) !=
+                            LabAnalysisSort.newestFirst,
+                        onSelected: (value) {
+                          ref.read(labAnalysisSortProvider.notifier).state = value;
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: LabAnalysisSort.newestFirst,
+                            child: Text(l10n.newestFirst),
+                          ),
+                          PopupMenuItem(
+                            value: LabAnalysisSort.oldestFirst,
+                            child: Text(l10n.oldestFirst),
+                          ),
+                          PopupMenuItem(
+                            value: LabAnalysisSort.titleAscending,
+                            child: Text(l10n.titleAscending),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: analyses.when(
+                    data: (analyses) => _buildList(analyses),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (error, stack) => _buildError(error),
+                  ),
+                ),
+              ],
             ),
     );
   }
@@ -244,42 +286,57 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
       ),
     );
   }
+}
 
-  void _showSearchDialog() {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.search),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: AppLocalizations.of(context)!.searchAnalyses,
-            prefixIcon: const Icon(Icons.search),
+class _CircleMenuButton<T> extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final bool selected;
+  final ValueChanged<T> onSelected;
+  final List<PopupMenuEntry<T>> Function(BuildContext context) itemBuilder;
+
+  const _CircleMenuButton({
+    required this.icon,
+    required this.tooltip,
+    this.selected = false,
+    required this.onSelected,
+    required this.itemBuilder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return PopupMenuButton<T>(
+      tooltip: tooltip,
+      onSelected: onSelected,
+      itemBuilder: itemBuilder,
+      child: Semantics(
+        label: tooltip,
+        button: true,
+        selected: selected,
+        child: Tooltip(
+          message: tooltip,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: selected
+                  ? colorScheme.secondaryContainer
+                  : colorScheme.surfaceContainerHighest,
+              border: Border.all(
+                color: selected ? colorScheme.secondary : Colors.transparent,
+                width: 2,
+              ),
+            ),
+            child: Icon(
+              icon,
+              color: selected
+                  ? colorScheme.onSecondaryContainer
+                  : colorScheme.onSurfaceVariant,
+            ),
           ),
-          autofocus: true,
-          onSubmitted: (value) {
-            ref.read(labAnalysisSearchQueryProvider.notifier).state = value;
-            Navigator.pop(context);
-          },
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              ref.read(labAnalysisSearchQueryProvider.notifier).state = '';
-              Navigator.pop(context);
-            },
-            child: Text(AppLocalizations.of(context)!.clear),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(labAnalysisSearchQueryProvider.notifier).state =
-                  controller.text;
-              Navigator.pop(context);
-            },
-            child: Text(AppLocalizations.of(context)!.search),
-          ),
-        ],
       ),
     );
   }
@@ -297,11 +354,14 @@ class _AnalysisListTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: _CategoryIcon(category: analysis.category),
-        title: Text(
-          analysis.title,
-          style: theme.textTheme.titleMedium,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        title: Tooltip(
+          message: analysis.title,
+          child: Text(
+            analysis.title,
+            style: theme.textTheme.titleMedium,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

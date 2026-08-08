@@ -71,11 +71,9 @@ class DoctorVisitSelector extends ConsumerWidget {
                   suffixIcon: const Icon(Icons.arrow_drop_down),
                 ),
                 child: Text(
-                  selected?.reason?.isNotEmpty == true
-                      ? selected!.reason!
-                      : (allowEmpty
-                          ? l10n.selectDoctorVisit
-                          : l10n.noUpcomingVisits),
+                  _visitLabel(context, selected),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: selected != null
                             ? Theme.of(context).colorScheme.onSurface
@@ -135,6 +133,21 @@ class DoctorVisitSelector extends ConsumerWidget {
   }
 }
 
+String _visitTitle(BuildContext context, DoctorVisitRecord visit) {
+  if (visit.reason != null && visit.reason!.trim().isNotEmpty) {
+    return visit.reason!;
+  }
+  final date = DateFormat.yMMMd().format(visit.scheduledDateTime);
+  final time = DateFormat.Hm().format(visit.scheduledDateTime);
+  return '$date $time';
+}
+
+String _visitLabel(BuildContext context, DoctorVisitRecord? visit) {
+  final l10n = AppLocalizations.of(context)!;
+  if (visit == null) return l10n.selectDoctorVisit;
+  return _visitTitle(context, visit);
+}
+
 class _VisitSelectionDialog extends StatelessWidget {
   const _VisitSelectionDialog({
     required this.visits,
@@ -186,7 +199,11 @@ class _VisitSelectionDialog extends StatelessWidget {
                   final visit = visits[index];
                   return ListTile(
                     leading: const Icon(Icons.calendar_today_outlined),
-                    title: Text(visit.reason ?? l10n.selectDoctorVisit),
+                    title: Text(
+                      _visitTitle(context, visit),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     subtitle: Text(
                       '${DateFormat.yMMMd().format(visit.scheduledDateTime)} at ${DateFormat.Hm().format(visit.scheduledDateTime)}',
                     ),

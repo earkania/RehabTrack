@@ -4160,6 +4160,12 @@ abstract class AppLocalizations {
   /// **'No eligible contacts. Add a care contact first.'**
   String get noEligibleContacts;
 
+  /// No description provided for @untitledContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled contact'**
+  String get untitledContact;
+
   /// No description provided for @contactReferencedByVisits.
   ///
   /// In en, this message translates to:
@@ -4357,6 +4363,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All Analyses'**
   String get allAnalyses;
+
+  /// No description provided for @seeArchivedAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'See Archived Records'**
+  String get seeArchivedAnalyses;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @sort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get sort;
 
   /// No description provided for @archivedAnalyses.
   ///
