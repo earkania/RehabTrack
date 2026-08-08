@@ -23,17 +23,17 @@ void main() {
   test('prepare writes and validates a valid database', () async {
     final preparedDir = Directory(p.join(dir.path, 'prepared'));
     await preparedDir.create(recursive: true);
-    final dbBytes = buildRestorableSqliteBytes(schema: 14, profiles: 2);
+    final dbBytes = buildRestorableSqliteBytes(schema: 15, profiles: 2);
     final prepared = await manager.prepare(
       dbBytes: dbBytes,
       preparedDir: preparedDir,
-      expectedSchemaVersion: 14,
+      expectedSchemaVersion: 15,
     );
     expect(prepared.file.existsSync(), isTrue);
     expect(
       await manager.validatePrepared(
         file: prepared.file,
-        expectedSchemaVersion: 14,
+        expectedSchemaVersion: 15,
       ),
       isTrue,
     );
@@ -47,7 +47,7 @@ void main() {
       manager.prepare(
         dbBytes: dbBytes,
         preparedDir: preparedDir,
-        expectedSchemaVersion: 14,
+        expectedSchemaVersion: 15,
       ),
       throwsA(isA<DatabasePreparationException>()),
     );
@@ -60,14 +60,14 @@ void main() {
       manager.prepare(
         dbBytes: Uint8List.fromList('not a database at all'.codeUnits),
         preparedDir: preparedDir,
-        expectedSchemaVersion: 14,
+        expectedSchemaVersion: 15,
       ),
       throwsA(isA<DatabasePreparationException>()),
     );
   });
 
   test('validatePrepared is false for wrong schema/missing tables', () async {
-    final good = buildRestorableSqliteBytes(schema: 14, profiles: 1);
+    final good = buildRestorableSqliteBytes(schema: 15, profiles: 1);
     final file = File(p.join(dir.path, 'db.sqlite'));
     await file.writeAsBytes(good);
     expect(
@@ -81,14 +81,14 @@ void main() {
     final liveDir = Directory(p.join(dir.path, 'live'));
     await liveDir.create(recursive: true);
     final liveDb = File(p.join(liveDir.path, 'rehabtrack.sqlite'));
-    await liveDb.writeAsBytes(buildRestorableSqliteBytes(schema: 14, profiles: 3));
+    await liveDb.writeAsBytes(buildRestorableSqliteBytes(schema: 15, profiles: 3));
 
     // Simulate a WAL sidecar that must move with the live database.
     final wal = File('${liveDb.path}-wal');
     await wal.writeAsBytes([1, 2, 3]);
 
     final prepared = File(p.join(dir.path, 'prepared.sqlite'));
-    await prepared.writeAsBytes(buildRestorableSqliteBytes(schema: 14, profiles: 1));
+    await prepared.writeAsBytes(buildRestorableSqliteBytes(schema: 15, profiles: 1));
 
     final rollbackDir = Directory(p.join(dir.path, 'rollback'));
     final swap = const RestoreDatabaseSwap();

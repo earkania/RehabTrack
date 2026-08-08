@@ -107,7 +107,7 @@ void main() {
       validator: const BackupValidator(),
       recoveryStore: recoveryStore,
       tempBaseDir: tempBaseDir,
-      currentDatabaseSchemaVersion: 14,
+      currentDatabaseSchemaVersion: 15,
       currentAppVersion: '1.2.0',
     );
   }
@@ -118,7 +118,7 @@ void main() {
     final outcome = await const BackupValidator().validate(
       handle: read.handle!,
       tempDir: tempBaseDir,
-      currentDatabaseSchemaVersion: 14,
+      currentDatabaseSchemaVersion: 15,
       currentAppVersion: '1.2.0',
     );
     return outcome.preview!;
@@ -158,7 +158,7 @@ void main() {
     // Live device currently holds different data (B).
     await writeLiveDatabase(
       docsDir,
-      buildRestorableSqliteBytes(schema: 14, profiles: 2),
+      buildRestorableSqliteBytes(schema: 15, profiles: 2),
     );
 
     final service = await restoreService();
@@ -180,7 +180,7 @@ void main() {
     var preview = await previewFor(backup);
     await writeLiveDatabase(
       docsDir,
-      buildRestorableSqliteBytes(schema: 14, profiles: 2),
+      buildRestorableSqliteBytes(schema: 15, profiles: 2),
     );
     var service = await restoreService();
     expect((await service.run(selectedBackupFile: backup, expectedPreview: preview)).succeeded,
@@ -214,7 +214,7 @@ void main() {
 
     await writeLiveDatabase(
       docsDir,
-      buildRestorableSqliteBytes(schema: 14, profiles: 2),
+      buildRestorableSqliteBytes(schema: 15, profiles: 2),
     );
 
     final service = await restoreService();

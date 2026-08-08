@@ -216,7 +216,7 @@ void main() {
 
       expect(manifest.backupFormatVersion, BackupManifest.currentFormatVersion);
       expect(manifest.appVersion, '1.0.0');
-      expect(manifest.databaseSchemaVersion, 14);
+      expect(manifest.databaseSchemaVersion, 15);
       expect(manifest.createdAt, DateTime.utc(2026, 8, 4, 12, 30));
       expect(manifest.platform, 'test');
       expect(manifest.fileCount, 1);

@@ -1606,7 +1606,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get chooseFromGallery => 'აირჩიეთ გალერეიდან';
 
   @override
-  String get takePhoto => 'გადაიღეთ ფოტო';
+  String get takePhoto => 'ფოტოს გადაღება';
 
   @override
   String get removeProfilePhoto => 'ფოტოს წაშლა';
@@ -2182,6 +2182,9 @@ class AppLocalizationsKa extends AppLocalizations {
       'შესაფერისი კონტაქტი არ არის. ჯერ დაამატეთ კონტაქტი.';
 
   @override
+  String get untitledContact => 'კონტაქტი უსახელოა';
+
+  @override
   String get contactReferencedByVisits =>
       'ეს კონტაქტი გამოიყენება ექიმთან ვიზიტში და მისი სამუდამოდ წაშლა შეუძლებელია.';
 
@@ -2207,4 +2210,253 @@ class AppLocalizationsKa extends AppLocalizations {
   String backupStoredAs(Object name) {
     return 'შენახულია როგორც: $name';
   }
+
+  @override
+  String get addLabAnalysis => 'ლაბორატორიული ანალიზის დამატება';
+
+  @override
+  String get editLabAnalysis => 'ლაბორატორიული ანალიზის რედაქტირება';
+
+  @override
+  String get labAnalysisDetails => 'ლაბორატორიული ანალიზის დეტალები';
+
+  @override
+  String get analysisTitle => 'სათაური';
+
+  @override
+  String get analysisTitleHint => 'მაგ.: სისხლის ანალიზი, MRI, ეკგ';
+
+  @override
+  String get analysisCategory => 'კატეგორია';
+
+  @override
+  String get analysisDate => 'ანალიზის თარიღი';
+
+  @override
+  String get resultReceivedDate => 'შედეგის მიღების თარიღი';
+
+  @override
+  String get laboratoryOrClinic => 'ლაბორატორია / კლინიკა';
+
+  @override
+  String get orderingDoctor => 'დამკვეთი ექიმი';
+
+  @override
+  String get relatedDoctorVisit => 'დაკავშირებული ექიმის ვიზიტი';
+
+  @override
+  String get analysisNotes => 'შენიშვნები';
+
+  @override
+  String get analysisNotesHint =>
+      'არასავალდებულო შენიშვნები ამ ანალიზის შესახებ';
+
+  @override
+  String get attachments => 'დამატებითი ფაილები';
+
+  @override
+  String get addAttachment => 'ფაილის დამატება';
+
+  @override
+  String get addPdf => 'PDF-ის დამატება';
+
+  @override
+  String get addImage => 'სურათის დამატება';
+
+  @override
+  String get openAttachment => 'გახსნა';
+
+  @override
+  String get shareAttachment => 'გაზიარება';
+
+  @override
+  String get removeAttachment => 'წაშლა';
+
+  @override
+  String get renameAttachment => 'სახელის შეცვლა';
+
+  @override
+  String get pdf => 'PDF';
+
+  @override
+  String get image => 'სურათი';
+
+  @override
+  String get cardiology => 'კარდიოლოგია';
+
+  @override
+  String get imaging => 'გამოსახულებითი დიაგნოსტიკა';
+
+  @override
+  String get pathology => 'პათოლოგია';
+
+  @override
+  String get allAnalyses => 'ყველა ანალიზი';
+
+  @override
+  String get seeArchivedAnalyses => 'არქივირებული ჩანაწერების ნახვა';
+
+  @override
+  String get filter => 'ფილტრი';
+
+  @override
+  String get sort => 'სორტირება';
+
+  @override
+  String get archivedAnalyses => 'არქივირებული ანალიზები';
+
+  @override
+  String get noLabAnalyses => 'ანალიზები ჯერ არ არის';
+
+  @override
+  String get noLabAnalysesDesc =>
+      'დაამატეთ PDF, სკანები ან ფოტოები თქვენი სამედიცინო ანალიზებისთვის.';
+
+  @override
+  String get noArchivedAnalyses => 'არქივირებული ანალიზები არ არის';
+
+  @override
+  String get noArchivedAnalysesDesc => 'არქივირებული ანალიზები აქ გამოჩნდება.';
+
+  @override
+  String get analysisSaved => 'ანალიზი შენახულია';
+
+  @override
+  String get analysisUpdated => 'ანალიზი განახლებულია';
+
+  @override
+  String get analysisArchived => 'ანალიზი დაარქივდა';
+
+  @override
+  String get analysisRestored => 'ანალიზი აღდგენილია';
+
+  @override
+  String get analysisDeleted => 'ანალიზი წაიშალა';
+
+  @override
+  String get unsupportedFileType =>
+      'არასაშვარი ფაილის ტიპი. აირჩიეთ PDF, JPG, JPEG ან PNG ფაილი.';
+
+  @override
+  String get attachmentMissing => 'დამატებითი ფაილი არ არსებობს';
+
+  @override
+  String get couldNotOpenAttachment => 'დამატებითი ფაილის გახსნა ვერ მოხერხდა';
+
+  @override
+  String get couldNotShareAttachment =>
+      'დამატებითი ფაილის გაზიარება ვერ მოხერხდა';
+
+  @override
+  String get confirmRemoveAttachment => 'ამ დამატებითი ფაილის წაშლა?';
+
+  @override
+  String get confirmDeleteAnalysis =>
+      'ამ ანალიზის სამუდამოდ წაშლა? ყველა დამატებითი ფაილი წაიშლება.';
+
+  @override
+  String get deleteAnalysisAndAttachments =>
+      'ანალიზი და ყველა დამატებითი ფაილის წაშლა';
+
+  @override
+  String get newestFirst => 'ყველაზე ახალი ჯერ';
+
+  @override
+  String get oldestFirst => 'ყველაზე ძველი ჯერ';
+
+  @override
+  String get titleAscending => 'სათაური (ა–ზ)';
+
+  @override
+  String get contactNoLongerAvailable => 'კონტაქტი აღარ არის ხელმისაწვდომი';
+
+  @override
+  String get visitNoLongerAvailable => 'ვიზიტი აღარ არის ხელმისაწვდომი';
+
+  @override
+  String get analysisTitleRequired => 'სათაური სავალდებულოა';
+
+  @override
+  String get resultDateBeforeAnalysisDate =>
+      'შედეგის მიღების თარიღი ვერ შეიძლება იყოს ანალიზის თარიღამდე';
+
+  @override
+  String get existingAttachments => 'არსებული დამატებითი ფაილები';
+
+  @override
+  String get newAttachments => 'ახალი დამატებითი ფაილები';
+
+  @override
+  String get activeAnalyses => 'აქტიური ანალიზები';
+
+  @override
+  String get archiveAnalysis => 'დაარქივება';
+
+  @override
+  String get archiveAnalysisConfirmation =>
+      'დავაარქივოთ ეს ანალიზი? ის გადაინაცვლებს არქივში, მაგრამ შესაძლებელი იქნება აღდგენა.';
+
+  @override
+  String get restoreAnalysis => 'ანალიზის აღდგენა';
+
+  @override
+  String get deleteLabAnalysis => 'ლაბორატორიული ანალიზის წაშლა';
+
+  @override
+  String get selectFile => 'ფაილის არჩევა';
+
+  @override
+  String get failedToSaveAnalysis => 'ანალიზის შენახვა ვერ მოხერხდა';
+
+  @override
+  String get analysisAlreadyInProgress => 'აღდგენა უკვე მიმდინარეობს.';
+
+  @override
+  String get openPdf => 'PDF-ის გახსნა';
+
+  @override
+  String get openImage => 'სურათის გახსნა';
+
+  @override
+  String get notSet => 'არ არის განსაზღვრული';
+
+  @override
+  String get selectContact => 'კონტაქტის არჩევა';
+
+  @override
+  String get selectDoctorVisit => 'ექიმის ვიზიტის არჩევა';
+
+  @override
+  String get clearSelection => 'არჩევის გაწმენდა';
+
+  @override
+  String get updateLabAnalysis => 'ლაბორატორიული ანალიზის განახლება';
+
+  @override
+  String get saveLabAnalysis => 'ლაბორატორიული ანალიზის შენახვა';
+
+  @override
+  String get noActiveProfile => 'აქტიური პროფილი არ არის';
+
+  @override
+  String get createProfileFirst => 'ჯერ შექმენით პაციენტის პროფილი.';
+
+  @override
+  String get errorLoadingAnalyses =>
+      'ლაბორატორიული ანალიზების ჩატვირთვა ვერ მოხერხდა';
+
+  @override
+  String get search => 'ძებნა';
+
+  @override
+  String get searchAnalyses => 'ლაბორატორიული ანალიზების ძებნა';
+
+  @override
+  String get clear => 'გასუფთავება';
+
+  @override
+  String get tomorrow => 'ხვალ';
+
+  @override
+  String get newAttachment => 'ახალი დამატებითი ფაილი';
 }

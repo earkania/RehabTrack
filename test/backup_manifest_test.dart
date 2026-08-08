@@ -5,7 +5,7 @@ void main() {
   BackupManifest buildManifest({
     int formatVersion = BackupManifest.currentFormatVersion,
     String appVersion = '1.0.0',
-    int schemaVersion = 14,
+    int schemaVersion = 15,
     int fileCount = 2,
     Map<String, String>? checksums,
   }) {
@@ -31,7 +31,7 @@ void main() {
     final json = buildManifest().toJson();
     expect(json['backupFormatVersion'], BackupManifest.currentFormatVersion);
     expect(json['appVersion'], '1.0.0');
-    expect(json['databaseSchemaVersion'], 14);
+    expect(json['databaseSchemaVersion'], 15);
     expect(json['createdAt'], '2026-08-04T12:30:00.000Z');
     expect(json['databaseFileName'], 'database.sqlite');
     expect(json['preferencesFileName'], 'preferences.json');

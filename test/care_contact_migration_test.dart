@@ -27,7 +27,7 @@ void main() {
   test('schema version is 14', () {
     final database = db.AppDatabase.test();
     addTearDown(database.close);
-    expect(database.schemaVersion, 14);
+    expect(database.schemaVersion, 15);
   });
 
   test('care_contacts table and indexes exist after fresh create', () async {

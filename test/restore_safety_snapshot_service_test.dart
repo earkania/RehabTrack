@@ -25,7 +25,7 @@ void main() {
   test('snapshots the database, allowlisted preferences and managed files',
       () async {
     final db = buildRestorableSqliteBytes(
-      schema: 14,
+      schema: 15,
       profiles: 2,
       settings: const {'app_language': 'ka', 'last_backup_at': 'ignored'},
     );
@@ -49,7 +49,7 @@ void main() {
 
   test('throws SafetySnapshotException when the database cannot be snapshotted',
       () async {
-    final db = buildRestorableSqliteBytes(schema: 14, profiles: 1);
+    final db = buildRestorableSqliteBytes(schema: 15, profiles: 1);
     await writeLiveDatabase(docsDir, db);
     env.failSnapshot = true;
 

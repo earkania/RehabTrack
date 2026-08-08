@@ -39,6 +39,21 @@ dependencies:
   # Image picking
   image_picker: ^1.1.2
 
+  # File picking
+  file_picker: ^8.0.0+1
+
+  # Sharing
+  share_plus: ^10.0.2
+
+  # Opening files
+  open_filex: ^4.7.0
+
+  # UUID
+  uuid: ^4.5.1
+
+  # Utilities
+  collection: ^1.19.0
+
   # UI
   fl_chart: ^0.70.0
   cupertino_icons: ^1.0.8
@@ -55,6 +70,12 @@ dev_dependencies:
   freezed: ">=3.0.0 <4.0.0"
   json_serializable: ^6.9.2
   drift_dev: ^2.34.0
+
+# flutter_plugin_android_lifecycle 2.0.23+ compiles against a newer Android SDK
+# than file_picker 8.x, which breaks the AAR-metadata check. Pin it to the last
+# version that builds against android-34 (compatible with file_picker 8.x).
+dependency_overrides:
+  flutter_plugin_android_lifecycle: 2.0.22
 
 flutter:
   uses-material-design: true

@@ -17,6 +17,7 @@ import 'package:rehab_track/data/database/tables/diet_tables.dart';
 import 'package:rehab_track/data/database/tables/health_template_table.dart';
 import 'package:rehab_track/data/database/tables/app_setting_table.dart';
 import 'package:rehab_track/data/database/tables/profile_reference_range_tables.dart';
+import 'package:rehab_track/data/database/tables/lab_analysis_tables.dart';
 import 'package:rehab_track/data/database/seed_data.dart';
 import 'package:rehab_track/data/database/daos/profile_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_dao.dart';
@@ -32,6 +33,7 @@ import 'package:rehab_track/data/database/daos/medication_alternatives_dao.dart'
 import 'package:rehab_track/data/database/daos/medication_components_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_alternative_components_dao.dart';
 import 'package:rehab_track/data/database/daos/doctor_visit_dao.dart';
+import 'package:rehab_track/data/database/daos/lab_analysis_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -63,11 +65,13 @@ part 'app_database.g.dart';
     HealthTemplates,
     AppSettings,
     ProfileReferenceRanges,
+    LabAnalyses,
+    LabAnalysisAttachments,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   /// Canonical current schema version used by the backup/restore validator.
-  static const int currentSchemaVersion = 14;
+  static const int currentSchemaVersion = 15;
 
   AppDatabase() : super(_openConnection());
 
@@ -91,11 +95,11 @@ class AppDatabase extends _$AppDatabase {
   DoctorDao get doctorDao => DoctorDao(this);
   CareContactDao get careContactDao => CareContactDao(this);
   DoctorVisitDao get doctorVisitDao => DoctorVisitDao(this);
-  DocumentDao get documentDao => DocumentDao(this);
+DocumentDao get documentDao => DocumentDao(this);
   DietDao get dietDao => DietDao(this);
-  HealthTemplateDao get healthTemplateDao =>
-      HealthTemplateDao(this);
+  HealthTemplateDao get healthTemplateDao => HealthTemplateDao(this);
   AppSettingDao get appSettingDao => AppSettingDao(this);
+  LabAnalysisDao get labAnalysisDao => LabAnalysisDao(this);
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -240,9 +244,13 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(careContacts);
       }
       if (from < 14) {
-        // Phase 8C: Doctor Visits - Records module backed by optional Care
-        // Contact references (doctor + clinic/hospital)
+        // Phase 8B: Doctor visit records
         await m.createTable(doctorVisitRecords);
+      }
+      if (from < 15) {
+        // Lab Analyses module - document archive for lab results
+        await m.createTable(labAnalyses);
+        await m.createTable(labAnalysisAttachments);
       }
     },
   );
