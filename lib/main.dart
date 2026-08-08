@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:rehab_track/app.dart';
+import 'package:rehab_track/data/services/storage/lab_attachment_layout_migrator.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/reminder_settings_provider.dart';
@@ -22,6 +24,11 @@ Future<void> main() async {
   // Detect and recover an interrupted restore from a previous launch before
   // anything opens the database, so the app never reads a half-restored file.
   await runStartupRestoreRecovery(container);
+
+  // Relocate legacy `files/lab_analyses` attachment files to the managed
+  // `lab_analyses/` root so backups and restores stay consistent.
+  await const LabAttachmentLayoutMigrator()
+      .migrate(await getApplicationDocumentsDirectory());
 
   // Initialize notification actions and schedule recovery at startup.
   // This must happen before runApp so that the callback is registered

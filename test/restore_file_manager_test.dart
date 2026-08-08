@@ -43,6 +43,7 @@ void main() {
     final files = {
       'files/profile_images/p1.jpg': Uint8List.fromList([1, 2, 3]),
       'files/care_contact_images/c1.jpg': Uint8List.fromList([9, 9]),
+      'files/lab_analyses/1/2/report.pdf': Uint8List.fromList([4, 5]),
     };
     final db = buildRestorableSqliteBytes(schema: 15, profiles: 1);
     final archive = buildRestorableBackupZip(
@@ -59,7 +60,7 @@ void main() {
       checksums: matches(handle),
       preparedFilesDir: prepared,
     );
-    expect(count, 2);
+    expect(count, 3);
     expect(
       File(p.join(prepared.path, 'profile_images', 'p1.jpg')).existsSync(),
       isTrue,
@@ -67,6 +68,18 @@ void main() {
     expect(
       File(p.join(prepared.path, 'care_contact_images', 'c1.jpg')).existsSync(),
       isTrue,
+    );
+    expect(
+      File(p.join(prepared.path, 'lab_analyses', '1', '2', 'report.pdf'))
+          .existsSync(),
+      isTrue,
+    );
+  });
+
+  test('managedRootNames includes lab_analyses', () {
+    expect(
+      RestoreFileManager.managedRootNames,
+      containsAll(['profile_images', 'care_contact_images', 'lab_analyses']),
     );
   });
 

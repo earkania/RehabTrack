@@ -58,6 +58,12 @@ void main() {
         isTrue);
     expect(await managedFileExists(fix.docsDir, 'profile_images', 'photoA.jpg'),
         isFalse);
+    expect(await managedFileExists(
+          fix.docsDir,
+          'lab_analyses',
+          p.join('1', '2', 'report.pdf'),
+        ),
+        isTrue);
 
     expect(phases.last, RestoreApplyPhase.finalizing);
   });
@@ -316,6 +322,7 @@ class _Fixture {
       preferences: const {'app_language': 'en'},
       files: {
         'files/profile_images/photoB.jpg': Uint8List.fromList([2, 2, 2]),
+        'files/lab_analyses/1/2/report.pdf': Uint8List.fromList([7, 8, 9]),
       },
     );
     final selectedFile = File(p.join(tempBaseDir.path, 'selected.rtb'));

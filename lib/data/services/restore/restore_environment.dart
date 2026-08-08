@@ -11,7 +11,8 @@ import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
 /// passed back to the caller by an implementation.
 abstract class RestoreEnvironment {
   /// The application documents directory that hosts `rehabtrack.sqlite` and
-  /// the managed image directories (`profile_images/`, `care_contact_images/`).
+  /// the managed file directories (profile images, care-contact images, lab
+  /// analysis attachments) each live directly under it.
   Future<Directory> documentsDirectory();
 
   /// Produces a consistent snapshot of the live database into [destinationPath]

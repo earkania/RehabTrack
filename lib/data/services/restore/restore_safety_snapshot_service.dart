@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import 'package:rehab_track/data/services/restore/restore_environment.dart';
+import 'package:rehab_track/data/services/restore/restore_file_manager.dart';
 
 /// Thrown when the pre-restore safety snapshot cannot be created. The current
 /// live state is left untouched; the restore must abort.
@@ -12,7 +13,7 @@ class SafetySnapshotException implements Exception {
 }
 
 /// Captures the current live state (database, allowlisted preferences and
-/// managed image files) into the safety-snapshot area of the workspace so a
+/// managed files) into the safety-snapshot area of the workspace so a
 /// failed restore can roll the device back to exactly this state.
 ///
 /// The snapshot directory is excluded from normal workspace cleanup and is
@@ -27,6 +28,7 @@ class RestoreSafetySnapshotService {
   ///   `<snapshotDir>/preferences.json`
   ///   `<snapshotDir>/files/profile_images/...`
   ///   `<snapshotDir>/files/care_contact_images/...`
+  ///   `<snapshotDir>/files/lab_analyses/<profileId>/<analysisId>/...`
   static const String databaseFileName = 'database.sqlite';
   static const String preferencesFileName = 'preferences.json';
   static const String filesDirectory = 'files';
@@ -64,20 +66,13 @@ class RestoreSafetySnapshotService {
     final filesRoot = Directory(p.join(snapshotDir.path, filesDirectory));
     await filesRoot.create(recursive: true);
 
-    for (final name in const ['profile_images', 'care_contact_images']) {
+    for (final name in RestoreFileManager.managedRootNames) {
       final source = Directory(p.join(docs.path, name));
       if (!await source.exists()) continue;
-      await _copyDirectory(source, Directory(p.join(filesRoot.path, name)));
-    }
-  }
-
-  static Future<void> _copyDirectory(Directory source, Directory target) async {
-    await target.create(recursive: true);
-    await for (final entity in source.list(recursive: false)) {
-      if (entity is File) {
-        await File(p.join(target.path, p.basename(entity.path)))
-            .writeAsBytes(await entity.readAsBytes(), flush: true);
-      }
+      await copyDirectoryTree(
+        source,
+        Directory(p.join(filesRoot.path, name)),
+      );
     }
   }
 }

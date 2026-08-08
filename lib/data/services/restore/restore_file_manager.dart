@@ -21,7 +21,7 @@ class FilesSwapHandle {
 }
 
 /// Stages, validates and replaces app-managed files (profile and care-contact
-/// photos) from the backup archive.
+/// photos, lab analysis attachments) from the backup archive.
 ///
 /// Extraction re-validates every path and re-verifies SHA-256 checksums against
 /// the manifest, independent of the earlier preview validation. Replacement
@@ -34,6 +34,7 @@ class RestoreFileManager {
   static const List<String> managedRootNames = [
     'profile_images',
     'care_contact_images',
+    'lab_analyses',
   ];
 
   /// Extracts all entries under `files/` into [preparedFilesDir], preserving

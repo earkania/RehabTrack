@@ -257,7 +257,6 @@ class LabAnalysisRepositoryImpl implements LabAnalysisRepository {
     final dir = Directory(
       p.join(
         appDir.path,
-        'files',
         'lab_analyses',
         profileId.toString(),
         analysisId.toString(),
@@ -271,7 +270,7 @@ class LabAnalysisRepositoryImpl implements LabAnalysisRepository {
 
   Future<void> _deleteManagedFile(String relativePath) async {
     final appDir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(appDir.path, 'files', relativePath));
+    final file = File(p.join(appDir.path, relativePath));
     if (await file.exists()) {
       await file.delete();
     }

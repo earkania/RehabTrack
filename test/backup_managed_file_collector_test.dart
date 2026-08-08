@@ -30,6 +30,14 @@ void main() {
     return dir;
   }
 
+  /// Creates a nested lab attachment file at `lab_analyses/<pid>/<aid>/...`.
+  File labAttachment(String relative, {required String content}) {
+    final file = File(p.join(docsDir.path, relative));
+    file.createSync(recursive: true);
+    file.writeAsStringSync(content);
+    return file;
+  }
+
   File photo(String name, {required String content}) {
     final file = File(p.join(docsDir.path, name));
     file.createSync(recursive: true);
@@ -58,6 +66,44 @@ void main() {
       containsAll([profilePhoto.path, contactPhoto.path]),
     );
     expect(collection.warnings, isEmpty);
+  });
+
+  test('collects nested lab attachments preserving their layout', () async {
+    final attachment = labAttachment(
+      '${ManagedFileCollector.labAnalysesDirName}/1/2/report.pdf',
+      content: 'lab',
+    );
+
+    final collection = await ManagedFileCollector(database, docsDir).collect();
+
+    expect(collection.files, hasLength(1));
+    expect(collection.files.single.archivePath,
+        'files/lab_analyses/1/2/report.pdf');
+    expect(collection.files.single.file.path, attachment.path);
+    expect(collection.warnings, isEmpty);
+  });
+
+  test('warns about DB-referenced lab attachments missing on disk', () async {
+    await database.into(database.labAnalysisAttachments).insert(
+          LabAnalysisAttachmentsCompanion.insert(
+            analysisId: 7,
+            profileId: 3,
+            fileType: 'image',
+            managedRelativePath: 'lab_analyses/3/9/missing.jpg',
+            originalFileName: 'missing.jpg',
+            displayName: 'missing',
+            mimeType: 'image/jpeg',
+            fileSize: const Value(1),
+            sortOrder: const Value(0),
+            createdAt: DateTime(2025),
+            updatedAt: DateTime(2025),
+          ),
+        );
+
+    final collection = await ManagedFileCollector(database, docsDir).collect();
+
+    expect(collection.warnings, hasLength(1));
+    expect(collection.warnings.single, contains('1'));
   });
 
   test('returns no files and no warnings when directories are absent', () async {

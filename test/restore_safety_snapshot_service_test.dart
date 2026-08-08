@@ -31,6 +31,12 @@ void main() {
     );
     await writeLiveDatabase(docsDir, db);
     await writeManagedFile(docsDir, 'profile_images', 'a.jpg', [1, 2, 3]);
+    await writeManagedFile(
+      docsDir,
+      p.join('lab_analyses', '1', '2'),
+      'report.pdf',
+      [4, 5],
+    );
 
     final snapshotDir = Directory(p.join(dir.path, 'safety-snapshot'));
     await RestoreSafetySnapshotService(env).create(snapshotDir: snapshotDir);
@@ -43,6 +49,17 @@ void main() {
     expect(
       File(p.join(snapshotDir.path, 'files', 'profile_images', 'a.jpg'))
           .existsSync(),
+      isTrue,
+    );
+    expect(
+      File(p.join(
+        snapshotDir.path,
+        'files',
+        'lab_analyses',
+        '1',
+        '2',
+        'report.pdf',
+      )).existsSync(),
       isTrue,
     );
   });

@@ -420,10 +420,7 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
 
   Future<File> _resolveFile(LabAnalysisAttachment attachment) async {
     final appDir = await getApplicationDocumentsDirectory();
-    if (attachment.managedRelativePath.startsWith('lab_analyses')) {
-      return File(p.join(appDir.path, 'files', attachment.managedRelativePath));
-    }
-    return File(p.join(appDir.path, 'files', attachment.managedRelativePath));
+    return File(p.join(appDir.path, attachment.managedRelativePath));
   }
 }
 
