@@ -32,11 +32,31 @@ class CareContactSelector extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
+            ),
+            if (selectedContactId != null && onChanged != null)
+              TextButton.icon(
+                onPressed: () => onChanged!(null),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  minimumSize: const Size(0, 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: const Icon(Icons.clear, size: 18),
+                label: Text(
+                  l10n.clearSelection,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 8),
         contactsAsync.when(
@@ -130,15 +150,6 @@ class CareContactSelector extends ConsumerWidget {
             child: const SizedBox.shrink(),
           ),
         ),
-        if (selectedContactId != null && onChanged != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: TextButton.icon(
-              onPressed: () => onChanged!(null),
-              icon: const Icon(Icons.clear),
-              label: Text(l10n.clearSelection),
-            ),
-          ),
       ],
     );
   }

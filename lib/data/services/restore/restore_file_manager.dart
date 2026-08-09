@@ -35,6 +35,7 @@ class RestoreFileManager {
     'profile_images',
     'care_contact_images',
     'lab_analyses',
+    'doctor_prescriptions',
   ];
 
   /// Extracts all entries under `files/` into [preparedFilesDir], preserving

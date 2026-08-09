@@ -18,12 +18,12 @@ void main() {
       final dir = Directory.systemTemp.createTempSync('verifier_');
       await writeLiveDatabase(
         dir,
-        buildRestorableSqliteBytes(schema: 15, profiles: 1),
+        buildRestorableSqliteBytes(schema: 16, profiles: 1),
       );
       expect(
         await verifier.verify(
           databasePath: p.join(dir.path, 'rehabtrack.sqlite'),
-          expectedSchemaVersion: 15,
+          expectedSchemaVersion: 16,
         ),
         isTrue,
       );
@@ -34,7 +34,7 @@ void main() {
       expect(
         await verifier.verify(
           databasePath: p.join('no/such/dir', 'db.sqlite'),
-          expectedSchemaVersion: 15,
+          expectedSchemaVersion: 16,
         ),
         isFalse,
       );
@@ -44,7 +44,7 @@ void main() {
       final dir = Directory.systemTemp.createTempSync('verifier_');
       await writeLiveDatabase(
         dir,
-        buildRestorableSqliteBytes(schema: 15, profiles: 1),
+        buildRestorableSqliteBytes(schema: 16, profiles: 1),
       );
       expect(
         await verifier.verify(
@@ -63,7 +63,7 @@ void main() {
       expect(
         await verifier.verify(
           databasePath: bogus.path,
-          expectedSchemaVersion: 15,
+          expectedSchemaVersion: 16,
         ),
         isFalse,
       );
@@ -74,14 +74,14 @@ void main() {
       final dir = Directory.systemTemp.createTempSync('verifier_');
       await writeLiveDatabase(
         dir,
-        buildRestorableSqliteBytes(schema: 15, profiles: 1),
+        buildRestorableSqliteBytes(schema: 16, profiles: 1),
       );
       final out = p.join(dir.path, 'rehabtrack.sqlite');
       await stripTable(out, 'measurement_records');
       expect(
         await verifier.verify(
           databasePath: out,
-          expectedSchemaVersion: 15,
+          expectedSchemaVersion: 16,
         ),
         isFalse,
       );
@@ -92,7 +92,7 @@ void main() {
       final dir = Directory.systemTemp.createTempSync('verifier_');
       await writeLiveDatabase(
         dir,
-        buildRestorableSqliteBytes(schema: 15, profiles: 1),
+        buildRestorableSqliteBytes(schema: 16, profiles: 1),
       );
       final root = Directory(p.join(dir.path, 'profile_images'));
       await root.create(recursive: true);
@@ -100,7 +100,7 @@ void main() {
       expect(
         await verifier.verify(
           databasePath: p.join(dir.path, 'rehabtrack.sqlite'),
-          expectedSchemaVersion: 15,
+          expectedSchemaVersion: 16,
           managedFilesRoot: root.path,
         ),
         isTrue,
@@ -108,7 +108,7 @@ void main() {
       expect(
         await verifier.verify(
           databasePath: p.join(dir.path, 'rehabtrack.sqlite'),
-          expectedSchemaVersion: 15,
+          expectedSchemaVersion: 16,
           managedFilesRoot: p.join(dir.path, 'missing_root'),
         ),
         isFalse,

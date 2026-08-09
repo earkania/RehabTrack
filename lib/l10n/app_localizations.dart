@@ -1052,11 +1052,29 @@ abstract class AppLocalizations {
   /// **'Edit Medication'**
   String get editMedication;
 
+  /// No description provided for @removeMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Medication'**
+  String get removeMedication;
+
   /// No description provided for @medicationName.
   ///
   /// In en, this message translates to:
   /// **'Medication Name'**
   String get medicationName;
+
+  /// No description provided for @medicationNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Amoxicillin'**
+  String get medicationNameHint;
+
+  /// No description provided for @medicationNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication name is required'**
+  String get medicationNameRequired;
 
   /// No description provided for @description.
   ///
@@ -4370,6 +4388,18 @@ abstract class AppLocalizations {
   /// **'See Archived Records'**
   String get seeArchivedAnalyses;
 
+  /// No description provided for @showArchivedAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'Show archived analyses'**
+  String get showArchivedAnalyses;
+
+  /// No description provided for @showingArchivedAnalyses.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing archived analyses'**
+  String get showingArchivedAnalyses;
+
   /// No description provided for @filter.
   ///
   /// In en, this message translates to:
@@ -4681,6 +4711,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New attachment'**
   String get newAttachment;
+
+  /// No description provided for @doctorPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Prescriptions'**
+  String get doctorPrescriptions;
+
+  /// No description provided for @addDoctorPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Prescription'**
+  String get addDoctorPrescription;
+
+  /// No description provided for @editDoctorPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Prescription'**
+  String get editDoctorPrescription;
+
+  /// No description provided for @doctorPrescriptionDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription Details'**
+  String get doctorPrescriptionDetails;
+
+  /// No description provided for @prescriptionName.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription Name'**
+  String get prescriptionName;
+
+  /// No description provided for @prescriptionNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Amoxicillin 500mg, Blood pressure medication'**
+  String get prescriptionNameHint;
+
+  /// No description provided for @prescriptionNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription name is required'**
+  String get prescriptionNameRequired;
+
+  /// No description provided for @prescriptionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription Date'**
+  String get prescriptionDate;
+
+  /// No description provided for @prescriptionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get prescriptionReason;
+
+  /// No description provided for @prescriptionReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional reason for this prescription'**
+  String get prescriptionReasonHint;
+
+  /// No description provided for @prescriptionNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get prescriptionNotes;
+
+  /// No description provided for @prescriptionNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional notes about this prescription'**
+  String get prescriptionNotesHint;
+
+  /// No description provided for @updateDoctorPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Prescription'**
+  String get updateDoctorPrescription;
+
+  /// No description provided for @saveDoctorPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Prescription'**
+  String get saveDoctorPrescription;
+
+  /// No description provided for @prescriptionSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription saved'**
+  String get prescriptionSaved;
+
+  /// No description provided for @prescriptionUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription updated'**
+  String get prescriptionUpdated;
+
+  /// No description provided for @prescriptionArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription archived'**
+  String get prescriptionArchived;
+
+  /// No description provided for @prescriptionRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription restored'**
+  String get prescriptionRestored;
+
+  /// No description provided for @prescriptionDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription deleted'**
+  String get prescriptionDeleted;
+
+  /// No description provided for @archivePrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Prescription'**
+  String get archivePrescription;
+
+  /// No description provided for @archivePrescriptionConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this prescription? It will be moved to the archived list but can be restored.'**
+  String get archivePrescriptionConfirmation;
+
+  /// No description provided for @restorePrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Prescription'**
+  String get restorePrescription;
+
+  /// No description provided for @deleteDoctorPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Prescription'**
+  String get deleteDoctorPrescription;
+
+  /// No description provided for @confirmDeletePrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this prescription permanently? All attachments will be removed.'**
+  String get confirmDeletePrescription;
+
+  /// No description provided for @noDoctorPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'No prescriptions yet'**
+  String get noDoctorPrescriptions;
+
+  /// No description provided for @noDoctorPrescriptionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add PDFs, scans, or photos of your prescriptions.'**
+  String get noDoctorPrescriptionsDesc;
+
+  /// No description provided for @noArchivedPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived prescriptions'**
+  String get noArchivedPrescriptions;
+
+  /// No description provided for @noArchivedPrescriptionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived prescriptions will appear here.'**
+  String get noArchivedPrescriptionsDesc;
+
+  /// No description provided for @archivedPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived Prescriptions'**
+  String get archivedPrescriptions;
+
+  /// No description provided for @seeArchivedPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'See Archived Prescriptions'**
+  String get seeArchivedPrescriptions;
+
+  /// No description provided for @activePrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Prescriptions'**
+  String get activePrescriptions;
+
+  /// No description provided for @showArchivedPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Show archived prescriptions'**
+  String get showArchivedPrescriptions;
+
+  /// No description provided for @showingArchivedPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing archived prescriptions'**
+  String get showingArchivedPrescriptions;
+
+  /// No description provided for @allPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'All Prescriptions'**
+  String get allPrescriptions;
+
+  /// No description provided for @hospital.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital'**
+  String get hospital;
+
+  /// No description provided for @searchPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Search prescriptions'**
+  String get searchPrescriptions;
+
+  /// No description provided for @errorLoadingPrescriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load prescriptions'**
+  String get errorLoadingPrescriptions;
+
+  /// No description provided for @createMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Medication'**
+  String get createMedication;
+
+  /// No description provided for @noMedicationInfoEntered.
+  ///
+  /// In en, this message translates to:
+  /// **'No medication information was entered'**
+  String get noMedicationInfoEntered;
+
+  /// No description provided for @frequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency'**
+  String get frequency;
+
+  /// No description provided for @timing.
+  ///
+  /// In en, this message translates to:
+  /// **'Timing'**
+  String get timing;
+
+  /// No description provided for @duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get duration;
+
+  /// No description provided for @medicationNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Notes'**
+  String get medicationNotes;
+
+  /// No description provided for @noMedicationsInPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No medications in this prescription'**
+  String get noMedicationsInPrescription;
+
+  /// No description provided for @medicationsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Medications: {count}'**
+  String medicationsCount(Object count);
+
+  /// No description provided for @attachmentRenamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment renamed'**
+  String get attachmentRenamed;
+
+  /// No description provided for @attachmentRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment removed'**
+  String get attachmentRemoved;
 }
 
 class _AppLocalizationsDelegate

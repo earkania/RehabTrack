@@ -52,7 +52,7 @@ void main() {
 
   test('apply persists the values via the environment', () async {
     final db = buildRestorableSqliteBytes(
-      schema: 15,
+      schema: 16,
       profiles: 0,
       settings: const {'app_language': 'ka'},
     );

@@ -45,9 +45,9 @@ void main() {
       'files/care_contact_images/c1.jpg': Uint8List.fromList([9, 9]),
       'files/lab_analyses/1/2/report.pdf': Uint8List.fromList([4, 5]),
     };
-    final db = buildRestorableSqliteBytes(schema: 15, profiles: 1);
+    final db = buildRestorableSqliteBytes(schema: 16, profiles: 1);
     final archive = buildRestorableBackupZip(
-      schema: 15,
+      schema: 16,
       database: db,
       preferences: const {'app_language': 'en'},
       files: files,
@@ -86,9 +86,9 @@ void main() {
   test('extract rejects a file whose checksum does not match the manifest',
       () async {
     final files = {'files/profile_images/p1.jpg': Uint8List.fromList([1, 2, 3])};
-    final db = buildRestorableSqliteBytes(schema: 15, profiles: 1);
+    final db = buildRestorableSqliteBytes(schema: 16, profiles: 1);
     final archive = buildRestorableBackupZip(
-      schema: 15,
+      schema: 16,
       database: db,
       preferences: const {'app_language': 'en'},
       files: files,

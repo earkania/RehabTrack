@@ -132,7 +132,7 @@ BackupPreview _preview() {
     appVersion: '1.2.0',
     backupFormatVersion: 1,
     databaseSchemaVersion: 14,
-    currentDatabaseSchemaVersion: 15,
+    currentDatabaseSchemaVersion: 16,
     compatibility: BackupCompatibility.compatible,
     migrationRequired: false,
     profileCount: 2,

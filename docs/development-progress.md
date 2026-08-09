@@ -4159,3 +4159,78 @@ no merge/selective restore, no encryption (all explicit non-goals).
 6. en/ka, light/dark, and screen-reader (TalkBack) pass on the backup screens.
 7. Storage-full scenario on the test device (free space below the guard) →
    `notEnoughStorage` / `insufficientStorage` messages and untouched data.
+
+## Phase 10 — Doctor Prescriptions Module (2026-08-09)
+
+**Goal:** Replace the Records placeholder with a full Doctor Prescriptions
+archive: list (search / filter / sort / archived toggle), add/edit form with
+doctor, clinic/hospital, related doctor visit pickers, details screen with
+attachments (PDF/image/photo) and a non-automatic **Create Medication** prefill,
+soft archive + permanent delete, and full backup/restore integration. No OCR,
+no automatic parsing, no reminder scheduling, no AI (explicit non-goals).
+
+### Key decisions
+
+- **Schema v15 → v16, additive migration.** New `DoctorPrescriptions` and
+  `DoctorPrescriptionAttachments` tables with FKs to Profiles (cascade), Care
+  Contacts (`setNull`) and Doctor Visit Records (`setNull`); no columns added to
+  existing tables. `currentSchemaVersion` moved 15 → 16 across the app and all
+  schema-version test fixtures.
+- **Managed-file storage mirrors Lab Analyses.** Attachment files live at
+  `<appDocs>/doctor_prescriptions/<profileId>/<prescriptionId>/<uuid><ext>`, the
+  DB stores the relative path, and delete removes both the row and the file.
+  `fileType` = `pdf` | `image` | `other`.
+- **Create Medication never auto-saves.** The details screen builds
+  `MedicationFormData(name: title, notes: reason+"\n"+notes)` from any non-empty
+  title/reason/notes and pushes the existing Medication Add route with it —
+  the user still completes and saves. `AddMedicationScreen` gained an optional
+  `initialData` parameter (route passes `state.extra`). Empty fields → snackbar.
+- **Archive is soft, delete is permanent.** AppBar toggle switches the active ↔
+  archived lists; restoring brings a row back to active; delete shows a confirm
+  dialog and removes attachment files too.
+- **Backup/restore covers attachments.** `ManagedFileCollector` scans the nested
+  `doctor_prescriptions` root and tracks DB-referenced attachment paths;
+  `RestoreFileManager.managedRootNames` includes the folder, so files round-trip
+  exactly like lab analyses.
+
+### New/changed files
+
+- `lib/data/database/tables/doctor_prescription_tables.dart` (new) — both tables
+  + indexes.
+- `lib/data/database/app_database.dart` — schema 16, migration, imports,
+  `doctorPrescriptionDao`.
+- `lib/data/database/daos/doctor_prescription_dao.dart` (new) — CRUD, watch,
+  archive, search, attachments.
+- `lib/domain/entities/doctor_prescription.dart`, `lib/domain/repositories/
+  doctor_prescription_repository.dart`, `lib/data/repositories/
+  doctor_prescription_repository_impl.dart` (new).
+- `lib/presentation/providers/doctor_prescription_provider.dart` (new).
+- `lib/presentation/screens/records/doctor_prescriptions_screen.dart`,
+  `doctor_prescription_form_screen.dart`, `doctor_prescription_details_screen.dart`,
+  `archived_doctor_prescriptions_screen.dart`, `doctor_prescription_attachments_section.dart`
+  (new).
+- `lib/presentation/screens/activities/add_medication_screen.dart` — `initialData`.
+- `lib/core/router/app_routes.dart` / `app_router.dart` — prescription routes +
+  `state.extra` prefill wiring.
+- `lib/presentation/screens/records/records_dashboard_screen.dart` — grid tile.
+- `lib/data/services/backup/managed_file_collector.dart`,
+  `lib/data/services/restore/restore_file_manager.dart` — backup integration.
+- `lib/l10n/app_en.arb` / `app_ka.arb` — new keys in en + ka.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1216/1216 passed (full suite) |
+| Pixel 7 manual | Passed (see below) |
+
+**Pixel 7 manual verification (adb 31140DLH2000KM):** dashboard tile → list →
+details (doctor/clinic/attach/date all render); Create Medication prefill
+carries the title + reason into the medication form; added a new prescription; the
+AppBar toggle shows archived; archive confirm dialog; backup created with the
+prescription attachment present in the archive (`files/doctor_prescriptions/1/1/...`);
+restore round-trip returned the active + archived prescriptions; delete with
+confirm dialog removed the test row. All flows verified via UI hierarchy dump on
+`31140DLH2000KM`.

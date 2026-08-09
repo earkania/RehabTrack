@@ -546,7 +546,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editMedication => 'Edit Medication';
 
   @override
+  String get removeMedication => 'Remove Medication';
+
+  @override
   String get medicationName => 'Medication Name';
+
+  @override
+  String get medicationNameHint => 'e.g., Amoxicillin';
+
+  @override
+  String get medicationNameRequired => 'Medication name is required';
 
   @override
   String get description => 'Description';
@@ -2307,6 +2316,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get seeArchivedAnalyses => 'See Archived Records';
 
   @override
+  String get showArchivedAnalyses => 'Show archived analyses';
+
+  @override
+  String get showingArchivedAnalyses => 'Showing archived analyses';
+
+  @override
   String get filter => 'Filter';
 
   @override
@@ -2468,4 +2483,153 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newAttachment => 'New attachment';
+
+  @override
+  String get doctorPrescriptions => 'Doctor Prescriptions';
+
+  @override
+  String get addDoctorPrescription => 'Add Prescription';
+
+  @override
+  String get editDoctorPrescription => 'Edit Prescription';
+
+  @override
+  String get doctorPrescriptionDetails => 'Prescription Details';
+
+  @override
+  String get prescriptionName => 'Prescription Name';
+
+  @override
+  String get prescriptionNameHint =>
+      'e.g., Amoxicillin 500mg, Blood pressure medication';
+
+  @override
+  String get prescriptionNameRequired => 'Prescription name is required';
+
+  @override
+  String get prescriptionDate => 'Prescription Date';
+
+  @override
+  String get prescriptionReason => 'Reason';
+
+  @override
+  String get prescriptionReasonHint => 'Optional reason for this prescription';
+
+  @override
+  String get prescriptionNotes => 'Notes';
+
+  @override
+  String get prescriptionNotesHint => 'Optional notes about this prescription';
+
+  @override
+  String get updateDoctorPrescription => 'Update Prescription';
+
+  @override
+  String get saveDoctorPrescription => 'Save Prescription';
+
+  @override
+  String get prescriptionSaved => 'Prescription saved';
+
+  @override
+  String get prescriptionUpdated => 'Prescription updated';
+
+  @override
+  String get prescriptionArchived => 'Prescription archived';
+
+  @override
+  String get prescriptionRestored => 'Prescription restored';
+
+  @override
+  String get prescriptionDeleted => 'Prescription deleted';
+
+  @override
+  String get archivePrescription => 'Archive Prescription';
+
+  @override
+  String get archivePrescriptionConfirmation =>
+      'Archive this prescription? It will be moved to the archived list but can be restored.';
+
+  @override
+  String get restorePrescription => 'Restore Prescription';
+
+  @override
+  String get deleteDoctorPrescription => 'Delete Prescription';
+
+  @override
+  String get confirmDeletePrescription =>
+      'Delete this prescription permanently? All attachments will be removed.';
+
+  @override
+  String get noDoctorPrescriptions => 'No prescriptions yet';
+
+  @override
+  String get noDoctorPrescriptionsDesc =>
+      'Add PDFs, scans, or photos of your prescriptions.';
+
+  @override
+  String get noArchivedPrescriptions => 'No archived prescriptions';
+
+  @override
+  String get noArchivedPrescriptionsDesc =>
+      'Archived prescriptions will appear here.';
+
+  @override
+  String get archivedPrescriptions => 'Archived Prescriptions';
+
+  @override
+  String get seeArchivedPrescriptions => 'See Archived Prescriptions';
+
+  @override
+  String get activePrescriptions => 'Active Prescriptions';
+
+  @override
+  String get showArchivedPrescriptions => 'Show archived prescriptions';
+
+  @override
+  String get showingArchivedPrescriptions => 'Showing archived prescriptions';
+
+  @override
+  String get allPrescriptions => 'All Prescriptions';
+
+  @override
+  String get hospital => 'Hospital';
+
+  @override
+  String get searchPrescriptions => 'Search prescriptions';
+
+  @override
+  String get errorLoadingPrescriptions => 'Couldn\'t load prescriptions';
+
+  @override
+  String get createMedication => 'Create Medication';
+
+  @override
+  String get noMedicationInfoEntered => 'No medication information was entered';
+
+  @override
+  String get frequency => 'Frequency';
+
+  @override
+  String get timing => 'Timing';
+
+  @override
+  String get duration => 'Duration';
+
+  @override
+  String get medicationNotes => 'Medication Notes';
+
+  @override
+  String get noMedicationsInPrescription =>
+      'No medications in this prescription';
+
+  @override
+  String medicationsCount(Object count) {
+    return 'Medications: $count';
+  }
+
+  @override
+  String get attachmentRenamed => 'Attachment renamed';
+
+  @override
+  String get attachmentRemoved => 'Attachment removed';
 }

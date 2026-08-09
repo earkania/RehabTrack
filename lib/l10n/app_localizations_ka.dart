@@ -548,7 +548,16 @@ class AppLocalizationsKa extends AppLocalizations {
   String get editMedication => 'მედიკამენტის რედაქტირება';
 
   @override
+  String get removeMedication => 'მედიკამენტის წაშლა';
+
+  @override
   String get medicationName => 'მედიკამენტის სახელი';
+
+  @override
+  String get medicationNameHint => 'მაგ., ამოქსიცილინი';
+
+  @override
+  String get medicationNameRequired => 'მედიკამენტის სახელი სავალდებულოა';
 
   @override
   String get description => 'აღწერა';
@@ -2273,7 +2282,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get removeAttachment => 'წაშლა';
 
   @override
-  String get renameAttachment => 'სახელის შეცვლა';
+  String get renameAttachment => 'გადარქმევა';
 
   @override
   String get pdf => 'PDF';
@@ -2295,6 +2304,12 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get seeArchivedAnalyses => 'არქივირებული ჩანაწერების ნახვა';
+
+  @override
+  String get showArchivedAnalyses => 'დაარქივებული ანალიზების ჩვენება';
+
+  @override
+  String get showingArchivedAnalyses => 'ნაჩვენებია დაარქივებული ანალიზები';
 
   @override
   String get filter => 'ფილტრი';
@@ -2459,4 +2474,158 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get newAttachment => 'ახალი დამატებითი ფაილი';
+
+  @override
+  String get doctorPrescriptions => 'ექიმის დანიშნულებები';
+
+  @override
+  String get addDoctorPrescription => 'დანიშნულების დამატება';
+
+  @override
+  String get editDoctorPrescription => 'დანიშნულების რედაქტირება';
+
+  @override
+  String get doctorPrescriptionDetails => 'დანიშნულების დეტალები';
+
+  @override
+  String get prescriptionName => 'დანიშნულების დასახელება';
+
+  @override
+  String get prescriptionNameHint =>
+      'მაგ., ამოქსიცილინი 500მგ, არტერიული წნევის წამალი';
+
+  @override
+  String get prescriptionNameRequired => 'დანიშნულების დასახელება სავალდებულოა';
+
+  @override
+  String get prescriptionDate => 'დანიშნულების თარიღი';
+
+  @override
+  String get prescriptionReason => 'მიზეზი';
+
+  @override
+  String get prescriptionReasonHint =>
+      'ამ დანიშნულების მიზეზი (არასავალდებულო)';
+
+  @override
+  String get prescriptionNotes => 'შენიშვნები';
+
+  @override
+  String get prescriptionNotesHint =>
+      'შენიშვნები ამ დანიშნულების შესახებ (არასავალდებულო)';
+
+  @override
+  String get updateDoctorPrescription => 'დანიშნულების განახლება';
+
+  @override
+  String get saveDoctorPrescription => 'დანიშნულების შენახვა';
+
+  @override
+  String get prescriptionSaved => 'დანიშნულება შენახულია';
+
+  @override
+  String get prescriptionUpdated => 'დანიშნულება განახლებულია';
+
+  @override
+  String get prescriptionArchived => 'დანიშნულება დაარქივებულია';
+
+  @override
+  String get prescriptionRestored => 'დანიშნულება აღდგენილია';
+
+  @override
+  String get prescriptionDeleted => 'დანიშნულება წაშლილია';
+
+  @override
+  String get archivePrescription => 'დაარქივება';
+
+  @override
+  String get archivePrescriptionConfirmation =>
+      'დავაარქივოთ ეს დანიშნულება? ის გადაინაცვლებს არქივში, მაგრამ შესაძლებელი იქნება აღდგენა.';
+
+  @override
+  String get restorePrescription => 'დანიშნულების აღდგენა';
+
+  @override
+  String get deleteDoctorPrescription => 'დანიშნულების წაშლა';
+
+  @override
+  String get confirmDeletePrescription =>
+      'ამ დანიშნულების სამუდამოდ წაშლა? ყველა დამატებითი ფაილი წაიშლება.';
+
+  @override
+  String get noDoctorPrescriptions => 'დანიშნულებები ჯერ არ არის';
+
+  @override
+  String get noDoctorPrescriptionsDesc =>
+      'დაამატეთ თქვენი დანიშნულებების PDF, სკანირებული ან ფოტო ფაილები.';
+
+  @override
+  String get noArchivedPrescriptions => 'დაარქივებული დანიშნულებები არ არის';
+
+  @override
+  String get noArchivedPrescriptionsDesc =>
+      'დაარქივებული დანიშნულებები აქ გამოჩნდება.';
+
+  @override
+  String get archivedPrescriptions => 'დაარქივებული დანიშნულებები';
+
+  @override
+  String get seeArchivedPrescriptions => 'დაარქივებული დანიშნულებების ნახვა';
+
+  @override
+  String get activePrescriptions => 'აქტიური დანიშნულებები';
+
+  @override
+  String get showArchivedPrescriptions => 'დაარქივებული დანიშნულებების ჩვენება';
+
+  @override
+  String get showingArchivedPrescriptions =>
+      'ნაჩვენებია დაარქივებული დანიშნულებები';
+
+  @override
+  String get allPrescriptions => 'ყველა დანიშნულება';
+
+  @override
+  String get hospital => 'საავადმყოფო';
+
+  @override
+  String get searchPrescriptions => 'დანიშნულებების ძებნა';
+
+  @override
+  String get errorLoadingPrescriptions =>
+      'დანიშნულებების ჩატვირთვა ვერ მოხერხდა';
+
+  @override
+  String get createMedication => 'მედიკამენტის შექმნა';
+
+  @override
+  String get noMedicationInfoEntered =>
+      'მედიკამენტის ინფორმაცია არ არის შეყვანილი';
+
+  @override
+  String get frequency => 'სიხშირე';
+
+  @override
+  String get timing => 'დრო';
+
+  @override
+  String get duration => 'ხანგრძლივობა';
+
+  @override
+  String get medicationNotes => 'მედიკამენტის შენიშვნები';
+
+  @override
+  String get noMedicationsInPrescription =>
+      'ამ დანიშნულებაში მედიკამენტები არ არის';
+
+  @override
+  String medicationsCount(Object count) {
+    return 'მედიკამენტები: $count';
+  }
+
+  @override
+  String get attachmentRenamed => 'დამატებითი ფაილი დაარქვეს';
+
+  @override
+  String get attachmentRemoved => 'დამატებითი ფაილი წაიშალა';
 }

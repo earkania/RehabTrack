@@ -24,10 +24,10 @@ void main() {
     return db.AppDatabase.forTesting(NativeDatabase(dbFile()));
   }
 
-  test('schema version is 14', () {
+  test('schema version is 17', () {
     final database = db.AppDatabase.test();
     addTearDown(database.close);
-    expect(database.schemaVersion, 15);
+    expect(database.schemaVersion, 17);
   });
 
   test('care_contacts table and indexes exist after fresh create', () async {
@@ -312,5 +312,138 @@ void main() {
 
     final count = await reopened.profileDao.getProfileCount();
     expect(count, greaterThanOrEqualTo(1));
+  });
+
+  test('upgrading from version 15 creates doctor prescription tables and '
+      'preserves data', () async {
+    // 1. Open a fresh file DB at the current schema and seed a profile.
+    var database = await openFileDb();
+    final profileId = await database.into(database.profiles).insert(
+      db.ProfilesCompanion.insert(
+        firstName: 'Existing',
+        lastName: 'User',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+        isPrimary: const Value(true),
+        isActive: const Value(true),
+      ),
+    );
+
+    // 2. Simulate a v15 database: drop the doctor prescription tables and mark
+    //    user_version as 15 so reopening runs the real onUpgrade path.
+    await database.customStatement('DROP TABLE doctor_prescription_attachments');
+    await database.customStatement('DROP TABLE doctor_prescriptions');
+    await database.customStatement('PRAGMA user_version = 15');
+    await database.close();
+
+    // 3. Reopen — drift detects 15 < 16 and applies the migration.
+    database = await openFileDb();
+    addTearDown(database.close);
+
+    // 4. Existing profile data is preserved.
+    final profiles = await (database.select(database.profiles)
+          ..where((t) => t.id.equals(profileId)))
+        .get();
+    expect(profiles, hasLength(1));
+    expect(profiles.single.firstName, 'Existing');
+
+    // 5. Both prescription tables exist again after migration.
+    final tables = await database
+        .customSelect('SELECT name FROM sqlite_master WHERE type = \'table\'')
+        .get();
+    final tableNames = tables.map((r) => r.read<String>('name')).toSet();
+    expect(tableNames, contains('doctor_prescriptions'));
+    expect(tableNames, contains('doctor_prescription_attachments'));
+
+    // 6. A prescription can be written through the DAO after migration.
+    final prescriptionId = await database.doctorPrescriptionDao
+        .insertPrescription(
+      db.DoctorPrescriptionsCompanion.insert(
+        profileId: profileId,
+        title: 'Amoxicillin 500mg',
+        prescriptionDate: DateTime(2026, 8, 1),
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+    expect(prescriptionId, greaterThan(0));
+
+    // 7. An attachment row can also be written.
+    final attachmentId = await database.doctorPrescriptionDao
+        .insertAttachment(
+      db.DoctorPrescriptionAttachmentsCompanion.insert(
+        prescriptionId: prescriptionId,
+        profileId: profileId,
+        fileType: 'pdf',
+        managedRelativePath: 'doctor_prescriptions/$profileId/$prescriptionId/a.pdf',
+        originalFileName: 'a.pdf',
+        displayName: 'a',
+        mimeType: 'application/pdf',
+        fileSize: const Value(1),
+        sortOrder: const Value(0),
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+    expect(attachmentId, greaterThan(0));
+  });
+
+  test('upgrading from version 16 creates the prescription medications table '
+      'and preserves data', () async {
+    // 1. Open a fresh file DB at the current schema and seed a profile.
+    var database = await openFileDb();
+    final profileId = await database.into(database.profiles).insert(
+      db.ProfilesCompanion.insert(
+        firstName: 'Existing',
+        lastName: 'User',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+        isPrimary: const Value(true),
+        isActive: const Value(true),
+      ),
+    );
+
+    // 2. Simulate a v16 database: drop the prescription medications table and
+    //    mark user_version as 16 so reopening runs the real onUpgrade path.
+    await database.customStatement('DROP TABLE doctor_prescription_medications');
+    await database.customStatement('PRAGMA user_version = 16');
+    await database.close();
+
+    // 3. Reopen — drift detects 16 < 17 and applies the migration.
+    database = await openFileDb();
+    addTearDown(database.close);
+
+    // 4. The medications table exists again after migration.
+    final tables = await database
+        .customSelect('SELECT name FROM sqlite_master WHERE type = \'table\'')
+        .get();
+    final tableNames = tables.map((r) => r.read<String>('name')).toSet();
+    expect(tableNames, contains('doctor_prescription_medications'));
+
+    // 5. A medication row can be written through the DAO after migration.
+    final prescriptionId = await database.doctorPrescriptionDao
+        .insertPrescription(
+      db.DoctorPrescriptionsCompanion.insert(
+        profileId: profileId,
+        title: 'Cardiology follow-up',
+        prescriptionDate: DateTime(2026, 8, 1),
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+    final medicationId = await database.doctorPrescriptionDao
+        .insertMedication(
+      db.DoctorPrescriptionMedicationsCompanion.insert(
+        prescriptionId: prescriptionId,
+        profileId: profileId,
+        medicationName: 'Clopidogrel 75 mg',
+        doseAmount: const Value('75'),
+        doseUnit: const Value('mg'),
+        sortOrder: const Value(0),
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+    expect(medicationId, greaterThan(0));
   });
 }

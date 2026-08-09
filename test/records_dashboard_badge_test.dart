@@ -89,8 +89,9 @@ void main() {
     testWidgets('badge does not add an extra grid item', (tester) async {
       await pumpApp(tester, count: 3);
 
-      // Only the three module tiles: Lab Analyses, Doctor Visits, Reports.
-      expect(find.byType(ModuleGridTile), findsNWidgets(3));
+      // Only the four module tiles: Lab Analyses, Doctor Prescriptions,
+      // Doctor Visits, Reports.
+      expect(find.byType(ModuleGridTile), findsNWidgets(4));
     });
 
     testWidgets('badge does not reduce the Doctor Visits tile width',

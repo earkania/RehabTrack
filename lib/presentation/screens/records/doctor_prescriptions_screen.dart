@@ -4,32 +4,31 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:rehab_track/core/router/app_routes.dart';
-import 'package:rehab_track/domain/entities/lab_analysis.dart';
+import 'package:rehab_track/domain/entities/doctor_prescription.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
-import 'package:rehab_track/presentation/providers/lab_analysis_provider.dart';
+import 'package:rehab_track/presentation/providers/doctor_prescription_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/widgets/common/archived_toggle_button.dart';
 
-/// Lab Analyses list screen
-class LabAnalysesScreen extends ConsumerStatefulWidget {
-  const LabAnalysesScreen({super.key, this.startArchived = false});
-
-  final bool startArchived;
+/// Doctor Prescriptions list screen
+class DoctorPrescriptionsScreen extends ConsumerStatefulWidget {
+  const DoctorPrescriptionsScreen({super.key});
 
   @override
-  ConsumerState<LabAnalysesScreen> createState() => _LabAnalysesScreenState();
+  ConsumerState<DoctorPrescriptionsScreen> createState() =>
+      _DoctorPrescriptionsScreenState();
 }
 
-class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
+class _DoctorPrescriptionsScreenState
+    extends ConsumerState<DoctorPrescriptionsScreen> {
   bool _showArchived = false;
   final _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _showArchived = widget.startArchived;
     _searchController.addListener(() {
-      ref.read(labAnalysisSearchQueryProvider.notifier).state =
+      ref.read(doctorPrescriptionSearchQueryProvider.notifier).state =
           _searchController.text;
     });
   }
@@ -45,18 +44,18 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
     final l10n = AppLocalizations.of(context)!;
     final activeProfileId = ref.watch(currentActiveProfileIdProvider);
 
-    final analyses = _showArchived
-        ? ref.watch(archivedLabAnalysesProvider(activeProfileId ?? 0))
-        : ref.watch(sortedLabAnalysesProvider(activeProfileId ?? 0));
+    final prescriptions = _showArchived
+        ? ref.watch(archivedDoctorPrescriptionsProvider(activeProfileId ?? 0))
+        : ref.watch(sortedDoctorPrescriptionsProvider(activeProfileId ?? 0));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.labAnalyses),
+        title: Text(l10n.doctorPrescriptions),
         actions: [
           ArchivedToggleButton(
             isArchived: _showArchived,
-            showTooltip: l10n.showArchivedAnalyses,
-            showingTooltip: l10n.showingArchivedAnalyses,
+            showTooltip: l10n.showArchivedPrescriptions,
+            showingTooltip: l10n.showingArchivedPrescriptions,
             onPressed: () {
               setState(() {
                 _showArchived = !_showArchived;
@@ -68,7 +67,7 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
       floatingActionButton: _showArchived
           ? null
           : FloatingActionButton(
-              onPressed: () => context.push(AppRoutes.recordsLabAnalysesAdd),
+              onPressed: () => context.push(AppRoutes.recordsPrescriptionsAdd),
               child: const Icon(Icons.add),
             ),
       body: activeProfileId == null
@@ -83,7 +82,7 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
                         child: TextField(
                           controller: _searchController,
                           decoration: InputDecoration(
-                            hintText: l10n.searchAnalyses,
+                            hintText: l10n.searchPrescriptions,
                             prefixIcon: const Icon(Icons.search),
                             border: const OutlineInputBorder(),
                             isDense: true,
@@ -91,64 +90,53 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      // Filters
-                      _CircleMenuButton<String>(
+                      _CircleMenuButton<DoctorPrescriptionFilter>(
                         icon: Icons.filter_list,
                         tooltip: l10n.filter,
-                        selected: ref.watch(labAnalysisCategoryFilterProvider) !=
-                            null,
+                        selected: ref.watch(doctorPrescriptionFilterProvider) !=
+                            DoctorPrescriptionFilter.all,
                         onSelected: (value) {
-                          ref.read(labAnalysisCategoryFilterProvider.notifier).state =
-                              value == 'all' ? null : value;
+                          ref
+                              .read(doctorPrescriptionFilterProvider.notifier)
+                              .state = value;
                         },
                         itemBuilder: (context) => [
                           PopupMenuItem(
-                            value: 'all',
-                            child: Text(l10n.allAnalyses),
+                            value: DoctorPrescriptionFilter.all,
+                            child: Text(l10n.allPrescriptions),
                           ),
                           PopupMenuItem(
-                            value: 'laboratory',
-                            child: Text(l10n.laboratory),
+                            value: DoctorPrescriptionFilter.doctor,
+                            child: Text(l10n.doctor),
                           ),
                           PopupMenuItem(
-                            value: 'cardiology',
-                            child: Text(l10n.cardiology),
-                          ),
-                          PopupMenuItem(
-                            value: 'imaging',
-                            child: Text(l10n.imaging),
-                          ),
-                          PopupMenuItem(
-                            value: 'pathology',
-                            child: Text(l10n.pathology),
-                          ),
-                          PopupMenuItem(
-                            value: 'other',
-                            child: Text(l10n.other),
+                            value: DoctorPrescriptionFilter.hospital,
+                            child: Text(l10n.hospital),
                           ),
                         ],
                       ),
                       const SizedBox(width: 8),
-                      // Sort
-                      _CircleMenuButton<LabAnalysisSort>(
+                      _CircleMenuButton<DoctorPrescriptionSort>(
                         icon: Icons.sort,
                         tooltip: l10n.sort,
-                        selected: ref.watch(labAnalysisSortProvider) !=
-                            LabAnalysisSort.newestFirst,
+                        selected: ref.watch(doctorPrescriptionSortProvider) !=
+                            DoctorPrescriptionSort.newestFirst,
                         onSelected: (value) {
-                          ref.read(labAnalysisSortProvider.notifier).state = value;
+                          ref
+                              .read(doctorPrescriptionSortProvider.notifier)
+                              .state = value;
                         },
                         itemBuilder: (context) => [
                           PopupMenuItem(
-                            value: LabAnalysisSort.newestFirst,
+                            value: DoctorPrescriptionSort.newestFirst,
                             child: Text(l10n.newestFirst),
                           ),
                           PopupMenuItem(
-                            value: LabAnalysisSort.oldestFirst,
+                            value: DoctorPrescriptionSort.oldestFirst,
                             child: Text(l10n.oldestFirst),
                           ),
                           PopupMenuItem(
-                            value: LabAnalysisSort.titleAscending,
+                            value: DoctorPrescriptionSort.titleAscending,
                             child: Text(l10n.titleAscending),
                           ),
                         ],
@@ -157,8 +145,8 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
                   ),
                 ),
                 Expanded(
-                  child: analyses.when(
-                    data: (analyses) => _buildList(analyses),
+                  child: prescriptions.when(
+                    data: (list) => _buildList(list),
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
                     error: (error, stack) => _buildError(error),
@@ -197,29 +185,31 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
     );
   }
 
-  Widget _buildList(List<LabAnalysis> analyses) {
+  Widget _buildList(List<DoctorPrescription> prescriptions) {
     final l10n = AppLocalizations.of(context)!;
 
-    if (analyses.isEmpty) {
+    if (prescriptions.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.science_outlined,
+              Icons.medication_outlined,
               size: 64,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 16),
             Text(
-              _showArchived ? l10n.noArchivedAnalyses : l10n.noLabAnalyses,
+              _showArchived
+                  ? l10n.noArchivedPrescriptions
+                  : l10n.noDoctorPrescriptions,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
               _showArchived
-                  ? l10n.noArchivedAnalysesDesc
-                  : l10n.noLabAnalysesDesc,
+                  ? l10n.noArchivedPrescriptionsDesc
+                  : l10n.noDoctorPrescriptionsDesc,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -228,9 +218,9 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
             if (!_showArchived) ...[
               const SizedBox(height: 24),
               FilledButton.icon(
-                onPressed: () => context.push(AppRoutes.recordsLabAnalysesAdd),
+                onPressed: () => context.push(AppRoutes.recordsPrescriptionsAdd),
                 icon: const Icon(Icons.add),
-                label: Text(l10n.addLabAnalysis),
+                label: Text(l10n.addDoctorPrescription),
               ),
             ],
           ],
@@ -240,10 +230,10 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: analyses.length,
+      itemCount: prescriptions.length,
       itemBuilder: (context, index) {
-        final analysis = analyses[index];
-        return _AnalysisListTile(analysis: analysis);
+        final prescription = prescriptions[index];
+        return _PrescriptionListTile(prescription: prescription);
       },
     );
   }
@@ -261,7 +251,7 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            l10n.errorLoadingAnalyses,
+            l10n.errorLoadingPrescriptions,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
@@ -274,9 +264,9 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
           const SizedBox(height: 16),
           FilledButton(
             onPressed: () {
-              ref.invalidate(labAnalysisSearchQueryProvider);
-              ref.invalidate(labAnalysisCategoryFilterProvider);
-              ref.invalidate(labAnalysisSortProvider);
+              ref.invalidate(doctorPrescriptionSearchQueryProvider);
+              ref.invalidate(doctorPrescriptionFilterProvider);
+              ref.invalidate(doctorPrescriptionSortProvider);
             },
             child: Text(l10n.retry),
           ),
@@ -340,10 +330,10 @@ class _CircleMenuButton<T> extends StatelessWidget {
   }
 }
 
-class _AnalysisListTile extends StatelessWidget {
-  final LabAnalysis analysis;
+class _PrescriptionListTile extends StatelessWidget {
+  final DoctorPrescription prescription;
 
-  const _AnalysisListTile({required this.analysis});
+  const _PrescriptionListTile({required this.prescription});
 
   @override
   Widget build(BuildContext context) {
@@ -351,11 +341,11 @@ class _AnalysisListTile extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        leading: _CategoryIcon(category: analysis.category),
+        leading: const _PrescriptionIcon(),
         title: Tooltip(
-          message: analysis.title,
+          message: prescription.title,
           child: Text(
-            analysis.title,
+            prescription.title,
             style: theme.textTheme.titleMedium,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -366,22 +356,30 @@ class _AnalysisListTile extends StatelessWidget {
           children: [
             const SizedBox(height: 4),
             Text(
-              _formatDate(context, analysis.analysisDate),
+              _formatDate(context, prescription.prescriptionDate),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            if (analysis.category.isNotEmpty) ...[
+            if (prescription.reason != null &&
+                prescription.reason!.isNotEmpty) ...[
               const SizedBox(height: 2),
-              _CategoryChip(category: analysis.category),
+              Text(
+                prescription.reason!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ],
           ],
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (analysis.laboratoryContactId != null ||
-                analysis.orderingDoctorContactId != null) ...[
+            if (prescription.doctorContactId != null ||
+                prescription.clinicContactId != null) ...[
               const SizedBox(width: 8),
               Icon(
                 Icons.local_hospital_outlined,
@@ -397,7 +395,7 @@ class _AnalysisListTile extends StatelessWidget {
           ],
         ),
         onTap: () => context.push(
-          AppRoutes.recordsLabAnalysesDetails(analysis.id!),
+          AppRoutes.recordsPrescriptionsDetails(prescription.id!),
         ),
       ),
     );
@@ -420,82 +418,14 @@ class _AnalysisListTile extends StatelessWidget {
   }
 }
 
-class _CategoryIcon extends StatelessWidget {
-  final String category;
-
-  const _CategoryIcon({required this.category});
+class _PrescriptionIcon extends StatelessWidget {
+  const _PrescriptionIcon();
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    IconData icon;
-    Color color;
-
-    switch (category) {
-      case 'laboratory':
-        icon = Icons.biotech_outlined;
-        color = Colors.blue;
-        break;
-      case 'cardiology':
-        icon = Icons.favorite_outlined;
-        color = Colors.red;
-        break;
-      case 'imaging':
-        icon = Icons.image_outlined;
-        color = Colors.purple;
-        break;
-      case 'pathology':
-        icon = Icons.science_outlined;
-        color = Colors.green;
-        break;
-      default:
-        icon = Icons.folder_outlined;
-        color = theme.colorScheme.onSurfaceVariant;
-    }
-
     return CircleAvatar(
-      backgroundColor: color.withValues(alpha: 0.1),
-      child: Icon(icon, color: color, size: 20),
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  final String category;
-
-  const _CategoryChip({required this.category});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    String label;
-
-    switch (category) {
-      case 'laboratory':
-        label = l10n.laboratory;
-        break;
-      case 'cardiology':
-        label = l10n.cardiology;
-        break;
-      case 'imaging':
-        label = l10n.imaging;
-        break;
-      case 'pathology':
-        label = l10n.pathology;
-        break;
-      default:
-        label = l10n.other;
-    }
-
-    return Chip(
-      label: Text(
-        label,
-        style: const TextStyle(fontSize: 10),
-      ),
-      visualDensity: VisualDensity.compact,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      labelPadding: EdgeInsets.zero,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      backgroundColor: Colors.teal.withValues(alpha: 0.1),
+      child: const Icon(Icons.description_outlined, color: Colors.teal, size: 20),
     );
   }
 }
