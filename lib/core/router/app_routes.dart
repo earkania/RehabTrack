@@ -27,6 +27,16 @@ class AppRoutes {
   static const recordsDoctorVisits = '/records/doctor-visits';
   static const recordsReports = '/records/reports';
 
+  // Doctor Prescriptions
+  static const recordsPrescriptions = '/records/prescriptions';
+  static const recordsPrescriptionsAdd = '/records/prescriptions/new';
+  static const recordsPrescriptionsArchived =
+      '/records/prescriptions/archived';
+  static String recordsPrescriptionsDetails(int id) =>
+      '/records/prescriptions/$id';
+  static String recordsPrescriptionsEdit(int id) =>
+      '/records/prescriptions/$id/edit';
+
   // Doctor Visits
   static const doctorVisitAdd = '/records/doctor-visits/add';
   static String doctorVisitDetails(int id) => '/records/doctor-visits/$id';

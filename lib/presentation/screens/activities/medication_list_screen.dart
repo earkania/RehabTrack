@@ -24,13 +24,17 @@ class MedicationListScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.medications),
         actions: [
-          TextButton.icon(
+          IconButton(
             onPressed: () {
               ref.read(showInactiveMedicationsProvider.notifier).state =
                   !showInactive;
             },
-            icon: Icon(showInactive ? Icons.medication : Icons.archive_outlined),
-            label: Text(showInactive ? l10n.medications : l10n.showDeactivated),
+            tooltip: showInactive
+                ? l10n.medications
+                : l10n.showDeactivated,
+            icon: Icon(
+              showInactive ? Icons.medication : Icons.archive_outlined,
+            ),
           ),
         ],
       ),

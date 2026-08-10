@@ -22,7 +22,7 @@ void main() {
   test('remaps profile and care-contact photo paths to the managed root',
       () async {
     final bytes = buildRestorableSqliteBytes(
-      schema: 15,
+      schema: 16,
       profiles: 1,
       profilePhotoPath: '/data/user/0/com.app/files/docs/profile_images/a1.jpg',
       withCareContacts: true,
@@ -59,7 +59,7 @@ void main() {
 
   test('handles databases without the columns gracefully', () async {
     final bytes = buildRestorableSqliteBytes(
-      schema: 15,
+      schema: 16,
       profiles: 1,
       withCareContacts: false,
     );
@@ -77,7 +77,7 @@ void main() {
 
   test('content:// URIs are rewritten to canonical managed paths', () async {
     final bytes = buildRestorableSqliteBytes(
-      schema: 15,
+      schema: 16,
       profiles: 1,
       profilePhotoPath: 'content://media/external/images/media/42',
       withCareContacts: false,
@@ -110,7 +110,7 @@ void main() {
 
   test('missing referenced files are cleared and reported', () async {
     final bytes = buildRestorableSqliteBytes(
-      schema: 15,
+      schema: 16,
       profiles: 1,
       profilePhotoPath: 'content://media/external/images/media/99',
       withCareContacts: true,
@@ -148,7 +148,7 @@ void main() {
 
   test('external website fields are never touched', () async {
     final bytes = buildRestorableSqliteBytes(
-      schema: 15,
+      schema: 16,
       profiles: 1,
       profilePhotoPath: '/old/profile_images/a1.jpg',
       withCareContacts: true,

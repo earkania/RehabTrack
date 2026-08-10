@@ -760,6 +760,53 @@ Activities / Diet / attachments / cloud / spoken reminders are out of scope.
 | `lib/presentation/screens/records/doctor_visit_details_screen.dart` | Details + status actions |
 | `lib/presentation/utils/doctor_visit_localizer.dart` | Type/status/offset labels |
 | `test/doctor_visit_*_test.dart` | Entity/repo/reminder/routing tests |
+
+## Doctor Prescriptions — Design Rules (Approved 2026-08-09)
+
+### Scope
+
+Records → Doctor Prescriptions: an archive of prescribed medications with the
+prescribing doctor, clinic/hospital, related doctor visit, reason/notes, an
+optional **"Create Medication"** prefill action, and attached PDFs / images /
+photos. Datetime, Care Contact and Doctor Visit selectors reuse the existing
+picker widgets. No OCR, no automatic parsing, no prescription reminders, no AI
+(explicit non-goals).
+
+### Data model
+
+- Tables `doctor_prescriptions` (class `DoctorPrescriptions`) + attachments
+  `doctor_prescription_attachments` (class `DoctorPrescriptionAttachments`).
+  Schema v15 → v16, additive migration (`from < 16` creates both).
+- Prescription columns: `profileId` (FK cascade), `title`, `prescriptionDate`,
+  `doctorContactId` / `clinicContactId` (nullable FKs → Care Contacts, `setNull`),
+  `relatedDoctorVisitId` (nullable FK → Doctor Visit Records, `setNull`),
+  `reason` / `notes` (nullable), `isArchived`, `createdAt`, `updatedAt`. Six
+  indexes (profile, date, archived, doctor, clinic, visit).
+- Attachment columns: `prescriptionId` (FK cascade), `profileId` (FK cascade),
+  `fileType` (`pdf` | `image` | `other`), `managedRelativePath`
+  (relative only, `doctor_prescriptions/<profileId>/<prescriptionId>/<uuid><ext>`),
+  `originalFileName`, `displayName`, `mimeType`, `fileSize`, `sortOrder`,
+  `createdAt`, `updatedAt`. Two indexes.
+
+### Behavior rules
+
+- **Create Medication prefill never auto-saves.** The details screen builds a
+  `MedicationFormData(name: title, notes: reason + "\n" + notes)` from any
+  non-empty title/reason/notes and pushes the Medication Add route with it; the
+  user still completes and saves the medication themselves. No text → snackbar.
+- **Managed-file storage mirrors Lab Analyses.** Files are copied under the app
+  documents dir with the layout above; DB stores the relative path. Deletion of
+  a prescription or attachment deletes both the row and the file.
+- **Search** matches title / reason / notes and an optional date range, with an
+  `includeArchived` flag. Sorting is newest-first (date, then createdAt).
+- **Archive is soft.** `isArchived` toggles the active ↔ archived list (toggle in
+  the AppBar); restore returns a row to active; delete is permanent (confirm
+  dialog) and removes attachment files.
+- **Backup/restore integration.** The managed-file collector scans the nested
+  `doctor_prescriptions` tree and adds any DB-referenced attachment path to the
+  referenced set; the restore file manager's managed roots include the folder, so
+  files round-trip through a backup exactly like lab analyses.
+
 ## Settings Navigation
 
 - Settings is a dashboard reached from the bottom navigation (label remains

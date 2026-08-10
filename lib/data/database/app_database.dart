@@ -18,6 +18,7 @@ import 'package:rehab_track/data/database/tables/health_template_table.dart';
 import 'package:rehab_track/data/database/tables/app_setting_table.dart';
 import 'package:rehab_track/data/database/tables/profile_reference_range_tables.dart';
 import 'package:rehab_track/data/database/tables/lab_analysis_tables.dart';
+import 'package:rehab_track/data/database/tables/doctor_prescription_tables.dart';
 import 'package:rehab_track/data/database/seed_data.dart';
 import 'package:rehab_track/data/database/daos/profile_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_dao.dart';
@@ -34,6 +35,7 @@ import 'package:rehab_track/data/database/daos/medication_components_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_alternative_components_dao.dart';
 import 'package:rehab_track/data/database/daos/doctor_visit_dao.dart';
 import 'package:rehab_track/data/database/daos/lab_analysis_dao.dart';
+import 'package:rehab_track/data/database/daos/doctor_prescription_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -67,11 +69,14 @@ part 'app_database.g.dart';
     ProfileReferenceRanges,
     LabAnalyses,
     LabAnalysisAttachments,
+    DoctorPrescriptions,
+    DoctorPrescriptionAttachments,
+    DoctorPrescriptionMedications,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   /// Canonical current schema version used by the backup/restore validator.
-  static const int currentSchemaVersion = 15;
+  static const int currentSchemaVersion = 17;
 
   AppDatabase() : super(_openConnection());
 
@@ -100,6 +105,8 @@ DocumentDao get documentDao => DocumentDao(this);
   HealthTemplateDao get healthTemplateDao => HealthTemplateDao(this);
   AppSettingDao get appSettingDao => AppSettingDao(this);
   LabAnalysisDao get labAnalysisDao => LabAnalysisDao(this);
+  DoctorPrescriptionDao get doctorPrescriptionDao =>
+      DoctorPrescriptionDao(this);
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -251,6 +258,15 @@ DocumentDao get documentDao => DocumentDao(this);
         // Lab Analyses module - document archive for lab results
         await m.createTable(labAnalyses);
         await m.createTable(labAnalysisAttachments);
+      }
+      if (from < 16) {
+        // Doctor Prescriptions module - document archive for prescriptions
+        await m.createTable(doctorPrescriptions);
+        await m.createTable(doctorPrescriptionAttachments);
+      }
+      if (from < 17) {
+        // Structured medications belonging to a doctor prescription
+        await m.createTable(doctorPrescriptionMedications);
       }
     },
   );

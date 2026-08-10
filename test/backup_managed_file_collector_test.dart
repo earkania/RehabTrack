@@ -106,6 +106,46 @@ void main() {
     expect(collection.warnings.single, contains('1'));
   });
 
+  test('collects nested prescription attachments preserving their layout',
+      () async {
+    final attachment = labAttachment(
+      '${ManagedFileCollector.doctorPrescriptionsDirName}/1/2/rx.pdf',
+      content: 'rx',
+    );
+
+    final collection = await ManagedFileCollector(database, docsDir).collect();
+
+    expect(collection.files, hasLength(1));
+    expect(collection.files.single.archivePath,
+        'files/doctor_prescriptions/1/2/rx.pdf');
+    expect(collection.files.single.file.path, attachment.path);
+    expect(collection.warnings, isEmpty);
+  });
+
+  test('warns about DB-referenced prescription attachments missing on disk',
+      () async {
+    await database.into(database.doctorPrescriptionAttachments).insert(
+          DoctorPrescriptionAttachmentsCompanion.insert(
+            prescriptionId: 7,
+            profileId: 3,
+            fileType: 'pdf',
+            managedRelativePath: 'doctor_prescriptions/3/9/missing.pdf',
+            originalFileName: 'missing.pdf',
+            displayName: 'missing',
+            mimeType: 'application/pdf',
+            fileSize: const Value(1),
+            sortOrder: const Value(0),
+            createdAt: DateTime(2025),
+            updatedAt: DateTime(2025),
+          ),
+        );
+
+    final collection = await ManagedFileCollector(database, docsDir).collect();
+
+    expect(collection.warnings, hasLength(1));
+    expect(collection.warnings.single, contains('1'));
+  });
+
   test('returns no files and no warnings when directories are absent', () async {
     final collection = await ManagedFileCollector(database, docsDir).collect();
     expect(collection.files, isEmpty);

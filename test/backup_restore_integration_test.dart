@@ -19,6 +19,7 @@ import 'package:rehab_track/data/services/restore/restore_service.dart';
 import 'package:rehab_track/domain/backup/backup_preview.dart';
 import 'package:rehab_track/domain/backup/backup_result.dart';
 import 'package:rehab_track/domain/repositories/settings_repository.dart';
+import 'package:rehab_track/domain/restore/restore_result.dart';
 
 import 'helpers/restore_test_utils.dart';
 
@@ -107,7 +108,7 @@ void main() {
       validator: const BackupValidator(),
       recoveryStore: recoveryStore,
       tempBaseDir: tempBaseDir,
-      currentDatabaseSchemaVersion: 15,
+      currentDatabaseSchemaVersion: AppDatabase.currentSchemaVersion,
       currentAppVersion: '1.2.0',
     );
   }
@@ -118,7 +119,7 @@ void main() {
     final outcome = await const BackupValidator().validate(
       handle: read.handle!,
       tempDir: tempBaseDir,
-      currentDatabaseSchemaVersion: 15,
+      currentDatabaseSchemaVersion: AppDatabase.currentSchemaVersion,
       currentAppVersion: '1.2.0',
     );
     return outcome.preview!;
@@ -158,7 +159,7 @@ void main() {
     // Live device currently holds different data (B).
     await writeLiveDatabase(
       docsDir,
-      buildRestorableSqliteBytes(schema: 15, profiles: 2),
+      buildRestorableSqliteBytes(schema: 16, profiles: 2),
     );
 
     final service = await restoreService();
@@ -180,7 +181,7 @@ void main() {
     var preview = await previewFor(backup);
     await writeLiveDatabase(
       docsDir,
-      buildRestorableSqliteBytes(schema: 15, profiles: 2),
+      buildRestorableSqliteBytes(schema: 16, profiles: 2),
     );
     var service = await restoreService();
     expect((await service.run(selectedBackupFile: backup, expectedPreview: preview)).succeeded,
@@ -214,7 +215,7 @@ void main() {
 
     await writeLiveDatabase(
       docsDir,
-      buildRestorableSqliteBytes(schema: 15, profiles: 2),
+      buildRestorableSqliteBytes(schema: 16, profiles: 2),
     );
 
     final service = await restoreService();
@@ -234,5 +235,82 @@ void main() {
           e.path,
     ];
     expect(leftovers, isEmpty);
+  });
+
+  test('backup includes prescription attachments and restore places them back',
+      () async {
+    await seedDatabase('Ana');
+    final profile = await database
+        .select(database.profiles)
+        .getSingle();
+    final profileId = profile.id;
+
+    // Write a prescription attachment to the managed documents directory and
+    // reference it from the database.
+    final attachmentsDir = Directory(
+      p.join(docsDir.path, 'doctor_prescriptions', '$profileId', '1'),
+    )..createSync(recursive: true);
+    File(p.join(attachmentsDir.path, 'rx.pdf')).writeAsBytesSync([1, 2, 3]);
+    await database.into(database.doctorPrescriptions).insert(
+          DoctorPrescriptionsCompanion.insert(
+            profileId: profileId,
+            title: 'Amoxicillin',
+            prescriptionDate: DateTime(2026, 8, 1),
+            createdAt: DateTime(2025),
+            updatedAt: DateTime(2025),
+          ),
+        );
+    await database.into(database.doctorPrescriptionAttachments).insert(
+          DoctorPrescriptionAttachmentsCompanion.insert(
+            prescriptionId: 1,
+            profileId: profileId,
+            fileType: 'pdf',
+            managedRelativePath:
+                'doctor_prescriptions/$profileId/1/rx.pdf',
+            originalFileName: 'rx.pdf',
+            displayName: 'rx',
+            mimeType: 'application/pdf',
+            fileSize: const Value(3),
+            sortOrder: const Value(0),
+            createdAt: DateTime(2025),
+            updatedAt: DateTime(2025),
+          ),
+        );
+
+    final backup = await createBackup();
+    final preview = await previewFor(backup);
+
+    // Restore into a fresh docs dir so the file must come from the archive.
+    final freshDocs =
+        Directory(p.join(tempBaseDir.path, 'fresh_docs'))..createSync();
+    await writeLiveDatabase(
+      freshDocs,
+      buildRestorableSqliteBytes(schema: 16, profiles: 2),
+    );
+    final env = FakeRestoreEnvironment(freshDocs);
+    final service = RestoreService(
+      environment: env,
+      archiveReader: const BackupArchiveReader(),
+      validator: const BackupValidator(),
+      recoveryStore: RestoreRecoveryStore.inDirectory(
+        Directory(p.join(tempBaseDir.path, 'recovery2')),
+      ),
+      tempBaseDir: tempBaseDir,
+      currentDatabaseSchemaVersion: AppDatabase.currentSchemaVersion,
+      currentAppVersion: '1.2.0',
+    );
+
+    final failure =
+        await service.run(selectedBackupFile: backup, expectedPreview: preview);
+    expect(failure.succeeded, isTrue,
+        reason: 'Failed at ${failure.result}');
+    expect(failure.result, RestoreResult.success);
+
+    final restoredFile = File(
+      p.join(freshDocs.path, 'doctor_prescriptions', '$profileId', '1',
+          'rx.pdf'),
+    );
+    expect(restoredFile.existsSync(), isTrue);
+    expect(restoredFile.readAsBytesSync(), [1, 2, 3]);
   });
 }

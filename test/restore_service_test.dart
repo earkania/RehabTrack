@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart' as sqlite;
 
+import 'package:rehab_track/data/database/app_database.dart';
 import 'package:rehab_track/data/services/backup/backup_archive_reader.dart';
 import 'package:rehab_track/data/services/backup/backup_validator.dart';
 import 'package:rehab_track/data/services/restore/restore_recovery_metadata.dart';
@@ -101,9 +102,16 @@ void main() {
           "WHERE type='table' AND name='doctor_visit_records'",
         )
         .isNotEmpty;
+    final hasPrescriptions = db
+        .select(
+          "SELECT name FROM sqlite_master "
+          "WHERE type='table' AND name='doctor_prescriptions'",
+        )
+        .isNotEmpty;
     db.close();
-    expect(version, 15);
+    expect(version, AppDatabase.currentSchemaVersion);
     expect(hasVisitRecords, isTrue);
+    expect(hasPrescriptions, isTrue);
   });
 
   test('a failed reminder rebuild still restores the data', () async {
@@ -293,7 +301,7 @@ class _Fixture {
       validator: const BackupValidator(),
       recoveryStore: recoveryStore,
       tempBaseDir: tempBaseDir,
-      currentDatabaseSchemaVersion: 15,
+      currentDatabaseSchemaVersion: AppDatabase.currentSchemaVersion,
       currentAppVersion: '1.2.0',
       storageInspector: storageInspector ?? const StorageInspector(),
       random: Random(7),
@@ -301,7 +309,7 @@ class _Fixture {
 
     // Live state A: 2 profiles, ka locale, one photo.
     final aDb = buildRestorableSqliteBytes(
-      schema: 15,
+      schema: 16,
       profiles: 2,
       settings: const {'app_language': 'ka'},
       profilePhotoPath: '/device/docs/profile_images/photoA.jpg',
@@ -311,13 +319,13 @@ class _Fixture {
 
     // Backup B: 1 profile, en locale, a different photo.
     final bDb = buildRestorableSqliteBytes(
-      schema: 15,
+      schema: 16,
       profiles: 1,
       settings: const {'app_language': 'en'},
       profilePhotoPath: '/other/device/profile_images/photoB.jpg',
     );
     final archive = buildRestorableBackupZip(
-      schema: 15,
+      schema: 16,
       database: bDb,
       preferences: const {'app_language': 'en'},
       files: {
@@ -344,7 +352,7 @@ class _Fixture {
     final outcome = await const BackupValidator().validate(
       handle: read.handle!,
       tempDir: tempBaseDir,
-      currentDatabaseSchemaVersion: 15,
+      currentDatabaseSchemaVersion: AppDatabase.currentSchemaVersion,
       currentAppVersion: '1.2.0',
     );
     expect(outcome.preview, isNotNull);

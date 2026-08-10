@@ -9,7 +9,11 @@ import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_form.dart';
 
 class AddMedicationScreen extends ConsumerStatefulWidget {
-  const AddMedicationScreen({super.key});
+  const AddMedicationScreen({super.key, this.initialData});
+
+  /// Optional prefill for a "Create Medication" action launched from another
+  /// module (e.g. Doctor Prescriptions). Never auto-saves; the user confirms.
+  final MedicationFormData? initialData;
 
   @override
   ConsumerState<AddMedicationScreen> createState() =>
@@ -73,7 +77,7 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
         title: Text(l10n.addMedication),
       ),
       body: MedicationForm(
-        initialData: MedicationFormData(),
+        initialData: widget.initialData ?? MedicationFormData(),
         onSave: _onSave,
         isLoading: _isSaving,
         saveButtonLabel: l10n.save,

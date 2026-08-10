@@ -24,6 +24,11 @@ class RecordsDashboardScreen extends ConsumerWidget {
             label: l10n.labAnalyses,
             onTap: () => context.push(AppRoutes.recordsLabAnalyses),
           ),
+          ModuleGridTile(
+            icon: const Icon(Icons.description_outlined),
+            label: l10n.doctorPrescriptions,
+            onTap: () => context.push(AppRoutes.recordsPrescriptions),
+          ),
           _DoctorVisitsTile(
             upcomingCount: upcomingCount,
             onTap: () => context.push(AppRoutes.recordsDoctorVisits),

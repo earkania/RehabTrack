@@ -25,6 +25,7 @@ class ManagedFileCollector {
   static const profileImagesDirName = 'profile_images';
   static const careContactImagesDirName = 'care_contact_images';
   static const labAnalysesDirName = 'lab_analyses';
+  static const doctorPrescriptionsDirName = 'doctor_prescriptions';
 
   final AppDatabase _database;
   final Directory _appDocumentsDir;
@@ -52,6 +53,12 @@ class ManagedFileCollector {
     await _scanTree(
       Directory(p.join(_appDocumentsDir.path, labAnalysesDirName)),
       'files/lab_analyses',
+      files,
+      found,
+    );
+    await _scanTree(
+      Directory(p.join(_appDocumentsDir.path, doctorPrescriptionsDirName)),
+      'files/doctor_prescriptions',
       files,
       found,
     );
@@ -117,15 +124,22 @@ class ManagedFileCollector {
   }
 
   /// Absolute photo paths referenced by any profile or care contact, plus
-  /// absolute lab attachment paths referenced by any analysis attachment.
+  /// absolute lab attachment and prescription attachment paths referenced by
+  /// any attachment row.
   Future<Set<String>> _referencedPhotoPaths() async {
     final profiles = await _database.select(_database.profiles).get();
     final contacts = await _database.select(_database.careContacts).get();
     final attachments = await _database.select(_database.labAnalysisAttachments).get();
+    final prescriptionAttachments = await _database
+        .select(_database.doctorPrescriptionAttachments)
+        .get();
     return {
       ...profiles.map((profile) => profile.photoPath).whereType<String>(),
       ...contacts.map((contact) => contact.photoPath).whereType<String>(),
       ...attachments.map(
+        (a) => p.join(_appDocumentsDir.path, a.managedRelativePath),
+      ),
+      ...prescriptionAttachments.map(
         (a) => p.join(_appDocumentsDir.path, a.managedRelativePath),
       ),
     };

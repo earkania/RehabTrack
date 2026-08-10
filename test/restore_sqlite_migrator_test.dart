@@ -19,10 +19,10 @@ void main() {
     dir.deleteSync(recursive: true);
   });
 
-  /// Builds a faithful pre-v15 database: the real current Drift schema with the
-  /// table added by the v15 migration removed and user_version set back to 14.
-  Future<File> buildSchema14Fixture() async {
-    final path = p.join(dir.path, 'schema14.sqlite');
+  /// Builds a faithful pre-v17 database: the real current Drift schema with the
+  /// table added by the v17 migration removed and user_version set back to 16.
+  Future<File> buildSchema16Fixture() async {
+    final path = p.join(dir.path, 'schema16.sqlite');
     final db = AppDatabase.forTesting(
       NativeDatabase.createInBackground(File(path)),
     );
@@ -30,37 +30,35 @@ void main() {
     await db.close();
 
     final raw = sqlite.sqlite3.open(path);
-    raw.execute('DROP TABLE lab_analysis_attachments');
-    raw.execute('DROP TABLE lab_analyses');
-    raw.execute('PRAGMA user_version = 14');
+    raw.execute('DROP TABLE doctor_prescription_medications');
+    raw.execute('PRAGMA user_version = 16');
     raw.close();
     return File(path);
   }
 
   test('migrates an older schema to the current schema in place', () async {
-    final file = await buildSchema14Fixture();
+    final file = await buildSchema16Fixture();
 
     final result = await const RestoreSqliteMigrator().migrateToCurrent(
       file: file,
-      fromSchemaVersion: 14,
+      fromSchemaVersion: 16,
     );
 
-    expect(result.fromSchemaVersion, 14);
-    expect(result.toSchemaVersion, 15);
+    expect(result.fromSchemaVersion, 16);
+    expect(result.toSchemaVersion, 17);
 
     final db = sqlite.sqlite3.open(file.path, mode: sqlite.OpenMode.readOnly);
-    expect(db.userVersion, 15);
-    final labTableNames = db
+    expect(db.userVersion, 17);
+    final prescriptionTableNames = db
         .select(
           "SELECT name FROM sqlite_master "
-          "WHERE type='table' AND (name='lab_analyses' "
-          "OR name='lab_analysis_attachments')",
+          "WHERE type='table' AND name='doctor_prescription_medications'",
         )
         .rows
         .map((r) => r.first.toString())
         .toSet();
     db.close();
-    expect(labTableNames, containsAll({'lab_analyses', 'lab_analysis_attachments'}));
+    expect(prescriptionTableNames, contains('doctor_prescription_medications'));
   });
 
   test('a database that is already current is a no-op', () async {
@@ -73,9 +71,9 @@ void main() {
 
     final result = await const RestoreSqliteMigrator().migrateToCurrent(
       file: File(path),
-      fromSchemaVersion: 15,
+      fromSchemaVersion: 17,
     );
-    expect(result.toSchemaVersion, 15);
+    expect(result.toSchemaVersion, 17);
   });
 
   test('an unreadable database is rejected', () async {

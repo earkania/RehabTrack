@@ -8,6 +8,10 @@ import 'package:rehab_track/presentation/screens/records/lab_analyses_screen.dar
 import 'package:rehab_track/presentation/screens/records/lab_analysis_form_screen.dart';
 import 'package:rehab_track/presentation/screens/records/lab_analysis_details_screen.dart';
 import 'package:rehab_track/presentation/screens/records/archived_lab_analyses_screen.dart';
+import 'package:rehab_track/presentation/screens/records/doctor_prescriptions_screen.dart';
+import 'package:rehab_track/presentation/screens/records/doctor_prescription_form_screen.dart';
+import 'package:rehab_track/presentation/screens/records/doctor_prescription_details_screen.dart';
+import 'package:rehab_track/presentation/screens/records/archived_doctor_prescriptions_screen.dart';
 import 'package:rehab_track/presentation/screens/today/today_screen.dart';
 import 'package:rehab_track/presentation/screens/health/health_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurements_screen.dart';
@@ -22,6 +26,7 @@ import 'package:rehab_track/presentation/screens/profile/edit_care_contact_scree
 import 'package:rehab_track/presentation/screens/profile/care_contact_details_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/medication_list_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/add_medication_screen.dart';
+import 'package:rehab_track/presentation/widgets/medication/medication_form.dart';
 import 'package:rehab_track/presentation/screens/activities/edit_medication_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/medication_detail_screen.dart';
 import 'package:rehab_track/presentation/screens/activities/add_schedule_screen.dart';
@@ -159,6 +164,39 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const DoctorVisitFormScreen(),
       ),
       GoRoute(
+        path: AppRoutes.recordsPrescriptions,
+        builder: (context, state) => const DoctorPrescriptionsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.recordsPrescriptionsAdd,
+        builder: (context, state) => const DoctorPrescriptionFormScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.recordsPrescriptionsArchived,
+        builder: (context, state) =>
+            const ArchivedDoctorPrescriptionsScreen(),
+      ),
+      GoRoute(
+        path: '/records/prescriptions/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return DoctorPrescriptionDetailsScreen(prescriptionId: id);
+        },
+      ),
+      GoRoute(
+        path: '/records/prescriptions/:id/edit',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return DoctorPrescriptionFormScreen(prescriptionId: id);
+        },
+      ),
+      GoRoute(
         path: '/records/doctor-visits/:id',
         builder: (context, state) {
           final id = int.tryParse(state.pathParameters['id'] ?? '');
@@ -250,7 +288,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.medicationAdd,
-        builder: (context, state) => const AddMedicationScreen(),
+        builder: (context, state) =>
+            AddMedicationScreen(initialData: state.extra as MedicationFormData?),
       ),
       GoRoute(
         path: '/medications/medication/:id',

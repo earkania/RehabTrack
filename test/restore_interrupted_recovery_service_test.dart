@@ -17,12 +17,12 @@ void main() {
   late RestoreInterruptedRecoveryService service;
 
   final aDb = buildRestorableSqliteBytes(
-    schema: 15,
+    schema: 16,
     profiles: 2,
     settings: const {'app_language': 'ka'},
   );
   final bDb = buildRestorableSqliteBytes(
-    schema: 15,
+    schema: 16,
     profiles: 1,
     settings: const {'app_language': 'en'},
   );
