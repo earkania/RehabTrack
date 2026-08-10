@@ -4982,6 +4982,54 @@ abstract class AppLocalizations {
   /// **'Medications: {count}'**
   String medicationsCount(Object count);
 
+  /// No description provided for @enterManually.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Manually'**
+  String get enterManually;
+
+  /// No description provided for @chooseFromMyMedications.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from My Medications'**
+  String get chooseFromMyMedications;
+
+  /// No description provided for @myMedications.
+  ///
+  /// In en, this message translates to:
+  /// **'My Medications'**
+  String get myMedications;
+
+  /// No description provided for @selectActiveMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Active Medication'**
+  String get selectActiveMedication;
+
+  /// No description provided for @searchMyMedications.
+  ///
+  /// In en, this message translates to:
+  /// **'Search My Medications'**
+  String get searchMyMedications;
+
+  /// No description provided for @noActiveMedicationsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No active medications available'**
+  String get noActiveMedicationsAvailable;
+
+  /// No description provided for @noActiveMedicationsAvailableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a medication in the Medications section first, or enter the details manually.'**
+  String get noActiveMedicationsAvailableHint;
+
+  /// No description provided for @prefilledFromMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied from My Medications — edit the details as needed before saving.'**
+  String get prefilledFromMedication;
+
   /// No description provided for @attachmentRenamed.
   ///
   /// In en, this message translates to:

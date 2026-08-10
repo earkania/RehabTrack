@@ -2,20 +2,39 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rehab_track/domain/entities/doctor_prescription.dart';
+import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/domain/mapping/prescription_medication_prefill_mapper.dart';
+import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/widgets/empty_state.dart';
+
+/// How a new prescription medication entry is created.
+enum _MedicationEntryChoice { fromMedications, manually }
 
 /// Editable list of medications belonging to a doctor prescription.
 ///
 /// Used on the add/edit form. New and edited medications are surfaced through
 /// [onChanged]; the caller persists them together with the prescription.
+///
+/// When a [medicationRepository] and a [profileId] are provided, the "Add
+/// Medication" action also offers to prefill an entry from the patient's
+/// active Medications (scoped to the prescription's own [profileId]). The
+/// selected Medication is only a source of snapshot values – later edits to
+/// the Medication record never affect the prescription entry.
 class DoctorPrescriptionMedicationsEditor extends StatefulWidget {
   const DoctorPrescriptionMedicationsEditor({
     super.key,
     this.initialMedications = const [],
+    this.prescriptionId,
+    this.profileId,
+    this.medicationRepository,
     required this.onChanged,
   });
 
   final List<DoctorPrescriptionMedication> initialMedications;
+  final int? prescriptionId;
+  final int? profileId;
+  final MedicationRepository? medicationRepository;
   final ValueChanged<List<DoctorPrescriptionMedication>> onChanged;
 
   @override
@@ -46,15 +65,19 @@ class _DoctorPrescriptionMedicationsEditorState
 
   void _emit() => widget.onChanged(List.of(_medications));
 
-  Future<void> _edit({DoctorPrescriptionMedication? medication}) async {
+  Future<void> _edit({
+    DoctorPrescriptionMedication? medication,
+    bool prefilledFromMedication = false,
+  }) async {
     final result = await showModalBottomSheet<DoctorPrescriptionMedication>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (context) => _MedicationEditorSheet(
-        prescriptionId: medication?.prescriptionId ?? 0,
-        profileId: medication?.profileId ?? 0,
+        prescriptionId: medication?.prescriptionId ?? widget.prescriptionId ?? 0,
+        profileId: medication?.profileId ?? widget.profileId ?? 0,
         initial: medication,
+        prefilledFromMedication: prefilledFromMedication,
       ),
     );
     if (result == null) return;
@@ -62,12 +85,112 @@ class _DoctorPrescriptionMedicationsEditorState
       _dirty = true;
       if (medication != null) {
         final index = _medications.indexOf(medication);
-        if (index >= 0) _medications[index] = result;
+        if (index >= 0) {
+          _medications[index] = result;
+        } else {
+          _medications.add(result);
+        }
       } else {
         _medications.add(result);
       }
       _emit();
     });
+  }
+
+  Future<void> _add() async {
+    final l10n = AppLocalizations.of(context)!;
+    final canPickFromMedications =
+        widget.medicationRepository != null && widget.profileId != null;
+    final choice = await showModalBottomSheet<_MedicationEntryChoice>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                l10n.addMedication,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.medication_outlined),
+              title: Text(l10n.chooseFromMyMedications),
+              enabled: canPickFromMedications,
+              onTap: () => Navigator.pop(
+                  context, _MedicationEntryChoice.fromMedications),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: Text(l10n.enterManually),
+              onTap: () =>
+                  Navigator.pop(context, _MedicationEntryChoice.manually),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (choice == null) return;
+    if (choice == _MedicationEntryChoice.manually) {
+      await _edit();
+      return;
+    }
+    await _pickFromMedications();
+  }
+
+  Future<void> _pickFromMedications() async {
+    final repository = widget.medicationRepository;
+    final profileId = widget.profileId;
+    if (repository == null || profileId == null) return;
+
+    final medications = await repository.getActiveMedications(profileId);
+    if (!mounted) return;
+
+    final selected = await showModalBottomSheet<_MedicationPickerResult>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (context) => _MedicationPickerSheet(
+        medications: medications,
+        onEnterManually: () =>
+            Navigator.pop(context, const _PickManually()),
+      ),
+    );
+    if (!mounted) return;
+    if (selected == null) return;
+    if (selected is _PickManually) {
+      await _edit();
+      return;
+    }
+
+    final medication = (selected as _PickedMedication).medication;
+    final schedules =
+        await repository.getSchedulesForMedication(medication.id!);
+    if (!mounted) return;
+    final activeSchedule = schedules.isEmpty
+        ? null
+        : schedules.firstWhere(
+            (s) => s.active,
+            orElse: () => schedules.first,
+          );
+
+    final draft = PrescriptionMedicationPrefillMapper.map(
+      medication,
+      schedule: activeSchedule,
+      prescriptionId: widget.prescriptionId ?? 0,
+      profileId: profileId,
+      l10n: AppLocalizations.of(context)!,
+    );
+
+    await _edit(
+      medication: draft,
+      prefilledFromMedication: true,
+    );
   }
 
   Future<void> _remove(DoctorPrescriptionMedication medication) async {
@@ -150,7 +273,7 @@ class _DoctorPrescriptionMedicationsEditorState
         Align(
           alignment: Alignment.centerLeft,
           child: OutlinedButton.icon(
-            onPressed: () => _edit(),
+            onPressed: _add,
             icon: const Icon(Icons.add),
             label: Text(l10n.addMedication),
           ),
@@ -273,6 +396,149 @@ class _MedicationCard extends StatelessWidget {
   }
 }
 
+/// Outcome of the "choose from My Medications" sheet.
+sealed class _MedicationPickerResult {
+  const _MedicationPickerResult();
+}
+
+class _PickedMedication extends _MedicationPickerResult {
+  const _PickedMedication(this.medication);
+
+  final Medication medication;
+}
+
+class _PickManually extends _MedicationPickerResult {
+  const _PickManually();
+}
+
+/// Bottom sheet that lets the user pick one of the patient's active
+/// Medications to prefill a prescription medication entry.
+///
+/// When there are no active Medications, a manual-entry fallback is surfaced
+/// through [onEnterManually] so the sheet never becomes a dead end.
+class _MedicationPickerSheet extends StatefulWidget {
+  const _MedicationPickerSheet({
+    required this.medications,
+    required this.onEnterManually,
+  });
+
+  final List<Medication> medications;
+  final VoidCallback onEnterManually;
+
+  @override
+  State<_MedicationPickerSheet> createState() => _MedicationPickerSheetState();
+}
+
+class _MedicationPickerSheetState extends State<_MedicationPickerSheet> {
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Medication> get _filtered {
+    final query = _query.trim().toLowerCase();
+    if (query.isEmpty) return widget.medications;
+    return widget.medications
+        .where((m) => m.name.toLowerCase().contains(query))
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final filtered = _filtered;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: FractionallySizedBox(
+        heightFactor: 0.9,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                l10n.chooseFromMyMedications,
+                style: theme.textTheme.titleLarge,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) => setState(() => _query = value),
+                decoration: InputDecoration(
+                  hintText: l10n.searchMyMedications,
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: widget.medications.isEmpty
+                  ? _NoActiveMedicationsEmptyState(
+                      onEnterManually: widget.onEnterManually,
+                    )
+                  : filtered.isEmpty
+                      ? Center(
+                          child: Text(
+                            l10n.searchPrescriptions,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        )
+                      : ListView(
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          children: filtered.map((medication) {
+                            return ListTile(
+                              leading: const Icon(Icons.medication_outlined),
+                              title: Text(
+                                medication.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              onTap: () => Navigator.pop(
+                                  context, _PickedMedication(medication)),
+                            );
+                          }).toList(),
+                        ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NoActiveMedicationsEmptyState extends StatelessWidget {
+  const _NoActiveMedicationsEmptyState({required this.onEnterManually});
+
+  final VoidCallback onEnterManually;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return EmptyState(
+      icon: Icons.medication_outlined,
+      title: l10n.noActiveMedicationsAvailable,
+      subtitle: l10n.noActiveMedicationsAvailableHint,
+      actionLabel: l10n.enterManually,
+      onAction: onEnterManually,
+    );
+  }
+}
+
 String _medicationSubtitle(DoctorPrescriptionMedication medication) {
   final parts = <String>[
     if (medication.doseAmount != null && medication.doseAmount!.trim().isNotEmpty)
@@ -293,11 +559,13 @@ class _MedicationEditorSheet extends StatefulWidget {
     required this.prescriptionId,
     required this.profileId,
     this.initial,
+    this.prefilledFromMedication = false,
   });
 
   final int prescriptionId;
   final int profileId;
   final DoctorPrescriptionMedication? initial;
+  final bool prefilledFromMedication;
 
   @override
   State<_MedicationEditorSheet> createState() => _MedicationEditorSheetState();
@@ -400,12 +668,34 @@ class _MedicationEditorSheetState extends State<_MedicationEditorSheet> {
               ),
               const SizedBox(height: 16),
               Text(
-                widget.initial == null
+                widget.initial == null || widget.prefilledFromMedication
                     ? l10n.addMedication
                     : l10n.editMedication,
                 style: theme.textTheme.titleLarge,
               ),
               const SizedBox(height: 16),
+              if (widget.prefilledFromMedication)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 18,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.prefilledFromMedication,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(

@@ -2624,6 +2624,32 @@ class AppLocalizationsKa extends AppLocalizations {
   }
 
   @override
+  String get enterManually => 'ხელით შეყვანა';
+
+  @override
+  String get chooseFromMyMedications => 'არჩევა ჩემი მედიკამენტებიდან';
+
+  @override
+  String get myMedications => 'ჩემი მედიკამენტები';
+
+  @override
+  String get selectActiveMedication => 'აქტიური მედიკამენტის არჩევა';
+
+  @override
+  String get searchMyMedications => 'ჩემი მედიკამენტების ძებნა';
+
+  @override
+  String get noActiveMedicationsAvailable => 'აქტიური მედიკამენტები არ არის';
+
+  @override
+  String get noActiveMedicationsAvailableHint =>
+      'ჯერ დაამატეთ მედიკამენტი მედიკამენტების განყოფილებაში, ან შეიყვანეთ მონაცემები ხელით.';
+
+  @override
+  String get prefilledFromMedication =>
+      'დაკოპირებულია ჩემი მედიკამენტებიდან — შეცვალეთ წვრილმანები გადარჩენამდე.';
+
+  @override
   String get attachmentRenamed => 'დამატებითი ფაილი დაარქვეს';
 
   @override

@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/doctor_prescription.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/doctor_prescription_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/widgets/care_contact_selector.dart';
@@ -221,6 +222,10 @@ class _DoctorPrescriptionFormScreenState
             // Medications Section
             DoctorPrescriptionMedicationsEditor(
               initialMedications: _medications,
+              prescriptionId: widget.prescriptionId,
+              profileId: ref.read(currentActiveProfileIdProvider),
+              medicationRepository:
+                  ref.read(medicationRepositoryProvider),
               onChanged: (medications) {
                 _medications = medications;
               },

@@ -2628,6 +2628,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get enterManually => 'Enter Manually';
+
+  @override
+  String get chooseFromMyMedications => 'Choose from My Medications';
+
+  @override
+  String get myMedications => 'My Medications';
+
+  @override
+  String get selectActiveMedication => 'Select Active Medication';
+
+  @override
+  String get searchMyMedications => 'Search My Medications';
+
+  @override
+  String get noActiveMedicationsAvailable => 'No active medications available';
+
+  @override
+  String get noActiveMedicationsAvailableHint =>
+      'Add a medication in the Medications section first, or enter the details manually.';
+
+  @override
+  String get prefilledFromMedication =>
+      'Copied from My Medications — edit the details as needed before saving.';
+
+  @override
   String get attachmentRenamed => 'Attachment renamed';
 
   @override
