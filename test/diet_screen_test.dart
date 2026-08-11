@@ -389,5 +389,52 @@ void main() {
       expect(find.text('Old rule'), findsOneWidget);
       expect(find.byType(FloatingActionButton), findsNothing);
     });
+
+    testWidgets('alcohol rule displays and filters correctly', (tester) async {
+      repo.addRule(
+        makeRule(id: 1, title: 'Limit drinks', category: 'alcohol'),
+      );
+      repo.addRule(
+        makeRule(id: 2, title: 'Drink water', category: 'hydration'),
+      );
+
+      await pumpDiet(tester);
+      await tester.tap(find.text('General Guidance'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Limit drinks'), findsOneWidget);
+      expect(find.text('Alcohol'), findsWidgets);
+
+      await tester.tap(find.byIcon(Icons.filter_list));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(PopupMenuItem<String>, 'Alcohol'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Limit drinks'), findsOneWidget);
+      expect(find.text('Drink water'), findsNothing);
+    });
+
+    testWidgets('alcohol archived rule shows in archived list',
+        (tester) async {
+      repo.addRule(
+        makeRule(id: 1, title: 'Old limit', category: 'alcohol', isArchived: true),
+      );
+
+      await pumpDiet(tester);
+      await tester.tap(find.text('General Guidance'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+      expect(find.text('Old limit'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.archive_outlined));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Old limit'), findsOneWidget);
+      expect(find.text('Alcohol'), findsWidgets);
+    });
   });
 }

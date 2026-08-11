@@ -234,6 +234,7 @@ void main() {
       expect(find.text('Smoking'), findsOneWidget);
       expect(find.text('Hydration'), findsOneWidget);
       expect(find.text('Caffeine'), findsOneWidget);
+      expect(find.text('Alcohol'), findsOneWidget);
       expect(find.text('Other'), findsOneWidget);
     });
   });

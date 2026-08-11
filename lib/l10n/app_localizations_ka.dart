@@ -2811,6 +2811,9 @@ class AppLocalizationsKa extends AppLocalizations {
   String get caffeineGuidanceCategory => 'კოფეინი';
 
   @override
+  String get alcoholGuidanceCategory => 'ალკოჰოლი';
+
+  @override
   String get otherGuidanceCategory => 'სხვა';
 
   @override

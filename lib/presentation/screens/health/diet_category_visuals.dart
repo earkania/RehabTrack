@@ -17,9 +17,10 @@ class DietGuidanceCategory {
   static const smoking = 'smoking';
   static const hydration = 'hydration';
   static const caffeine = 'caffeine';
+  static const alcohol = 'alcohol';
   static const other = 'other';
 
-  static const all = [diet, smoking, hydration, caffeine, other];
+  static const all = [diet, smoking, hydration, caffeine, alcohol, other];
 }
 
 /// Localized label for a stable food category value.
@@ -47,6 +48,8 @@ String guidanceCategoryLabel(AppLocalizations l10n, String category) {
       return l10n.hydrationGuidanceCategory;
     case DietGuidanceCategory.caffeine:
       return l10n.caffeineGuidanceCategory;
+    case DietGuidanceCategory.alcohol:
+      return l10n.alcoholGuidanceCategory;
     case DietGuidanceCategory.other:
       return l10n.otherGuidanceCategory;
     default:
@@ -79,6 +82,8 @@ IconData guidanceCategoryIcon(String category) {
       return Icons.water_drop_outlined;
     case DietGuidanceCategory.caffeine:
       return Icons.coffee_outlined;
+    case DietGuidanceCategory.alcohol:
+      return Icons.local_bar_outlined;
     case DietGuidanceCategory.other:
       return Icons.info_outline;
     default:
@@ -114,6 +119,8 @@ Color guidanceCategoryColor(ColorScheme colorScheme, String category) {
       return colorScheme.primary;
     case DietGuidanceCategory.caffeine:
       return colorScheme.secondary;
+    case DietGuidanceCategory.alcohol:
+      return colorScheme.tertiary;
     default:
       return colorScheme.onSurfaceVariant;
   }

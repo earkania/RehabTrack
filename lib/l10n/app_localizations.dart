@@ -5324,6 +5324,12 @@ abstract class AppLocalizations {
   /// **'Caffeine'**
   String get caffeineGuidanceCategory;
 
+  /// No description provided for @alcoholGuidanceCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Alcohol'**
+  String get alcoholGuidanceCategory;
+
   /// No description provided for @otherGuidanceCategory.
   ///
   /// In en, this message translates to:

@@ -305,6 +305,13 @@ void main() {
           description: 'Max two cups',
         ),
       );
+      await repository.createGuidanceRule(
+        makeGuidanceRule(
+          profileId: profileId,
+          title: 'Avoid binge drinking',
+          category: 'alcohol',
+        ),
+      );
 
       final byTitle = await repository
           .searchGuidanceRules(profileId, query: 'smok')
@@ -320,6 +327,11 @@ void main() {
           .searchGuidanceRules(profileId, category: 'caffeine')
           .first;
       expect(byCategory.map((e) => e.title), ['Limit coffee']);
+
+      final byAlcohol = await repository
+          .searchGuidanceRules(profileId, category: 'alcohol')
+          .first;
+      expect(byAlcohol.map((e) => e.title), ['Avoid binge drinking']);
     });
 
     test('permanently deletes a guidance rule', () async {

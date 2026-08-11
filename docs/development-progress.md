@@ -4495,9 +4495,9 @@ patient-managed Diet module. Two content sections via a single screen —
 **Foods** (Food Guidance: `allowed` / `caution` / `avoid` stable categories,
 search / filter / sort / archive / details / edit / permanent delete) and
 **General Guidance** (free-form rules: `diet` / `smoking` / `hydration` /
-`caffeine` / `other` categories, search / filter / archive / details / edit /
-delete). Patient-managed reference data only — no calorie tracking, meal
-planning, nutrition database or AI suggestions. No commit/push.
+`caffeine` / `alcohol` / `other` categories, search / filter / archive /
+details / edit / delete). Patient-managed reference data only — no calorie
+tracking, meal planning, nutrition database or AI suggestions. No commit/push.
 
 ### Key decisions (approved design)
 
@@ -4514,7 +4514,14 @@ planning, nutrition database or AI suggestions. No commit/push.
   `m.createTable` does not create them.
 - **Stable, non-localized categories.** Patient-visible labels are mapped at
   the UI layer (`diet_category_visuals.dart`, theme-derived tint colors, icon
-  + semantics label), never persisted.
+  + semantics label), never persisted. Category values are free-text columns
+  (no CHECK constraint), so adding a category requires no migration.
+- **Alcohol category (2026-08-11).** Added `alcohol` to General Guidance
+  between `caffeine` and `other` — dropdown (add/edit), list filter, list /
+  details / archived display all use `local_bar_outlined` + tertiary tint +
+  localized label ("Alcohol" / "ალკოჰოლი"). No migration; existing rows
+  unchanged; backup/restore covers the whole `database.sqlite`, so alcohol
+  records round-trip automatically.
 - **Single screen, two sections.** `SegmentedButton<DietSection>` switches
   Foods / General Guidance; each section keeps independent search / filter /
   sort / archive-flag state so switching never loses data.
@@ -4559,6 +4566,11 @@ planning, nutrition database or AI suggestions. No commit/push.
   real screens (placeholder removed).
 - `lib/l10n/app_en.arb` / `app_ka.arb` — diet keys; `flutter gen-l10n`
   regenerated `app_localizations.dart`.
+- `test/diet_category_visuals_test.dart` (new) — stable `alcohol` value, full
+  category list, localized label, `local_bar_outlined` icon, tertiary tint,
+  unknown-category fallback.
+- `test/backup_restore_integration_test.dart` — added an alcohol guidance
+  record backup → restore round-trip test (survives restore intact).
 
 ### Tests
 

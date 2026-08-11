@@ -123,6 +123,10 @@ class _DietGuidanceFormScreenState
                   child: Text(l10n.caffeineGuidanceCategory),
                 ),
                 DropdownMenuItem(
+                  value: DietGuidanceCategory.alcohol,
+                  child: Text(l10n.alcoholGuidanceCategory),
+                ),
+                DropdownMenuItem(
                   value: DietGuidanceCategory.other,
                   child: Text(l10n.otherGuidanceCategory),
                 ),

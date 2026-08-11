@@ -1256,9 +1256,9 @@ sections on one screen:
   sort (A–Z / Z–A / by category: allowed=0, caution=1, avoid=2, then name),
   archive / restore / details / edit / permanent delete.
 - **General Guidance** — free-form rules with stable categories `diet` /
-  `smoking` / `hydration` / `caffeine` / `other`, optional `description` /
-  `source` / `sortOrder`. Search, filter  by category, archive / restore /
-  details / edit / delete; ordered `sortOrder ASC` then `title ASC`.
+  `smoking` / `hydration` / `caffeine` / `alcohol` / `other`, optional
+  `description` / `source` / `sortOrder`. Search, filter by category, archive /
+  restore / details / edit / delete; ordered `sortOrder ASC` then `title ASC`.
 
 Out of scope (unchanged non-goals): calorie tracking, meal planning, nutrition
 database, AI-generated guidance. Both sections are patient-managed reference
@@ -1280,8 +1280,10 @@ data.
   they must be created explicitly with `m.createIndex`.
 - Stable persisted enum names: food `category` = `allowed` | `caution` |
   `avoid`; guidance `category` = `diet` | `smoking` | `hydration` | `caffeine` |
-  `other`. Localized labels, icons and theme-tinted colors are UI-only
-  (`diet_category_visuals.dart`), never persisted.
+  `alcohol` | `other`. Localized labels, icons and theme-tinted colors are
+  UI-only (`diet_category_visuals.dart`), never persisted. Category values are
+  free-text (`TextColumn`, no CHECK constraint), so adding a category requires
+  no database migration.
 
 ### Behavior rules
 

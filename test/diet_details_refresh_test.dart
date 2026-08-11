@@ -3,7 +3,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/diet.dart';
 import 'package:rehab_track/domain/repositories/diet_repository.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';

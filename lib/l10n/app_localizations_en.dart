@@ -2813,6 +2813,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get caffeineGuidanceCategory => 'Caffeine';
 
   @override
+  String get alcoholGuidanceCategory => 'Alcohol';
+
+  @override
   String get otherGuidanceCategory => 'Other';
 
   @override

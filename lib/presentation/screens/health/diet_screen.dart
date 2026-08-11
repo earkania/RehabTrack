@@ -281,6 +281,10 @@ class _DietScreenState extends ConsumerState<DietScreen> {
                 child: Text(l10n.caffeineGuidanceCategory),
               ),
               PopupMenuItem(
+                value: DietGuidanceCategory.alcohol,
+                child: Text(l10n.alcoholGuidanceCategory),
+              ),
+              PopupMenuItem(
                 value: DietGuidanceCategory.other,
                 child: Text(l10n.otherGuidanceCategory),
               ),

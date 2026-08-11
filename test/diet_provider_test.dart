@@ -321,6 +321,11 @@ void main() {
         title: 'Limit coffee',
         category: 'caffeine',
       ));
+      repo.addRule(makeRule(
+        id: 3,
+        title: 'Avoid binge drinking',
+        category: 'alcohol',
+      ));
 
       container.read(dietGuidanceSearchQueryProvider.notifier).state = 'smok';
       var value = await container.read(dietGuidanceSearchProvider(7).future);
@@ -331,6 +336,11 @@ void main() {
           'caffeine';
       value = await container.read(dietGuidanceSearchProvider(7).future);
       expect(value.map((r) => r.title), ['Limit coffee']);
+
+      container.read(dietGuidanceCategoryFilterProvider.notifier).state =
+          'alcohol';
+      value = await container.read(dietGuidanceSearchProvider(7).future);
+      expect(value.map((r) => r.title), ['Avoid binge drinking']);
     });
   });
 
