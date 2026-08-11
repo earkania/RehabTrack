@@ -13966,12 +13966,12 @@ class DocumentAttachmentsCompanion extends UpdateCompanion<DocumentAttachment> {
   }
 }
 
-class $DietPlansTable extends DietPlans
-    with TableInfo<$DietPlansTable, DietPlan> {
+class $DietItemsTable extends DietItems
+    with TableInfo<$DietItemsTable, DietItem> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $DietPlansTable(this.attachedDatabase, [this._alias]);
+  $DietItemsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -13996,13 +13996,625 @@ class $DietPlansTable extends DietPlans
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES profiles (id)',
+      'REFERENCES profiles (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _foodGroupMeta = const VerificationMeta(
+    'foodGroup',
+  );
+  @override
+  late final GeneratedColumn<String> foodGroup = GeneratedColumn<String>(
+    'food_group',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    category,
+    foodGroup,
+    notes,
+    source,
+    isArchived,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'diet_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DietItem> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('food_group')) {
+      context.handle(
+        _foodGroupMeta,
+        foodGroup.isAcceptableOrUnknown(data['food_group']!, _foodGroupMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DietItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DietItem(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      foodGroup: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}food_group'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      ),
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DietItemsTable createAlias(String alias) {
+    return $DietItemsTable(attachedDatabase, alias);
+  }
+}
+
+class DietItem extends DataClass implements Insertable<DietItem> {
+  final int id;
+  final int profileId;
+  final String name;
+  final String category;
+  final String? foodGroup;
+  final String? notes;
+  final String? source;
+  final bool isArchived;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const DietItem({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    required this.category,
+    this.foodGroup,
+    this.notes,
+    this.source,
+    required this.isArchived,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['name'] = Variable<String>(name);
+    map['category'] = Variable<String>(category);
+    if (!nullToAbsent || foodGroup != null) {
+      map['food_group'] = Variable<String>(foodGroup);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || source != null) {
+      map['source'] = Variable<String>(source);
+    }
+    map['is_archived'] = Variable<bool>(isArchived);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  DietItemsCompanion toCompanion(bool nullToAbsent) {
+    return DietItemsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      category: Value(category),
+      foodGroup: foodGroup == null && nullToAbsent
+          ? const Value.absent()
+          : Value(foodGroup),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      source: source == null && nullToAbsent
+          ? const Value.absent()
+          : Value(source),
+      isArchived: Value(isArchived),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory DietItem.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DietItem(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      category: serializer.fromJson<String>(json['category']),
+      foodGroup: serializer.fromJson<String?>(json['foodGroup']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      source: serializer.fromJson<String?>(json['source']),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'name': serializer.toJson<String>(name),
+      'category': serializer.toJson<String>(category),
+      'foodGroup': serializer.toJson<String?>(foodGroup),
+      'notes': serializer.toJson<String?>(notes),
+      'source': serializer.toJson<String?>(source),
+      'isArchived': serializer.toJson<bool>(isArchived),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  DietItem copyWith({
+    int? id,
+    int? profileId,
+    String? name,
+    String? category,
+    Value<String?> foodGroup = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    Value<String?> source = const Value.absent(),
+    bool? isArchived,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => DietItem(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    category: category ?? this.category,
+    foodGroup: foodGroup.present ? foodGroup.value : this.foodGroup,
+    notes: notes.present ? notes.value : this.notes,
+    source: source.present ? source.value : this.source,
+    isArchived: isArchived ?? this.isArchived,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  DietItem copyWithCompanion(DietItemsCompanion data) {
+    return DietItem(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      category: data.category.present ? data.category.value : this.category,
+      foodGroup: data.foodGroup.present ? data.foodGroup.value : this.foodGroup,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      source: data.source.present ? data.source.value : this.source,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DietItem(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('category: $category, ')
+          ..write('foodGroup: $foodGroup, ')
+          ..write('notes: $notes, ')
+          ..write('source: $source, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    name,
+    category,
+    foodGroup,
+    notes,
+    source,
+    isArchived,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DietItem &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.category == this.category &&
+          other.foodGroup == this.foodGroup &&
+          other.notes == this.notes &&
+          other.source == this.source &&
+          other.isArchived == this.isArchived &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DietItemsCompanion extends UpdateCompanion<DietItem> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> name;
+  final Value<String> category;
+  final Value<String?> foodGroup;
+  final Value<String?> notes;
+  final Value<String?> source;
+  final Value<bool> isArchived;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const DietItemsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.category = const Value.absent(),
+    this.foodGroup = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.source = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  DietItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String name,
+    required String category,
+    this.foodGroup = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.source = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : profileId = Value(profileId),
+       name = Value(name),
+       category = Value(category),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<DietItem> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? name,
+    Expression<String>? category,
+    Expression<String>? foodGroup,
+    Expression<String>? notes,
+    Expression<String>? source,
+    Expression<bool>? isArchived,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (category != null) 'category': category,
+      if (foodGroup != null) 'food_group': foodGroup,
+      if (notes != null) 'notes': notes,
+      if (source != null) 'source': source,
+      if (isArchived != null) 'is_archived': isArchived,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  DietItemsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? profileId,
+    Value<String>? name,
+    Value<String>? category,
+    Value<String?>? foodGroup,
+    Value<String?>? notes,
+    Value<String?>? source,
+    Value<bool>? isArchived,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return DietItemsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      foodGroup: foodGroup ?? this.foodGroup,
+      notes: notes ?? this.notes,
+      source: source ?? this.source,
+      isArchived: isArchived ?? this.isArchived,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (foodGroup.present) {
+      map['food_group'] = Variable<String>(foodGroup.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DietItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('category: $category, ')
+          ..write('foodGroup: $foodGroup, ')
+          ..write('notes: $notes, ')
+          ..write('source: $source, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DietGuidanceRulesTable extends DietGuidanceRules
+    with TableInfo<$DietGuidanceRulesTable, DietGuidanceRule> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DietGuidanceRulesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
     'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -14019,69 +14631,84 @@ class $DietPlansTable extends DietPlans
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _startDateMeta = const VerificationMeta(
-    'startDate',
-  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
-  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
-    'start_date',
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
     aliasedName,
     true,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _endDateMeta = const VerificationMeta(
-    'endDate',
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
   );
   @override
-  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
-    'end_date',
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
     aliasedName,
     true,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _activeMeta = const VerificationMeta('active');
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
   @override
-  late final GeneratedColumn<bool> active = GeneratedColumn<bool>(
-    'active',
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
     aliasedName,
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("active" IN (0, 1))',
+      'CHECK ("is_archived" IN (0, 1))',
     ),
-    defaultValue: const Constant(true),
+    defaultValue: const Constant(false),
   );
-  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
-  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
-    'notes',
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
     aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
   );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     profileId,
     title,
+    category,
     description,
-    startDate,
-    endDate,
-    active,
-    notes,
+    source,
+    sortOrder,
+    isArchived,
+    createdAt,
+    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'diet_plans';
+  static const String $name = 'diet_guidance_rules';
   @override
   VerificationContext validateIntegrity(
-    Insertable<DietPlan> instance, {
+    Insertable<DietGuidanceRule> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -14105,6 +14732,14 @@ class $DietPlansTable extends DietPlans
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
     if (data.containsKey('description')) {
       context.handle(
         _descriptionMeta,
@@ -14114,29 +14749,39 @@ class $DietPlansTable extends DietPlans
         ),
       );
     }
-    if (data.containsKey('start_date')) {
+    if (data.containsKey('source')) {
       context.handle(
-        _startDateMeta,
-        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
       );
     }
-    if (data.containsKey('end_date')) {
+    if (data.containsKey('sort_order')) {
       context.handle(
-        _endDateMeta,
-        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
       );
     }
-    if (data.containsKey('active')) {
+    if (data.containsKey('is_archived')) {
       context.handle(
-        _activeMeta,
-        active.isAcceptableOrUnknown(data['active']!, _activeMeta),
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
       );
     }
-    if (data.containsKey('notes')) {
+    if (data.containsKey('created_at')) {
       context.handle(
-        _notesMeta,
-        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
     }
     return context;
   }
@@ -14144,9 +14789,9 @@ class $DietPlansTable extends DietPlans
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  DietPlan map(Map<String, dynamic> data, {String? tablePrefix}) {
+  DietGuidanceRule map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DietPlan(
+    return DietGuidanceRule(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -14159,53 +14804,66 @@ class $DietPlansTable extends DietPlans
         DriftSqlType.string,
         data['${effectivePrefix}title'],
       )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       ),
-      startDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}start_date'],
-      ),
-      endDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}end_date'],
-      ),
-      active: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}active'],
-      )!,
-      notes: attachedDatabase.typeMapping.read(
+      source: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}notes'],
+        data['${effectivePrefix}source'],
       ),
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      ),
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
   @override
-  $DietPlansTable createAlias(String alias) {
-    return $DietPlansTable(attachedDatabase, alias);
+  $DietGuidanceRulesTable createAlias(String alias) {
+    return $DietGuidanceRulesTable(attachedDatabase, alias);
   }
 }
 
-class DietPlan extends DataClass implements Insertable<DietPlan> {
+class DietGuidanceRule extends DataClass
+    implements Insertable<DietGuidanceRule> {
   final int id;
   final int profileId;
   final String title;
+  final String category;
   final String? description;
-  final DateTime? startDate;
-  final DateTime? endDate;
-  final bool active;
-  final String? notes;
-  const DietPlan({
+  final String? source;
+  final int? sortOrder;
+  final bool isArchived;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const DietGuidanceRule({
     required this.id,
     required this.profileId,
     required this.title,
+    required this.category,
     this.description,
-    this.startDate,
-    this.endDate,
-    required this.active,
-    this.notes,
+    this.source,
+    this.sortOrder,
+    required this.isArchived,
+    required this.createdAt,
+    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -14213,57 +14871,59 @@ class DietPlan extends DataClass implements Insertable<DietPlan> {
     map['id'] = Variable<int>(id);
     map['profile_id'] = Variable<int>(profileId);
     map['title'] = Variable<String>(title);
+    map['category'] = Variable<String>(category);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
-    if (!nullToAbsent || startDate != null) {
-      map['start_date'] = Variable<DateTime>(startDate);
+    if (!nullToAbsent || source != null) {
+      map['source'] = Variable<String>(source);
     }
-    if (!nullToAbsent || endDate != null) {
-      map['end_date'] = Variable<DateTime>(endDate);
+    if (!nullToAbsent || sortOrder != null) {
+      map['sort_order'] = Variable<int>(sortOrder);
     }
-    map['active'] = Variable<bool>(active);
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
-    }
+    map['is_archived'] = Variable<bool>(isArchived);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
-  DietPlansCompanion toCompanion(bool nullToAbsent) {
-    return DietPlansCompanion(
+  DietGuidanceRulesCompanion toCompanion(bool nullToAbsent) {
+    return DietGuidanceRulesCompanion(
       id: Value(id),
       profileId: Value(profileId),
       title: Value(title),
+      category: Value(category),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
-      startDate: startDate == null && nullToAbsent
+      source: source == null && nullToAbsent
           ? const Value.absent()
-          : Value(startDate),
-      endDate: endDate == null && nullToAbsent
+          : Value(source),
+      sortOrder: sortOrder == null && nullToAbsent
           ? const Value.absent()
-          : Value(endDate),
-      active: Value(active),
-      notes: notes == null && nullToAbsent
-          ? const Value.absent()
-          : Value(notes),
+          : Value(sortOrder),
+      isArchived: Value(isArchived),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
     );
   }
 
-  factory DietPlan.fromJson(
+  factory DietGuidanceRule.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DietPlan(
+    return DietGuidanceRule(
       id: serializer.fromJson<int>(json['id']),
       profileId: serializer.fromJson<int>(json['profileId']),
       title: serializer.fromJson<String>(json['title']),
+      category: serializer.fromJson<String>(json['category']),
       description: serializer.fromJson<String?>(json['description']),
-      startDate: serializer.fromJson<DateTime?>(json['startDate']),
-      endDate: serializer.fromJson<DateTime?>(json['endDate']),
-      active: serializer.fromJson<bool>(json['active']),
-      notes: serializer.fromJson<String?>(json['notes']),
+      source: serializer.fromJson<String?>(json['source']),
+      sortOrder: serializer.fromJson<int?>(json['sortOrder']),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -14273,59 +14933,71 @@ class DietPlan extends DataClass implements Insertable<DietPlan> {
       'id': serializer.toJson<int>(id),
       'profileId': serializer.toJson<int>(profileId),
       'title': serializer.toJson<String>(title),
+      'category': serializer.toJson<String>(category),
       'description': serializer.toJson<String?>(description),
-      'startDate': serializer.toJson<DateTime?>(startDate),
-      'endDate': serializer.toJson<DateTime?>(endDate),
-      'active': serializer.toJson<bool>(active),
-      'notes': serializer.toJson<String?>(notes),
+      'source': serializer.toJson<String?>(source),
+      'sortOrder': serializer.toJson<int?>(sortOrder),
+      'isArchived': serializer.toJson<bool>(isArchived),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
-  DietPlan copyWith({
+  DietGuidanceRule copyWith({
     int? id,
     int? profileId,
     String? title,
+    String? category,
     Value<String?> description = const Value.absent(),
-    Value<DateTime?> startDate = const Value.absent(),
-    Value<DateTime?> endDate = const Value.absent(),
-    bool? active,
-    Value<String?> notes = const Value.absent(),
-  }) => DietPlan(
+    Value<String?> source = const Value.absent(),
+    Value<int?> sortOrder = const Value.absent(),
+    bool? isArchived,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => DietGuidanceRule(
     id: id ?? this.id,
     profileId: profileId ?? this.profileId,
     title: title ?? this.title,
+    category: category ?? this.category,
     description: description.present ? description.value : this.description,
-    startDate: startDate.present ? startDate.value : this.startDate,
-    endDate: endDate.present ? endDate.value : this.endDate,
-    active: active ?? this.active,
-    notes: notes.present ? notes.value : this.notes,
+    source: source.present ? source.value : this.source,
+    sortOrder: sortOrder.present ? sortOrder.value : this.sortOrder,
+    isArchived: isArchived ?? this.isArchived,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
-  DietPlan copyWithCompanion(DietPlansCompanion data) {
-    return DietPlan(
+  DietGuidanceRule copyWithCompanion(DietGuidanceRulesCompanion data) {
+    return DietGuidanceRule(
       id: data.id.present ? data.id.value : this.id,
       profileId: data.profileId.present ? data.profileId.value : this.profileId,
       title: data.title.present ? data.title.value : this.title,
+      category: data.category.present ? data.category.value : this.category,
       description: data.description.present
           ? data.description.value
           : this.description,
-      startDate: data.startDate.present ? data.startDate.value : this.startDate,
-      endDate: data.endDate.present ? data.endDate.value : this.endDate,
-      active: data.active.present ? data.active.value : this.active,
-      notes: data.notes.present ? data.notes.value : this.notes,
+      source: data.source.present ? data.source.value : this.source,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('DietPlan(')
+    return (StringBuffer('DietGuidanceRule(')
           ..write('id: $id, ')
           ..write('profileId: $profileId, ')
           ..write('title: $title, ')
+          ..write('category: $category, ')
           ..write('description: $description, ')
-          ..write('startDate: $startDate, ')
-          ..write('endDate: $endDate, ')
-          ..write('active: $active, ')
-          ..write('notes: $notes')
+          ..write('source: $source, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -14335,97 +15007,118 @@ class DietPlan extends DataClass implements Insertable<DietPlan> {
     id,
     profileId,
     title,
+    category,
     description,
-    startDate,
-    endDate,
-    active,
-    notes,
+    source,
+    sortOrder,
+    isArchived,
+    createdAt,
+    updatedAt,
   );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is DietPlan &&
+      (other is DietGuidanceRule &&
           other.id == this.id &&
           other.profileId == this.profileId &&
           other.title == this.title &&
+          other.category == this.category &&
           other.description == this.description &&
-          other.startDate == this.startDate &&
-          other.endDate == this.endDate &&
-          other.active == this.active &&
-          other.notes == this.notes);
+          other.source == this.source &&
+          other.sortOrder == this.sortOrder &&
+          other.isArchived == this.isArchived &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
-class DietPlansCompanion extends UpdateCompanion<DietPlan> {
+class DietGuidanceRulesCompanion extends UpdateCompanion<DietGuidanceRule> {
   final Value<int> id;
   final Value<int> profileId;
   final Value<String> title;
+  final Value<String> category;
   final Value<String?> description;
-  final Value<DateTime?> startDate;
-  final Value<DateTime?> endDate;
-  final Value<bool> active;
-  final Value<String?> notes;
-  const DietPlansCompanion({
+  final Value<String?> source;
+  final Value<int?> sortOrder;
+  final Value<bool> isArchived;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const DietGuidanceRulesCompanion({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
     this.title = const Value.absent(),
+    this.category = const Value.absent(),
     this.description = const Value.absent(),
-    this.startDate = const Value.absent(),
-    this.endDate = const Value.absent(),
-    this.active = const Value.absent(),
-    this.notes = const Value.absent(),
+    this.source = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
-  DietPlansCompanion.insert({
+  DietGuidanceRulesCompanion.insert({
     this.id = const Value.absent(),
     required int profileId,
     required String title,
+    required String category,
     this.description = const Value.absent(),
-    this.startDate = const Value.absent(),
-    this.endDate = const Value.absent(),
-    this.active = const Value.absent(),
-    this.notes = const Value.absent(),
+    this.source = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
   }) : profileId = Value(profileId),
-       title = Value(title);
-  static Insertable<DietPlan> custom({
+       title = Value(title),
+       category = Value(category),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<DietGuidanceRule> custom({
     Expression<int>? id,
     Expression<int>? profileId,
     Expression<String>? title,
+    Expression<String>? category,
     Expression<String>? description,
-    Expression<DateTime>? startDate,
-    Expression<DateTime>? endDate,
-    Expression<bool>? active,
-    Expression<String>? notes,
+    Expression<String>? source,
+    Expression<int>? sortOrder,
+    Expression<bool>? isArchived,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (profileId != null) 'profile_id': profileId,
       if (title != null) 'title': title,
+      if (category != null) 'category': category,
       if (description != null) 'description': description,
-      if (startDate != null) 'start_date': startDate,
-      if (endDate != null) 'end_date': endDate,
-      if (active != null) 'active': active,
-      if (notes != null) 'notes': notes,
+      if (source != null) 'source': source,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (isArchived != null) 'is_archived': isArchived,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
-  DietPlansCompanion copyWith({
+  DietGuidanceRulesCompanion copyWith({
     Value<int>? id,
     Value<int>? profileId,
     Value<String>? title,
+    Value<String>? category,
     Value<String?>? description,
-    Value<DateTime?>? startDate,
-    Value<DateTime?>? endDate,
-    Value<bool>? active,
-    Value<String?>? notes,
+    Value<String?>? source,
+    Value<int?>? sortOrder,
+    Value<bool>? isArchived,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
   }) {
-    return DietPlansCompanion(
+    return DietGuidanceRulesCompanion(
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
       title: title ?? this.title,
+      category: category ?? this.category,
       description: description ?? this.description,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      active: active ?? this.active,
-      notes: notes ?? this.notes,
+      source: source ?? this.source,
+      sortOrder: sortOrder ?? this.sortOrder,
+      isArchived: isArchived ?? this.isArchived,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -14441,394 +15134,43 @@ class DietPlansCompanion extends UpdateCompanion<DietPlan> {
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
-    if (description.present) {
-      map['description'] = Variable<String>(description.value);
-    }
-    if (startDate.present) {
-      map['start_date'] = Variable<DateTime>(startDate.value);
-    }
-    if (endDate.present) {
-      map['end_date'] = Variable<DateTime>(endDate.value);
-    }
-    if (active.present) {
-      map['active'] = Variable<bool>(active.value);
-    }
-    if (notes.present) {
-      map['notes'] = Variable<String>(notes.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DietPlansCompanion(')
-          ..write('id: $id, ')
-          ..write('profileId: $profileId, ')
-          ..write('title: $title, ')
-          ..write('description: $description, ')
-          ..write('startDate: $startDate, ')
-          ..write('endDate: $endDate, ')
-          ..write('active: $active, ')
-          ..write('notes: $notes')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $DietItemsTable extends DietItems
-    with TableInfo<$DietItemsTable, DietItem> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $DietItemsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _dietPlanIdMeta = const VerificationMeta(
-    'dietPlanId',
-  );
-  @override
-  late final GeneratedColumn<int> dietPlanId = GeneratedColumn<int>(
-    'diet_plan_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES diet_plans (id)',
-    ),
-  );
-  static const VerificationMeta _categoryMeta = const VerificationMeta(
-    'category',
-  );
-  @override
-  late final GeneratedColumn<String> category = GeneratedColumn<String>(
-    'category',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _itemTextMeta = const VerificationMeta(
-    'itemText',
-  );
-  @override
-  late final GeneratedColumn<String> itemText = GeneratedColumn<String>(
-    'item_text',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
-  @override
-  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
-    'notes',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    dietPlanId,
-    category,
-    itemText,
-    notes,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'diet_items';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<DietItem> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('diet_plan_id')) {
-      context.handle(
-        _dietPlanIdMeta,
-        dietPlanId.isAcceptableOrUnknown(
-          data['diet_plan_id']!,
-          _dietPlanIdMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_dietPlanIdMeta);
-    }
-    if (data.containsKey('category')) {
-      context.handle(
-        _categoryMeta,
-        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_categoryMeta);
-    }
-    if (data.containsKey('item_text')) {
-      context.handle(
-        _itemTextMeta,
-        itemText.isAcceptableOrUnknown(data['item_text']!, _itemTextMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_itemTextMeta);
-    }
-    if (data.containsKey('notes')) {
-      context.handle(
-        _notesMeta,
-        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  DietItem map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DietItem(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      dietPlanId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}diet_plan_id'],
-      )!,
-      category: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}category'],
-      )!,
-      itemText: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}item_text'],
-      )!,
-      notes: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}notes'],
-      ),
-    );
-  }
-
-  @override
-  $DietItemsTable createAlias(String alias) {
-    return $DietItemsTable(attachedDatabase, alias);
-  }
-}
-
-class DietItem extends DataClass implements Insertable<DietItem> {
-  final int id;
-  final int dietPlanId;
-  final String category;
-  final String itemText;
-  final String? notes;
-  const DietItem({
-    required this.id,
-    required this.dietPlanId,
-    required this.category,
-    required this.itemText,
-    this.notes,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['diet_plan_id'] = Variable<int>(dietPlanId);
-    map['category'] = Variable<String>(category);
-    map['item_text'] = Variable<String>(itemText);
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
-    }
-    return map;
-  }
-
-  DietItemsCompanion toCompanion(bool nullToAbsent) {
-    return DietItemsCompanion(
-      id: Value(id),
-      dietPlanId: Value(dietPlanId),
-      category: Value(category),
-      itemText: Value(itemText),
-      notes: notes == null && nullToAbsent
-          ? const Value.absent()
-          : Value(notes),
-    );
-  }
-
-  factory DietItem.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DietItem(
-      id: serializer.fromJson<int>(json['id']),
-      dietPlanId: serializer.fromJson<int>(json['dietPlanId']),
-      category: serializer.fromJson<String>(json['category']),
-      itemText: serializer.fromJson<String>(json['itemText']),
-      notes: serializer.fromJson<String?>(json['notes']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'dietPlanId': serializer.toJson<int>(dietPlanId),
-      'category': serializer.toJson<String>(category),
-      'itemText': serializer.toJson<String>(itemText),
-      'notes': serializer.toJson<String?>(notes),
-    };
-  }
-
-  DietItem copyWith({
-    int? id,
-    int? dietPlanId,
-    String? category,
-    String? itemText,
-    Value<String?> notes = const Value.absent(),
-  }) => DietItem(
-    id: id ?? this.id,
-    dietPlanId: dietPlanId ?? this.dietPlanId,
-    category: category ?? this.category,
-    itemText: itemText ?? this.itemText,
-    notes: notes.present ? notes.value : this.notes,
-  );
-  DietItem copyWithCompanion(DietItemsCompanion data) {
-    return DietItem(
-      id: data.id.present ? data.id.value : this.id,
-      dietPlanId: data.dietPlanId.present
-          ? data.dietPlanId.value
-          : this.dietPlanId,
-      category: data.category.present ? data.category.value : this.category,
-      itemText: data.itemText.present ? data.itemText.value : this.itemText,
-      notes: data.notes.present ? data.notes.value : this.notes,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DietItem(')
-          ..write('id: $id, ')
-          ..write('dietPlanId: $dietPlanId, ')
-          ..write('category: $category, ')
-          ..write('itemText: $itemText, ')
-          ..write('notes: $notes')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, dietPlanId, category, itemText, notes);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is DietItem &&
-          other.id == this.id &&
-          other.dietPlanId == this.dietPlanId &&
-          other.category == this.category &&
-          other.itemText == this.itemText &&
-          other.notes == this.notes);
-}
-
-class DietItemsCompanion extends UpdateCompanion<DietItem> {
-  final Value<int> id;
-  final Value<int> dietPlanId;
-  final Value<String> category;
-  final Value<String> itemText;
-  final Value<String?> notes;
-  const DietItemsCompanion({
-    this.id = const Value.absent(),
-    this.dietPlanId = const Value.absent(),
-    this.category = const Value.absent(),
-    this.itemText = const Value.absent(),
-    this.notes = const Value.absent(),
-  });
-  DietItemsCompanion.insert({
-    this.id = const Value.absent(),
-    required int dietPlanId,
-    required String category,
-    required String itemText,
-    this.notes = const Value.absent(),
-  }) : dietPlanId = Value(dietPlanId),
-       category = Value(category),
-       itemText = Value(itemText);
-  static Insertable<DietItem> custom({
-    Expression<int>? id,
-    Expression<int>? dietPlanId,
-    Expression<String>? category,
-    Expression<String>? itemText,
-    Expression<String>? notes,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (dietPlanId != null) 'diet_plan_id': dietPlanId,
-      if (category != null) 'category': category,
-      if (itemText != null) 'item_text': itemText,
-      if (notes != null) 'notes': notes,
-    });
-  }
-
-  DietItemsCompanion copyWith({
-    Value<int>? id,
-    Value<int>? dietPlanId,
-    Value<String>? category,
-    Value<String>? itemText,
-    Value<String?>? notes,
-  }) {
-    return DietItemsCompanion(
-      id: id ?? this.id,
-      dietPlanId: dietPlanId ?? this.dietPlanId,
-      category: category ?? this.category,
-      itemText: itemText ?? this.itemText,
-      notes: notes ?? this.notes,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (dietPlanId.present) {
-      map['diet_plan_id'] = Variable<int>(dietPlanId.value);
-    }
     if (category.present) {
       map['category'] = Variable<String>(category.value);
     }
-    if (itemText.present) {
-      map['item_text'] = Variable<String>(itemText.value);
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
     }
-    if (notes.present) {
-      map['notes'] = Variable<String>(notes.value);
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('DietItemsCompanion(')
+    return (StringBuffer('DietGuidanceRulesCompanion(')
           ..write('id: $id, ')
-          ..write('dietPlanId: $dietPlanId, ')
+          ..write('profileId: $profileId, ')
+          ..write('title: $title, ')
           ..write('category: $category, ')
-          ..write('itemText: $itemText, ')
-          ..write('notes: $notes')
+          ..write('description: $description, ')
+          ..write('source: $source, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -19741,8 +20083,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $DoctorVisitRecordsTable(this);
   late final $DocumentAttachmentsTable documentAttachments =
       $DocumentAttachmentsTable(this);
-  late final $DietPlansTable dietPlans = $DietPlansTable(this);
   late final $DietItemsTable dietItems = $DietItemsTable(this);
+  late final $DietGuidanceRulesTable dietGuidanceRules =
+      $DietGuidanceRulesTable(this);
   late final $HealthTemplatesTable healthTemplates = $HealthTemplatesTable(
     this,
   );
@@ -19801,6 +20144,42 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index doctorVisitRecordsArchivedIdx = Index(
     'doctor_visit_records_archived_idx',
     'CREATE INDEX doctor_visit_records_archived_idx ON doctor_visit_records (is_archived)',
+  );
+  late final Index dietItemsProfileIdx = Index(
+    'diet_items_profile_idx',
+    'CREATE INDEX diet_items_profile_idx ON diet_items (profile_id)',
+  );
+  late final Index dietItemsCategoryIdx = Index(
+    'diet_items_category_idx',
+    'CREATE INDEX diet_items_category_idx ON diet_items (category)',
+  );
+  late final Index dietItemsArchivedIdx = Index(
+    'diet_items_archived_idx',
+    'CREATE INDEX diet_items_archived_idx ON diet_items (is_archived)',
+  );
+  late final Index dietItemsNameIdx = Index(
+    'diet_items_name_idx',
+    'CREATE INDEX diet_items_name_idx ON diet_items (name)',
+  );
+  late final Index dietGuidanceRulesProfileIdx = Index(
+    'diet_guidance_rules_profile_idx',
+    'CREATE INDEX diet_guidance_rules_profile_idx ON diet_guidance_rules (profile_id)',
+  );
+  late final Index dietGuidanceRulesCategoryIdx = Index(
+    'diet_guidance_rules_category_idx',
+    'CREATE INDEX diet_guidance_rules_category_idx ON diet_guidance_rules (category)',
+  );
+  late final Index dietGuidanceRulesArchivedIdx = Index(
+    'diet_guidance_rules_archived_idx',
+    'CREATE INDEX diet_guidance_rules_archived_idx ON diet_guidance_rules (is_archived)',
+  );
+  late final Index dietGuidanceRulesTitleIdx = Index(
+    'diet_guidance_rules_title_idx',
+    'CREATE INDEX diet_guidance_rules_title_idx ON diet_guidance_rules (title)',
+  );
+  late final Index dietGuidanceRulesSortIdx = Index(
+    'diet_guidance_rules_sort_idx',
+    'CREATE INDEX diet_guidance_rules_sort_idx ON diet_guidance_rules (sort_order)',
   );
   late final Index labAnalysesProfileIdx = Index(
     'lab_analyses_profile_idx',
@@ -19904,8 +20283,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     careContacts,
     doctorVisitRecords,
     documentAttachments,
-    dietPlans,
     dietItems,
+    dietGuidanceRules,
     healthTemplates,
     appSettings,
     profileReferenceRanges,
@@ -19925,6 +20304,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     doctorVisitRecordsDoctorIdx,
     doctorVisitRecordsOrgIdx,
     doctorVisitRecordsArchivedIdx,
+    dietItemsProfileIdx,
+    dietItemsCategoryIdx,
+    dietItemsArchivedIdx,
+    dietItemsNameIdx,
+    dietGuidanceRulesProfileIdx,
+    dietGuidanceRulesCategoryIdx,
+    dietGuidanceRulesArchivedIdx,
+    dietGuidanceRulesTitleIdx,
+    dietGuidanceRulesSortIdx,
     labAnalysesProfileIdx,
     labAnalysesDateIdx,
     labAnalysesCategoryIdx,
@@ -19947,6 +20335,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('diet_items', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('diet_guidance_rules', kind: UpdateKind.delete)],
+    ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'profiles',
@@ -20351,19 +20753,40 @@ final class $$ProfilesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$DietPlansTable, List<DietPlan>>
-  _dietPlansRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.dietPlans,
-    aliasName: 'profiles__id__diet_plans__profile_id',
+  static MultiTypedResultKey<$DietItemsTable, List<DietItem>>
+  _dietItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.dietItems,
+    aliasName: 'profiles__id__diet_items__profile_id',
   );
 
-  $$DietPlansTableProcessedTableManager get dietPlansRefs {
-    final manager = $$DietPlansTableTableManager(
+  $$DietItemsTableProcessedTableManager get dietItemsRefs {
+    final manager = $$DietItemsTableTableManager(
       $_db,
-      $_db.dietPlans,
+      $_db.dietItems,
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_dietPlansRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_dietItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$DietGuidanceRulesTable, List<DietGuidanceRule>>
+  _dietGuidanceRulesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.dietGuidanceRules,
+        aliasName: 'profiles__id__diet_guidance_rules__profile_id',
+      );
+
+  $$DietGuidanceRulesTableProcessedTableManager get dietGuidanceRulesRefs {
+    final manager = $$DietGuidanceRulesTableTableManager(
+      $_db,
+      $_db.dietGuidanceRules,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _dietGuidanceRulesRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -20926,22 +21349,47 @@ class $$ProfilesTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> dietPlansRefs(
-    Expression<bool> Function($$DietPlansTableFilterComposer f) f,
+  Expression<bool> dietItemsRefs(
+    Expression<bool> Function($$DietItemsTableFilterComposer f) f,
   ) {
-    final $$DietPlansTableFilterComposer composer = $composerBuilder(
+    final $$DietItemsTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.dietPlans,
+      referencedTable: $db.dietItems,
       getReferencedColumn: (t) => t.profileId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$DietPlansTableFilterComposer(
+          }) => $$DietItemsTableFilterComposer(
             $db: $db,
-            $table: $db.dietPlans,
+            $table: $db.dietItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> dietGuidanceRulesRefs(
+    Expression<bool> Function($$DietGuidanceRulesTableFilterComposer f) f,
+  ) {
+    final $$DietGuidanceRulesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.dietGuidanceRules,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DietGuidanceRulesTableFilterComposer(
+            $db: $db,
+            $table: $db.dietGuidanceRules,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -21609,28 +22057,54 @@ class $$ProfilesTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> dietPlansRefs<T extends Object>(
-    Expression<T> Function($$DietPlansTableAnnotationComposer a) f,
+  Expression<T> dietItemsRefs<T extends Object>(
+    Expression<T> Function($$DietItemsTableAnnotationComposer a) f,
   ) {
-    final $$DietPlansTableAnnotationComposer composer = $composerBuilder(
+    final $$DietItemsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.dietPlans,
+      referencedTable: $db.dietItems,
       getReferencedColumn: (t) => t.profileId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$DietPlansTableAnnotationComposer(
+          }) => $$DietItemsTableAnnotationComposer(
             $db: $db,
-            $table: $db.dietPlans,
+            $table: $db.dietItems,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<T> dietGuidanceRulesRefs<T extends Object>(
+    Expression<T> Function($$DietGuidanceRulesTableAnnotationComposer a) f,
+  ) {
+    final $$DietGuidanceRulesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.dietGuidanceRules,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DietGuidanceRulesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.dietGuidanceRules,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 
@@ -21822,7 +22296,8 @@ class $$ProfilesTableTableManager
             bool careContactsRefs,
             bool doctorVisitRecordsRefs,
             bool documentAttachmentsRefs,
-            bool dietPlansRefs,
+            bool dietItemsRefs,
+            bool dietGuidanceRulesRefs,
             bool profileReferenceRangesRefs,
             bool labAnalysesRefs,
             bool labAnalysisAttachmentsRefs,
@@ -21956,7 +22431,8 @@ class $$ProfilesTableTableManager
                 careContactsRefs = false,
                 doctorVisitRecordsRefs = false,
                 documentAttachmentsRefs = false,
-                dietPlansRefs = false,
+                dietItemsRefs = false,
+                dietGuidanceRulesRefs = false,
                 profileReferenceRangesRefs = false,
                 labAnalysesRefs = false,
                 labAnalysisAttachmentsRefs = false,
@@ -21979,7 +22455,8 @@ class $$ProfilesTableTableManager
                     if (careContactsRefs) db.careContacts,
                     if (doctorVisitRecordsRefs) db.doctorVisitRecords,
                     if (documentAttachmentsRefs) db.documentAttachments,
-                    if (dietPlansRefs) db.dietPlans,
+                    if (dietItemsRefs) db.dietItems,
+                    if (dietGuidanceRulesRefs) db.dietGuidanceRules,
                     if (profileReferenceRangesRefs) db.profileReferenceRanges,
                     if (labAnalysesRefs) db.labAnalyses,
                     if (labAnalysisAttachmentsRefs) db.labAnalysisAttachments,
@@ -22244,21 +22721,42 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
-                      if (dietPlansRefs)
+                      if (dietItemsRefs)
                         await $_getPrefetchedData<
                           Profile,
                           $ProfilesTable,
-                          DietPlan
+                          DietItem
                         >(
                           currentTable: table,
                           referencedTable: $$ProfilesTableReferences
-                              ._dietPlansRefsTable(db),
+                              ._dietItemsRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$ProfilesTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).dietPlansRefs,
+                              ).dietItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (dietGuidanceRulesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          DietGuidanceRule
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._dietGuidanceRulesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).dietGuidanceRulesRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.profileId == item.id,
@@ -22424,7 +22922,8 @@ typedef $$ProfilesTableProcessedTableManager =
         bool careContactsRefs,
         bool doctorVisitRecordsRefs,
         bool documentAttachmentsRefs,
-        bool dietPlansRefs,
+        bool dietItemsRefs,
+        bool dietGuidanceRulesRefs,
         bool profileReferenceRangesRefs,
         bool labAnalysesRefs,
         bool labAnalysisAttachmentsRefs,
@@ -33480,35 +33979,39 @@ typedef $$DocumentAttachmentsTableProcessedTableManager =
       DocumentAttachment,
       PrefetchHooks Function({bool profileId})
     >;
-typedef $$DietPlansTableCreateCompanionBuilder =
-    DietPlansCompanion Function({
+typedef $$DietItemsTableCreateCompanionBuilder =
+    DietItemsCompanion Function({
       Value<int> id,
       required int profileId,
-      required String title,
-      Value<String?> description,
-      Value<DateTime?> startDate,
-      Value<DateTime?> endDate,
-      Value<bool> active,
+      required String name,
+      required String category,
+      Value<String?> foodGroup,
       Value<String?> notes,
+      Value<String?> source,
+      Value<bool> isArchived,
+      required DateTime createdAt,
+      required DateTime updatedAt,
     });
-typedef $$DietPlansTableUpdateCompanionBuilder =
-    DietPlansCompanion Function({
+typedef $$DietItemsTableUpdateCompanionBuilder =
+    DietItemsCompanion Function({
       Value<int> id,
       Value<int> profileId,
-      Value<String> title,
-      Value<String?> description,
-      Value<DateTime?> startDate,
-      Value<DateTime?> endDate,
-      Value<bool> active,
+      Value<String> name,
+      Value<String> category,
+      Value<String?> foodGroup,
       Value<String?> notes,
+      Value<String?> source,
+      Value<bool> isArchived,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
     });
 
-final class $$DietPlansTableReferences
-    extends BaseReferences<_$AppDatabase, $DietPlansTable, DietPlan> {
-  $$DietPlansTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$DietItemsTableReferences
+    extends BaseReferences<_$AppDatabase, $DietItemsTable, DietItem> {
+  $$DietItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
-      db.profiles.createAlias('diet_plans__profile_id__profiles__id');
+      db.profiles.createAlias('diet_items__profile_id__profiles__id');
 
   $$ProfilesTableProcessedTableManager get profileId {
     final $_column = $_itemColumn<int>('profile_id')!;
@@ -33523,29 +34026,11 @@ final class $$DietPlansTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
-
-  static MultiTypedResultKey<$DietItemsTable, List<DietItem>>
-  _dietItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.dietItems,
-    aliasName: 'diet_plans__id__diet_items__diet_plan_id',
-  );
-
-  $$DietItemsTableProcessedTableManager get dietItemsRefs {
-    final manager = $$DietItemsTableTableManager(
-      $_db,
-      $_db.dietItems,
-    ).filter((f) => f.dietPlanId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_dietItemsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
 }
 
-class $$DietPlansTableFilterComposer
-    extends Composer<_$AppDatabase, $DietPlansTable> {
-  $$DietPlansTableFilterComposer({
+class $$DietItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $DietItemsTable> {
+  $$DietItemsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -33557,33 +34042,43 @@ class $$DietPlansTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get title => $composableBuilder(
-    column: $table.title,
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get description => $composableBuilder(
-    column: $table.description,
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get active => $composableBuilder(
-    column: $table.active,
+  ColumnFilters<String> get foodGroup => $composableBuilder(
+    column: $table.foodGroup,
     builder: (column) => ColumnFilters(column),
   );
 
   ColumnFilters<String> get notes => $composableBuilder(
     column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -33609,36 +34104,11 @@ class $$DietPlansTableFilterComposer
     );
     return composer;
   }
-
-  Expression<bool> dietItemsRefs(
-    Expression<bool> Function($$DietItemsTableFilterComposer f) f,
-  ) {
-    final $$DietItemsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.dietItems,
-      getReferencedColumn: (t) => t.dietPlanId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$DietItemsTableFilterComposer(
-            $db: $db,
-            $table: $db.dietItems,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
-class $$DietPlansTableOrderingComposer
-    extends Composer<_$AppDatabase, $DietPlansTable> {
-  $$DietPlansTableOrderingComposer({
+class $$DietItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DietItemsTable> {
+  $$DietItemsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -33650,33 +34120,43 @@ class $$DietPlansTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get title => $composableBuilder(
-    column: $table.title,
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get description => $composableBuilder(
-    column: $table.description,
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get active => $composableBuilder(
-    column: $table.active,
+  ColumnOrderings<String> get foodGroup => $composableBuilder(
+    column: $table.foodGroup,
     builder: (column) => ColumnOrderings(column),
   );
 
   ColumnOrderings<String> get notes => $composableBuilder(
     column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -33704,9 +34184,9 @@ class $$DietPlansTableOrderingComposer
   }
 }
 
-class $$DietPlansTableAnnotationComposer
-    extends Composer<_$AppDatabase, $DietPlansTable> {
-  $$DietPlansTableAnnotationComposer({
+class $$DietItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DietItemsTable> {
+  $$DietItemsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -33716,25 +34196,31 @@ class $$DietPlansTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
 
-  GeneratedColumn<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get startDate =>
-      $composableBuilder(column: $table.startDate, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get endDate =>
-      $composableBuilder(column: $table.endDate, builder: (column) => column);
-
-  GeneratedColumn<bool> get active =>
-      $composableBuilder(column: $table.active, builder: (column) => column);
+  GeneratedColumn<String> get foodGroup =>
+      $composableBuilder(column: $table.foodGroup, builder: (column) => column);
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   $$ProfilesTableAnnotationComposer get profileId {
     final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
@@ -33758,111 +34244,94 @@ class $$DietPlansTableAnnotationComposer
     );
     return composer;
   }
-
-  Expression<T> dietItemsRefs<T extends Object>(
-    Expression<T> Function($$DietItemsTableAnnotationComposer a) f,
-  ) {
-    final $$DietItemsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.dietItems,
-      getReferencedColumn: (t) => t.dietPlanId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$DietItemsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.dietItems,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
-class $$DietPlansTableTableManager
+class $$DietItemsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $DietPlansTable,
-          DietPlan,
-          $$DietPlansTableFilterComposer,
-          $$DietPlansTableOrderingComposer,
-          $$DietPlansTableAnnotationComposer,
-          $$DietPlansTableCreateCompanionBuilder,
-          $$DietPlansTableUpdateCompanionBuilder,
-          (DietPlan, $$DietPlansTableReferences),
-          DietPlan,
-          PrefetchHooks Function({bool profileId, bool dietItemsRefs})
+          $DietItemsTable,
+          DietItem,
+          $$DietItemsTableFilterComposer,
+          $$DietItemsTableOrderingComposer,
+          $$DietItemsTableAnnotationComposer,
+          $$DietItemsTableCreateCompanionBuilder,
+          $$DietItemsTableUpdateCompanionBuilder,
+          (DietItem, $$DietItemsTableReferences),
+          DietItem,
+          PrefetchHooks Function({bool profileId})
         > {
-  $$DietPlansTableTableManager(_$AppDatabase db, $DietPlansTable table)
+  $$DietItemsTableTableManager(_$AppDatabase db, $DietItemsTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$DietPlansTableFilterComposer($db: db, $table: table),
+              $$DietItemsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$DietPlansTableOrderingComposer($db: db, $table: table),
+              $$DietItemsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$DietPlansTableAnnotationComposer($db: db, $table: table),
+              $$DietItemsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> profileId = const Value.absent(),
-                Value<String> title = const Value.absent(),
-                Value<String?> description = const Value.absent(),
-                Value<DateTime?> startDate = const Value.absent(),
-                Value<DateTime?> endDate = const Value.absent(),
-                Value<bool> active = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String?> foodGroup = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
-              }) => DietPlansCompanion(
+                Value<String?> source = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => DietItemsCompanion(
                 id: id,
                 profileId: profileId,
-                title: title,
-                description: description,
-                startDate: startDate,
-                endDate: endDate,
-                active: active,
+                name: name,
+                category: category,
+                foodGroup: foodGroup,
                 notes: notes,
+                source: source,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int profileId,
-                required String title,
-                Value<String?> description = const Value.absent(),
-                Value<DateTime?> startDate = const Value.absent(),
-                Value<DateTime?> endDate = const Value.absent(),
-                Value<bool> active = const Value.absent(),
+                required String name,
+                required String category,
+                Value<String?> foodGroup = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
-              }) => DietPlansCompanion.insert(
+                Value<String?> source = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => DietItemsCompanion.insert(
                 id: id,
                 profileId: profileId,
-                title: title,
-                description: description,
-                startDate: startDate,
-                endDate: endDate,
-                active: active,
+                name: name,
+                category: category,
+                foodGroup: foodGroup,
                 notes: notes,
+                source: source,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
                   e.readTable(table),
-                  $$DietPlansTableReferences(db, table, e),
+                  $$DietItemsTableReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({profileId = false, dietItemsRefs = false}) {
+          prefetchHooksCallback: ({profileId = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (dietItemsRefs) db.dietItems],
+              explicitlyWatchedTables: [],
               addJoins:
                   <
                     T extends TableManagerState<
@@ -33884,341 +34353,10 @@ class $$DietPlansTableTableManager
                           state.withJoin(
                                 currentTable: table,
                                 currentColumn: table.profileId,
-                                referencedTable: $$DietPlansTableReferences
-                                    ._profileIdTable(db),
-                                referencedColumn: $$DietPlansTableReferences
-                                    ._profileIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (dietItemsRefs)
-                    await $_getPrefetchedData<
-                      DietPlan,
-                      $DietPlansTable,
-                      DietItem
-                    >(
-                      currentTable: table,
-                      referencedTable: $$DietPlansTableReferences
-                          ._dietItemsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$DietPlansTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).dietItemsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.dietPlanId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$DietPlansTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $DietPlansTable,
-      DietPlan,
-      $$DietPlansTableFilterComposer,
-      $$DietPlansTableOrderingComposer,
-      $$DietPlansTableAnnotationComposer,
-      $$DietPlansTableCreateCompanionBuilder,
-      $$DietPlansTableUpdateCompanionBuilder,
-      (DietPlan, $$DietPlansTableReferences),
-      DietPlan,
-      PrefetchHooks Function({bool profileId, bool dietItemsRefs})
-    >;
-typedef $$DietItemsTableCreateCompanionBuilder =
-    DietItemsCompanion Function({
-      Value<int> id,
-      required int dietPlanId,
-      required String category,
-      required String itemText,
-      Value<String?> notes,
-    });
-typedef $$DietItemsTableUpdateCompanionBuilder =
-    DietItemsCompanion Function({
-      Value<int> id,
-      Value<int> dietPlanId,
-      Value<String> category,
-      Value<String> itemText,
-      Value<String?> notes,
-    });
-
-final class $$DietItemsTableReferences
-    extends BaseReferences<_$AppDatabase, $DietItemsTable, DietItem> {
-  $$DietItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $DietPlansTable _dietPlanIdTable(_$AppDatabase db) =>
-      db.dietPlans.createAlias('diet_items__diet_plan_id__diet_plans__id');
-
-  $$DietPlansTableProcessedTableManager get dietPlanId {
-    final $_column = $_itemColumn<int>('diet_plan_id')!;
-
-    final manager = $$DietPlansTableTableManager(
-      $_db,
-      $_db.dietPlans,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_dietPlanIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
-class $$DietItemsTableFilterComposer
-    extends Composer<_$AppDatabase, $DietItemsTable> {
-  $$DietItemsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get category => $composableBuilder(
-    column: $table.category,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get itemText => $composableBuilder(
-    column: $table.itemText,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$DietPlansTableFilterComposer get dietPlanId {
-    final $$DietPlansTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.dietPlanId,
-      referencedTable: $db.dietPlans,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$DietPlansTableFilterComposer(
-            $db: $db,
-            $table: $db.dietPlans,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$DietItemsTableOrderingComposer
-    extends Composer<_$AppDatabase, $DietItemsTable> {
-  $$DietItemsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get category => $composableBuilder(
-    column: $table.category,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get itemText => $composableBuilder(
-    column: $table.itemText,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$DietPlansTableOrderingComposer get dietPlanId {
-    final $$DietPlansTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.dietPlanId,
-      referencedTable: $db.dietPlans,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$DietPlansTableOrderingComposer(
-            $db: $db,
-            $table: $db.dietPlans,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$DietItemsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $DietItemsTable> {
-  $$DietItemsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get category =>
-      $composableBuilder(column: $table.category, builder: (column) => column);
-
-  GeneratedColumn<String> get itemText =>
-      $composableBuilder(column: $table.itemText, builder: (column) => column);
-
-  GeneratedColumn<String> get notes =>
-      $composableBuilder(column: $table.notes, builder: (column) => column);
-
-  $$DietPlansTableAnnotationComposer get dietPlanId {
-    final $$DietPlansTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.dietPlanId,
-      referencedTable: $db.dietPlans,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$DietPlansTableAnnotationComposer(
-            $db: $db,
-            $table: $db.dietPlans,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$DietItemsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $DietItemsTable,
-          DietItem,
-          $$DietItemsTableFilterComposer,
-          $$DietItemsTableOrderingComposer,
-          $$DietItemsTableAnnotationComposer,
-          $$DietItemsTableCreateCompanionBuilder,
-          $$DietItemsTableUpdateCompanionBuilder,
-          (DietItem, $$DietItemsTableReferences),
-          DietItem,
-          PrefetchHooks Function({bool dietPlanId})
-        > {
-  $$DietItemsTableTableManager(_$AppDatabase db, $DietItemsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$DietItemsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$DietItemsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$DietItemsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<int> dietPlanId = const Value.absent(),
-                Value<String> category = const Value.absent(),
-                Value<String> itemText = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
-              }) => DietItemsCompanion(
-                id: id,
-                dietPlanId: dietPlanId,
-                category: category,
-                itemText: itemText,
-                notes: notes,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required int dietPlanId,
-                required String category,
-                required String itemText,
-                Value<String?> notes = const Value.absent(),
-              }) => DietItemsCompanion.insert(
-                id: id,
-                dietPlanId: dietPlanId,
-                category: category,
-                itemText: itemText,
-                notes: notes,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$DietItemsTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback: ({dietPlanId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (dietPlanId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.dietPlanId,
                                 referencedTable: $$DietItemsTableReferences
-                                    ._dietPlanIdTable(db),
+                                    ._profileIdTable(db),
                                 referencedColumn: $$DietItemsTableReferences
-                                    ._dietPlanIdTable(db)
+                                    ._profileIdTable(db)
                                     .id,
                               )
                               as T;
@@ -34247,7 +34385,433 @@ typedef $$DietItemsTableProcessedTableManager =
       $$DietItemsTableUpdateCompanionBuilder,
       (DietItem, $$DietItemsTableReferences),
       DietItem,
-      PrefetchHooks Function({bool dietPlanId})
+      PrefetchHooks Function({bool profileId})
+    >;
+typedef $$DietGuidanceRulesTableCreateCompanionBuilder =
+    DietGuidanceRulesCompanion Function({
+      Value<int> id,
+      required int profileId,
+      required String title,
+      required String category,
+      Value<String?> description,
+      Value<String?> source,
+      Value<int?> sortOrder,
+      Value<bool> isArchived,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$DietGuidanceRulesTableUpdateCompanionBuilder =
+    DietGuidanceRulesCompanion Function({
+      Value<int> id,
+      Value<int> profileId,
+      Value<String> title,
+      Value<String> category,
+      Value<String?> description,
+      Value<String?> source,
+      Value<int?> sortOrder,
+      Value<bool> isArchived,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$DietGuidanceRulesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $DietGuidanceRulesTable,
+          DietGuidanceRule
+        > {
+  $$DietGuidanceRulesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('diet_guidance_rules__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DietGuidanceRulesTableFilterComposer
+    extends Composer<_$AppDatabase, $DietGuidanceRulesTable> {
+  $$DietGuidanceRulesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DietGuidanceRulesTableOrderingComposer
+    extends Composer<_$AppDatabase, $DietGuidanceRulesTable> {
+  $$DietGuidanceRulesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DietGuidanceRulesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DietGuidanceRulesTable> {
+  $$DietGuidanceRulesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DietGuidanceRulesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DietGuidanceRulesTable,
+          DietGuidanceRule,
+          $$DietGuidanceRulesTableFilterComposer,
+          $$DietGuidanceRulesTableOrderingComposer,
+          $$DietGuidanceRulesTableAnnotationComposer,
+          $$DietGuidanceRulesTableCreateCompanionBuilder,
+          $$DietGuidanceRulesTableUpdateCompanionBuilder,
+          (DietGuidanceRule, $$DietGuidanceRulesTableReferences),
+          DietGuidanceRule,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$DietGuidanceRulesTableTableManager(
+    _$AppDatabase db,
+    $DietGuidanceRulesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DietGuidanceRulesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DietGuidanceRulesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DietGuidanceRulesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<String?> source = const Value.absent(),
+                Value<int?> sortOrder = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => DietGuidanceRulesCompanion(
+                id: id,
+                profileId: profileId,
+                title: title,
+                category: category,
+                description: description,
+                source: source,
+                sortOrder: sortOrder,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int profileId,
+                required String title,
+                required String category,
+                Value<String?> description = const Value.absent(),
+                Value<String?> source = const Value.absent(),
+                Value<int?> sortOrder = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => DietGuidanceRulesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                title: title,
+                category: category,
+                description: description,
+                source: source,
+                sortOrder: sortOrder,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$DietGuidanceRulesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$DietGuidanceRulesTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$DietGuidanceRulesTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DietGuidanceRulesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DietGuidanceRulesTable,
+      DietGuidanceRule,
+      $$DietGuidanceRulesTableFilterComposer,
+      $$DietGuidanceRulesTableOrderingComposer,
+      $$DietGuidanceRulesTableAnnotationComposer,
+      $$DietGuidanceRulesTableCreateCompanionBuilder,
+      $$DietGuidanceRulesTableUpdateCompanionBuilder,
+      (DietGuidanceRule, $$DietGuidanceRulesTableReferences),
+      DietGuidanceRule,
+      PrefetchHooks Function({bool profileId})
     >;
 typedef $$HealthTemplatesTableCreateCompanionBuilder =
     HealthTemplatesCompanion Function({
@@ -38610,10 +39174,10 @@ class $AppDatabaseManager {
       $$DoctorVisitRecordsTableTableManager(_db, _db.doctorVisitRecords);
   $$DocumentAttachmentsTableTableManager get documentAttachments =>
       $$DocumentAttachmentsTableTableManager(_db, _db.documentAttachments);
-  $$DietPlansTableTableManager get dietPlans =>
-      $$DietPlansTableTableManager(_db, _db.dietPlans);
   $$DietItemsTableTableManager get dietItems =>
       $$DietItemsTableTableManager(_db, _db.dietItems);
+  $$DietGuidanceRulesTableTableManager get dietGuidanceRules =>
+      $$DietGuidanceRulesTableTableManager(_db, _db.dietGuidanceRules);
   $$HealthTemplatesTableTableManager get healthTemplates =>
       $$HealthTemplatesTableTableManager(_db, _db.healthTemplates);
   $$AppSettingsTableTableManager get appSettings =>

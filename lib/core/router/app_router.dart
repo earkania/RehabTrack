@@ -15,6 +15,11 @@ import 'package:rehab_track/presentation/screens/records/archived_doctor_prescri
 import 'package:rehab_track/presentation/screens/today/today_screen.dart';
 import 'package:rehab_track/presentation/screens/health/health_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurements_screen.dart';
+import 'package:rehab_track/presentation/screens/health/diet_screen.dart';
+import 'package:rehab_track/presentation/screens/health/diet_food_form_screen.dart';
+import 'package:rehab_track/presentation/screens/health/diet_food_details_screen.dart';
+import 'package:rehab_track/presentation/screens/health/diet_guidance_form_screen.dart';
+import 'package:rehab_track/presentation/screens/health/diet_guidance_details_screen.dart';
 import 'package:rehab_track/presentation/screens/records/records_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/records/doctor_visits_screen.dart';
 import 'package:rehab_track/presentation/screens/records/doctor_visit_form_screen.dart';
@@ -118,10 +123,55 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.healthDiet,
-        builder: (context, state) => ModulePlaceholderScreen(
-          icon: Icons.restaurant,
-          title: AppLocalizations.of(context)!.diet,
-        ),
+        builder: (context, state) => const DietScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.healthDietFoodsAdd,
+        builder: (context, state) => const DietFoodFormScreen(),
+      ),
+      GoRoute(
+        path: '/health/diet/foods/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return DietFoodDetailsScreen(foodId: id);
+        },
+      ),
+      GoRoute(
+        path: '/health/diet/foods/:id/edit',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return DietFoodFormScreen(foodId: id);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.healthDietGuidanceAdd,
+        builder: (context, state) => const DietGuidanceFormScreen(),
+      ),
+      GoRoute(
+        path: '/health/diet/guidance/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return DietGuidanceDetailsScreen(ruleId: id);
+        },
+      ),
+      GoRoute(
+        path: '/health/diet/guidance/:id/edit',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return DietGuidanceFormScreen(ruleId: id);
+        },
       ),
       // Records
       GoRoute(

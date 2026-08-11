@@ -2772,4 +2772,249 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attachmentRemoved => 'Attachment removed';
+
+  @override
+  String get foods => 'Foods';
+
+  @override
+  String get generalGuidance => 'General Guidance';
+
+  @override
+  String get searchFoods => 'Search foods';
+
+  @override
+  String get searchGuidance => 'Search general guidance';
+
+  @override
+  String get allowed => 'Allowed';
+
+  @override
+  String get caution => 'Caution';
+
+  @override
+  String get avoid => 'Avoid';
+
+  @override
+  String get allDietItems => 'All Categories';
+
+  @override
+  String get allGuidanceRules => 'All Categories';
+
+  @override
+  String get dietGuidanceCategory => 'Diet';
+
+  @override
+  String get smokingGuidanceCategory => 'Smoking';
+
+  @override
+  String get hydrationGuidanceCategory => 'Hydration';
+
+  @override
+  String get caffeineGuidanceCategory => 'Caffeine';
+
+  @override
+  String get alcoholGuidanceCategory => 'Alcohol';
+
+  @override
+  String get otherGuidanceCategory => 'Other';
+
+  @override
+  String get alphabeticalAZ => 'A-Z';
+
+  @override
+  String get alphabeticalZA => 'Z-A';
+
+  @override
+  String get sortByCategory => 'By category';
+
+  @override
+  String get noDietItems => 'No food guidance yet';
+
+  @override
+  String get noDietItemsDescription =>
+      'Track foods as allowed, caution, or avoid.';
+
+  @override
+  String get noArchivedDietItems => 'No archived food items';
+
+  @override
+  String get noGuidanceRules => 'No general guidance yet';
+
+  @override
+  String get noGuidanceRulesDescription =>
+      'Record diet, smoking, hydration, caffeine, and other rules.';
+
+  @override
+  String get noArchivedGuidanceRules => 'No archived guidance rules';
+
+  @override
+  String get errorLoadingDietItems => 'Couldn\'t load food guidance';
+
+  @override
+  String get errorLoadingGuidanceRules => 'Couldn\'t load general guidance';
+
+  @override
+  String get addDietItem => 'Add Food';
+
+  @override
+  String get editDietItem => 'Edit Food';
+
+  @override
+  String get dietItemDetails => 'Food Details';
+
+  @override
+  String get dietItemNotFound => 'Food item not found';
+
+  @override
+  String get dietItemIsArchived => 'This food item is archived.';
+
+  @override
+  String get archiveDietItem => 'Archive Food';
+
+  @override
+  String get archiveDietItemConfirmation =>
+      'Archive this food item? It will be moved to the archived list but can be restored.';
+
+  @override
+  String get restoreDietItem => 'Restore Food';
+
+  @override
+  String get deleteDietItem => 'Delete Food';
+
+  @override
+  String get confirmDeleteDietItem => 'Delete this food item permanently?';
+
+  @override
+  String get dietItemSaved => 'Food saved';
+
+  @override
+  String get dietItemUpdated => 'Food updated';
+
+  @override
+  String get dietItemArchived => 'Food archived';
+
+  @override
+  String get dietItemRestored => 'Food restored';
+
+  @override
+  String get dietItemDeleted => 'Food deleted';
+
+  @override
+  String get showArchivedDietItems => 'Show archived foods';
+
+  @override
+  String get showingArchivedDietItems => 'Showing archived foods';
+
+  @override
+  String get foodName => 'Food Name';
+
+  @override
+  String get foodNameHint => 'e.g., Fresh fruit';
+
+  @override
+  String get foodNameRequired => 'Food name is required';
+
+  @override
+  String get foodCategory => 'Category';
+
+  @override
+  String get foodGroup => 'Food Group';
+
+  @override
+  String get foodGroupHint => 'e.g., Fruits, Vegetables, Grains';
+
+  @override
+  String get foodNotes => 'Notes';
+
+  @override
+  String get foodNotesHint => 'Optional notes about this food';
+
+  @override
+  String get source => 'Source';
+
+  @override
+  String get sourceHint => 'e.g., Dietitian recommendation';
+
+  @override
+  String get updateDietItem => 'Update Food';
+
+  @override
+  String get saveDietItem => 'Save Food';
+
+  @override
+  String get addGuidanceRule => 'Add Guidance';
+
+  @override
+  String get editGuidanceRule => 'Edit Guidance';
+
+  @override
+  String get guidanceRuleDetails => 'Guidance Details';
+
+  @override
+  String get guidanceRuleNotFound => 'Guidance rule not found';
+
+  @override
+  String get guidanceRuleIsArchived => 'This guidance rule is archived.';
+
+  @override
+  String get guidanceTitle => 'Title';
+
+  @override
+  String get guidanceTitleHint => 'e.g., Drink water throughout the day';
+
+  @override
+  String get guidanceTitleRequired => 'Title is required';
+
+  @override
+  String get guidanceCategory => 'Category';
+
+  @override
+  String get guidanceDescription => 'Description';
+
+  @override
+  String get guidanceDescriptionHint => 'Optional details about this rule';
+
+  @override
+  String get updateGuidanceRule => 'Update Guidance';
+
+  @override
+  String get saveGuidanceRule => 'Save Guidance';
+
+  @override
+  String get archiveGuidanceRule => 'Archive Guidance';
+
+  @override
+  String get archiveGuidanceRuleConfirmation =>
+      'Archive this guidance rule? It will be moved to the archived list but can be restored.';
+
+  @override
+  String get restoreGuidanceRule => 'Restore Guidance';
+
+  @override
+  String get deleteGuidanceRule => 'Delete Guidance';
+
+  @override
+  String get confirmDeleteGuidanceRule =>
+      'Delete this guidance rule permanently?';
+
+  @override
+  String get guidanceRuleSaved => 'Guidance saved';
+
+  @override
+  String get guidanceRuleUpdated => 'Guidance updated';
+
+  @override
+  String get guidanceRuleArchived => 'Guidance archived';
+
+  @override
+  String get guidanceRuleRestored => 'Guidance restored';
+
+  @override
+  String get guidanceRuleDeleted => 'Guidance deleted';
+
+  @override
+  String get showArchivedGuidanceRules => 'Show archived guidance';
+
+  @override
+  String get showingArchivedGuidanceRules => 'Showing archived guidance';
 }

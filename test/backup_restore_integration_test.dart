@@ -313,4 +313,53 @@ void main() {
     expect(restoredFile.existsSync(), isTrue);
     expect(restoredFile.readAsBytesSync(), [1, 2, 3]);
   });
+
+  test('an alcohol guidance record survives backup and restore', () async {
+    await seedDatabase('Ana');
+    final profile = await database.select(database.profiles).getSingle();
+
+    await database.dietDao.insertGuidanceRule(
+      DietGuidanceRulesCompanion.insert(
+        profileId: profile.id,
+        title: 'Limit drinks',
+        category: 'alcohol',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+
+    final backup = await createBackup();
+    final preview = await previewFor(backup);
+
+    await writeLiveDatabase(
+      docsDir,
+      buildRestorableSqliteBytes(schema: 16, profiles: 2),
+    );
+
+    final service = await restoreService();
+    final failure = await service.run(
+      selectedBackupFile: backup,
+      expectedPreview: preview,
+    );
+
+    expect(failure.succeeded, isTrue);
+
+    final restored = sqlite.sqlite3.open(
+      p.join(docsDir.path, 'rehabtrack.sqlite'),
+      mode: sqlite.OpenMode.readOnly,
+    );
+    try {
+      final rows = restored
+          .select(
+            "SELECT title, category FROM diet_guidance_rules "
+            "WHERE category = 'alcohol'",
+          )
+          .rows;
+      expect(rows, hasLength(1));
+      expect(rows.first[0], 'Limit drinks');
+      expect(rows.first[1], 'alcohol');
+    } finally {
+      restored.close();
+    }
+  });
 }

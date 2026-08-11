@@ -19,6 +19,16 @@ class AppRoutes {
   static const healthActivities = '/health/activities';
   static const healthDiet = '/health/diet';
 
+  // Diet
+  static const healthDietFoodsAdd = '/health/diet/foods/new';
+  static String healthDietFoodsDetails(int id) => '/health/diet/foods/$id';
+  static String healthDietFoodsEdit(int id) => '/health/diet/foods/$id/edit';
+  static const healthDietGuidanceAdd = '/health/diet/guidance/new';
+  static String healthDietGuidanceDetails(int id) =>
+      '/health/diet/guidance/$id';
+  static String healthDietGuidanceEdit(int id) =>
+      '/health/diet/guidance/$id/edit';
+
   // Records
   static const recordsLabAnalyses = '/records/lab-analyses';
   static const recordsLabAnalysesAdd = '/records/lab-analyses/new';

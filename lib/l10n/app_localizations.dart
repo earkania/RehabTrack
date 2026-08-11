@@ -5245,6 +5245,486 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Attachment removed'**
   String get attachmentRemoved;
+
+  /// No description provided for @foods.
+  ///
+  /// In en, this message translates to:
+  /// **'Foods'**
+  String get foods;
+
+  /// No description provided for @generalGuidance.
+  ///
+  /// In en, this message translates to:
+  /// **'General Guidance'**
+  String get generalGuidance;
+
+  /// No description provided for @searchFoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Search foods'**
+  String get searchFoods;
+
+  /// No description provided for @searchGuidance.
+  ///
+  /// In en, this message translates to:
+  /// **'Search general guidance'**
+  String get searchGuidance;
+
+  /// No description provided for @allowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed'**
+  String get allowed;
+
+  /// No description provided for @caution.
+  ///
+  /// In en, this message translates to:
+  /// **'Caution'**
+  String get caution;
+
+  /// No description provided for @avoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid'**
+  String get avoid;
+
+  /// No description provided for @allDietItems.
+  ///
+  /// In en, this message translates to:
+  /// **'All Categories'**
+  String get allDietItems;
+
+  /// No description provided for @allGuidanceRules.
+  ///
+  /// In en, this message translates to:
+  /// **'All Categories'**
+  String get allGuidanceRules;
+
+  /// No description provided for @dietGuidanceCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet'**
+  String get dietGuidanceCategory;
+
+  /// No description provided for @smokingGuidanceCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoking'**
+  String get smokingGuidanceCategory;
+
+  /// No description provided for @hydrationGuidanceCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Hydration'**
+  String get hydrationGuidanceCategory;
+
+  /// No description provided for @caffeineGuidanceCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Caffeine'**
+  String get caffeineGuidanceCategory;
+
+  /// No description provided for @alcoholGuidanceCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Alcohol'**
+  String get alcoholGuidanceCategory;
+
+  /// No description provided for @otherGuidanceCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get otherGuidanceCategory;
+
+  /// No description provided for @alphabeticalAZ.
+  ///
+  /// In en, this message translates to:
+  /// **'A-Z'**
+  String get alphabeticalAZ;
+
+  /// No description provided for @alphabeticalZA.
+  ///
+  /// In en, this message translates to:
+  /// **'Z-A'**
+  String get alphabeticalZA;
+
+  /// No description provided for @sortByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'By category'**
+  String get sortByCategory;
+
+  /// No description provided for @noDietItems.
+  ///
+  /// In en, this message translates to:
+  /// **'No food guidance yet'**
+  String get noDietItems;
+
+  /// No description provided for @noDietItemsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Track foods as allowed, caution, or avoid.'**
+  String get noDietItemsDescription;
+
+  /// No description provided for @noArchivedDietItems.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived food items'**
+  String get noArchivedDietItems;
+
+  /// No description provided for @noGuidanceRules.
+  ///
+  /// In en, this message translates to:
+  /// **'No general guidance yet'**
+  String get noGuidanceRules;
+
+  /// No description provided for @noGuidanceRulesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Record diet, smoking, hydration, caffeine, and other rules.'**
+  String get noGuidanceRulesDescription;
+
+  /// No description provided for @noArchivedGuidanceRules.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived guidance rules'**
+  String get noArchivedGuidanceRules;
+
+  /// No description provided for @errorLoadingDietItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load food guidance'**
+  String get errorLoadingDietItems;
+
+  /// No description provided for @errorLoadingGuidanceRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load general guidance'**
+  String get errorLoadingGuidanceRules;
+
+  /// No description provided for @addDietItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Food'**
+  String get addDietItem;
+
+  /// No description provided for @editDietItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Food'**
+  String get editDietItem;
+
+  /// No description provided for @dietItemDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Food Details'**
+  String get dietItemDetails;
+
+  /// No description provided for @dietItemNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Food item not found'**
+  String get dietItemNotFound;
+
+  /// No description provided for @dietItemIsArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'This food item is archived.'**
+  String get dietItemIsArchived;
+
+  /// No description provided for @archiveDietItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Food'**
+  String get archiveDietItem;
+
+  /// No description provided for @archiveDietItemConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this food item? It will be moved to the archived list but can be restored.'**
+  String get archiveDietItemConfirmation;
+
+  /// No description provided for @restoreDietItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Food'**
+  String get restoreDietItem;
+
+  /// No description provided for @deleteDietItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Food'**
+  String get deleteDietItem;
+
+  /// No description provided for @confirmDeleteDietItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this food item permanently?'**
+  String get confirmDeleteDietItem;
+
+  /// No description provided for @dietItemSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Food saved'**
+  String get dietItemSaved;
+
+  /// No description provided for @dietItemUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Food updated'**
+  String get dietItemUpdated;
+
+  /// No description provided for @dietItemArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Food archived'**
+  String get dietItemArchived;
+
+  /// No description provided for @dietItemRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Food restored'**
+  String get dietItemRestored;
+
+  /// No description provided for @dietItemDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Food deleted'**
+  String get dietItemDeleted;
+
+  /// No description provided for @showArchivedDietItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Show archived foods'**
+  String get showArchivedDietItems;
+
+  /// No description provided for @showingArchivedDietItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing archived foods'**
+  String get showingArchivedDietItems;
+
+  /// No description provided for @foodName.
+  ///
+  /// In en, this message translates to:
+  /// **'Food Name'**
+  String get foodName;
+
+  /// No description provided for @foodNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Fresh fruit'**
+  String get foodNameHint;
+
+  /// No description provided for @foodNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Food name is required'**
+  String get foodNameRequired;
+
+  /// No description provided for @foodCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get foodCategory;
+
+  /// No description provided for @foodGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Food Group'**
+  String get foodGroup;
+
+  /// No description provided for @foodGroupHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Fruits, Vegetables, Grains'**
+  String get foodGroupHint;
+
+  /// No description provided for @foodNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get foodNotes;
+
+  /// No description provided for @foodNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional notes about this food'**
+  String get foodNotesHint;
+
+  /// No description provided for @source.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get source;
+
+  /// No description provided for @sourceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Dietitian recommendation'**
+  String get sourceHint;
+
+  /// No description provided for @updateDietItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Food'**
+  String get updateDietItem;
+
+  /// No description provided for @saveDietItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Food'**
+  String get saveDietItem;
+
+  /// No description provided for @addGuidanceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Guidance'**
+  String get addGuidanceRule;
+
+  /// No description provided for @editGuidanceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Guidance'**
+  String get editGuidanceRule;
+
+  /// No description provided for @guidanceRuleDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance Details'**
+  String get guidanceRuleDetails;
+
+  /// No description provided for @guidanceRuleNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance rule not found'**
+  String get guidanceRuleNotFound;
+
+  /// No description provided for @guidanceRuleIsArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'This guidance rule is archived.'**
+  String get guidanceRuleIsArchived;
+
+  /// No description provided for @guidanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get guidanceTitle;
+
+  /// No description provided for @guidanceTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Drink water throughout the day'**
+  String get guidanceTitleHint;
+
+  /// No description provided for @guidanceTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get guidanceTitleRequired;
+
+  /// No description provided for @guidanceCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get guidanceCategory;
+
+  /// No description provided for @guidanceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get guidanceDescription;
+
+  /// No description provided for @guidanceDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional details about this rule'**
+  String get guidanceDescriptionHint;
+
+  /// No description provided for @updateGuidanceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Guidance'**
+  String get updateGuidanceRule;
+
+  /// No description provided for @saveGuidanceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Guidance'**
+  String get saveGuidanceRule;
+
+  /// No description provided for @archiveGuidanceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Guidance'**
+  String get archiveGuidanceRule;
+
+  /// No description provided for @archiveGuidanceRuleConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this guidance rule? It will be moved to the archived list but can be restored.'**
+  String get archiveGuidanceRuleConfirmation;
+
+  /// No description provided for @restoreGuidanceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Guidance'**
+  String get restoreGuidanceRule;
+
+  /// No description provided for @deleteGuidanceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Guidance'**
+  String get deleteGuidanceRule;
+
+  /// No description provided for @confirmDeleteGuidanceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this guidance rule permanently?'**
+  String get confirmDeleteGuidanceRule;
+
+  /// No description provided for @guidanceRuleSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance saved'**
+  String get guidanceRuleSaved;
+
+  /// No description provided for @guidanceRuleUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance updated'**
+  String get guidanceRuleUpdated;
+
+  /// No description provided for @guidanceRuleArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance archived'**
+  String get guidanceRuleArchived;
+
+  /// No description provided for @guidanceRuleRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance restored'**
+  String get guidanceRuleRestored;
+
+  /// No description provided for @guidanceRuleDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance deleted'**
+  String get guidanceRuleDeleted;
+
+  /// No description provided for @showArchivedGuidanceRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Show archived guidance'**
+  String get showArchivedGuidanceRules;
+
+  /// No description provided for @showingArchivedGuidanceRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing archived guidance'**
+  String get showingArchivedGuidanceRules;
 }
 
 class _AppLocalizationsDelegate

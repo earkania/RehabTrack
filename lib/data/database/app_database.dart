@@ -62,8 +62,8 @@ part 'app_database.g.dart';
     CareContacts,
     DoctorVisitRecords,
     DocumentAttachments,
-    DietPlans,
     DietItems,
+    DietGuidanceRules,
     HealthTemplates,
     AppSettings,
     ProfileReferenceRanges,
@@ -76,7 +76,7 @@ part 'app_database.g.dart';
 )
 class AppDatabase extends _$AppDatabase {
   /// Canonical current schema version used by the backup/restore validator.
-  static const int currentSchemaVersion = 17;
+  static const int currentSchemaVersion = 18;
 
   AppDatabase() : super(_openConnection());
 
@@ -267,6 +267,27 @@ DocumentDao get documentDao => DocumentDao(this);
       if (from < 17) {
         // Structured medications belonging to a doctor prescription
         await m.createTable(doctorPrescriptionMedications);
+      }
+      if (from < 18) {
+        // Diet module: replace the legacy (unused) DietPlans/DietItems
+        // scaffolding with the patient-managed DietItems (profile-owned,
+        // name/category/foodGroup/notes/source/isArchived/timestamps) and
+        // the new DietGuidanceRules table. Both target tables are dropped
+        // first (guarded by IF EXISTS) so the migration is idempotent.
+        await m.deleteTable('diet_items');
+        await m.deleteTable('diet_plans');
+        await m.deleteTable('diet_guidance_rules');
+        await m.createTable(dietItems);
+        await m.createTable(dietGuidanceRules);
+        await m.createIndex(dietItemsProfileIdx);
+        await m.createIndex(dietItemsCategoryIdx);
+        await m.createIndex(dietItemsArchivedIdx);
+        await m.createIndex(dietItemsNameIdx);
+        await m.createIndex(dietGuidanceRulesProfileIdx);
+        await m.createIndex(dietGuidanceRulesCategoryIdx);
+        await m.createIndex(dietGuidanceRulesArchivedIdx);
+        await m.createIndex(dietGuidanceRulesTitleIdx);
+        await m.createIndex(dietGuidanceRulesSortIdx);
       }
     },
   );
