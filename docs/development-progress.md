@@ -4234,3 +4234,256 @@ prescription attachment present in the archive (`files/doctor_prescriptions/1/1/
 restore round-trip returned the active + archived prescriptions; delete with
 confirm dialog removed the test row. All flows verified via UI hierarchy dump on
 `31140DLH2000KM`.
+
+## Phase 10A — Backup & Restore: Manage Backups (2026-08-10)
+
+**Goal:** Add "Manage Backups" (Settings → Backup & Restore → Manage Backups):
+list the backups this app created, with detail / restore / share / delete
+actions. Enforced scope-storage rules: no `MANAGE_EXTERNAL_STORAGE`, no loose
+permissions. Out of scope (explicit non-goals): automatic/retention/scheduled
+backups, cloud sync, selective/merge restore, encryption.
+
+### Key decisions
+
+- **Backup Registry.** Scoped storage prevents listing arbitrary user documents,
+  so the app tracks every successfully created backup as non-sensitive metadata
+  persisted as JSON under the `backup_registry` settings key (via
+  `SettingsRepository`): `contentUri`, `displayName`, `createdAt`, `fileSize`,
+  `backupFormatVersion`, `databaseSchemaVersion`, `available`. **No patient,
+  clinical or personal data and no filesystem paths are stored.**
+- **Persisted SAF permissions.** After `ACTION_CREATE_DOCUMENT`, the native side
+  calls `takePersistableUriPermission(READ|WRITE)` and reports `persisted` plus
+  provider metadata (`displayName`, `size`, `lastModified`) in the
+  `createDocument` payload. Registry entries are only written for `content://`
+  URIs; a failed registry write never fails an otherwise-successful backup.
+- **Availability is probed, never assumed.** The list re-probes every entry via
+  the native `queryDocument` (a live document-provider query). Missing/moved/
+  revoked documents are shown with an "Unavailable" marker; restore and share are
+  disabled for them, delete stays available (to clear the stale entry). The UI
+  never silently claims a deleted file still exists. "Last backup" semantics stay
+  a creation-event timestamp — distinct from current file availability.
+- **Restore reuses the existing pipeline.** "Restore" on a row copies the
+  `content://` document to an app temp file via the existing
+  `RestoreSelectionService.selectFromUri` → `BackupArchiveReader` →
+  `BackupValidator` → `BackupPreviewScreen` → restore-engine flow. No database
+  schema migration was needed.
+- **Share via ACTION_SEND.** Uses the `content://` URI directly with
+  `FLAG_GRANT_READ_URI_PERMISSION` (MIME `application/octet-stream`); filesystem
+  paths are never exposed to share targets or the UI.
+- **Delete via DocumentsContract.** `deleteDocument` deletes through the provider;
+  the registry entry is removed regardless so the list never claims the file
+  exists after failure.
+
+### Implementation
+
+- `lib/domain/backup/registered_backup.dart` (new) — registry model + JSON.
+- `lib/data/services/backup/backup_registry.dart` (new) — SettingsRepository-backed
+  persistence, upsert-by-URI, availability updates, offline-safe decoding.
+- `lib/data/services/backup/backup_management_service.dart` (new) — `refresh` /
+  `refreshAll` / `share` / `delete` with `BackupDeleteOutcome`.
+- `lib/data/services/backup/backup_storage_gateway.dart` — `BackupSaveResult`
+  gained `fileSize`/`persisted`; added `queryDocument`, `deleteDocument`,
+  `shareDocument`, `hasPersistedPermission` + `BackupDocumentMetadata`.
+- `lib/data/services/backup/restore_selection_service.dart` — added
+  `selectFromUri` (copy a known URI without the picker).
+- `lib/presentation/providers/restore_provider.dart` — added
+  `RestoreOperationController.restoreFromUri`; shared validation pipeline
+  (`_continueFromSelection`) with `await` kept so the `finally` temp cleanup never
+  deletes the work directory mid-operation.
+- `lib/presentation/providers/manage_backups_provider.dart` (new) —
+  `backupRegistryProvider`, `backupManagementServiceProvider`,
+  `manageBackupsProvider` (`ManageBackupsController`).
+- `lib/presentation/providers/backup_provider.dart` — registers each successful
+  backup (content URI only) in the registry.
+- `lib/presentation/screens/settings/manage_backups_screen.dart` (new) — empty /
+  load-failed / list states, availability markers, details dialog (restore /
+  share / delete with confirmations).
+- `lib/presentation/screens/settings/backup_and_restore_screen.dart` — "Manage
+  Backups" entry; `lib/core/router/app_routes.dart`, `app_router.dart` —
+  `/settings/backup-restore/manage` route.
+- `android/app/src/main/kotlin/com/earkania/rehabtrack/MainActivity.kt` —
+  `takePersistableUriPermission`, `queryDocument` (via `DocumentsContract.Document.
+  COLUMN_LAST_MODIFIED`), `deleteDocument`, `shareDocument`,
+  `persistableUriPermission` handlers.
+- `lib/l10n/app_en.arb` / `app_ka.arb` — new keys in en + ka.
+
+### Tests
+
+- `test/backup_storage_gateway_test.dart` (new) — payload parsing (URI/name/size/
+  persisted), legacy path fallback, ENOSPC mapping, `queryDocument`/`delete`/
+  `share`/permission channel calls.
+- `test/backup_registry_test.dart` (new) — round-trip, upsert dedupe, ordering,
+  corrupt-payload resilience, availability/update/remove.
+- `test/backup_management_service_test.dart` (new) — availability probing,
+  throwing-gateway tolerance, share/delete outcomes, entry drop on unresolved
+  delete.
+- `test/backup_restore_from_uri_test.dart` (new) — `restoreFromUri` validates a
+  known URI, maps failures, rejects concurrent runs.
+- `test/backup_provider_test.dart` — registry registration (content:// only),
+  no duplicates.
+- `test/manage_backups_screen_test.dart` (new) — empty/list/unavailable states,
+  details dialog, delete flow + cancel, restore-confirm cancel, unavailable
+  disables restore/share, confirm-restore pop-then-navigate regression (gated
+  fake controller reproduces the on-device async gap).
+
+**Bug found & fixed during device validation.** Confirming "Restore" on a row
+opened the restore, but the result was silently dropped (and later threw
+`Bad state: Cannot use "ref" after the widget was disposed`) because the
+details dialog is popped before the restore completes, disposing the dialog's
+`context`/`ref`. Fix: `_BackupDetailsDialog` now receives the managing screen's
+`WidgetRef` (`parentRef`) and `_confirmRestore` captures the root
+`Navigator`/`ScaffoldMessenger` before the pop, so the restore outcome (preview
+push or failure snackbar) is surfaced on the still-alive screen.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1283/1283 passed (full suite) |
+| `:app:compileDebugKotlin` | Passed |
+| Pixel 7 manual | Verified — see below |
+
+**Pixel 7 manual verification (adb `31140DLH2000KM`, uiautomator + logcat):**
+Settings → Backup & Restore → Manage Backups: back button appears (left-top) and
+returns to Backup & Restore; empty state renders before any tracked backup.
+Create backup via SAF save picker → registry entry appears with date + size
+(`RehabTrack-Backup-2026-08-10_08-49.rtb`, 4.9 MB). Details dialog shows
+date/size/versions + Share / Delete / Close / Restore. Restore → confirmation →
+preview opens with full metadata (Compatible, date, app 1.0.0, format 1, DB 17,
+profiles 1, managed files 6, size 4.9 MB); back returns to Manage Backups
+(restore NOT applied). Share opens the system share sheet ("Sharing 1 file").
+Delete → confirmation → entry removed, file gone from Downloads, empty state +
+"Backup deleted" snackbar. No logcat errors; `flutter test` regression covers
+the disposed-context restore path.
+
+## Phase 10B — Backup & Restore: Import + Unavailable States (2026-08-11)
+
+**Goal:** Extend "Manage Backups" with "Import Existing Backups" (SAF
+multi-select, valid with the canonical `BackupValidator`) and full
+unavailable-backup lifecycle (probed availability, error-container visuals,
+"Remove from List" that never deletes a file, and a "File unavailable" Last
+Backup tile). Still no `MANAGE_EXTERNAL_STORAGE`, no loose permissions, no
+filesystem enumeration, no commit/push.
+
+### Key decisions (approved design)
+
+- **Import via SAF multi-select.** `ACTION_OPEN_DOCUMENT` with
+  `EXTRA_ALLOW_MULTIPLE`; per-URI `takePersistableUriPermission(READ)`. Each
+  selection is copied to an app temp file and validated with the canonical
+  `BackupValidator`; invalid files are skipped without failing the batch.
+  Duplicate URIs refresh the existing entry (contain → update) instead of
+  duplicating. Picker cancel never touches the registry; results surface as
+  controlled counts (imported / already-present / invalid-skipped).
+- **Registry model v2.** `RegisteredBackup` now carries
+  `availabilityState` (`BackupAvailability` enum persisted as the stable
+  non-localized `name`) plus `lastCheckedAt`/`lastModified`; legacy
+  `available` booleans still decode. Only non-sensitive metadata is stored.
+- **Availability is probed, never assumed.** Ope/load, pull-to-refresh and
+  opening row details re-probe every URI (`queryDocument`); accessible docs also
+  get display-name/size/last-modified refreshed (external rename shows the new
+  name). Missing/moved/revoked files are marked unavailable and **never
+  auto-removed**.
+- **Unavailable rows:** `errorContainer`/`onErrorContainer` + `cloud_off`,
+  "Unavailable" badge + "Backup file not found", single announced semantics node
+  "<name>, Unavailable" (tap kept via `InkWell` under `ExcludeSemantics`).
+  Restore/Share disabled; delete becomes "Remove from List".
+- **Remove from List** removes the registry entry only — never touches storage.
+  Available rows keep delete-document-first, then registry removal; a failed
+  registry cleanup marks the entry unavailable so the next refresh repairs it
+  rather than showing a deleted file as available.
+- **Last Backup tile** keeps "Last backup created: {time}"; adds "File
+  unavailable" when the linked registry entry (via the new
+  `last_backup_content_uri` key written on each successful backup) is
+  unavailable.
+- **Native probe hardened:** `queryDocument` verifies accessibility by opening
+  (and closing) the input stream rather than trusting a query cursor — Downloads
+  returns a synthetic row for a gone `raw:` URI.
+
+### Implementation
+
+- `lib/domain/backup/backup_availability.dart` (new) — enum + stable `storageKey`
+  + legacy-bool `fromStorage`.
+- `lib/domain/backup/registered_backup.dart` — availability/lastCheckedAt/
+  lastModified, `id` => contentUri, copyWith/toJson/fromJson, legacy read.
+- `lib/data/services/backup/backup_registry.dart` — `applyProbe`, `update`,
+  `contains`, `remove`, `all` (newest-first; unavailable stays in order),
+  upsert `add`.
+- `lib/data/services/backup/backup_import_service.dart` (new) —
+  `BackupImportStatus`/`BackupImportOutcome`/`import()` (temp copy → read →
+  validate → upsert, per-file skip/count, temp cleanup).
+- `lib/data/services/backup/backup_storage_gateway.dart` —
+  `BackupImportDocument`/`BackupImportPickResult`/`pickBackupDocuments`
+  (channel `openDocuments`).
+- `lib/data/services/backup/backup_management_service.dart` — `refresh` (probe +
+  metadata refresh), `refreshAll` (catch → unavailable fallback, no removal),
+  `delete` (doc-first; registry failure → `applyProbe` unavailable),
+  `removeFromList` (registry only).
+- `android/.../MainActivity.kt` — `openDocuments` + `handleOpenDocumentsResult`
+  (multi-select, per-URI read grant), `tryTakePersistablePermission(flags)`;
+  `queryDocument` accessibility now open-stream based.
+- `lib/presentation/providers/manage_backups_provider.dart` — `isImporting`,
+  `importBackups`, `refreshOne`, `removeFromList`; `backupImportServiceProvider`.
+- `lib/presentation/providers/backup_provider.dart` — writes
+  `last_backup_content_uri` on success; `lastBackupAvailabilityProvider`.
+- `lib/presentation/screens/settings/manage_backups_screen.dart` — Import button
+  + result snackbars; unavailable row visuals/semantics; Remove from List +
+  confirmation; details re-probes before opening.
+- `lib/presentation/screens/settings/backup_and_restore_screen.dart` — Last
+  Backup tile "File unavailable" + invalidate on Manage Backups navigation.
+- `lib/l10n/app_en.arb` / `app_ka.arb` — new import/unavailable/remove keys in
+  en + ka; `flutter gen-l10n` regenerated app_localizations.
+
+### Tests
+
+- `test/backup_import_service_test.dart` (new) — single/multi import, dedupe
+  refresh, cancel, picker failure, invalid-skip-without-failing-batch, copy
+  failure counting, temp-creation failure, temp cleanup.
+- `test/backup_registry_test.dart` — availability state/`applyProbe`/update,
+  stable non-localized persistence, legacy-`available` read, unknown default,
+  no-op probe for unknown URIs.
+- `test/backup_management_service_test.dart` — rename refresh, probe timestamp
+  persistence, unavailable stays listed after `refreshAll`, `removeFromList`
+  registry-only, delete marks unavailable when registry cleanup fails.
+- `test/manage_backups_screen_test.dart` — Import entry + result snackbars
+  (imported/already-present/invalid-skipped/failure/cancel-silent), unavailable
+  row semantics + not-found subtitle, disabled Restore/Share, Remove from List
+  flow (file untouched), original tests moved to new `availability:` model and
+  two-arg controller.
+- `test/backup_screen_test.dart` — Last Backup tile shows "File unavailable"
+  when linked entry unavailable; keeps "Stored as" when available.
+
+**Bug found & fixed during device validation.** The `queryDocument` probe judged
+a document "accessible" from any non-null query cursor; Downloads returns a
+synthetic row for a `raw:` URI whose file was already moved, so a renamed/deleted
+document was shown as available with size "0 B". Fixed on the native side to open
+(and close) the document's input stream as the existence/access probe.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1311/1311 passed (full suite) |
+| `:app:compileDebugKotlin` | Passed |
+| Pixel 7 manual | Verified — see below |
+
+**Pixel 7 manual verification (adb `31140DLH2000KM`, uiautomator):** Import
+Existing Backups opens the multi-select SAF picker; importing a previously
+unregistered older backup → "1 backups imported" + row appears with full
+metadata (`backupFormatVersion 1`, `databaseSchemaVersion 17` persisted);
+re-importing the same file → "1 backups were already in your list and were
+updated" with no duplicate; importing a non-backup file → "1 files were not
+valid RehabTrack backups and were skipped" with the list unchanged. A moved
+file's row becomes Unavailable (error-container row, semantics
+"<name>, Unavailable"); its details dialog shows "This file is no longer
+available", Restore and Share disabled, and "Remove from List" enabled —
+confirming it removes the entry while the physical file stays on disk. A manual
+move (provider URI change) marks the original entry unavailable; the Last Backup
+tile then shows "File unavailable" (verified on a fresh backup whose
+`last_backup_content_uri` was written; legacy pre-key entries fall back to
+"Stored as"). Georgian locale shows "არსებული სარეზერვო ასლების იმპორტი" and
+"<name>, მიუწვდომელია". All test fixtures removed and device state restored
+(3 registered backups, all probed available).

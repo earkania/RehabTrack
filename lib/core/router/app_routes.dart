@@ -11,6 +11,7 @@ class AppRoutes {
   // Settings
   static const settingsApp = '/settings/app';
   static const settingsBackupRestore = '/settings/backup-restore';
+  static const manageBackups = '/settings/backup-restore/manage';
 
   // Health
   static const healthMedications = '/health/medications';

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:rehab_track/core/router/app_routes.dart';
+import 'package:rehab_track/domain/backup/backup_availability.dart';
 import 'package:rehab_track/domain/backup/backup_result.dart';
 import 'package:rehab_track/domain/backup/backup_validation_result.dart';
 import 'package:rehab_track/domain/backup/restore_phase.dart';
@@ -35,6 +38,8 @@ class _BackupAndRestoreScreenState
     final restoreApply = ref.watch(restoreApplyProvider);
     final lastBackup = ref.watch(lastBackupAtProvider);
     final lastBackupDisplayName = ref.watch(lastBackupDisplayNameProvider);
+    final lastBackupAvailability =
+        ref.watch(lastBackupAvailabilityProvider).value;
     final lastRestore = ref.watch(lastRestoreAtProvider);
 
     final anyRunning =
@@ -54,10 +59,12 @@ class _BackupAndRestoreScreenState
                 : l10n.backupLastCreated(
                     _formatDateTime(context, lastBackup.value!),
                   ),
-            secondary: switch (lastBackupDisplayName.value) {
-              final name? => l10n.backupStoredAs(name),
-              null => null,
-            },
+            secondary: lastBackupAvailability == BackupAvailability.unavailable
+                ? l10n.fileUnavailable
+                : switch (lastBackupDisplayName.value) {
+                    final name? => l10n.backupStoredAs(name),
+                    null => null,
+                  },
           ),
           if (lastRestore.value != null) ...[
             const SizedBox(height: 8),
@@ -128,6 +135,13 @@ class _BackupAndRestoreScreenState
             icon: const Icon(Icons.restore),
             label: Text(l10n.restoreBackup),
           ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed:
+                anyRunning ? null : _openManageBackups,
+            icon: const Icon(Icons.folder_open_outlined),
+            label: Text(l10n.manageBackups),
+          ),
         ],
       ),
     );
@@ -149,6 +163,7 @@ class _BackupAndRestoreScreenState
     if (!mounted) return;
     ref.invalidate(lastBackupAtProvider);
     ref.invalidate(lastBackupDisplayNameProvider);
+    ref.invalidate(lastBackupAvailabilityProvider);
 
     switch (result) {
       case BackupResult.success:
@@ -171,6 +186,15 @@ class _BackupAndRestoreScreenState
           message: _failureMessage(l10n, result),
         );
     }
+  }
+
+  Future<void> _openManageBackups() async {
+    // push preserves the back stack so the AppBar shows a back button.
+    ref.invalidate(lastBackupAvailabilityProvider);
+    await context.push(AppRoutes.manageBackups);
+    if (!mounted) return;
+    // Manage Backups re-probes availability; refresh the tile on return.
+    ref.invalidate(lastBackupAvailabilityProvider);
   }
 
   Future<void> _restoreBackup(AppLocalizations l10n) async {

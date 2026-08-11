@@ -44,6 +44,7 @@ import 'package:rehab_track/presentation/screens/health/reference_range_screen.d
 import 'package:rehab_track/presentation/screens/settings/settings_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/app_settings_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/backup_and_restore_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/manage_backups_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_view_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_edit_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/notification_diagnostics_screen.dart';
@@ -430,6 +431,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.settingsBackupRestore,
         builder: (context, state) => const BackupAndRestoreScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.manageBackups,
+        builder: (context, state) => const ManageBackupsScreen(),
       ),
       GoRoute(
         path: '/settings/notification-diagnostics',

@@ -1248,7 +1248,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get pulseShort => 'პულსი';
 
   @override
-  String get unavailable => 'მიუწვდომელი';
+  String get unavailable => 'მიუწვდომელია';
 
   @override
   String get withinConfiguredRange => 'კონფიგურირებულ დიაპაზონში';
@@ -2219,6 +2219,122 @@ class AppLocalizationsKa extends AppLocalizations {
   String backupStoredAs(Object name) {
     return 'შენახულია როგორც: $name';
   }
+
+  @override
+  String get manageBackups => 'სარეზერვო ასლების მართვა';
+
+  @override
+  String get manageBackupsEmpty => 'სარეზერვო ასლები ჯერ არ შექმნილა';
+
+  @override
+  String get manageBackupsEmptyHint =>
+      'თქვენ მიერ შექმნილი სარეზერვო ასლები აქ გამოჩნდება, რათა შეძლოთ მათი ნახვა, აღდგენა, გაზიარება ან წაშლა.';
+
+  @override
+  String get manageBackupsLoadFailed => 'სარეზერვო ასლები ვერ ჩაიტვირთა.';
+
+  @override
+  String get manageBackupsUnavailable => 'მიუწვდომელია';
+
+  @override
+  String get manageBackupsUnavailableDetail =>
+      'ეს ფაილი აღარ არის ხელმისაწვდომი. ის შესაძლოა გადატანილი, გადარქმეული ან წაშლილი იყოს.';
+
+  @override
+  String get manageBackupsShare => 'გაზიარება';
+
+  @override
+  String get manageBackupsShareFailed =>
+      'ამ სარეზერვო ასლის გაზიარება ვერ მოხერხდა.';
+
+  @override
+  String get manageBackupsDelete => 'წაშლა';
+
+  @override
+  String get manageBackupsDeleteTitle => 'სარეზერვო ასლის წაშლა?';
+
+  @override
+  String get manageBackupsDeleteConfirm =>
+      'ეს სამუდამოდ წაშლის სარეზერვო ფაილს. ამ მოქმედების გაუქმება შეუძლებელია.';
+
+  @override
+  String get manageBackupsDeleted => 'სარეზერვო ასლი წაიშალა';
+
+  @override
+  String get manageBackupsDeleteUnresolved =>
+      'სარეზერვო ფაილი ვერ მოიძებნა, ამიტომ ის ამ სიიდან ამოიღეს.';
+
+  @override
+  String get manageBackupsRestore => 'აღდგენა';
+
+  @override
+  String get manageBackupsRestoreTitle => 'სარეზერვო ასლის აღდგენა?';
+
+  @override
+  String get manageBackupsRestoreConfirm =>
+      'აღდგენა ჩაანაცვლებს თქვენს მიმდინარე მონაცემებს ამ სარეზერვო ასლის შიგთავსით.';
+
+  @override
+  String get manageBackupsRestoreCancelled => 'აღდგენა გაუქმდა.';
+
+  @override
+  String get importExistingBackups => 'არსებული სარეზერვო ასლების იმპორტი';
+
+  @override
+  String get importBackups => 'სარეზერვო ასლების იმპორტი';
+
+  @override
+  String backupsImported(Object count) {
+    return '$count სარეზერვო ასლი იმპორტირებულია';
+  }
+
+  @override
+  String backupsAlreadyPresent(Object count) {
+    return '$count სარეზერვო ასლი უკვე იყო სიაში და განახლდა';
+  }
+
+  @override
+  String invalidBackupSkipped(Object count) {
+    return '$count ფაილი არ იყო ვალიდური RehabTrack სარეზერვო ასლი და გამოტოვდა';
+  }
+
+  @override
+  String get backupImportFailed => 'მონიშნული ფაილების იმპორტი ვერ შესრულდა.';
+
+  @override
+  String get backupImportCancelled => 'იმპორტი გაუქმდა.';
+
+  @override
+  String get backupUnavailable => 'მიუწვდომელია';
+
+  @override
+  String get backupFileNotFound => 'სარეზერვო ფაილი ვერ მოიძებნა';
+
+  @override
+  String get removeFromList => 'სიიდან წაშლა';
+
+  @override
+  String get confirmRemoveBackupFromList =>
+      'წავშალოთ ეს სარეზერვო ასლი სიიდან? მისი ფაილი აღარ არის ხელმისაწვდომი, ამიტომ საცავში არაფერი წაიშლება.';
+
+  @override
+  String get backupRemovedFromList => 'სარეზერვო ასლი ამოღებულია სიიდან';
+
+  @override
+  String get available => 'ხელმისაწვდომია';
+
+  @override
+  String get unknownAvailability => 'მდგომარეობა უცნობია';
+
+  @override
+  String get fileUnavailable => 'ფაილი მიუწვდომელია';
+
+  @override
+  String get refreshingBackupAvailability =>
+      'სარეზერვო ასლების მდგომარეობა განახლდება';
+
+  @override
+  String get close => 'დახურვა';
 
   @override
   String get addLabAnalysis => 'ლაბორატორიული ანალიზის დამატება';

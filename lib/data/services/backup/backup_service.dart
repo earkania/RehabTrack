@@ -32,10 +32,23 @@ class BackupOutcome {
   /// provider, when available (set only on success).
   final String? savedFileName;
 
+  /// Stable `content://` URI of the stored document, when available (set only
+  /// on success).
+  final String? savedContentUri;
+
+  /// Archive size in bytes reported by the document provider, when available.
+  final int? savedFileSize;
+
+  /// Whether the app obtained a persistable grant for the stored document.
+  final bool persisted;
+
   const BackupOutcome({
     required this.result,
     this.warnings = const [],
     this.savedFileName,
+    this.savedContentUri,
+    this.savedFileSize,
+    this.persisted = false,
   });
 }
 
@@ -184,6 +197,9 @@ class BackupService {
         result: BackupResult.success,
         warnings: collection.warnings,
         savedFileName: saveResult.displayName,
+        savedContentUri: saveResult.path,
+        savedFileSize: saveResult.fileSize,
+        persisted: saveResult.persisted,
       );
     } catch (_) {
       return const BackupOutcome(result: BackupResult.unexpectedFailure);

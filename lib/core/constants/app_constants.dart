@@ -39,6 +39,11 @@ class AppConstants {
   /// the last successful backup file, when one is available.
   static const String lastBackupDisplayNameKey = 'last_backup_display_name';
 
+  /// Settings key holding the stable `content://` URI of the last successful
+  /// backup. Links the "Last backup" tile to its registry entry so the UI can
+  /// report when the file has become unavailable.
+  static const String lastBackupContentUriKey = 'last_backup_content_uri';
+
   /// Settings key holding the ISO 8601 timestamp of the last completed restore,
   /// written only after the restored state and reminders were finalized. Never
   /// written after a rollback.

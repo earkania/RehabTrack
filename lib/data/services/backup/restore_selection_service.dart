@@ -51,6 +51,19 @@ class RestoreSelectionService {
     if (contentUri == null) {
       return BackupSelectionOutcome.cancelled();
     }
+    return selectFromUri(
+      contentUri: contentUri,
+      tempFilePath: tempFilePath,
+    );
+  }
+
+  /// Copies the document at [contentUri] into [tempFilePath] without showing
+  /// the picker. Used by "Manage Backups" to restore a previously tracked
+  /// document whose URI is already known.
+  Future<BackupSelectionOutcome> selectFromUri({
+    required String contentUri,
+    required String tempFilePath,
+  }) async {
     try {
       await _gateway.copyDocument(
         contentUri: contentUri,

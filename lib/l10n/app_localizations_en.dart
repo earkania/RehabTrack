@@ -2232,6 +2232,120 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get manageBackups => 'Manage Backups';
+
+  @override
+  String get manageBackupsEmpty => 'No backups have been created yet';
+
+  @override
+  String get manageBackupsEmptyHint =>
+      'Backups you create appear here so you can inspect, restore, share or delete them.';
+
+  @override
+  String get manageBackupsLoadFailed => 'Could not load your backups.';
+
+  @override
+  String get manageBackupsUnavailable => 'Unavailable';
+
+  @override
+  String get manageBackupsUnavailableDetail =>
+      'This file is no longer available. It may have been moved, renamed or removed.';
+
+  @override
+  String get manageBackupsShare => 'Share';
+
+  @override
+  String get manageBackupsShareFailed => 'Could not share this backup.';
+
+  @override
+  String get manageBackupsDelete => 'Delete';
+
+  @override
+  String get manageBackupsDeleteTitle => 'Delete backup?';
+
+  @override
+  String get manageBackupsDeleteConfirm =>
+      'This will permanently delete the backup file. This action cannot be undone.';
+
+  @override
+  String get manageBackupsDeleted => 'Backup deleted';
+
+  @override
+  String get manageBackupsDeleteUnresolved =>
+      'The backup file could not be resolved, so it was removed from this list.';
+
+  @override
+  String get manageBackupsRestore => 'Restore';
+
+  @override
+  String get manageBackupsRestoreTitle => 'Restore backup?';
+
+  @override
+  String get manageBackupsRestoreConfirm =>
+      'Restore will replace your current data with the contents of this backup.';
+
+  @override
+  String get manageBackupsRestoreCancelled => 'Restore cancelled.';
+
+  @override
+  String get importExistingBackups => 'Import Existing Backups';
+
+  @override
+  String get importBackups => 'Import backups';
+
+  @override
+  String backupsImported(Object count) {
+    return '$count backups imported';
+  }
+
+  @override
+  String backupsAlreadyPresent(Object count) {
+    return '$count backups were already in your list and were updated';
+  }
+
+  @override
+  String invalidBackupSkipped(Object count) {
+    return '$count files were not valid RehabTrack backups and were skipped';
+  }
+
+  @override
+  String get backupImportFailed => 'Could not import the selected files.';
+
+  @override
+  String get backupImportCancelled => 'Import cancelled.';
+
+  @override
+  String get backupUnavailable => 'Unavailable';
+
+  @override
+  String get backupFileNotFound => 'Backup file not found';
+
+  @override
+  String get removeFromList => 'Remove from List';
+
+  @override
+  String get confirmRemoveBackupFromList =>
+      'Remove this backup from the list? Its file is no longer available, so nothing will be deleted from storage.';
+
+  @override
+  String get backupRemovedFromList => 'Backup removed from list';
+
+  @override
+  String get available => 'Available';
+
+  @override
+  String get unknownAvailability => 'Availability unknown';
+
+  @override
+  String get fileUnavailable => 'File unavailable';
+
+  @override
+  String get refreshingBackupAvailability => 'Refreshing backup availability';
+
+  @override
+  String get close => 'Close';
+
+  @override
   String get addLabAnalysis => 'Add Lab Analysis';
 
   @override

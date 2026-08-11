@@ -4220,6 +4220,210 @@ abstract class AppLocalizations {
   /// **'Stored as: {name}'**
   String backupStoredAs(Object name);
 
+  /// No description provided for @manageBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Backups'**
+  String get manageBackups;
+
+  /// No description provided for @manageBackupsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No backups have been created yet'**
+  String get manageBackupsEmpty;
+
+  /// No description provided for @manageBackupsEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups you create appear here so you can inspect, restore, share or delete them.'**
+  String get manageBackupsEmptyHint;
+
+  /// No description provided for @manageBackupsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your backups.'**
+  String get manageBackupsLoadFailed;
+
+  /// No description provided for @manageBackupsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get manageBackupsUnavailable;
+
+  /// No description provided for @manageBackupsUnavailableDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is no longer available. It may have been moved, renamed or removed.'**
+  String get manageBackupsUnavailableDetail;
+
+  /// No description provided for @manageBackupsShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get manageBackupsShare;
+
+  /// No description provided for @manageBackupsShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not share this backup.'**
+  String get manageBackupsShareFailed;
+
+  /// No description provided for @manageBackupsDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get manageBackupsDelete;
+
+  /// No description provided for @manageBackupsDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete backup?'**
+  String get manageBackupsDeleteTitle;
+
+  /// No description provided for @manageBackupsDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete the backup file. This action cannot be undone.'**
+  String get manageBackupsDeleteConfirm;
+
+  /// No description provided for @manageBackupsDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup deleted'**
+  String get manageBackupsDeleted;
+
+  /// No description provided for @manageBackupsDeleteUnresolved.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup file could not be resolved, so it was removed from this list.'**
+  String get manageBackupsDeleteUnresolved;
+
+  /// No description provided for @manageBackupsRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get manageBackupsRestore;
+
+  /// No description provided for @manageBackupsRestoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup?'**
+  String get manageBackupsRestoreTitle;
+
+  /// No description provided for @manageBackupsRestoreConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore will replace your current data with the contents of this backup.'**
+  String get manageBackupsRestoreConfirm;
+
+  /// No description provided for @manageBackupsRestoreCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore cancelled.'**
+  String get manageBackupsRestoreCancelled;
+
+  /// No description provided for @importExistingBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Existing Backups'**
+  String get importExistingBackups;
+
+  /// No description provided for @importBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'Import backups'**
+  String get importBackups;
+
+  /// No description provided for @backupsImported.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} backups imported'**
+  String backupsImported(Object count);
+
+  /// No description provided for @backupsAlreadyPresent.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} backups were already in your list and were updated'**
+  String backupsAlreadyPresent(Object count);
+
+  /// No description provided for @invalidBackupSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} files were not valid RehabTrack backups and were skipped'**
+  String invalidBackupSkipped(Object count);
+
+  /// No description provided for @backupImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not import the selected files.'**
+  String get backupImportFailed;
+
+  /// No description provided for @backupImportCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Import cancelled.'**
+  String get backupImportCancelled;
+
+  /// No description provided for @backupUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get backupUnavailable;
+
+  /// No description provided for @backupFileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup file not found'**
+  String get backupFileNotFound;
+
+  /// No description provided for @removeFromList.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from List'**
+  String get removeFromList;
+
+  /// No description provided for @confirmRemoveBackupFromList.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this backup from the list? Its file is no longer available, so nothing will be deleted from storage.'**
+  String get confirmRemoveBackupFromList;
+
+  /// No description provided for @backupRemovedFromList.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup removed from list'**
+  String get backupRemovedFromList;
+
+  /// No description provided for @available.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
+
+  /// No description provided for @unknownAvailability.
+  ///
+  /// In en, this message translates to:
+  /// **'Availability unknown'**
+  String get unknownAvailability;
+
+  /// No description provided for @fileUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'File unavailable'**
+  String get fileUnavailable;
+
+  /// No description provided for @refreshingBackupAvailability.
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshing backup availability'**
+  String get refreshingBackupAvailability;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
   /// No description provided for @addLabAnalysis.
   ///
   /// In en, this message translates to:

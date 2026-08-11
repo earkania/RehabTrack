@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rehab_track/core/constants/app_constants.dart';
 import 'package:rehab_track/data/database/app_database.dart';
 import 'package:rehab_track/data/services/backup/backup_archive_writer.dart';
+import 'package:rehab_track/data/services/backup/backup_registry.dart';
 import 'package:rehab_track/data/services/backup/backup_service.dart';
 import 'package:rehab_track/data/services/backup/backup_storage_gateway.dart';
 import 'package:rehab_track/data/services/backup/preferences_exporter.dart';
@@ -114,6 +115,73 @@ void main() {
     expect(controller.state.isRunning, isFalse);
     expect(settings.store.containsKey(AppConstants.lastSuccessfulBackupKey),
         isFalse);
+  });
+
+  test('registers a content:// backup in the registry on success', () async {
+    final service = ControllableBackupService();
+    final settings = FakeSettingsRepository();
+    final controller = BackupOperationController(service, settings);
+
+    final future = controller.createBackup();
+    service.gate.complete(
+      const BackupOutcome(
+        result: BackupResult.success,
+        savedContentUri: 'content://backups/42',
+        savedFileName: 'MyBackup.rtb',
+        savedFileSize: 1024,
+      ),
+    );
+    await future;
+
+    final raw = settings.store[backupRegistryStorageKey];
+    expect(raw, isNotNull);
+    expect(raw, contains('content://backups/42'));
+    expect(raw, contains('MyBackup.rtb'));
+  });
+
+  test('does not register non content:// backup destinations', () async {
+    final service = ControllableBackupService();
+    final settings = FakeSettingsRepository();
+    final controller = BackupOperationController(service, settings);
+
+    final future = controller.createBackup();
+    service.gate.complete(
+      const BackupOutcome(
+        result: BackupResult.success,
+        savedContentUri: '/tmp/out.rtb',
+      ),
+    );
+    await future;
+
+    expect(settings.store.containsKey(backupRegistryStorageKey), isFalse);
+  });
+
+  test('registers a second backup without duplicating entries', () async {
+    final settings = FakeSettingsRepository();
+
+    final firstService = ControllableBackupService();
+    final controller = BackupOperationController(firstService, settings);
+    final first = controller.createBackup();
+    firstService.gate.complete(
+      const BackupOutcome(
+        result: BackupResult.success,
+        savedContentUri: 'content://backups/1',
+      ),
+    );
+    await first;
+
+    final secondService = ControllableBackupService();
+    final second = controller.createBackup();
+    secondService.gate.complete(
+      const BackupOutcome(
+        result: BackupResult.success,
+        savedContentUri: 'content://backups/1',
+      ),
+    );
+    await second;
+
+    final raw = settings.store[backupRegistryStorageKey]!;
+    expect(raw, contains('content://backups/1'));
   });
 
   test('returns operationAlreadyInProgress while running', () async {

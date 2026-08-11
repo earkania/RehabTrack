@@ -1115,3 +1115,131 @@ Restore metadata and UX polish. It intentionally adds **no new backup types**.
 
 No automatic backups, no cloud, no merge/selective restore, no encryption, no
 commit/push.
+
+## Backup & Restore — Manage Backups — Approved Design (2026-08-10)
+
+Phase 6 adds "Manage Backups" (Settings → Backup & Restore → Manage Backups):
+list the backups this app created and inspect / restore / share / delete them.
+It respects Android scoped storage — no `MANAGE_EXTERNAL_STORAGE`, no loose
+permissions are requested.
+
+### Backup Registry (storage-side answer to scoped storage)
+
+- The app cannot reliably enumerate arbitrary user documents, so it tracks the
+  documents it created. Each successful backup writes a non-sensitive entry
+  (JSON under the `backup_registry` app-settings key via `SettingsRepository`):
+  `contentUri`, `displayName`, `createdAt`, `fileSize`, `backupFormatVersion`,
+  `databaseSchemaVersion`, `available`.
+- **No patient, clinical or personal data and no filesystem paths are stored.**
+  Only `content://` URIs are registered; a registry write failure never fails an
+  otherwise-successful backup.
+- Entries are upserted by `contentUri` (never duplicated) and sorted newest-first
+  by creation time.
+
+### Persisted SAF permissions
+
+- After `ACTION_CREATE_DOCUMENT` the native side requests
+  `takePersistableUriPermission(READ|WRITE)` and reports `persisted` plus
+  provider metadata (`displayName`, `size`, `lastModified`) in the JSON payload.
+- Availability is **probed, never assumed**: the list re-queries each document
+  (`queryDocument`). Missing / moved / access-revoked files are marked
+  "Unavailable"; restore and share are disabled for them, delete remains so the
+  stale entry can be cleared. The UI never silently claims a deleted file exists.
+- "Last Backup" remains a creation-event timestamp distinct from current file
+  availability.
+
+### Actions
+
+- **Restore:** copies the known `content://` document to an app temp file
+  (`RestoreSelectionService.selectFromUri`) and runs the existing
+  validation → preview → restore-engine pipeline. No schema migration.
+- **Share:** `ACTION_SEND` with `FLAG_GRANT_READ_URI_PERMISSION`, MIME
+  `application/octet-stream`, direct `content://` URI; filesystem paths never
+  exposed.
+- **Delete:** `DocumentsContract.deleteDocument`; the registry entry is removed
+  regardless, so the list never claims a failed/unresolved delete left the file
+  present.
+
+### Concurrency / preconditions
+
+- Restore/share/delete are disabled while a backup or restore operation runs;
+  restore from a row reuses the shared `RestoreOperationController` pipeline
+  (concurrent-restore guard included).
+
+### Non-goals (unchanged)
+
+No automatic backups, no retention policy, no cloud sync, no selective/merge
+restore, no encryption, no commit/push. Manual picker-based "Restore backup"
+remains available alongside the registry.
+
+## Backup & Restore — Manage Backups: Import + Unavailable States — Approved Design (2026-08-11)
+
+Extends Manage Backups with two capabilities. Still zero broad storage
+permissions: the app never enumerates Downloads, never requests
+`MANAGE_EXTERNAL_STORAGE`, and never converts `content://` URIs into raw
+filesystem paths.
+
+### Import Existing Backups
+
+- "Import Existing Backups" opens the SAF **multi-select** picker
+  (`ACTION_OPEN_DOCUMENT`, `EXTRA_ALLOW_MULTIPLE`, MIME `application/octet-stream`).
+  Only the user-chosen documents are handled — nothing is discovered.
+- Each chosen document is copied to an app-owned temp file (content-resolver
+  copy, not path resolution), then validated with the canonical `BackupValidator`
+  (manifest, format/schema compatibility, checksums, read-only SQLite check).
+- Valid documents are registered (upsert by URI — a duplicate refresh existing
+  metadata instead of duplicating). Invalid files are skipped without failing the
+  batch. The result is surfaced with controlled counts:
+  imported / already-present-refreshed / invalid-skipped; picker dismiss and
+  I/O failures map to quiet or failure messages. A cancelled picker never
+  touches the registry.
+- Imported entries appear in Manage Backups and support every existing action
+  (details / restore / share / delete).
+- Persistable read access is taken per chosen URI; the native channel returns a
+  JSON array of `{uri, displayName}` (`openDocuments` / `handleOpenDocumentsResult`).
+
+### Availability lifecycle
+
+- **Registry model** (`RegisteredBackup`): `contentUri` (id), `displayName`,
+  `createdAt`, `fileSize`, `backupFormatVersion`, `databaseSchemaVersion`,
+  `availabilityState` ∈ {available, unavailable, unknown} persisted as the
+  **stable non-localized enum `name`**, plus `lastCheckedAt` and `lastModified`.
+  Legacy `available` booleans still decode (`fromStorage`). Only non-sensitive
+  metadata is ever stored.
+- **Probing, never assumed:** on open / refresh (`load` → `refreshAll`,
+  pull-to-refresh, and before opening a row's details) every registered URI is
+  re-probed with the light-weight native `queryDocument`. Available documents
+  get provider metadata refreshed too (display name, size, last-modified), so an
+  external rename shows the new name. A document that can no longer be opened is
+  marked unavailable — the entry is never auto-removed (a later provider change
+  could restore access).
+- **Unavailable visual:** `errorContainer` background / `onErrorContainer`
+  foreground, `cloud_off` icon, "Unavailable" badge + "Backup file not found"
+  subtitle, and a single announced semantics node labelled
+  "<name>, Unavailable" (tap is preserved via an `InkWell` under an
+  `ExcludeSemantics` row). Restore and Share are disabled; delete becomes
+  "Remove from List".
+- **Remove from List** removes the registry entry only — the storage document is
+  never touched (labeled "Remove from List", not "Delete Backup"). An available
+  row keeps today's delete: document deleted first, registry entry removed; if
+  registry cleanup fails the entry is marked unavailable so the next refresh
+  repairs it rather than presenting a deleted file as available.
+- **Manual rename:** if the document URI stays valid, refresh shows the new
+  provider name; if the provider changes the URI, the original entry is marked
+  unavailable (this is expected and handled).
+- **Last Backup tile:** keeps "Last backup created: {time}" wording; when the
+  linked registry entry (matched by `last_backup_content_uri`) is unavailable
+  the tile adds "File unavailable".
+
+### Native probe hardening
+
+The `queryDocument` accessibility probe opens (and immediately closes) the
+document's input stream instead of trusting a query cursor: Downloads can return
+a synthetic row for a `raw:` URI whose file is already gone. Opening the stream
+is a definitive existence/access check without reading content.
+
+### Non-goals (unchanged)
+
+The manual "Restore backup" picker (any `.rtb`, no registry involvement) keeps
+working. No automatic/retention/scheduled backups, no search, no folder-level
+operations, no commit/push.

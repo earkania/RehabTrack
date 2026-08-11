@@ -205,4 +205,38 @@ void main() {
 
     expect(find.textContaining('Last restore completed:'), findsOneWidget);
   });
+
+  testWidgets('shows "File unavailable" when the last backup entry is '
+      'unavailable without losing the last-created wording', (tester) async {
+    final settings = FakeSettingsRepository()
+      ..store['last_backup_at'] = '2026-08-04T12:00:00.000'
+      ..store['last_backup_content_uri'] = 'content://doc/1'
+      ..store['backup_registry'] =
+          '[{"contentUri":"content://doc/1","availabilityState":"unavailable"}]';
+    await tester.pumpWidget(
+      _wrap(ControllableBackupService(BackupResult.success), settings),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Last backup created:'), findsOneWidget);
+    expect(find.text('File unavailable'), findsOneWidget);
+  });
+
+  testWidgets('keeps showing the stored-as name when the last backup entry '
+      'is available', (tester) async {
+    final settings = FakeSettingsRepository()
+      ..store['last_backup_at'] = '2026-08-04T12:00:00.000'
+      ..store['last_backup_content_uri'] = 'content://doc/1'
+      ..store['last_backup_display_name'] = 'My Good.rtb'
+      ..store['backup_registry'] =
+          '[{"contentUri":"content://doc/1","displayName":"My Good.rtb","availabilityState":"available"}]';
+    await tester.pumpWidget(
+      _wrap(ControllableBackupService(BackupResult.success), settings),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Last backup created:'), findsOneWidget);
+    expect(find.text('Stored as: My Good.rtb'), findsOneWidget);
+    expect(find.text('File unavailable'), findsNothing);
+  });
 }
