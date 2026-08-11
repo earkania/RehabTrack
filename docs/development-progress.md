@@ -4487,3 +4487,108 @@ tile then shows "File unavailable" (verified on a fresh backup whose
 "Stored as"). Georgian locale shows "არსებული სარეზერვო ასლების იმპორტი" and
 "<name>, მიუწვდომელია". All test fixtures removed and device state restored
 (3 registered backups, all probed available).
+
+## Phase 10C — Diet Module: Foods + General Guidance (2026-08-11)
+
+**Goal:** Replace the Health → Diet `ModulePlaceholderScreen` with a fully
+patient-managed Diet module. Two content sections via a single screen —
+**Foods** (Food Guidance: `allowed` / `caution` / `avoid` stable categories,
+search / filter / sort / archive / details / edit / permanent delete) and
+**General Guidance** (free-form rules: `diet` / `smoking` / `hydration` /
+`caffeine` / `other` categories, search / filter / archive / details / edit /
+delete). Patient-managed reference data only — no calorie tracking, meal
+planning, nutrition database or AI suggestions. No commit/push.
+
+### Key decisions (approved design)
+
+- **Schema v18.** New `DietItems` (profile-owned, `name`, `category`,
+  `foodGroup?`, `notes?`, `source?`, `isArchived`, timestamps) and
+  `DietGuidanceRules` (profile-owned, `title`, `category`, `description?`,
+  `source?`, `sortOrder?`, `isArchived`, timestamps) tables with explicit
+  indexes (`*_profile_idx`, `*_category_idx`, `*_archived_idx`, plus
+  `diet_items_name_idx` and `diet_guidance_rules_title_idx` / `_sort_idx`).
+  The legacy unused `DietPlans` scaffolding is removed. The `from < 18`
+  migration drops the old `diet_items`/`diet_plans`/new `diet_guidance_rules`
+  tables (guarded `IF EXISTS`, so idempotent) then recreates — `@TableIndex`
+  indexes must be created explicitly via `m.createIndex` because Drift's
+  `m.createTable` does not create them.
+- **Stable, non-localized categories.** Patient-visible labels are mapped at
+  the UI layer (`diet_category_visuals.dart`, theme-derived tint colors, icon
+  + semantics label), never persisted.
+- **Single screen, two sections.** `SegmentedButton<DietSection>` switches
+  Foods / General Guidance; each section keeps independent search / filter /
+  sort / archive-flag state so switching never loses data.
+- **Search/filter/sort.** Rudimentary case-insensitive `LIKE` on name / group /
+  notes / source (no transliteration); food sort A–Z / Z–A / by category
+  (allowed=0, caution=1, avoid=2, then name); guidance ordered by
+  `sortOrder ASC` then `title ASC`.
+- **Actions.** Active lists offer details + edit + archive + delete; archived
+  lists offer restore + delete + delete confirmation. Archive mode hides the
+  FAB and uses the shared `ArchivedToggleButton` selected state (filled icon +
+  `secondaryContainer`).
+- **Routing.** `/health/diet` → `DietScreen`; `/health/diet/foods/:id`,
+  `foods/new`, `foods/:id/edit`, `/health/diet/guidance/:id`, `guidance/new`,
+  `guidance/:id/edit` (int-param guarded like record routes).
+
+### Implementation
+
+- `lib/data/database/tables/diet_tables.dart` — rewritten `DietItems` +
+  `DietGuidanceRules` with `@TableIndex` annotations.
+- `lib/data/database/app_database.dart` — schema v18, `if (from < 18)`
+  migration (drop legacy + recreate + explicit `m.createIndex` for all diet
+  indexes), table registration updated.
+- `lib/data/database/daos/diet_dao.dart` — profile-scoped
+  watch/search/insert/update/archive/restore/delete for both tables.
+- `lib/domain/entities/diet.dart` — `DietItem` + `DietGuidanceRule` with
+  `fromDb` / `toCompanion` / `toUpdateCompanion`.
+- `lib/domain/repositories/diet_repository.dart` +
+  `lib/data/repositories/diet_repository_impl.dart` — interface + Drift impl.
+- `lib/presentation/providers/diet_provider.dart` — food + guidance search /
+  filter / sort / archived providers, by-id providers, `DietSection` and
+  `activeDietSectionProvider`.
+- `lib/presentation/screens/health/diet_screen.dart` — `SegmentedButton`
+  sections, per-section search + filter + sort controls, foods/guidance lists
+  (with archive mode), empty states, archive-mode restore/delete popups.
+- `lib/presentation/screens/health/diet_food_form_screen.dart`,
+  `diet_food_details_screen.dart`, `diet_guidance_form_screen.dart`,
+  `diet_guidance_details_screen.dart` — add/edit + details (archive/restore/
+  delete with confirmation) screens.
+- `lib/presentation/screens/health/diet_category_visuals.dart` — stable
+  category constants + localized labels + theme-tinted icons.
+- `lib/core/router/app_routes.dart` + `app_router.dart` — diet routes wired to
+  real screens (placeholder removed).
+- `lib/l10n/app_en.arb` / `app_ka.arb` — diet keys; `flutter gen-l10n`
+  regenerated `app_localizations.dart`.
+
+### Tests
+
+- `test/diet_repository_test.dart` (new) — food create/update/archive/restore/
+  delete, active/archived watch + A–Z, profile scoping, search by name/group/
+  category, archived-inclusion; guidance create/update/archive/restore/delete,
+  `sortOrder`→title ordering, search by title/description/category, delete.
+- `test/diet_provider_test.dart` (new) — food/guidance active + archived +
+  by-id providers, search/filter/sort, food A–Z/Z–A/by-category, section
+  switcher; fake repo.
+- `test/diet_screen_test.dart` (new) — foods list/categories/empty state/search,
+  archive toggle hides FAB, narrow-screen no overflow, Georgian labels; guidance
+  switch, preserve-foods-on-switch, archived toggle; fake repo + active profile.
+- `test/diet_form_test.dart` (new) — food/guidance forms require name/title in
+  en + ka, category dropdown options.
+- `test/diet_routing_test.dart` (new) — Health → Diet tile navigation, back
+  navigation, Foods FAB route, narrow-screen no overflow (full app).
+- `test/care_contact_migration_test.dart` — schema-version assertion updated
+  17 → 18; added v17 → v18 diet migration test (data preserved, tables/explicit
+  indexes exist, DAO writes work).
+- `test/restore_sqlite_migrator_test.dart` — schema16 fixture now migrates
+  to 18; "already current" no-op at 18.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| `flutter test` | 1358/1358 passed (full suite) |
+| `:app:compileDebugKotlin` | Passed |
+
+Not committed/pushed — feature branch `feature/diet` only.

@@ -1243,3 +1243,65 @@ is a definitive existence/access check without reading content.
 The manual "Restore backup" picker (any `.rtb`, no registry involvement) keeps
 working. No automatic/retention/scheduled backups, no search, no folder-level
 operations, no commit/push.
+
+## Diet Module — Design Rules (Approved 2026-08-11)
+
+### Scope
+
+Health → Diet replaces the placeholder with two patient-managed content
+sections on one screen:
+
+- **Foods** (Food Guidance) — stable categories `allowed` / `caution` / `avoid`,
+  plus optional `foodGroup` / `notes` / `source`. Search, filter by category,
+  sort (A–Z / Z–A / by category: allowed=0, caution=1, avoid=2, then name),
+  archive / restore / details / edit / permanent delete.
+- **General Guidance** — free-form rules with stable categories `diet` /
+  `smoking` / `hydration` / `caffeine` / `other`, optional `description` /
+  `source` / `sortOrder`. Search, filter  by category, archive / restore /
+  details / edit / delete; ordered `sortOrder ASC` then `title ASC`.
+
+Out of scope (unchanged non-goals): calorie tracking, meal planning, nutrition
+database, AI-generated guidance. Both sections are patient-managed reference
+data.
+
+### Data model (schema v18)
+
+- `DietItems` — `id`, `profileId` (FK → Profiles, cascade), `name`, `category`,
+  `foodGroup?`, `notes?`, `source?`, `isArchived` (default false), `createdAt`,
+  `updatedAt`. Indexes: profile / category / archived / name.
+- `DietGuidanceRules` — `id`, `profileId`, `title`, `category`,
+  `description?`, `source?`, `sortOrder?`, `isArchived`, `createdAt`,
+  `updatedAt`. Indexes: profile / category / archived / title / sort.
+- The unused legacy `DietPlans` scaffolding and old `DietItems` (dietPlanId
+  based) are removed. The `from < 18` migration drops the old `diet_items` /
+  `diet_plans` tables and the (never-existing-in-17) `diet_guidance_rules` —
+  all with `DROP TABLE IF EXISTS` for idempotence — then recreates both new
+  tables. Drift's `m.createTable` does **not** create `@TableIndex` indexes, so
+  they must be created explicitly with `m.createIndex`.
+- Stable persisted enum names: food `category` = `allowed` | `caution` |
+  `avoid`; guidance `category` = `diet` | `smoking` | `hydration` | `caffeine` |
+  `other`. Localized labels, icons and theme-tinted colors are UI-only
+  (`diet_category_visuals.dart`), never persisted.
+
+### Behavior rules
+
+- All queries are profile-scoped (direct-ID operations always include
+  `profileId`). Switching the active profile naturally isolates the data.
+- Each section keeps its own search / filter / sort / archive-flag state, so
+  switching sections never loses the user's view.
+- Archive mode (via the shared `ArchivedToggleButton` — filled icon + tonal
+  `secondaryContainer`) swaps the list content, hides the FAB, and offers
+  restore + delete (+ confirmation) on each row. Active lists offer details /
+  edit / archive / delete.
+- Search is a coarse case-insensitive `LIKE` across the searchable text fields
+  (no transliteration).
+- Add/edit screens are standard forms: required name (foods) / title (guidance),
+  category dropdown, optional free-text fields, save button.
+- Routes: `/health/diet` → `DietScreen` (the `SegmentedButton` host),
+  `/health/diet/foods/new|:id|:id/edit` and
+  `/health/diet/guidance/new|:id|:id/edit`; ids are int-param guarded.
+
+### Non-goals (unchanged)
+
+No calorie tracking / meal planning / nutrition database / AI suggestions; no
+commit/push.

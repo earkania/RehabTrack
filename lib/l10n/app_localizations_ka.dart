@@ -2770,4 +2770,249 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get attachmentRemoved => 'დამატებითი ფაილი წაიშალა';
+
+  @override
+  String get foods => 'საკვები';
+
+  @override
+  String get generalGuidance => 'ზოგადი რეკომენდაციები';
+
+  @override
+  String get searchFoods => 'საკვების ძებნა';
+
+  @override
+  String get searchGuidance => 'ზოგადი რეკომენდაციების ძებნა';
+
+  @override
+  String get allowed => 'დასაშვები';
+
+  @override
+  String get caution => 'სიფრთხილით';
+
+  @override
+  String get avoid => 'აკრძალული';
+
+  @override
+  String get allDietItems => 'ყველა კატეგორია';
+
+  @override
+  String get allGuidanceRules => 'ყველა კატეგორია';
+
+  @override
+  String get dietGuidanceCategory => 'დიეტა';
+
+  @override
+  String get smokingGuidanceCategory => 'მოწევა';
+
+  @override
+  String get hydrationGuidanceCategory => 'ჰიდრატაცია';
+
+  @override
+  String get caffeineGuidanceCategory => 'კოფეინი';
+
+  @override
+  String get otherGuidanceCategory => 'სხვა';
+
+  @override
+  String get alphabeticalAZ => 'A-ზ';
+
+  @override
+  String get alphabeticalZA => 'ზ-A';
+
+  @override
+  String get sortByCategory => 'კატეგორიის მიხედვით';
+
+  @override
+  String get noDietItems => 'საკვების რეკომენდაციები ჯერ არ არის';
+
+  @override
+  String get noDietItemsDescription =>
+      'აღრიცხეთ საკვები როგორც დასაშვები, სიფრთხილით ან აკრძალული.';
+
+  @override
+  String get noArchivedDietItems => 'დაარქივებული საკვები არ არის';
+
+  @override
+  String get noGuidanceRules => 'ზოგადი რეკომენდაციები ჯერ არ არის';
+
+  @override
+  String get noGuidanceRulesDescription =>
+      'აღრიცხეთ დიეტის, მოწევის, ჰიდრატაციის, კოფეინის და სხვა წესები.';
+
+  @override
+  String get noArchivedGuidanceRules => 'დაარქივებული რეკომენდაციები არ არის';
+
+  @override
+  String get errorLoadingDietItems =>
+      'საკვების რეკომენდაციების ჩატვირთვა ვერ მოხერხდა';
+
+  @override
+  String get errorLoadingGuidanceRules =>
+      'ზოგადი რეკომენდაციების ჩატვირთვა ვერ მოხერხდა';
+
+  @override
+  String get addDietItem => 'საკვების დამატება';
+
+  @override
+  String get editDietItem => 'საკვების რედაქტირება';
+
+  @override
+  String get dietItemDetails => 'საკვების დეტალები';
+
+  @override
+  String get dietItemNotFound => 'საკვები ვერ მოიძებნა';
+
+  @override
+  String get dietItemIsArchived => 'ეს საკვები დაარქივებულია.';
+
+  @override
+  String get archiveDietItem => 'საკვების დაარქივება';
+
+  @override
+  String get archiveDietItemConfirmation =>
+      'დაარქივოთ ეს საკვები? ის გადავა დაარქივებულ სიაში, მაგრამ შესაძლებელია მისი აღდგენა.';
+
+  @override
+  String get restoreDietItem => 'საკვების აღდგენა';
+
+  @override
+  String get deleteDietItem => 'საკვების წაშლა';
+
+  @override
+  String get confirmDeleteDietItem => 'წავშალოთ ეს საკვები სამუდამოდ?';
+
+  @override
+  String get dietItemSaved => 'საკვები შენახულია';
+
+  @override
+  String get dietItemUpdated => 'საკვები განახლდა';
+
+  @override
+  String get dietItemArchived => 'საკვები დაარქივდა';
+
+  @override
+  String get dietItemRestored => 'საკვები აღდგა';
+
+  @override
+  String get dietItemDeleted => 'საკვები წაიშალა';
+
+  @override
+  String get showArchivedDietItems => 'დაარქივებული საკვების ჩვენება';
+
+  @override
+  String get showingArchivedDietItems => 'დაარქივებული საკვები ნაჩვენებია';
+
+  @override
+  String get foodName => 'საკვების დასახელება';
+
+  @override
+  String get foodNameHint => 'მაგ., ახალი ხილი';
+
+  @override
+  String get foodNameRequired => 'საკვების დასახელება სავალდებულოა';
+
+  @override
+  String get foodCategory => 'კატეგორია';
+
+  @override
+  String get foodGroup => 'საკვების ჯგუფი';
+
+  @override
+  String get foodGroupHint => 'მაგ., ხილი, ბოსტნეული, მარცვლეული';
+
+  @override
+  String get foodNotes => 'შენიშვნები';
+
+  @override
+  String get foodNotesHint => 'შენიშვნები ამ საკვებზე';
+
+  @override
+  String get source => 'წყარო';
+
+  @override
+  String get sourceHint => 'მაგ., დიეტოლოგის რეკომენდაცია';
+
+  @override
+  String get updateDietItem => 'საკვების განახლება';
+
+  @override
+  String get saveDietItem => 'საკვების შენახვა';
+
+  @override
+  String get addGuidanceRule => 'რეკომენდაციის დამატება';
+
+  @override
+  String get editGuidanceRule => 'რეკომენდაციის რედაქტირება';
+
+  @override
+  String get guidanceRuleDetails => 'რეკომენდაციის დეტალები';
+
+  @override
+  String get guidanceRuleNotFound => 'რეკომენდაცია ვერ მოიძებნა';
+
+  @override
+  String get guidanceRuleIsArchived => 'ეს რეკომენდაცია დაარქივებულია.';
+
+  @override
+  String get guidanceTitle => 'სათაური';
+
+  @override
+  String get guidanceTitleHint => 'მაგ., დალიეთ წყალი მთელი დღის განმავლობაში';
+
+  @override
+  String get guidanceTitleRequired => 'სათაური სავალდებულოა';
+
+  @override
+  String get guidanceCategory => 'კატეგორია';
+
+  @override
+  String get guidanceDescription => 'აღწერა';
+
+  @override
+  String get guidanceDescriptionHint => 'დეტალები ამ რეკომენდაციის შესახებ';
+
+  @override
+  String get updateGuidanceRule => 'რეკომენდაციის განახლება';
+
+  @override
+  String get saveGuidanceRule => 'რეკომენდაციის შენახვა';
+
+  @override
+  String get archiveGuidanceRule => 'რეკომენდაციის დაარქივება';
+
+  @override
+  String get archiveGuidanceRuleConfirmation =>
+      'დაარქივოთ ეს რეკომენდაცია? ის გადავა დაარქივებულ სიაში, მაგრამ შესაძლებელია მისი აღდგენა.';
+
+  @override
+  String get restoreGuidanceRule => 'რეკომენდაციის აღდგენა';
+
+  @override
+  String get deleteGuidanceRule => 'რეკომენდაციის წაშლა';
+
+  @override
+  String get confirmDeleteGuidanceRule => 'წავშალოთ ეს რეკომენდაცია სამუდამოდ?';
+
+  @override
+  String get guidanceRuleSaved => 'რეკომენდაცია შენახულია';
+
+  @override
+  String get guidanceRuleUpdated => 'რეკომენდაცია განახლდა';
+
+  @override
+  String get guidanceRuleArchived => 'რეკომენდაცია დაარქივდა';
+
+  @override
+  String get guidanceRuleRestored => 'რეკომენდაცია აღდგა';
+
+  @override
+  String get guidanceRuleDeleted => 'რეკომენდაცია წაიშალა';
+
+  @override
+  String get showArchivedGuidanceRules =>
+      'დაარქივებული რეკომენდაციების ჩვენება';
+
+  @override
+  String get showingArchivedGuidanceRules =>
+      'დაარქივებული რეკომენდაციები ნაჩვენებია';
 }

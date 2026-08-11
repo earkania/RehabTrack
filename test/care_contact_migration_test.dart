@@ -24,10 +24,10 @@ void main() {
     return db.AppDatabase.forTesting(NativeDatabase(dbFile()));
   }
 
-  test('schema version is 17', () {
+  test('schema version is 18', () {
     final database = db.AppDatabase.test();
     addTearDown(database.close);
-    expect(database.schemaVersion, 17);
+    expect(database.schemaVersion, 18);
   });
 
   test('care_contacts table and indexes exist after fresh create', () async {
@@ -445,5 +445,98 @@ void main() {
       ),
     );
     expect(medicationId, greaterThan(0));
+  });
+
+  test('upgrading from version 17 creates the diet tables and preserves data',
+      () async {
+    // 1. Open a fresh file DB at the current schema and seed a profile.
+    var database = await openFileDb();
+    final profileId = await database.into(database.profiles).insert(
+      db.ProfilesCompanion.insert(
+        firstName: 'Existing',
+        lastName: 'User',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+        isPrimary: const Value(true),
+        isActive: const Value(true),
+      ),
+    );
+
+    // 2. Simulate a v17 database: the diet tables were not present in v17.
+    //    Drop the legacy scaffolding tables if present and mark user_version
+    //    as 17 so reopening runs the real onUpgrade path.
+    final tables = await database
+        .customSelect('SELECT name FROM sqlite_master WHERE type = \'table\'')
+        .get();
+    final tableNames = tables.map((r) => r.read<String>('name')).toSet();
+    for (final table in ['diet_items', 'diet_plans']) {
+      if (tableNames.contains(table)) {
+        await database.customStatement('DROP TABLE $table');
+      }
+    }
+    await database.customStatement('PRAGMA user_version = 17');
+    await database.close();
+
+    // 3. Reopen — drift detects 17 < 18 and applies the migration.
+    database = await openFileDb();
+    addTearDown(database.close);
+
+    // 4. Existing profile data is preserved.
+    final profiles = await (database.select(database.profiles)
+          ..where((t) => t.id.equals(profileId)))
+        .get();
+    expect(profiles, hasLength(1));
+    expect(profiles.single.firstName, 'Existing');
+
+    // 5. Both diet tables exist after migration, with their indexes.
+    final reopenedTables = await database
+        .customSelect('SELECT name FROM sqlite_master WHERE type = \'table\'')
+        .get();
+    final reopenedTableNames =
+        reopenedTables.map((r) => r.read<String>('name')).toSet();
+    expect(reopenedTableNames, contains('diet_items'));
+    expect(reopenedTableNames, contains('diet_guidance_rules'));
+
+    final dietIndexes = await database
+        .customSelect(
+          'SELECT name FROM sqlite_master WHERE type = \'index\' '
+          'AND tbl_name = \'diet_items\'',
+        )
+        .get();
+    final dietIndexNames = dietIndexes.map((r) => r.read<String>('name')).toSet();
+    expect(dietIndexNames, containsAll([
+      'diet_items_profile_idx',
+      'diet_items_category_idx',
+      'diet_items_archived_idx',
+      'diet_items_name_idx',
+    ]));
+
+    // 6. A food item can be written through the DAO after migration.
+    final foodId = await database.dietDao.insertFoodItem(
+      db.DietItemsCompanion.insert(
+        profileId: profileId,
+        name: 'Apples',
+        category: 'allowed',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+    expect(foodId, greaterThan(0));
+    final savedFood = await database.dietDao.getFoodItem(foodId, profileId);
+    expect(savedFood!.name, 'Apples');
+
+    // 7. A guidance rule can also be written.
+    final ruleId = await database.dietDao.insertGuidanceRule(
+      db.DietGuidanceRulesCompanion.insert(
+        profileId: profileId,
+        title: 'Drink water',
+        category: 'hydration',
+        createdAt: DateTime(2025),
+        updatedAt: DateTime(2025),
+      ),
+    );
+    expect(ruleId, greaterThan(0));
+    final savedRule = await database.dietDao.getGuidanceRule(ruleId, profileId);
+    expect(savedRule!.title, 'Drink water');
   });
 }
