@@ -71,6 +71,39 @@ final _todayAgendaServiceProvider = Provider<TodayAgendaService>((ref) {
 
 final todayRefreshTickProvider = StateProvider<int>((ref) => 0);
 
+/// The current local minute, kept fresh by a single timer aligned to minute
+/// boundaries (opening at 10:23:42 ticks next at 10:24:00).
+///
+/// All relative-time labels share this provider so exactly one Timer exists
+/// while any of them is on screen. It is auto-disposed (and the Timer
+/// cancelled) when the last listener goes away.
+final currentMinuteProvider = StateProvider.autoDispose<DateTime>((ref) {
+  final clock = ref.read(todayClockProvider);
+  final now = clock.now();
+  final minute = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+  Timer? timer;
+
+  void scheduleNext() {
+    final current = ref.read(todayClockProvider).now();
+    final currentMinute =
+        DateTime(current.year, current.month, current.day, current.hour, current.minute);
+    final nextMinute = currentMinute.add(const Duration(minutes: 1));
+    final delay = nextMinute.difference(current);
+    timer = Timer(delay.isNegative ? Duration.zero : delay, () {
+      final latest = ref.read(todayClockProvider).now();
+      final latestMinute =
+          DateTime(latest.year, latest.month, latest.day, latest.hour, latest.minute);
+      ref.controller.state = latestMinute;
+      scheduleNext();
+    });
+  }
+
+  scheduleNext();
+  ref.onDispose(() => timer?.cancel());
+  return minute;
+});
+
 final dailyAgendaProvider =
     FutureProvider.autoDispose<TodayAgenda>((ref) async {
   ref.watch(todayRefreshTickProvider);

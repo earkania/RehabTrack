@@ -14,6 +14,7 @@ import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/widgets/today/today_background.dart';
 import 'package:rehab_track/presentation/widgets/today/today_measurement_reading.dart';
+import 'package:rehab_track/presentation/widgets/today/today_relative_time_label.dart';
 
 class TodayAgendaItemWidget extends ConsumerWidget {
   final TodayAgendaItem item;
@@ -77,6 +78,12 @@ class TodayAgendaItemWidget extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: TodayMeasurementReading(item: item),
+                    ),
+                  if (item.type == TodayAgendaItemType.medication ||
+                      item.type == TodayAgendaItemType.measurement)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: TodayRelativeTimeLabel(item: item),
                     ),
                   if (_hasDosageInfo(item))
                     Padding(

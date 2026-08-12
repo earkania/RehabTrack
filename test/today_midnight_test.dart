@@ -81,6 +81,7 @@ Widget _wrap({
       nextItemGracePeriodProvider.overrideWith(
         (ref) => NextItemGracePeriodNotifier(_FakeSettingsRepository()),
       ),
+      currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
     ],
     child: MaterialApp(
       locale: const Locale('en'),

@@ -1104,5 +1104,113 @@
   "guidanceRuleRestored": "რეკომენდაცია აღდგა",
   "guidanceRuleDeleted": "რეკომენდაცია წაიშალა",
   "showArchivedGuidanceRules": "დაარქივებული რეკომენდაციების ჩვენება",
-  "showingArchivedGuidanceRules": "დაარქივებული რეკომენდაციები ნაჩვენებია"
+  "showingArchivedGuidanceRules": "დაარქივებული რეკომენდაციები ნაჩვენებია",
+  "inHoursMinutes": "{hours}სთ {minutes}წთ-ში",
+  "@inHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "inHours": "{hours}სთ-ში",
+  "@inHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "inMinutes": "{minutes}წთ-ში",
+  "@inMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursMinutesOverdue": "{hours}სთ {minutes}წთ გადაცილება",
+  "@hoursMinutesOverdue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursOverdue": "{hours}სთ გადაცილება",
+  "@hoursOverdue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesOverdue": "{minutes}წთ გადაცილება",
+  "@minutesOverdue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticInHoursMinutes": "{hours} საათსა და {minutes} წუთში",
+  "@semanticInHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticInHours": "{hours} საათში",
+  "@semanticInHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticInMinutes": "{minutes} წუთში",
+  "@semanticInMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticHoursMinutesOverdue": "{hours} საათი და {minutes} წუთია ვადაგადაცილებული",
+  "@semanticHoursMinutesOverdue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticHoursOverdue": "{hours} საათია ვადაგადაცილებული",
+  "@semanticHoursOverdue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticMinutesOverdue": "{minutes} წუთია ვადაგადაცილებული",
+  "@semanticMinutesOverdue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  }
 }

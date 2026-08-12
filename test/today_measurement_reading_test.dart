@@ -6,6 +6,7 @@ import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/reference_range_provider.dart';
+import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/widgets/today/today_agenda_item.dart';
 import 'package:rehab_track/presentation/widgets/today/today_measurement_reading.dart';
 
@@ -14,6 +15,7 @@ Widget _wrap(Widget child) {
     overrides: [
       effectiveRangesForCurrentProfileProvider
           .overrideWith((_, _) async => null),
+      currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
     ],
     child: MaterialApp(
       localizationsDelegates: const [

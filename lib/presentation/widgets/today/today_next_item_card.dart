@@ -7,6 +7,7 @@ import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
+import 'package:rehab_track/presentation/widgets/today/today_relative_time_label.dart';
 
 class TodayNextItemCard extends ConsumerWidget {
   const TodayNextItemCard({super.key});
@@ -58,6 +59,13 @@ class TodayNextItemCard extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.onPrimaryContainer,
                     ),
+                  ),
+                  const SizedBox(height: 2),
+                  TodayRelativeTimeLabel(
+                    item: nextItem,
+                    upcomingColor: theme.colorScheme.onPrimaryContainer
+                        .withValues(alpha: 0.7),
+                    overdueColor: theme.colorScheme.onPrimaryContainer,
                   ),
                   if (hasDosageInfo) ...[
                     const SizedBox(height: 2),

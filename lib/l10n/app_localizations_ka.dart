@@ -3018,4 +3018,64 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get showingArchivedGuidanceRules =>
       'დაარქივებული რეკომენდაციები ნაჩვენებია';
+
+  @override
+  String inHoursMinutes(int hours, int minutes) {
+    return '$hoursსთ $minutesწთ-ში';
+  }
+
+  @override
+  String inHours(int hours) {
+    return '$hoursსთ-ში';
+  }
+
+  @override
+  String inMinutes(int minutes) {
+    return '$minutesწთ-ში';
+  }
+
+  @override
+  String hoursMinutesOverdue(int hours, int minutes) {
+    return '$hoursსთ $minutesწთ გადაცილება';
+  }
+
+  @override
+  String hoursOverdue(int hours) {
+    return '$hoursსთ გადაცილება';
+  }
+
+  @override
+  String minutesOverdue(int minutes) {
+    return '$minutesწთ გადაცილება';
+  }
+
+  @override
+  String semanticInHoursMinutes(int hours, int minutes) {
+    return '$hours საათსა და $minutes წუთში';
+  }
+
+  @override
+  String semanticInHours(int hours) {
+    return '$hours საათში';
+  }
+
+  @override
+  String semanticInMinutes(int minutes) {
+    return '$minutes წუთში';
+  }
+
+  @override
+  String semanticHoursMinutesOverdue(int hours, int minutes) {
+    return '$hours საათი და $minutes წუთია ვადაგადაცილებული';
+  }
+
+  @override
+  String semanticHoursOverdue(int hours) {
+    return '$hours საათია ვადაგადაცილებული';
+  }
+
+  @override
+  String semanticMinutesOverdue(int minutes) {
+    return '$minutes წუთია ვადაგადაცილებული';
+  }
 }

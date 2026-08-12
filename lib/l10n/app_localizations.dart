@@ -5725,6 +5725,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Showing archived guidance'**
   String get showingArchivedGuidanceRules;
+
+  /// No description provided for @inHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'In {hours}h {minutes}m'**
+  String inHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @inHours.
+  ///
+  /// In en, this message translates to:
+  /// **'In {hours}h'**
+  String inHours(int hours);
+
+  /// No description provided for @inMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'In {minutes}m'**
+  String inMinutes(int minutes);
+
+  /// No description provided for @hoursMinutesOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m overdue'**
+  String hoursMinutesOverdue(int hours, int minutes);
+
+  /// No description provided for @hoursOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h overdue'**
+  String hoursOverdue(int hours);
+
+  /// No description provided for @minutesOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m overdue'**
+  String minutesOverdue(int minutes);
+
+  /// No description provided for @semanticInHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'in {hours} hours {minutes} minutes'**
+  String semanticInHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @semanticInHours.
+  ///
+  /// In en, this message translates to:
+  /// **'in {hours} hours'**
+  String semanticInHours(int hours);
+
+  /// No description provided for @semanticInMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'in {minutes} minutes'**
+  String semanticInMinutes(int minutes);
+
+  /// No description provided for @semanticHoursMinutesOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hours {minutes} minutes overdue'**
+  String semanticHoursMinutesOverdue(int hours, int minutes);
+
+  /// No description provided for @semanticHoursOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hours overdue'**
+  String semanticHoursOverdue(int hours);
+
+  /// No description provided for @semanticMinutesOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} minutes overdue'**
+  String semanticMinutesOverdue(int minutes);
 }
 
 class _AppLocalizationsDelegate

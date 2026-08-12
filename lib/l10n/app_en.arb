@@ -1104,5 +1104,113 @@
   "guidanceRuleRestored": "Guidance restored",
   "guidanceRuleDeleted": "Guidance deleted",
   "showArchivedGuidanceRules": "Show archived guidance",
-  "showingArchivedGuidanceRules": "Showing archived guidance"
+  "showingArchivedGuidanceRules": "Showing archived guidance",
+  "inHoursMinutes": "In {hours}h {minutes}m",
+  "@inHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "inHours": "In {hours}h",
+  "@inHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "inMinutes": "In {minutes}m",
+  "@inMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursMinutesOverdue": "{hours}h {minutes}m overdue",
+  "@hoursMinutesOverdue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursOverdue": "{hours}h overdue",
+  "@hoursOverdue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesOverdue": "{minutes}m overdue",
+  "@minutesOverdue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticInHoursMinutes": "in {hours} hours {minutes} minutes",
+  "@semanticInHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticInHours": "in {hours} hours",
+  "@semanticInHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticInMinutes": "in {minutes} minutes",
+  "@semanticInMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticHoursMinutesOverdue": "{hours} hours {minutes} minutes overdue",
+  "@semanticHoursMinutesOverdue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticHoursOverdue": "{hours} hours overdue",
+  "@semanticHoursOverdue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticMinutesOverdue": "{minutes} minutes overdue",
+  "@semanticMinutesOverdue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  }
 }

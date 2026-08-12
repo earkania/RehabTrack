@@ -58,6 +58,7 @@ Widget _buildShellApp({required int initialIndex}) {
     overrides: [
       selectedAgendaDateProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
       todayAutoRefreshProvider.overrideWith((ref) {}),
+      currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
     ],
     child: MaterialApp.router(
       routerConfig: router,

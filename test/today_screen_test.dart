@@ -16,6 +16,7 @@ Widget _wrapWithApp(Widget child, {TodayAgenda? agenda}) {
   final overrides = <Override>[
     todayAutoRefreshProvider.overrideWith((ref) {}),
     selectedAgendaDateProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
+    currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
   ];
   if (agenda != null) {
     overrides.add(todayAgendaProvider.overrideWith((_) async => agenda));
@@ -80,6 +81,7 @@ Widget _wrapWithGoRouter(Widget child) {
     overrides: [
       selectedAgendaDateProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
       todayAutoRefreshProvider.overrideWith((ref) {}),
+      currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
     ],
     child: MaterialApp.router(
       routerConfig: router,
@@ -157,6 +159,7 @@ Widget _buildScreen({required TodayAgenda agenda}) {
       todayAgendaProvider.overrideWith((_) async => agenda),
       todayAutoRefreshProvider.overrideWith((ref) {}),
       selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+      currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
     ],
     child: MaterialApp(
       localizationsDelegates: const [
@@ -324,6 +327,7 @@ void main() {
             todayAgendaProvider.overrideWith((_) async => agenda),
             todayAutoRefreshProvider.overrideWith((ref) {}),
             selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+            currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
           ],
           child: MaterialApp(
             locale: const Locale('ka'),
@@ -354,6 +358,7 @@ void main() {
             todayAgendaProvider.overrideWith((_) async => agenda),
             todayAutoRefreshProvider.overrideWith((ref) {}),
             selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+            currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
           ],
           child: MaterialApp(
             theme: ThemeData.light(),
@@ -383,6 +388,7 @@ void main() {
             todayAgendaProvider.overrideWith((_) async => agenda),
             todayAutoRefreshProvider.overrideWith((ref) {}),
             selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+            currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
           ],
           child: MaterialApp(
             theme: ThemeData.dark(),
@@ -424,6 +430,7 @@ void main() {
             todayAgendaProvider.overrideWith((_) async => agenda),
             todayAutoRefreshProvider.overrideWith((ref) {}),
             selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+            currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
           ],
           child: MaterialApp(
             locale: const Locale('ka'),
@@ -441,6 +448,45 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('დღის განრიგი'), findsOneWidget);
+    });
+
+    testWidgets('Georgian Today layout has no overflow on Pixel 7 portrait',
+        (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.625;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final now = DateTime(2025, 7, 25, 12, 0);
+      final agenda = _mockAgenda(now: now);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            todayAgendaProvider.overrideWith((_) async => agenda),
+            todayAutoRefreshProvider.overrideWith((ref) {}),
+            selectedAgendaDateProvider.overrideWith((ref) => agenda.date),
+            currentMinuteProvider.overrideWith(
+              (ref) => DateTime(2025, 7, 25, 12, 40),
+            ),
+          ],
+          child: MaterialApp(
+            locale: const Locale('ka'),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const TodayScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('4სთ 40წთ გადაცილება'), findsOneWidget);
     });
 
     testWidgets('no duplicate section headings', (tester) async {
@@ -855,6 +901,7 @@ void main() {
             }),
             selectedAgendaDateProvider.overrideWith((_) => today),
             todayAutoRefreshProvider.overrideWith((ref) {}),
+            currentMinuteProvider.overrideWith((ref) => DateTime(2000, 1, 1)),
           ],
           child: MaterialApp(
             localizationsDelegates: const [

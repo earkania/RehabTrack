@@ -3017,4 +3017,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showingArchivedGuidanceRules => 'Showing archived guidance';
+
+  @override
+  String inHoursMinutes(int hours, int minutes) {
+    return 'In ${hours}h ${minutes}m';
+  }
+
+  @override
+  String inHours(int hours) {
+    return 'In ${hours}h';
+  }
+
+  @override
+  String inMinutes(int minutes) {
+    return 'In ${minutes}m';
+  }
+
+  @override
+  String hoursMinutesOverdue(int hours, int minutes) {
+    return '${hours}h ${minutes}m overdue';
+  }
+
+  @override
+  String hoursOverdue(int hours) {
+    return '${hours}h overdue';
+  }
+
+  @override
+  String minutesOverdue(int minutes) {
+    return '${minutes}m overdue';
+  }
+
+  @override
+  String semanticInHoursMinutes(int hours, int minutes) {
+    return 'in $hours hours $minutes minutes';
+  }
+
+  @override
+  String semanticInHours(int hours) {
+    return 'in $hours hours';
+  }
+
+  @override
+  String semanticInMinutes(int minutes) {
+    return 'in $minutes minutes';
+  }
+
+  @override
+  String semanticHoursMinutesOverdue(int hours, int minutes) {
+    return '$hours hours $minutes minutes overdue';
+  }
+
+  @override
+  String semanticHoursOverdue(int hours) {
+    return '$hours hours overdue';
+  }
+
+  @override
+  String semanticMinutesOverdue(int minutes) {
+    return '$minutes minutes overdue';
+  }
 }
