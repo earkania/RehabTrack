@@ -863,19 +863,19 @@ class NotificationActionBridge {
             times: [schedule.time],
           );
 
-    final payload = ReminderPayload(
-      type: ReminderType.measurement,
-      profileId: schedule.profileId,
-      scheduleId: schedule.id!,
-      occurrenceTime: DateTime.now().toIso8601String(),
-      measurementTypeId: schedule.measurementTypeId,
-    );
-
     return ScheduleRecoveryEntry(
       scheduleId: schedule.id!,
       config: scheduleConfig,
       channelId: NotificationService.measurementChannelId,
-      payload: payload.toJsonString(),
+      perOccurrencePayload: (occDateTime) {
+        return ReminderPayload(
+          type: ReminderType.measurement,
+          profileId: schedule.profileId,
+          scheduleId: schedule.id!,
+          occurrenceTime: occDateTime.toIso8601String(),
+          measurementTypeId: schedule.measurementTypeId,
+        ).toJsonString();
+      },
       includeActions: true,
       isMeasurement: true,
       profileId: schedule.profileId,

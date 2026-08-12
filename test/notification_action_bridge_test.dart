@@ -1023,4 +1023,88 @@ void main() {
       );
     });
   });
+
+  group('Measurement recovery payloads', () {
+    late NotificationActionBridge bridge;
+    late FakeNotificationService notificationService;
+    late FakeMeasurementRepository measurementRepo;
+    late FakeMedicationRepository medicationRepo;
+
+    setUp(() {
+      notificationService = FakeNotificationService();
+      measurementRepo = FakeMeasurementRepository();
+      medicationRepo = FakeMedicationRepository();
+      final scheduler = FakeNotificationScheduler(
+        notificationService: notificationService,
+      );
+      final recoveryService = ScheduleRecoveryService(
+        notificationService: notificationService,
+        notificationScheduler: scheduler,
+      );
+      bridge = NotificationActionBridge(
+        notificationService: notificationService,
+        notificationScheduler: scheduler,
+        scheduleRecoveryService: recoveryService,
+        medicationRepository: medicationRepo,
+        measurementRepository: measurementRepo,
+        doctorVisitRepository: FakeDoctorVisitRepository(),
+        careContactRepository: FakeCareContactRepository(),
+        profileRepository: FakeProfileRepository(),
+        getSnoozeDuration: () => const Duration(minutes: 10),
+        showProfileName: () => true,
+        showDetailsOnLockScreen: () => true,
+      );
+      measurementRepo.schedules[7] = MeasurementSchedule(
+        id: 7,
+        profileId: 1,
+        measurementTypeId: 5,
+        scheduleType: 'daily',
+        time: '08:30',
+        startDate: DateTime(2020, 1, 1),
+        active: true,
+        createdAt: DateTime(2020, 1, 1),
+        updatedAt: DateTime(2020, 1, 1),
+      );
+    });
+
+    test(
+      'each recovered measurement notification carries its own occurrence time',
+      () async {
+        await bridge.initialize();
+
+        final count = await bridge.recoverMeasurementSchedules(1);
+
+        // One schedule entry was restored, which produced one notification per
+        // future occurrence.
+        expect(count, 1);
+        expect(notificationService.scheduledNotifications, isNotEmpty);
+
+        // Every payload must reference the exact occurrence it was scheduled
+        // for, not a single "now" shared by all occurrences. This is what lets
+        // Record Now bind the reading to the correct agenda slot.
+        final occurrenceInstants = <DateTime>{};
+        for (final scheduled in notificationService.scheduledNotifications) {
+          final rawPayload = scheduled['payload'] as String;
+          final payload = ReminderPayload.parse(rawPayload);
+          expect(payload, isNotNull);
+          expect(payload!.scheduleId, 7);
+          expect(payload.measurementTypeId, 5);
+          final occ = payload.occurrenceDateTime;
+          expect(occ, isNotNull);
+          final occIn = scheduled['scheduledDate'] as DateTime;
+          expect(
+            occ!.isAtSameMomentAs(occIn),
+            isTrue,
+            reason: 'payload occurrenceTime must match the scheduled occurrence',
+          );
+          occurrenceInstants.add(payload.occurrenceDateTime!);
+        }
+
+        // The static-payload bug made every notification share the same
+        // occurrenceTime. A fixed per-occurrence payload yields many distinct
+        // instants across the 30-day horizon.
+        expect(occurrenceInstants.length, greaterThan(1));
+      },
+    );
+  });
 }
