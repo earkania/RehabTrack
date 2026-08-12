@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
-import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
@@ -277,12 +276,14 @@ class _MeasurementEntryScreenState
       );
 
       final repo = ref.read(measurementRepositoryProvider);
-      final recordId = await repo.createRecord(record, values);
-
       final extra = widget.recordNowExtra;
-      if (extra != null) {
-        await _completeReminder(repo, extra, recordId);
-      }
+      await repo.recordScheduledMeasurement(
+        profileId: profileId,
+        record: record,
+        values: values,
+        scheduleId: extra?.reminderScheduleId,
+        occurrenceDateTime: extra?.scheduledOccurrenceTime,
+      );
 
       ref.invalidate(todayAgendaProvider);
 
@@ -300,47 +301,6 @@ class _MeasurementEntryScreenState
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
-    }
-  }
-
-  Future<void> _completeReminder(
-    MeasurementRepository repo,
-    RecordNowExtra extra,
-    int measurementRecordId,
-  ) async {
-    try {
-      final existing = await repo.getReminderLog(
-        extra.reminderScheduleId,
-        extra.scheduledOccurrenceTime,
-      );
-
-      if (existing != null && existing.id != null) {
-        await repo.updateReminderLog(
-          existing.copyWith(
-            status: MeasurementReminderAction.completed,
-            actionTime: DateTime.now(),
-            measurementRecordId: measurementRecordId,
-          ),
-        );
-      } else {
-        await repo.logReminder(
-          MeasurementReminderLog(
-            measurementScheduleId: extra.reminderScheduleId,
-            scheduledTime: extra.scheduledOccurrenceTime,
-            actionTime: DateTime.now(),
-            status: MeasurementReminderAction.completed,
-            measurementRecordId: measurementRecordId,
-            createdAt: DateTime.now(),
-          ),
-        );
-      }
-
-      await repo.cancelReminderNotification(
-        extra.reminderScheduleId,
-        extra.scheduledOccurrenceTime,
-      );
-    } catch (_) {
-      // Best-effort: measurement record was already saved.
     }
   }
 }

@@ -17,6 +17,7 @@ import 'package:rehab_track/domain/enums/enums.dart';
 import 'package:rehab_track/domain/restore/reminder_rebuild_report.dart';
 
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/entities/scheduled_measurement.dart';
 import 'package:rehab_track/domain/repositories/care_contact_repository.dart';
 import 'package:rehab_track/domain/repositories/doctor_visit_repository.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
@@ -392,7 +393,9 @@ class NotificationActionBridge {
   // --- Measurement: Skip ---
 
   Future<ActionResult> _handleMeasurementSkip(ReminderPayload payload) async {
-    final scheduledTime = payload.occurrenceDateTime ?? DateTime.now();
+    final scheduledTime = MeasurementOccurrenceTime.normalize(
+      payload.occurrenceDateTime ?? DateTime.now(),
+    );
 
     try {
       final existing = await _measurementRepository.getReminderLog(

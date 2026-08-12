@@ -19,6 +19,7 @@ import 'package:rehab_track/domain/entities/medication_alternative_component.dar
 import 'package:rehab_track/domain/entities/medication_component.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/entities/scheduled_measurement.dart';
 import 'package:rehab_track/domain/entities/care_contact.dart';
 import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
 import 'package:rehab_track/domain/enums/enums.dart';
@@ -201,6 +202,20 @@ class FakeMeasurementRepository implements MeasurementRepository {
   Future<MeasurementRecord?> getRecord(int id) async => null;
   @override
   Future<int> createRecord(MeasurementRecord record, List<MeasurementRecordValue> values) async => 0;
+  @override
+  Future<RecordScheduledMeasurementResult> recordScheduledMeasurement({
+    required int profileId,
+    required MeasurementRecord record,
+    required List<MeasurementRecordValue> values,
+    int? scheduleId,
+    DateTime? occurrenceDateTime,
+  }) async {
+    return const RecordScheduledMeasurementResult(
+      recordId: 0,
+      notificationCancelled: true,
+      alreadyCompleted: false,
+    );
+  }
   @override
   Future<void> updateRecord(MeasurementRecord record, List<MeasurementRecordValue> values) async {}
   @override

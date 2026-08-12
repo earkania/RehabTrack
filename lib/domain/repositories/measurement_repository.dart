@@ -1,4 +1,5 @@
 import 'package:rehab_track/domain/entities/measurement.dart';
+import 'package:rehab_track/domain/entities/scheduled_measurement.dart';
 
 abstract class MeasurementRepository {
   // --- MeasurementTypes ---
@@ -45,6 +46,27 @@ abstract class MeasurementRepository {
     MeasurementRecord record,
     List<MeasurementRecordValue> values,
   );
+
+  /// Saves a measurement reading and, when the reading belongs to a scheduled
+  /// occurrence ([scheduleId] + [occurrenceDateTime] present), marks that
+  /// occurrence completed in the same database transaction.
+  ///
+  /// The reading insert and the reminder-log completion are atomic: if either
+  /// fails the whole operation rolls back and throws. The occurrence
+  /// notification is then cancelled after commit; a cancellation failure is
+  /// reported through [RecordScheduledMeasurementResult.notificationCancelled]
+  /// and never rolls back the medical data.
+  ///
+  /// [occurrenceDateTime] may arrive UTC or local from any source; it is
+  /// normalized to a local minute-precision wall clock so the stored log
+  /// matches the occurrence shown on the Today agenda.
+  Future<RecordScheduledMeasurementResult> recordScheduledMeasurement({
+    required int profileId,
+    required MeasurementRecord record,
+    required List<MeasurementRecordValue> values,
+    int? scheduleId,
+    DateTime? occurrenceDateTime,
+  });
   Future<void> updateRecord(
     MeasurementRecord record,
     List<MeasurementRecordValue> values,

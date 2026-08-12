@@ -10,6 +10,7 @@ import '../../data/services/notification/notification_action_handler.dart';
 import '../../data/services/notification/notification_scheduler.dart';
 import '../../data/services/notification/notification_service.dart';
 import '../../data/services/notification/schedule_recovery_service.dart';
+import '../../domain/entities/scheduled_measurement.dart';
 import 'database_provider.dart';
 import 'profile_provider.dart';
 import 'reminder_settings_provider.dart';
@@ -78,7 +79,9 @@ final notificationActionBridgeProvider =
       try {
         if (actionType == NotificationActionType.measurementRecordNow &&
             payload.measurementTypeId != null) {
-          final scheduledTime = payload.occurrenceDateTime ?? now;
+          final scheduledTime = payload.occurrenceDateTime != null
+              ? MeasurementOccurrenceTime.normalize(payload.occurrenceDateTime!)
+              : DateTime(now.year, now.month, now.day, now.hour, now.minute);
           final extra = RecordNowExtra(
             reminderScheduleId: payload.scheduleId,
             scheduledOccurrenceTime: scheduledTime,

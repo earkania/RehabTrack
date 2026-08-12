@@ -8,6 +8,7 @@ import 'package:rehab_track/data/services/notification/reminder_content_formatte
 import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/entities/scheduled_measurement.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 
@@ -225,6 +226,124 @@ class MeasurementRepositoryImpl implements MeasurementRepository {
       }
       return recordId;
     });
+  }
+
+  @override
+  Future<RecordScheduledMeasurementResult> recordScheduledMeasurement({
+    required int profileId,
+    required MeasurementRecord record,
+    required List<MeasurementRecordValue> values,
+    int? scheduleId,
+    DateTime? occurrenceDateTime,
+  }) async {
+    final canonicalOccurrence = occurrenceDateTime != null
+        ? MeasurementOccurrenceTime.normalize(occurrenceDateTime)
+        : null;
+
+    int recordId = 0;
+    int? reminderLogId;
+    var alreadyCompleted = false;
+
+    await _database.transaction(() async {
+      final now = DateTime.now();
+      recordId = await _database.measurementDao.insertRecord(
+        db.MeasurementRecordsCompanion.insert(
+          profileId: profileId,
+          measurementTypeId: record.measurementTypeId,
+          timestamp: record.timestamp,
+          valuePrimary: record.valuePrimary,
+          valueSecondary: Value(record.valueSecondary),
+          valueTertiary: Value(record.valueTertiary),
+          unit: record.unit,
+          irregularHeartbeatDetected: Value(record.irregularHeartbeatDetected),
+          notes: Value(record.notes),
+          createdAt: now,
+          updatedAt: Value(now),
+        ),
+      );
+      if (values.isNotEmpty) {
+        await _database.measurementDao.replaceRecordValues(
+          recordId,
+          values
+              .map(
+                (v) => db.MeasurementRecordValuesCompanion.insert(
+                  measurementRecordId: recordId,
+                  fieldKey: v.fieldKey,
+                  numericValue: v.numericValue,
+                  unit: v.unit,
+                  displayOrder: Value(v.displayOrder),
+                ),
+              )
+              .toList(),
+        );
+      }
+
+      if (scheduleId != null && canonicalOccurrence != null) {
+        final existing = await _database.measurementDao.getReminderLog(
+          scheduleId,
+          canonicalOccurrence,
+        );
+
+        if (existing != null) {
+          alreadyCompleted =
+              existing.status == MeasurementReminderAction.completed.name;
+          reminderLogId = existing.id;
+          await _database.measurementDao.updateReminderLog(
+            db.MeasurementReminderLogsCompanion(
+              id: Value(existing.id),
+              measurementScheduleId: Value(existing.measurementScheduleId),
+              scheduledTime: Value(canonicalOccurrence),
+              actionTime: Value(now),
+              status: Value(MeasurementReminderAction.completed.name),
+              measurementRecordId: Value(recordId),
+              createdAt: Value(existing.createdAt),
+            ),
+          );
+        } else {
+          reminderLogId = await _database.measurementDao.insertReminderLog(
+            db.MeasurementReminderLogsCompanion.insert(
+              measurementScheduleId: scheduleId,
+              scheduledTime: canonicalOccurrence,
+              actionTime: Value(now),
+              status: MeasurementReminderAction.completed.name,
+              measurementRecordId: Value(recordId),
+              createdAt: now,
+            ),
+          );
+        }
+      }
+    });
+
+    // Cancellation happens after commit: the medical data and the completed
+    // occurrence must survive a cancellation failure. Unlike
+    // [cancelReminderNotification], failures here must surface so the caller
+    // can report the reminder as still scheduled (a warning, never an error).
+    var notificationCancelled = true;
+    if (scheduleId != null && canonicalOccurrence != null) {
+      try {
+        final schedule = await getSchedule(scheduleId);
+        if (schedule != null) {
+          final scheduler = _scheduler;
+          if (scheduler != null) {
+            await scheduler.cancelOccurrenceNotification(
+              scheduleId: scheduleId,
+              occurrenceDate: canonicalOccurrence,
+              scheduleStartDate: schedule.startDate ?? canonicalOccurrence,
+              isMeasurement: true,
+            );
+          }
+        }
+      } catch (_) {
+        notificationCancelled = false;
+      }
+    }
+
+    return RecordScheduledMeasurementResult(
+      recordId: recordId,
+      reminderLogId: reminderLogId,
+      notificationCancelled: notificationCancelled,
+      alreadyCompleted: alreadyCompleted,
+    );
   }
 
   @override
