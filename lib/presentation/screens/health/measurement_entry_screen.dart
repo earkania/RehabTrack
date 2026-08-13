@@ -291,7 +291,11 @@ class _MeasurementEntryScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.measurementAdded)),
         );
-        context.pop();
+        if (widget.recordNowExtra != null) {
+          context.go(AppRoutes.home);
+        } else {
+          context.pop();
+        }
       }
     } catch (e) {
       if (context.mounted) {
