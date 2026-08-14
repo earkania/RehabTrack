@@ -7,6 +7,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/core/localization/app_locale.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
+import 'package:rehab_track/domain/entities/reminder_style.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/reminder_settings_provider.dart';
@@ -35,6 +36,7 @@ class AppSettingsScreen extends ConsumerWidget {
     final snoozeDuration = ref.watch(defaultSnoozeDurationProvider);
     final showPatientName = ref.watch(showPatientNameInNotificationsProvider);
     final showLockScreenDetails = ref.watch(showDetailsOnLockScreenProvider);
+    final reminderStyle = ref.watch(reminderStyleProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.appSettings)),
@@ -111,6 +113,17 @@ class AppSettingsScreen extends ConsumerWidget {
             onChanged: (value) {
               ref.read(reminderVibrationEnabledProvider.notifier).setEnabled(value);
             },
+          ),
+          ListTile(
+            leading: const Icon(Icons.notification_add_outlined),
+            title: Text(l10n.reminderStyle),
+            subtitle: Text(
+              reminderStyle == ReminderStyle.prominent
+                  ? l10n.reminderStyleProminent
+                  : l10n.reminderStyleStandard,
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showReminderStyleDialog(context, ref, l10n, reminderStyle),
           ),
           ListTile(
             leading: const Icon(Icons.timer_outlined),
@@ -340,6 +353,50 @@ class AppSettingsScreen extends ConsumerWidget {
     };
   }
 
+  void _showReminderStyleDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    ReminderStyle current,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return SimpleDialog(
+          title: Text(l10n.reminderStyle),
+          children: [
+            for (final style in ReminderStyle.values) ...[
+              ListTile(
+                leading: Icon(
+                  style == current
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
+                  color: style == current
+                      ? Theme.of(ctx).colorScheme.primary
+                      : null,
+                ),
+                title: Text(
+                  style == ReminderStyle.prominent
+                      ? l10n.reminderStyleProminent
+                      : l10n.reminderStyleStandard,
+                ),
+                subtitle: Text(
+                  style == ReminderStyle.prominent
+                      ? l10n.reminderStyleProminentDescription
+                      : l10n.reminderStyleStandardDescription,
+                ),
+                onTap: () {
+                  ref.read(reminderStyleProvider.notifier).setStyle(style);
+                  Navigator.pop(ctx);
+                },
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _sendTestReminder(
     BuildContext context,
     WidgetRef ref,
@@ -359,6 +416,7 @@ class AppSettingsScreen extends ConsumerWidget {
 
     final playSound = ref.read(reminderSoundEnabledProvider);
     final enableVibration = ref.read(reminderVibrationEnabledProvider);
+    final style = ref.read(reminderStyleProvider);
 
     final now = DateTime.now();
     final testTime = now.add(const Duration(seconds: 5));
@@ -373,10 +431,13 @@ class AppSettingsScreen extends ConsumerWidget {
     );
 
     if (isMeasurement) {
-      const channelId = NotificationService.measurementChannelId;
-      const id = 999998;
+      final eventChannelId = NotificationService.measurementChannelId;
+      final channelId = NotificationService.channelForReminderStyle(
+        style: style,
+        eventChannelId: eventChannelId,
+      );
       await service.scheduleNotification(
-        id: id,
+        id: NotificationService.testMeasurementNotificationId,
         title: 'Test measurement reminder',
         body: 'This is a test of measurement reminder alerts.',
         scheduledDate: tzDate,
@@ -385,10 +446,13 @@ class AppSettingsScreen extends ConsumerWidget {
         enableVibration: enableVibration,
       );
     } else {
-      const channelId = NotificationService.medicationChannelId;
-      const id = 999999;
+      final eventChannelId = NotificationService.medicationChannelId;
+      final channelId = NotificationService.channelForReminderStyle(
+        style: style,
+        eventChannelId: eventChannelId,
+      );
       await service.scheduleNotification(
-        id: id,
+        id: NotificationService.testMedicationNotificationId,
         title: 'Test medication reminder',
         body: 'This is a test of medication reminder alerts.',
         scheduledDate: tzDate,

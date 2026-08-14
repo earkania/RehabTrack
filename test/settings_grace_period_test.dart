@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/domain/repositories/settings_repository.dart';
@@ -13,7 +14,9 @@ import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/screens/settings/app_settings_screen.dart';
 
 class FakeNotificationServiceForSettings extends NotificationService {
-  FakeNotificationServiceForSettings() : super();
+  FakeNotificationServiceForSettings();
+
+  final List<Map<String, dynamic>> scheduledNotifications = [];
 
   @override
   bool get isInitialized => true;
@@ -44,7 +47,12 @@ class FakeNotificationServiceForSettings extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
-  }) async {}
+  }) async {
+    scheduledNotifications.add({
+      'id': id,
+      'channelId': channelId,
+    });
+  }
 }
 
 class FakeSettingsRepo implements SettingsRepository {
@@ -75,13 +83,14 @@ class FakeSettingsRepo implements SettingsRepository {
 Widget _buildApp({
   required FakeSettingsRepo settings,
   Locale? locale,
+  FakeNotificationServiceForSettings? notificationService,
 }) {
   return ProviderScope(
     overrides: [
       settingsRepositoryProvider.overrideWithValue(settings),
       currentActiveProfileIdProvider.overrideWith((ref) => null),
       notificationServiceProvider.overrideWithValue(
-        FakeNotificationServiceForSettings(),
+        notificationService ?? FakeNotificationServiceForSettings(),
       ),
     ],
     child: MaterialApp(
@@ -102,13 +111,22 @@ extension PumpGracePeriod on WidgetTester {
   Future<void> pumpGracePeriod({
     required FakeSettingsRepo settings,
     Locale? locale,
+    FakeNotificationServiceForSettings? notificationService,
   }) async {
-    await pumpWidget(_buildApp(settings: settings, locale: locale));
+    await pumpWidget(_buildApp(
+      settings: settings,
+      locale: locale,
+      notificationService: notificationService,
+    ));
     await pump();
   }
 }
 
 void main() {
+  setUpAll(() {
+    tzdata.initializeTimeZones();
+  });
+
   group('Settings grace period tile', () {
     testWidgets('shows Next item grace period tile in English', (
       tester,
@@ -329,6 +347,144 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(await settings.getValue('app_language'), 'en');
+    });
+  });
+
+  group('Reminder style tile', () {
+    Future<void> pumpTall(WidgetTester tester, {
+      required FakeSettingsRepo settings,
+      Locale? locale,
+      FakeNotificationServiceForSettings? notificationService,
+    }) async {
+      await tester.binding.setSurfaceSize(const Size(800, 2800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpGracePeriod(
+        settings: settings,
+        locale: locale,
+        notificationService: notificationService,
+      );
+    }
+
+    testWidgets('shows Reminder style tile with Standard subtitle', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await pumpTall(tester, settings: settings);
+
+      expect(find.text('Reminder style'), findsOneWidget);
+      expect(find.text('Standard'), findsOneWidget);
+    });
+
+    testWidgets('shows persisted Prominent style in subtitle', (tester) async {
+      final settings = FakeSettingsRepo();
+      await settings.setValue('reminder_style', 'prominent');
+      await pumpTall(tester, settings: settings);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reminder style'), findsOneWidget);
+      expect(find.text('Prominent'), findsOneWidget);
+    });
+
+    testWidgets('tapping opens dialog with both styles', (tester) async {
+      final settings = FakeSettingsRepo();
+      await pumpTall(tester, settings: settings);
+
+      await tester.tap(find.text('Reminder style'));
+      await tester.pumpAndSettle();
+
+      final dialog = find.byType(SimpleDialog);
+      expect(dialog, findsOneWidget);
+      expect(
+        find.descendant(of: dialog, matching: find.text('Standard')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: dialog, matching: find.text('Prominent')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('choosing Prominent persists and updates the tile', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await pumpTall(tester, settings: settings);
+
+      await tester.tap(find.text('Reminder style'));
+      await tester.pumpAndSettle();
+
+      final dialog = find.byType(SimpleDialog);
+      await tester.tap(
+        find.descendant(of: dialog, matching: find.text('Prominent')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(await settings.getValue('reminder_style'), 'prominent');
+      expect(find.text('Prominent'), findsOneWidget);
+    });
+
+    testWidgets('test notification uses prominent channel in prominent mode', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      await settings.setValue('reminder_style', 'prominent');
+      final notificationService = FakeNotificationServiceForSettings();
+      await pumpTall(
+        tester,
+        settings: settings,
+        notificationService: notificationService,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Test medication reminder'));
+      await tester.pumpAndSettle();
+
+      expect(notificationService.scheduledNotifications, hasLength(1));
+      expect(
+        notificationService.scheduledNotifications.single['channelId'],
+        NotificationService.prominentChannelId,
+      );
+      expect(
+        notificationService.scheduledNotifications.single['id'],
+        NotificationService.testMedicationNotificationId,
+      );
+    });
+
+    testWidgets('test notification uses event channel in standard mode', (
+      tester,
+    ) async {
+      final settings = FakeSettingsRepo();
+      final notificationService = FakeNotificationServiceForSettings();
+      await pumpTall(
+        tester,
+        settings: settings,
+        notificationService: notificationService,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Test measurement reminder'));
+      await tester.pumpAndSettle();
+
+      expect(notificationService.scheduledNotifications, hasLength(1));
+      expect(
+        notificationService.scheduledNotifications.single['channelId'],
+        NotificationService.measurementChannelId,
+      );
+      expect(
+        notificationService.scheduledNotifications.single['id'],
+        NotificationService.testMeasurementNotificationId,
+      );
+    });
+
+    testWidgets('Georgia layout shows Reminder style tile', (tester) async {
+      final settings = FakeSettingsRepo();
+      await pumpTall(
+        tester,
+        settings: settings,
+        locale: const Locale('ka'),
+      );
+
+      expect(find.text('შეხსენების სტილი'), findsOneWidget);
     });
   });
 }

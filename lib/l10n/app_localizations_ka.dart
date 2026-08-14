@@ -1673,6 +1673,23 @@ class AppLocalizationsKa extends AppLocalizations {
   String get reminderVibration => 'ვიბრაცია';
 
   @override
+  String get reminderStyle => 'შეხსენების სტილი';
+
+  @override
+  String get reminderStyleStandard => 'სტანდარტული';
+
+  @override
+  String get reminderStyleStandardDescription =>
+      'დაბალანსებული გაფრთხილებები ჩვეულებრივი ხმით და ვიბრაციით';
+
+  @override
+  String get reminderStyleProminent => 'გამორჩეული';
+
+  @override
+  String get reminderStyleProminentDescription =>
+      'მაღალი ყურადღების გაფრთხილებები, რომლებიც უფრო ძლიერად არღვევს ყურადღებას';
+
+  @override
   String get defaultSnoozeDuration => 'გადადების ხანგრძლივობა';
 
   @override

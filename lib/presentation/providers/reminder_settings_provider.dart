@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/core/constants/app_constants.dart';
+import 'package:rehab_track/domain/entities/reminder_style.dart';
 import 'package:rehab_track/domain/repositories/settings_repository.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 
@@ -42,6 +43,13 @@ final reminderVibrationEnabledProvider =
 final defaultSnoozeDurationProvider =
     StateNotifierProvider<SnoozeDurationNotifier, int>((ref) {
   return SnoozeDurationNotifier(
+    ref.read(settingsRepositoryProvider),
+  );
+});
+
+final reminderStyleProvider =
+    StateNotifierProvider<ReminderStyleNotifier, ReminderStyle>((ref) {
+  return ReminderStyleNotifier(
     ref.read(settingsRepositoryProvider),
   );
 });
@@ -101,6 +109,33 @@ class SnoozeDurationNotifier extends StateNotifier<int> {
     await _settingsRepository.setValue(
       AppConstants.defaultSnoozeDurationKey,
       minutes.toString(),
+    );
+  }
+}
+
+class ReminderStyleNotifier extends StateNotifier<ReminderStyle> {
+  final SettingsRepository _settingsRepository;
+  Future<void>? _loadFuture;
+
+  ReminderStyleNotifier(this._settingsRepository)
+      : super(ReminderStyle.standard) {
+    _loadFuture = _load();
+  }
+
+  Future<void> get ready => _loadFuture ?? Future.value();
+
+  Future<void> _load() async {
+    final raw = await _settingsRepository.getValue(AppConstants.reminderStyleKey);
+    if (raw != null) {
+      state = ReminderStyle.fromStorageValue(raw);
+    }
+  }
+
+  Future<void> setStyle(ReminderStyle style) async {
+    state = style;
+    await _settingsRepository.setValue(
+      AppConstants.reminderStyleKey,
+      style.storageValue,
     );
   }
 }

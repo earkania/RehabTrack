@@ -1677,6 +1677,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reminderVibration => 'Vibration';
 
   @override
+  String get reminderStyle => 'Reminder style';
+
+  @override
+  String get reminderStyleStandard => 'Standard';
+
+  @override
+  String get reminderStyleStandardDescription =>
+      'Balanced alerts with the usual sound and vibration';
+
+  @override
+  String get reminderStyleProminent => 'Prominent';
+
+  @override
+  String get reminderStyleProminentDescription =>
+      'High-attention alerts that interrupt more strongly';
+
+  @override
   String get defaultSnoozeDuration => 'Default snooze duration';
 
   @override

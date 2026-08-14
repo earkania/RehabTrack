@@ -35,10 +35,12 @@ final notificationSchedulerProvider = Provider<NotificationScheduler>((ref) {
   final service = ref.watch(notificationServiceProvider);
   final soundEnabled = ref.watch(reminderSoundEnabledProvider);
   final vibrationEnabled = ref.watch(reminderVibrationEnabledProvider);
+  final style = ref.watch(reminderStyleProvider);
   return NotificationScheduler(
     notificationService: service,
     playSound: soundEnabled,
     enableVibration: vibrationEnabled,
+    reminderStyle: style,
   );
 });
 
@@ -204,6 +206,18 @@ final reminderToggleWatcherProvider = Provider<void>((ref) {
   });
 
   ref.listen(reminderVibrationEnabledProvider, (prev, next) async {
+    if (prev == null || prev == next) return;
+    final profileId = ref.read(currentActiveProfileIdProvider);
+    if (profileId == null) return;
+    await service.cancelAllNotifications();
+    await bridge.recoverAll(profileId);
+  });
+
+  // Re-schedule all notifications when the reminder style changes, since
+  // future pending notifications must move to the channel for the new style.
+  // Occurrences already past or intentionally skipped/completed are not
+  // re-scheduled because recovery only produces future occurrences.
+  ref.listen(reminderStyleProvider, (prev, next) async {
     if (prev == null || prev == next) return;
     final profileId = ref.read(currentActiveProfileIdProvider);
     if (profileId == null) return;

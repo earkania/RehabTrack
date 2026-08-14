@@ -3194,6 +3194,36 @@ abstract class AppLocalizations {
   /// **'Vibration'**
   String get reminderVibration;
 
+  /// No description provided for @reminderStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder style'**
+  String get reminderStyle;
+
+  /// No description provided for @reminderStyleStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get reminderStyleStandard;
+
+  /// No description provided for @reminderStyleStandardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced alerts with the usual sound and vibration'**
+  String get reminderStyleStandardDescription;
+
+  /// No description provided for @reminderStyleProminent.
+  ///
+  /// In en, this message translates to:
+  /// **'Prominent'**
+  String get reminderStyleProminent;
+
+  /// No description provided for @reminderStyleProminentDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'High-attention alerts that interrupt more strongly'**
+  String get reminderStyleProminentDescription;
+
   /// No description provided for @defaultSnoozeDuration.
   ///
   /// In en, this message translates to:

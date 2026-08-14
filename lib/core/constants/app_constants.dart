@@ -27,6 +27,7 @@ class AppConstants {
   static const String reminderSoundEnabledKey = 'reminder_sound_enabled';
   static const String reminderVibrationEnabledKey = 'reminder_vibration_enabled';
   static const String defaultSnoozeDurationKey = 'default_snooze_duration';
+  static const String reminderStyleKey = 'reminder_style';
   static const String showPatientNameInNotificationsKey = 'show_patient_name_in_notifications';
   static const String showDetailsOnLockScreenKey = 'show_details_on_lock_screen';
 

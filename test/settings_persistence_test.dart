@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:rehab_track/core/constants/app_constants.dart';
 import 'package:rehab_track/core/localization/app_locale.dart';
+import 'package:rehab_track/domain/entities/reminder_style.dart';
 import 'package:rehab_track/domain/repositories/settings_repository.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
@@ -186,6 +187,59 @@ void main() {
       await restarted.read(nextItemGracePeriodProvider.notifier).ready;
       expect(restarted.read(nextItemGracePeriodProvider), 30);
       restarted.dispose();
+    });
+  });
+
+  group('Reminder style persistence', () {
+    test('defaults to standard when nothing is persisted', () async {
+      final repo = FakeSettingsRepository();
+
+      final container = restartContainer(repo);
+      await container.read(reminderStyleProvider.notifier).ready;
+      expect(container.read(reminderStyleProvider), ReminderStyle.standard);
+      container.dispose();
+    });
+
+    test('prominent style persists with a stable value across restart', () async {
+      final repo = FakeSettingsRepository();
+
+      final first = restartContainer(repo);
+      final notifier = first.read(reminderStyleProvider.notifier);
+      await notifier.ready;
+      await notifier.setStyle(ReminderStyle.prominent);
+      expect(await repo.getValue(AppConstants.reminderStyleKey), 'prominent');
+      first.dispose();
+
+      final restarted = restartContainer(repo);
+      await restarted.read(reminderStyleProvider.notifier).ready;
+      expect(restarted.read(reminderStyleProvider), ReminderStyle.prominent);
+      restarted.dispose();
+    });
+
+    test('standard style persists and reloads as standard', () async {
+      final repo = FakeSettingsRepository();
+
+      final first = restartContainer(repo);
+      final notifier = first.read(reminderStyleProvider.notifier);
+      await notifier.ready;
+      await notifier.setStyle(ReminderStyle.standard);
+      expect(await repo.getValue(AppConstants.reminderStyleKey), 'standard');
+      first.dispose();
+
+      final restarted = restartContainer(repo);
+      await restarted.read(reminderStyleProvider.notifier).ready;
+      expect(restarted.read(reminderStyleProvider), ReminderStyle.standard);
+      restarted.dispose();
+    });
+
+    test('unknown persisted value falls back to standard', () async {
+      final repo = FakeSettingsRepository();
+      await repo.setValue(AppConstants.reminderStyleKey, 'alarm');
+
+      final container = restartContainer(repo);
+      await container.read(reminderStyleProvider.notifier).ready;
+      expect(container.read(reminderStyleProvider), ReminderStyle.standard);
+      container.dispose();
     });
   });
 }

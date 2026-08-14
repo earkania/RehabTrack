@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
+import '../../../domain/entities/reminder_style.dart';
 import 'notification_action_handler.dart';
 import 'pending_action_store.dart';
 
@@ -104,6 +105,37 @@ class NotificationService {
   static const _doctorVisitNotificationIdOffset = 5000000;
 
   static final _vibrationPattern = Int64List.fromList([0, 250, 200, 250]);
+
+  /// Dedicated channel for the [ReminderStyle.prominent] presentation.
+  ///
+  /// Kept separate from the event-type channels so users can independently
+  /// manage prominent alerts in Android Settings without affecting their
+  /// standard per-event channel choices (and vice versa).
+  static const prominentChannelId = 'rehabtrack_reminders_prominent';
+  static const _prominentChannelName = 'Prominent Reminders';
+  static const _prominentChannelDesc =
+      'High-attention reminders with a stronger alert';
+  static final _prominentVibrationPattern =
+      Int64List.fromList([0, 300, 200, 300, 200, 300]);
+
+  /// Stable IDs for manual test notifications. Chosen well above all real ID
+  /// offsets (medication 100k, measurement 1M, snooze 2M, doctor 5M) so they
+  /// can never collide with a scheduled occurrence.
+  static const testMedicationNotificationId = 9000000;
+  static const testMeasurementNotificationId = 9000001;
+
+  /// Resolves the channel that presents a reminder of the given event type
+  /// under [style]. Standard style keeps the existing per-event channels
+  /// (backward compatible with user channel overrides); prominent style routes
+  /// all event types through the shared prominent channel.
+  static String channelForReminderStyle({
+    required ReminderStyle style,
+    required String eventChannelId,
+  }) {
+    return style == ReminderStyle.prominent
+        ? prominentChannelId
+        : eventChannelId;
+  }
 
   bool get isInitialized => _initialized;
 
@@ -216,6 +248,17 @@ class NotificationService {
         vibrationPattern: _vibrationPattern,
       ),
     );
+    await androidPlugin.createNotificationChannel(
+      AndroidNotificationChannel(
+        prominentChannelId,
+        _prominentChannelName,
+        description: _prominentChannelDesc,
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+        vibrationPattern: _prominentVibrationPattern,
+      ),
+    );
   }
 
   Future<bool> requestNotificationPermission() async {
@@ -288,17 +331,20 @@ class NotificationService {
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
   }) {
+    final isProminent = channelId == prominentChannelId;
     return AndroidNotificationDetails(
       channelId,
       channelName,
       channelDescription: channelDesc,
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: isProminent ? Importance.max : Importance.high,
+      priority: isProminent ? Priority.high : Priority.high,
       category: AndroidNotificationCategory.alarm,
       actions: actions,
       playSound: playSound,
       enableVibration: enableVibration,
-      vibrationPattern: enableVibration ? _vibrationPattern : null,
+      vibrationPattern: enableVibration
+          ? (isProminent ? _prominentVibrationPattern : _vibrationPattern)
+          : null,
       visibility: visibility,
     );
   }
@@ -544,6 +590,7 @@ class NotificationService {
         medicationChannelId => _medicationChannelName,
         measurementChannelId => _measurementChannelName,
         doctorVisitChannelId => _doctorVisitChannelName,
+        prominentChannelId => _prominentChannelName,
         _ => _medicationChannelName,
       };
 
@@ -551,6 +598,7 @@ class NotificationService {
         medicationChannelId => _medicationChannelDesc,
         measurementChannelId => _measurementChannelDesc,
         doctorVisitChannelId => _doctorVisitChannelDesc,
+        prominentChannelId => _prominentChannelDesc,
         _ => _medicationChannelDesc,
       };
 }
