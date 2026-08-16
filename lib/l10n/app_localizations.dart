@@ -3380,11 +3380,155 @@ abstract class AppLocalizations {
   /// **'Alarm-style presentation'**
   String get alarmStyleReminders;
 
+  /// No description provided for @alarmStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm-style'**
+  String get alarmStyle;
+
+  /// No description provided for @alarmStyleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Full-screen alarms with the strongest sound and vibration that interrupt even on the lock screen'**
+  String get alarmStyleDescription;
+
+  /// No description provided for @alarmStyleCapabilityAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Full-screen alarms available'**
+  String get alarmStyleCapabilityAvailable;
+
+  /// No description provided for @alarmStyleCapabilityNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm-style reminders present as prominent alerts because full-screen access is not available'**
+  String get alarmStyleCapabilityNotAvailable;
+
+  /// No description provided for @alarmStyleCapabilityNotificationPermissionMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission is required to show alarm-style reminders'**
+  String get alarmStyleCapabilityNotificationPermissionMissing;
+
+  /// No description provided for @alarmStyleCapabilityExactAlarmMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact alarm access is required for precise alarm timing'**
+  String get alarmStyleCapabilityExactAlarmMissing;
+
+  /// No description provided for @alarmStyleCapabilityChannelDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'The alarm notification channel is disabled; enable it in Android notification settings'**
+  String get alarmStyleCapabilityChannelDisabled;
+
+  /// No description provided for @alarmStyleCapabilityUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Full-screen alarms require Android 14 or later; alarm-style reminders use a prominent alert instead'**
+  String get alarmStyleCapabilityUnsupported;
+
+  /// No description provided for @manageAlarmStyleAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage alarm-style access'**
+  String get manageAlarmStyleAccess;
+
+  /// No description provided for @manageAlarmStyleAccessDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Open system settings to allow or deny full-screen notifications'**
+  String get manageAlarmStyleAccessDescription;
+
+  /// No description provided for @fullScreenRemindersAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Full-screen reminders are allowed'**
+  String get fullScreenRemindersAllowed;
+
+  /// No description provided for @fullScreenRemindersNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Full-screen reminders are not allowed'**
+  String get fullScreenRemindersNotAllowed;
+
+  /// No description provided for @testAlarmStyleTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Test alarm-style reminder'**
+  String get testAlarmStyleTile;
+
+  /// No description provided for @alarmStyleUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm-style reminders are not available on this device'**
+  String get alarmStyleUnavailable;
+
   /// No description provided for @lockScreenReminderDetails.
   ///
   /// In en, this message translates to:
   /// **'Show full reminder details on lock screen'**
   String get lockScreenReminderDetails;
+
+  /// No description provided for @alarmReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm'**
+  String get alarmReminder;
+
+  /// No description provided for @alarmDismissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm dismissed'**
+  String get alarmDismissed;
+
+  /// No description provided for @scheduledHealthReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a scheduled health reminder'**
+  String get scheduledHealthReminder;
+
+  /// No description provided for @doctorVisitReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor visit reminder'**
+  String get doctorVisitReminder;
+
+  /// No description provided for @measurementToRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Record {type} at {time}'**
+  String measurementToRecord(String type, String time);
+
+  /// No description provided for @dismissAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismissAlarm;
+
+  /// No description provided for @dismissTestAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss test alarm'**
+  String get dismissTestAlarm;
+
+  /// No description provided for @testAlarmStyleReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm-style test'**
+  String get testAlarmStyleReminder;
+
+  /// No description provided for @testAlarmStyleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a test of the alarm-style presentation. Press Dismiss to stop it.'**
+  String get testAlarmStyleBody;
+
+  /// No description provided for @dismissFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not dismiss the alarm'**
+  String get dismissFailed;
 
   /// No description provided for @noPermission.
   ///

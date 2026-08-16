@@ -1775,8 +1775,95 @@ class AppLocalizationsKa extends AppLocalizations {
   String get alarmStyleReminders => 'მაღვიძარას სტილის პრეზენტაცია';
 
   @override
+  String get alarmStyle => 'მაღვიძარას სტილი';
+
+  @override
+  String get alarmStyleDescription =>
+      'სრულეკრანიანი მაღვიძარა უძლიერესი ხმით და ვიბრაციით, რომელიც ჩაკეტილ ეკრანზეც კი წყვეტს';
+
+  @override
+  String get alarmStyleCapabilityAvailable =>
+      'სრულეკრანიანი მაღვიძარა ხელმისაწვდომია';
+
+  @override
+  String get alarmStyleCapabilityNotAvailable =>
+      'მაღვიძარას სტილის შეხსენებები გამოჩნდება გამორჩეული გაფრთხილებით, რადგან სრულეკრანიანი წვდომა არ არის ხელმისაწვდომი';
+
+  @override
+  String get alarmStyleCapabilityNotificationPermissionMissing =>
+      'შეტყობინების ნებართვა აუცილებელია მაღვიძარას სტილის შეხსენებების ჩვენებისთვის';
+
+  @override
+  String get alarmStyleCapabilityExactAlarmMissing =>
+      'ზუსტი მაღვიძარას წვდომა აუცილებელია ზუსტი დროისთვის';
+
+  @override
+  String get alarmStyleCapabilityChannelDisabled =>
+      'მაღვიძარას შეტყობინების არხი გამორთულია; ჩართეთ Android შეტყობინებების პარამეტრებში';
+
+  @override
+  String get alarmStyleCapabilityUnsupported =>
+      'სრულეკრანიანი მაღვიძარა საჭიროებს Android 14-ს ან უფრო ახალს; მაღვიძარას სტილის შეხსენებები იყენებს გამორჩეულ გაფრთხილებას';
+
+  @override
+  String get manageAlarmStyleAccess => 'მაღვიძარას წვდომის მართვა';
+
+  @override
+  String get manageAlarmStyleAccessDescription =>
+      'გახსენით სისტემის პარამეტრები სრულეკრანიანი შეტყობინებების დასაშვებად ან ასაკრძალად';
+
+  @override
+  String get fullScreenRemindersAllowed =>
+      'სრულეკრანიანი შეხსენებები ნებადართულია';
+
+  @override
+  String get fullScreenRemindersNotAllowed =>
+      'სრულეკრანიანი შეხსენებები არ არის ნებადართული';
+
+  @override
+  String get testAlarmStyleTile => 'მაღვიძარას სტილის ტესტური შეხსენება';
+
+  @override
+  String get alarmStyleUnavailable =>
+      'მაღვიძარას სტილის შეხსენებები ამ მოწყობილობაზე ხელმისაწვდომი არ არის';
+
+  @override
   String get lockScreenReminderDetails =>
       'სრული შეხსენების დეტალების ჩვენება ჩაკეტილ ეკრანზე';
+
+  @override
+  String get alarmReminder => 'მაღვიძარა';
+
+  @override
+  String get alarmDismissed => 'მაღვიძარა გამორთულია';
+
+  @override
+  String get scheduledHealthReminder =>
+      'თქვენ გაქვთ დაგეგმილი ჯანმრთელობის შეხსენება';
+
+  @override
+  String get doctorVisitReminder => 'ექიმთან ვიზიტის შეხსენება';
+
+  @override
+  String measurementToRecord(String type, String time) {
+    return 'ჩაიწერეთ $type $time-ზე';
+  }
+
+  @override
+  String get dismissAlarm => 'გათიშვა';
+
+  @override
+  String get dismissTestAlarm => 'ტესტური მაღვიძარას გათიშვა';
+
+  @override
+  String get testAlarmStyleReminder => 'მაღვიძარას სტილის ტესტი';
+
+  @override
+  String get testAlarmStyleBody =>
+      'ეს არის მაღვიძარას სტილის პრეზენტაციის ტესტი. გასაჩერებლად დააჭირეთ გათიშვას.';
+
+  @override
+  String get dismissFailed => 'მაღვიძარას გათიშვა ვერ მოხერხდა';
 
   @override
   String get noPermission => 'ნებართვა არ არის';

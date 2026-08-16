@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:rehab_track/data/services/notification/alarm_presentation.dart';
 import 'package:rehab_track/data/services/notification/notification_action_bridge.dart';
 import 'package:rehab_track/data/services/notification/notification_action_handler.dart';
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
@@ -407,7 +408,9 @@ class FakeMedicationRepository implements MedicationRepository {
 
 class FakeNotificationService extends NotificationService {
   NotificationActionCallback? actionCallback;
+  NotificationTapCallback? tapCallback;
   final List<Map<String, dynamic>> scheduledNotifications = [];
+  final List<int> cancelledIds = [];
 
   FakeNotificationService() : super();
 
@@ -417,6 +420,11 @@ class FakeNotificationService extends NotificationService {
   @override
   void setActionCallback(NotificationActionCallback callback) {
     actionCallback = callback;
+  }
+
+  @override
+  void setNotificationTapCallback(NotificationTapCallback callback) {
+    tapCallback = callback;
   }
 
   @override
@@ -439,6 +447,7 @@ class FakeNotificationService extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {
     scheduledNotifications.add({
       'id': id,
@@ -450,6 +459,7 @@ class FakeNotificationService extends NotificationService {
       'includeActions': includeActions,
       'isMeasurement': isMeasurement,
       'isDoctorVisit': isDoctorVisit,
+      'fullScreenIntent': fullScreenIntent,
     });
   }
 
@@ -466,13 +476,18 @@ class FakeNotificationService extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {}
 
   @override
-  Future<void> cancelNotification(int id) async {}
+  Future<void> cancelNotification(int id) async {
+    cancelledIds.add(id);
+  }
 
   @override
-  Future<void> cancelNotifications(List<int> ids) async {}
+  Future<void> cancelNotifications(List<int> ids) async {
+    cancelledIds.addAll(ids);
+  }
 
   @override
   Future<void> cancelAllNotifications() async {}
@@ -496,6 +511,34 @@ class FakeNotificationService extends NotificationService {
 class FakeNotificationScheduler extends NotificationScheduler {
   FakeNotificationScheduler({NotificationService? notificationService})
       : super(notificationService: notificationService ?? FakeNotificationService());
+}
+
+class _TapCaptureService extends FakeNotificationService {
+  @override
+  void setNotificationTapCallback(NotificationTapCallback callback) {
+    tapCallback = callback;
+  }
+}
+
+class _LaunchDetailsService extends FakeNotificationService {
+  _LaunchDetailsService({required this.payload, required this.id, this.actionId});
+
+  final String payload;
+  final int id;
+  final String? actionId;
+
+  @override
+  Future<NotificationAppLaunchDetails?> getLaunchDetails() async {
+    return NotificationAppLaunchDetails(
+      true,
+      notificationResponse: NotificationResponse(
+        notificationResponseType: NotificationResponseType.selectedNotification,
+        id: id,
+        payload: payload,
+        actionId: actionId,
+      ),
+    );
+  }
 }
 
 void main() {
@@ -1106,5 +1149,259 @@ void main() {
         expect(occurrenceInstants.length, greaterThan(1));
       },
     );
+  });
+
+  group('Alarm presentation', () {
+    test('test alarm payload is recognised and has no reminder', () {
+      final presentation = AlarmPresentation(
+        notificationId: NotificationService.testAlarmNotificationId,
+        payload: NotificationService.testAlarmPayload,
+      );
+      expect(presentation.isTestAlarm, isTrue);
+      expect(presentation.reminder, isNull);
+    });
+
+    test('medication payload yields a parseable reminder', () {
+      final payload = ReminderPayload(
+        type: ReminderType.medication,
+        profileId: 1,
+        scheduleId: 7,
+        occurrenceTime: DateTime.now().toIso8601String(),
+        medicationId: 3,
+      );
+      final presentation = AlarmPresentation(
+        notificationId: 1234,
+        payload: payload.toJsonString(),
+      );
+      expect(presentation.isTestAlarm, isFalse);
+      expect(presentation.reminder!.scheduleId, 7);
+      expect(presentation.reminder!.medicationId, 3);
+    });
+
+    test('executeUiAction dismiss cancels notification and snooze', () async {
+      final notificationService = FakeNotificationService();
+      final scheduler = FakeNotificationScheduler(
+        notificationService: notificationService,
+      );
+      final recoveryService = ScheduleRecoveryService(
+        notificationService: notificationService,
+        notificationScheduler: scheduler,
+      );
+      String? lastDismissedPayload;
+      final bridge = NotificationActionBridge(
+        notificationService: notificationService,
+        notificationScheduler: scheduler,
+        scheduleRecoveryService: recoveryService,
+        medicationRepository: FakeMedicationRepository(),
+        measurementRepository: FakeMeasurementRepository(),
+        doctorVisitRepository: FakeDoctorVisitRepository(),
+        careContactRepository: FakeCareContactRepository(),
+        profileRepository: FakeProfileRepository(),
+        getSnoozeDuration: () => const Duration(minutes: 10),
+        showProfileName: () => true,
+        showDetailsOnLockScreen: () => true,
+        onActionProcessed: (type, payload) {
+          if (type == NotificationActionType.dismiss) {
+            lastDismissedPayload = payload.toJsonString();
+          }
+        },
+      );
+      await bridge.initialize();
+
+      final payload = ReminderPayload(
+        type: ReminderType.medication,
+        profileId: 1,
+        scheduleId: 7,
+        occurrenceTime: DateTime.now().toIso8601String(),
+        medicationId: 3,
+      );
+      final result = await bridge.executeUiAction(
+        actionType: NotificationActionType.dismiss,
+        payload: payload,
+        notificationId: 9000,
+      );
+
+      expect(result, ActionResult.success);
+      expect(notificationService.cancelledIds, containsAll([
+        9000,
+        NotificationService.snoozeNotificationId(9000),
+      ]));
+      // The payload embedded the active notification id.
+      expect(
+        ReminderPayload.parse(lastDismissedPayload)!.notificationId,
+        9000,
+      );
+    });
+
+    test('notification tap with alarm style active presents the alarm', () async {
+      final notificationService = _TapCaptureService();
+      final scheduler = FakeNotificationScheduler(
+        notificationService: notificationService,
+      );
+      final recoveryService = ScheduleRecoveryService(
+        notificationService: notificationService,
+        notificationScheduler: scheduler,
+      );
+      int? presentedId;
+      String? presentedPayload;
+      final bridge = NotificationActionBridge(
+        notificationService: notificationService,
+        notificationScheduler: scheduler,
+        scheduleRecoveryService: recoveryService,
+        medicationRepository: FakeMedicationRepository(),
+        measurementRepository: FakeMeasurementRepository(),
+        doctorVisitRepository: FakeDoctorVisitRepository(),
+        careContactRepository: FakeCareContactRepository(),
+        profileRepository: FakeProfileRepository(),
+        getSnoozeDuration: () => const Duration(minutes: 10),
+        showProfileName: () => true,
+        showDetailsOnLockScreen: () => true,
+        isAlarmStyleActive: () => true,
+        onAlarmPresent: (id, payload) {
+          presentedId = id;
+          presentedPayload = payload;
+        },
+      );
+      await bridge.initialize();
+      expect(notificationService.tapCallback, isNotNull);
+      final tapCallback = notificationService.tapCallback!;
+
+      final payload = ReminderPayload(
+        type: ReminderType.medication,
+        profileId: 1,
+        scheduleId: 7,
+        occurrenceTime: DateTime.now().toIso8601String(),
+        medicationId: 3,
+      );
+
+      tapCallback(9000, payload.toJsonString());
+
+      expect(presentedId, 9000);
+      expect(presentedPayload, payload.toJsonString());
+    });
+
+    test('cold start with alarm payload presents the alarm', () async {
+      final launchService = _LaunchDetailsService(
+        payload: ReminderPayload(
+          type: ReminderType.medication,
+          profileId: 1,
+          scheduleId: 7,
+          occurrenceTime: DateTime.now().toIso8601String(),
+          medicationId: 3,
+        ).toJsonString(),
+        id: 9001,
+      );
+      final scheduler = FakeNotificationScheduler(
+        notificationService: launchService,
+      );
+      final recoveryService = ScheduleRecoveryService(
+        notificationService: launchService,
+        notificationScheduler: scheduler,
+      );
+      int? presentedId;
+      String? presentedPayload;
+      final bridge = NotificationActionBridge(
+        notificationService: launchService,
+        notificationScheduler: scheduler,
+        scheduleRecoveryService: recoveryService,
+        medicationRepository: FakeMedicationRepository(),
+        measurementRepository: FakeMeasurementRepository(),
+        doctorVisitRepository: FakeDoctorVisitRepository(),
+        careContactRepository: FakeCareContactRepository(),
+        profileRepository: FakeProfileRepository(),
+        getSnoozeDuration: () => const Duration(minutes: 10),
+        showProfileName: () => true,
+        showDetailsOnLockScreen: () => true,
+        isAlarmStyleActive: () => true,
+        onAlarmPresent: (id, payload) {
+          presentedId = id;
+          presentedPayload = payload;
+        },
+      );
+
+      await bridge.processAppLaunchAlarmPresentation();
+
+      expect(presentedId, 9001);
+      expect(presentedPayload, isNotNull);
+    });
+
+    test('cold start with an action button does not present the alarm', () async {
+      final launchService = _LaunchDetailsService(
+        payload: ReminderPayload(
+          type: ReminderType.medication,
+          profileId: 1,
+          scheduleId: 7,
+          occurrenceTime: DateTime.now().toIso8601String(),
+          medicationId: 3,
+        ).toJsonString(),
+        id: 9002,
+        actionId: 'medication_mark_taken',
+      );
+      final scheduler = FakeNotificationScheduler(
+        notificationService: launchService,
+      );
+      final recoveryService = ScheduleRecoveryService(
+        notificationService: launchService,
+        notificationScheduler: scheduler,
+      );
+      var presented = false;
+      final bridge = NotificationActionBridge(
+        notificationService: launchService,
+        notificationScheduler: scheduler,
+        scheduleRecoveryService: recoveryService,
+        medicationRepository: FakeMedicationRepository(),
+        measurementRepository: FakeMeasurementRepository(),
+        doctorVisitRepository: FakeDoctorVisitRepository(),
+        careContactRepository: FakeCareContactRepository(),
+        profileRepository: FakeProfileRepository(),
+        getSnoozeDuration: () => const Duration(minutes: 10),
+        showProfileName: () => true,
+        showDetailsOnLockScreen: () => true,
+        isAlarmStyleActive: () => true,
+        onAlarmPresent: (id, payload) {
+          presented = true;
+        },
+      );
+
+      await bridge.processAppLaunchAlarmPresentation();
+
+      expect(presented, isFalse);
+    });
+
+    test('cold start ignores taps when alarm style is inactive', () async {
+      final launchService = _LaunchDetailsService(
+        payload: 'anything',
+        id: 9003,
+      );
+      final scheduler = FakeNotificationScheduler(
+        notificationService: launchService,
+      );
+      final recoveryService = ScheduleRecoveryService(
+        notificationService: launchService,
+        notificationScheduler: scheduler,
+      );
+      var presented = false;
+      final bridge = NotificationActionBridge(
+        notificationService: launchService,
+        notificationScheduler: scheduler,
+        scheduleRecoveryService: recoveryService,
+        medicationRepository: FakeMedicationRepository(),
+        measurementRepository: FakeMeasurementRepository(),
+        doctorVisitRepository: FakeDoctorVisitRepository(),
+        careContactRepository: FakeCareContactRepository(),
+        profileRepository: FakeProfileRepository(),
+        getSnoozeDuration: () => const Duration(minutes: 10),
+        showProfileName: () => true,
+        showDetailsOnLockScreen: () => true,
+        isAlarmStyleActive: () => false,
+        onAlarmPresent: (id, payload) {
+          presented = true;
+        },
+      );
+
+      await bridge.processAppLaunchAlarmPresentation();
+
+      expect(presented, isFalse);
+    });
   });
 }

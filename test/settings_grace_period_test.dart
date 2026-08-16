@@ -47,10 +47,12 @@ class FakeNotificationServiceForSettings extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {
     scheduledNotifications.add({
       'id': id,
       'channelId': channelId,
+      'fullScreenIntent': fullScreenIntent,
     });
   }
 }

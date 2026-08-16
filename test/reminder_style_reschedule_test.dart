@@ -53,6 +53,7 @@ class _RecordingService extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {}
 
   @override
@@ -68,6 +69,7 @@ class _RecordingService extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {}
 
   @override

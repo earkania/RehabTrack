@@ -42,7 +42,7 @@ void _handleNotificationResponse(NotificationResponse response) {
   if (response.actionId == null || response.actionId!.isEmpty) {
     final tapCallback = _notificationTapCallback;
     if (tapCallback != null) {
-      tapCallback(response.payload);
+      tapCallback(response.id, response.payload);
     }
     return;
   }
@@ -85,6 +85,11 @@ class NotificationService {
   bool _initialized = false;
   Completer<void>? _initCompleter;
 
+  /// Default alarm ringtone URI from the OS, cached after channel setup so
+  /// alarm-style notifications can reuse the same alarm sound without
+  /// falling back to the ordinary notification tone.
+  String? _alarmSoundUri;
+
   static const medicationChannelId = 'rehabtrack_medications';
   static const measurementChannelId = 'rehabtrack_measurements';
   static const doctorVisitChannelId = 'rehabtrack_doctor_visits';
@@ -118,23 +123,59 @@ class NotificationService {
   static final _prominentVibrationPattern =
       Int64List.fromList([0, 300, 200, 300, 200, 300]);
 
+  /// Dedicated channel for the [ReminderStyle.alarmStyle] presentation.
+  ///
+  /// Alarm-style reminders present through this channel with the strongest
+  /// sound, an extended repeating vibration, and (when the OS permits) a
+  /// full-screen intent so the alert can interrupt while the screen is locked.
+  /// Separate from standard and prominent channels so users can manage it
+  /// independently in Android Settings.
+  static const alarmChannelId = 'rehabtrack_reminders_alarm_v2';
+
+  /// Legacy alarm channel ID from before the v2 split. The OS on some devices
+  /// (e.g. stock Android 17 Pixels) refuses to apply sound/audio-attributes
+  /// changes to an existing channel even after a delete+recreate, so the alarm
+  /// channel was re-created under a fresh ID. The old channel is removed once
+  /// the app launches with the new ID so no stale duplicate remains.
+  static const _legacyAlarmChannelId = 'rehabtrack_reminders_alarm';
+
+  /// Channel ID used only by early diagnostic builds during channel-setup
+  /// investigation. Cleaned up if present so the notification channel list
+  /// stays free of leftover probes.
+  static const _debugProbeChannelId = 'rehabtrack_reminders_alarm_probe';
+  static const _alarmChannelName = 'Alarm-style Reminders';
+  static const _alarmChannelDesc =
+      'High-priority alarms with a strong alert and full-screen presentation';
+  static final _alarmVibrationPattern =
+      Int64List.fromList([0, 400, 300, 400, 300, 400, 300, 400]);
+
   /// Stable IDs for manual test notifications. Chosen well above all real ID
   /// offsets (medication 100k, measurement 1M, snooze 2M, doctor 5M) so they
   /// can never collide with a scheduled occurrence.
   static const testMedicationNotificationId = 9000000;
   static const testMeasurementNotificationId = 9000001;
+  static const testAlarmNotificationId = 9000002;
+
+  static const _insistentFlag = 4;
+
+  /// Payload marker for the manual Alarm-style test. Not a real reminder; the
+  /// alarm screen recognises it and shows a safe, Dismiss-only presentation.
+  static const testAlarmPayload = 'rehabtrack_test_alarm';
 
   /// Resolves the channel that presents a reminder of the given event type
   /// under [style]. Standard style keeps the existing per-event channels
   /// (backward compatible with user channel overrides); prominent style routes
-  /// all event types through the shared prominent channel.
+  /// all event types through the shared prominent channel; alarm style routes
+  /// all event types through the dedicated alarm channel.
   static String channelForReminderStyle({
     required ReminderStyle style,
     required String eventChannelId,
   }) {
-    return style == ReminderStyle.prominent
-        ? prominentChannelId
-        : eventChannelId;
+    return switch (style) {
+      ReminderStyle.standard => eventChannelId,
+      ReminderStyle.prominent => prominentChannelId,
+      ReminderStyle.alarmStyle => alarmChannelId,
+    };
   }
 
   bool get isInitialized => _initialized;
@@ -259,6 +300,54 @@ class NotificationService {
         vibrationPattern: _prominentVibrationPattern,
       ),
     );
+
+    final alarmSoundUri = await getDefaultAlarmSoundUri();
+    _alarmSoundUri = alarmSoundUri;
+
+    final existingChannels = await androidPlugin.getNotificationChannels();
+    final existingAlarm = existingChannels
+        ?.where((c) => c.id == alarmChannelId)
+        .toList()
+        .firstOrNull;
+    final needsRecreate =
+        existingAlarm != null && !_alarmChannelMatches(existingAlarm, alarmSoundUri);
+    if (needsRecreate) {
+      await androidPlugin.deleteNotificationChannel(alarmChannelId);
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    }
+    if (existingChannels
+        ?.any((c) => c.id == _legacyAlarmChannelId) ??
+        false) {
+      await androidPlugin.deleteNotificationChannel(_legacyAlarmChannelId);
+    }
+    if (existingChannels?.any((c) => c.id == _debugProbeChannelId) ??
+        false) {
+      await androidPlugin.deleteNotificationChannel(_debugProbeChannelId);
+    }
+
+    await androidPlugin.createNotificationChannel(
+      AndroidNotificationChannel(
+        alarmChannelId,
+        _alarmChannelName,
+        description: _alarmChannelDesc,
+        importance: Importance.max,
+        playSound: true,
+        sound: alarmSoundUri != null
+            ? UriAndroidNotificationSound(alarmSoundUri)
+            : null,
+        enableVibration: true,
+        vibrationPattern: _alarmVibrationPattern,
+        audioAttributesUsage: AudioAttributesUsage.alarm,
+      ),
+    );
+  }
+
+  bool _alarmChannelMatches(
+    AndroidNotificationChannel channel,
+    String? alarmSoundUri,
+  ) {
+    return channel.audioAttributesUsage == AudioAttributesUsage.alarm &&
+        channel.sound?.sound == alarmSoundUri;
   }
 
   Future<bool> requestNotificationPermission() async {
@@ -311,10 +400,61 @@ class NotificationService {
     } catch (_) {}
   }
 
+  /// Whether the OS allows full-screen intents for this app (Android 14+ only).
+  /// Returns null on older Android or when the native check is unavailable.
+  Future<bool?> canUseFullScreenIntent() async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      return await channel.invokeMethod<bool>('canUseFullScreenIntent');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Opens the system "Full screen content" settings for this app. Returns
+  /// false when the setting does not exist on the device.
+  Future<bool> openFullScreenSettings() async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      return await channel.invokeMethod<bool>('openFullScreenIntentSettings') ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Android SDK level reported by the device (Build.VERSION.SDK_INT).
+  Future<int> getAndroidSdkInt() async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      return await channel.invokeMethod<int>('getAndroidSdkInt') ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  Future<List<AndroidNotificationChannel>> getNotificationChannels() async {
+    final androidPlugin =
+        _plugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin == null) return [];
+    return await androidPlugin.getNotificationChannels() ?? [];
+  }
+
   Future<String?> getDeviceTimeZone() async {
     const channel = MethodChannel('com.earkania.rehabtrack/notifications');
     try {
       return await channel.invokeMethod<String>('getTimeZone');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The OS-default alarm ringtone URI, or null when unavailable.
+  Future<String?> getDefaultAlarmSoundUri() async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      return await channel.invokeMethod<String>('getDefaultAlarmSoundUri');
     } catch (_) {
       return null;
     }
@@ -330,22 +470,37 @@ class NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) {
-    final isProminent = channelId == prominentChannelId;
+    final isHighAttention =
+        channelId == prominentChannelId || channelId == alarmChannelId;
+    final isAlarm = channelId == alarmChannelId;
+    final alarmSoundUri = _alarmSoundUri;
     return AndroidNotificationDetails(
       channelId,
       channelName,
       channelDescription: channelDesc,
-      importance: isProminent ? Importance.max : Importance.high,
-      priority: isProminent ? Priority.high : Priority.high,
+      importance: isHighAttention ? Importance.max : Importance.high,
+      priority: isHighAttention ? Priority.max : Priority.high,
       category: AndroidNotificationCategory.alarm,
       actions: actions,
       playSound: playSound,
+      sound: isAlarm && alarmSoundUri != null
+          ? UriAndroidNotificationSound(alarmSoundUri)
+          : null,
       enableVibration: enableVibration,
       vibrationPattern: enableVibration
-          ? (isProminent ? _prominentVibrationPattern : _vibrationPattern)
+          ? (channelId == alarmChannelId
+              ? _alarmVibrationPattern
+              : (isHighAttention ? _prominentVibrationPattern : _vibrationPattern))
           : null,
       visibility: visibility,
+      fullScreenIntent: fullScreenIntent,
+      audioAttributesUsage:
+          isAlarm ? AudioAttributesUsage.alarm : AudioAttributesUsage.notification,
+      additionalFlags: isAlarm
+          ? Int32List.fromList([_insistentFlag])
+          : null,
     );
   }
 
@@ -357,6 +512,7 @@ class NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) {
     return NotificationDetails(
       android: _channelDetails(
@@ -367,6 +523,7 @@ class NotificationService {
         playSound: playSound,
         enableVibration: enableVibration,
         visibility: visibility,
+        fullScreenIntent: fullScreenIntent,
       ),
     );
   }
@@ -432,6 +589,7 @@ class NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {
     if (!_initialized) {
       debugPrint('[NotificationService] showNotification SKIPPED: not initialized');
@@ -452,6 +610,7 @@ class NotificationService {
       playSound: playSound,
       enableVibration: enableVibration,
       visibility: visibility,
+      fullScreenIntent: fullScreenIntent,
     );
 
     debugPrint('[NotificationService] showNotification calling plugin.show');
@@ -478,6 +637,7 @@ class NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {
     if (!_initialized) {
       debugPrint('[NotificationService] scheduleNotification SKIPPED: not initialized');
@@ -498,6 +658,7 @@ class NotificationService {
       playSound: playSound,
       enableVibration: enableVibration,
       visibility: visibility,
+      fullScreenIntent: fullScreenIntent,
     );
 
     debugPrint('[NotificationService] zonedSchedule: id=$id channelId=$channelId scheduledDate=$scheduledDate');
@@ -591,6 +752,7 @@ class NotificationService {
         measurementChannelId => _measurementChannelName,
         doctorVisitChannelId => _doctorVisitChannelName,
         prominentChannelId => _prominentChannelName,
+        alarmChannelId => _alarmChannelName,
         _ => _medicationChannelName,
       };
 
@@ -599,6 +761,7 @@ class NotificationService {
         measurementChannelId => _measurementChannelDesc,
         doctorVisitChannelId => _doctorVisitChannelDesc,
         prominentChannelId => _prominentChannelDesc,
+        alarmChannelId => _alarmChannelDesc,
         _ => _medicationChannelDesc,
       };
 }

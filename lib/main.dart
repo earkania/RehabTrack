@@ -63,4 +63,5 @@ Future<void> _warmUpPersistedSettings(ProviderContainer container) async {
   await container.read(reminderVibrationEnabledProvider.notifier).ready;
   await container.read(showPatientNameInNotificationsProvider.notifier).ready;
   await container.read(showDetailsOnLockScreenProvider.notifier).ready;
+  await container.read(reminderStyleProvider.notifier).ready;
 }

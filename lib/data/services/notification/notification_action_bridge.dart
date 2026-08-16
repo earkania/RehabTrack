@@ -40,6 +40,8 @@ class NotificationActionBridge {
     required this.showProfileName,
     required this.showDetailsOnLockScreen,
     this.onActionProcessed,
+    this.onAlarmPresent,
+    this.isAlarmStyleActive,
   });
 
   final NotificationService _notificationService;
@@ -54,6 +56,13 @@ class NotificationActionBridge {
   final bool Function() showProfileName;
   final bool Function() showDetailsOnLockScreen;
   final void Function(NotificationActionType actionType, ReminderPayload payload)? onActionProcessed;
+
+  /// Invoked when an Alarm-style notification is opened (tapped or launched
+  /// via full-screen intent). Receives the notification id and raw payload so
+  /// the app can present the dedicated Alarm screen. Null when Alarm style is
+  /// not active.
+  final void Function(int? notificationId, String payload)? onAlarmPresent;
+  final bool Function()? isAlarmStyleActive;
 
   Future<void> initialize() async {
     _notificationService.setActionCallback(_handleAction);
@@ -181,6 +190,14 @@ class NotificationActionBridge {
       case NotificationActionType.tap:
         result = ActionResult.success;
       case NotificationActionType.dismiss:
+        // Dismissing an Alarm-style presentation stops the sound/vibration by
+        // cancelling the active notification, but leaves the occurrence
+        // unresolved (Pending/Overdue). No medical state is changed.
+        await _notificationService.cancelNotification(response.notificationId);
+        final snoozeId = NotificationService.snoozeNotificationId(
+          response.notificationId,
+        );
+        await _notificationService.cancelNotification(snoozeId);
         result = ActionResult.success;
     }
     onActionProcessed?.call(response.actionType, payload);
@@ -191,12 +208,84 @@ class NotificationActionBridge {
     await _executeAction(response);
   }
 
-  void _onNotificationTap(String? payload) {
+  void _onNotificationTap(int? notificationId, String? payload) {
+    // Alarm-style: any opened alarm notification (tap or full-screen launch)
+    // presents the dedicated Alarm screen instead of falling through to the
+    // ordinary notification routing.
+    final alarmActive = isAlarmStyleActive?.call() ?? false;
+    if (alarmActive && payload != null) {
+      onAlarmPresent?.call(notificationId, payload);
+      debugPrint('[NotificationActionBridge] alarm presentation opened (id=$notificationId)');
+      return;
+    }
     final reminder = ReminderPayload.parse(payload);
     if (reminder != null && reminder.type == ReminderType.doctorVisit) {
       onActionProcessed?.call(NotificationActionType.doctorVisitOpen, reminder);
     }
     debugPrint('[NotificationActionBridge] notification tap');
+  }
+
+  /// Routes a cold start (terminated process) that was opened by an
+  /// Alarm-style full-screen intent or a notification tap with a payload but
+  /// no action button. Button presses ([actionId] present) are handled by
+  /// [processAppLaunchAction]; a plain launch with a payload presents the
+  /// dedicated Alarm screen instead.
+  Future<void> processAppLaunchAlarmPresentation() async {
+    try {
+      final launchDetails = await _notificationService.getLaunchDetails();
+      if (launchDetails == null || !launchDetails.didNotificationLaunchApp) {
+        return;
+      }
+      final response = launchDetails.notificationResponse;
+      if (response == null) return;
+
+      final actionId = response.actionId;
+      if (actionId != null && actionId.isNotEmpty) return;
+
+      final payload = response.payload;
+      if (payload == null || payload.isEmpty) return;
+
+      final alarmActive = isAlarmStyleActive?.call() ?? false;
+      if (!alarmActive) return;
+
+      onAlarmPresent?.call(response.id, payload);
+    } catch (e) {
+      debugPrint('[NotificationActionBridge] processAppLaunchAlarmPresentation '
+          'ERROR: $e');
+    }
+  }
+
+  /// Executes a canonical reminder action from a UI surface (e.g. the
+  /// Alarm-style presentation screen) rather than a notification action button.
+  ///
+  /// [notificationId] is the id of the active alarm notification; it is used
+  /// exactly like the notification action path so snooze and cancellation stay
+  /// deterministic. [actionType] may be any of
+  /// [NotificationActionType.medicationMarkTaken],
+  /// [NotificationActionType.medicationSkip],
+  /// [NotificationActionType.medicationSnooze],
+  /// [NotificationActionType.measurementRecordNow],
+  /// [NotificationActionType.measurementSkip],
+  /// [NotificationActionType.measurementSnooze],
+  /// [NotificationActionType.doctorVisitOpen],
+  /// [NotificationActionType.doctorVisitSnooze] or
+  /// [NotificationActionType.dismiss].
+  Future<ActionResult> executeUiAction({
+    required NotificationActionType actionType,
+    required ReminderPayload payload,
+    required int notificationId,
+  }) {
+    // Embed the active notification id so downstream cancellation, snooze and
+    // occurrence cleanup operate on the exact alarm being acknowledged.
+    final effectivePayload = payload.copyWith(notificationId: notificationId);
+    return _executeAction(
+      NotificationActionResponse(
+        notificationId: notificationId,
+        actionId: actionType.name,
+        actionType: actionType,
+        payload: effectivePayload.toJsonString(),
+      ),
+    );
   }
 
   // --- Medication: Taken ---

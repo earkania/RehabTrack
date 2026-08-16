@@ -44,6 +44,7 @@ void main() {
       AppConstants.defaultSnoozeDurationKey: '10',
       AppConstants.showPatientNameInNotificationsKey: 'false',
       AppConstants.showDetailsOnLockScreenKey: 'false',
+      AppConstants.reminderStyleKey: 'alarmStyle',
     });
 
     final json = jsonDecode(await PreferencesExporter(repo).exportJson());
@@ -57,6 +58,7 @@ void main() {
       AppConstants.defaultSnoozeDurationKey: '10',
       AppConstants.showPatientNameInNotificationsKey: 'false',
       AppConstants.showDetailsOnLockScreenKey: 'false',
+      AppConstants.reminderStyleKey: 'alarmStyle',
     });
   });
 

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -48,8 +49,24 @@ class MainActivity : FlutterActivity() {
                 "hasExactAlarmPermission" -> {
                     result.success(hasExactAlarmPermission())
                 }
+                "canUseFullScreenIntent" -> {
+                    result.success(canUseFullScreenIntent())
+                }
+                "getAndroidSdkInt" -> {
+                    result.success(Build.VERSION.SDK_INT)
+                }
+                "openFullScreenIntentSettings" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        openFullScreenIntentSettings(result)
+                    } else {
+                        result.success(false)
+                    }
+                }
                 "getTimeZone" -> {
                     result.success(TimeZone.getDefault().id)
+                }
+                "getDefaultAlarmSoundUri" -> {
+                    result.success(getDefaultAlarmSoundUri())
                 }
                 "openImageWithPhotos" -> {
                     openImageWithPhotos(call, result)
@@ -477,6 +494,47 @@ class MainActivity : FlutterActivity() {
         } else {
             true
         }
+    }
+
+    /**
+     * Whether the app may present full-screen alarms on this device.
+     *
+     * Full-screen intents are only supported on API 34+ and require either the
+     * USE_FULL_SCREEN_INTENT permission or a granted exemption for alarm apps.
+     * Below API 34 (or when neither applies) Android degrades the presentation
+     * to a heads-up notification, which the Alarm-style fallback handles.
+     */
+    private fun canUseFullScreenIntent(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            notificationManager.canUseFullScreenIntent()
+        } else {
+            false
+        }
+    }
+
+    /** Opens the system "Full screen content" settings page for this app. */
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private fun openFullScreenIntentSettings(result: MethodChannel.Result) {
+        try {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
+                data = android.net.Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+            result.success(true)
+        } catch (e: Exception) {
+            result.error("OPEN_FULL_SCREEN_SETTINGS_ERROR", e.message, null)
+        }
+    }
+
+    /** Returns the device's default alarm sound URI (falls back to ringtone/notification). */
+    private fun getDefaultAlarmSoundUri(): String? {
+        val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        if (alarmUri != null) return alarmUri.toString()
+        val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+        if (ringtoneUri != null) return ringtoneUri.toString()
+        return null
     }
 
     /** Opens an image file directly in the Google Photos app, falling back to a generic viewer. */

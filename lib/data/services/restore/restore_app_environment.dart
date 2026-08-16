@@ -15,6 +15,7 @@ import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
+import 'package:rehab_track/presentation/providers/reminder_settings_provider.dart';
 
 /// Binds the restore engine to the live app: the canonical Riverpod container,
 /// the app documents directory, the Drift database and the settings store.
@@ -88,6 +89,11 @@ class RestoreAppEnvironment implements RestoreEnvironment {
     _container.invalidate(careContactImageServiceProvider);
     _container.invalidate(notificationActionBridgeProvider);
     _container.invalidate(localeProvider);
+    // The reminder style is caches in memory; reload it from the restored
+    // settings store. Device capability is re-inspected so the alarm-style
+    // status reflects the current device (capability is never restored).
+    _container.invalidate(reminderStyleProvider);
+    _container.invalidate(alarmStyleCapabilityProvider);
   }
 
   @override

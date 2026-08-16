@@ -6,12 +6,14 @@
 /// notification payload, or the notification identity.
 enum ReminderStyle {
   standard,
-  prominent;
+  prominent,
+  alarmStyle;
 
   /// Stable value persisted to settings. Localized labels are never stored.
   String get storageValue => switch (this) {
         ReminderStyle.standard => 'standard',
         ReminderStyle.prominent => 'prominent',
+        ReminderStyle.alarmStyle => 'alarmStyle',
       };
 
   /// Parses a persisted value. Unknown or missing values fall back to
@@ -20,6 +22,7 @@ enum ReminderStyle {
     return switch (value) {
       'standard' => ReminderStyle.standard,
       'prominent' => ReminderStyle.prominent,
+      'alarmStyle' => ReminderStyle.alarmStyle,
       _ => ReminderStyle.standard,
     };
   }

@@ -20,6 +20,7 @@ class PreferencesExporter {
     AppConstants.defaultSnoozeDurationKey,
     AppConstants.showPatientNameInNotificationsKey,
     AppConstants.showDetailsOnLockScreenKey,
+    AppConstants.reminderStyleKey,
   };
 
   final SettingsRepository _settingsRepository;

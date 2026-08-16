@@ -6,6 +6,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/core/localization/app_locale.dart';
+import 'package:rehab_track/data/services/notification/alarm_style_capability_service.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/domain/entities/reminder_style.dart';
 import 'package:rehab_track/presentation/providers/locale_provider.dart';
@@ -118,13 +119,18 @@ class AppSettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.notification_add_outlined),
             title: Text(l10n.reminderStyle),
             subtitle: Text(
-              reminderStyle == ReminderStyle.prominent
-                  ? l10n.reminderStyleProminent
-                  : l10n.reminderStyleStandard,
+              switch (reminderStyle) {
+                ReminderStyle.prominent => l10n.reminderStyleProminent,
+                ReminderStyle.alarmStyle => l10n.alarmStyle,
+                ReminderStyle.standard => l10n.reminderStyleStandard,
+              },
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showReminderStyleDialog(context, ref, l10n, reminderStyle),
           ),
+          if (reminderStyle == ReminderStyle.alarmStyle) ...[
+            const _AlarmStyleStatusTiles(),
+          ],
           ListTile(
             leading: const Icon(Icons.timer_outlined),
             title: Text(l10n.defaultSnoozeDuration),
@@ -376,14 +382,18 @@ class AppSettingsScreen extends ConsumerWidget {
                       : null,
                 ),
                 title: Text(
-                  style == ReminderStyle.prominent
-                      ? l10n.reminderStyleProminent
-                      : l10n.reminderStyleStandard,
+                  switch (style) {
+                    ReminderStyle.prominent => l10n.reminderStyleProminent,
+                    ReminderStyle.alarmStyle => l10n.alarmStyle,
+                    ReminderStyle.standard => l10n.reminderStyleStandard,
+                  },
                 ),
                 subtitle: Text(
-                  style == ReminderStyle.prominent
-                      ? l10n.reminderStyleProminentDescription
-                      : l10n.reminderStyleStandardDescription,
+                  switch (style) {
+                    ReminderStyle.prominent => l10n.reminderStyleProminentDescription,
+                    ReminderStyle.alarmStyle => l10n.alarmStyleDescription,
+                    ReminderStyle.standard => l10n.reminderStyleStandardDescription,
+                  },
                 ),
                 onTap: () {
                   ref.read(reminderStyleProvider.notifier).setStyle(style);
@@ -485,5 +495,155 @@ class AppSettingsScreen extends ConsumerWidget {
       title: Text(title),
       onTap: () => ref.read(localeProvider.notifier).setLocale(locale),
     );
+  }
+}
+
+/// Capability status and management tiles shown only when Alarm-style is the
+/// selected reminder style.
+class _AlarmStyleStatusTiles extends ConsumerWidget {
+  const _AlarmStyleStatusTiles();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final capability = ref.watch(alarmStyleCapabilityProvider);
+
+    return capability.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.fromLTRB(72, 4, 16, 4),
+        child: Text('...'),
+      ),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (data) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(72, 4, 16, 4),
+              child: Row(
+                children: [
+                  Icon(
+                    data.isAvailable
+                        ? Icons.check_circle_outline
+                        : Icons.info_outline,
+                    size: 18,
+                    color: data.isAvailable
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _statusText(l10n, data),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (data.fullScreenAllowed != null)
+              ListTile(
+                leading: Icon(
+                  data.fullScreenAllowed!
+                      ? Icons.fullscreen
+                      : Icons.fullscreen_exit,
+                ),
+                title: Text(l10n.manageAlarmStyleAccess),
+                subtitle: Text(
+                  data.fullScreenAllowed!
+                      ? l10n.fullScreenRemindersAllowed
+                      : l10n.fullScreenRemindersNotAllowed,
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  final service =
+                      ref.read(alarmStyleCapabilityServiceProvider);
+                  await service.openFullScreenSettings();
+                  // Re-inspect capability when returning from system settings.
+                  ref.invalidate(alarmStyleCapabilityProvider);
+                },
+              ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.alarm),
+              title: Text(l10n.testAlarmStyleTile),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _sendAlarmTest(context, ref, l10n),
+            ),
+            const Divider(),
+          ],
+        );
+      },
+    );
+  }
+
+  String _statusText(AppLocalizations l10n, AlarmStyleCapability data) {
+    return switch (data.status) {
+      AlarmStyleCapabilityStatus.available =>
+        l10n.alarmStyleCapabilityAvailable,
+      AlarmStyleCapabilityStatus.fullScreenNotAllowed =>
+        l10n.alarmStyleCapabilityNotAvailable,
+      AlarmStyleCapabilityStatus.unsupportedAndroidVersion =>
+        l10n.alarmStyleCapabilityUnsupported,
+      AlarmStyleCapabilityStatus.notificationPermissionMissing =>
+        l10n.alarmStyleCapabilityNotificationPermissionMissing,
+      AlarmStyleCapabilityStatus.exactAlarmAccessMissing =>
+        l10n.alarmStyleCapabilityExactAlarmMissing,
+      AlarmStyleCapabilityStatus.channelDisabledOrLimited =>
+        l10n.alarmStyleCapabilityChannelDisabled,
+    };
+  }
+
+  Future<void> _sendAlarmTest(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    final service = ref.read(notificationServiceProvider);
+    final hasPermission = await service.hasNotificationPermission();
+    if (!hasPermission) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.noPermission)),
+        );
+      }
+      return;
+    }
+
+    final playSound = ref.read(reminderSoundEnabledProvider);
+    final enableVibration = ref.read(reminderVibrationEnabledProvider);
+    final fullScreenAllowed = ref.read(alarmFullScreenAllowedProvider);
+
+    final now = DateTime.now();
+    final testTime = now.add(const Duration(seconds: 5));
+    final tzDate = tz.TZDateTime(
+      tz.local,
+      testTime.year,
+      testTime.month,
+      testTime.day,
+      testTime.hour,
+      testTime.minute,
+      testTime.second,
+    );
+
+    await service.scheduleNotification(
+      id: NotificationService.testAlarmNotificationId,
+      title: l10n.testAlarmStyleReminder,
+      body: l10n.testAlarmStyleBody,
+      scheduledDate: tzDate,
+      payload: NotificationService.testAlarmPayload,
+      channelId: NotificationService.alarmChannelId,
+      playSound: playSound,
+      enableVibration: enableVibration,
+      fullScreenIntent: fullScreenAllowed,
+    );
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.testReminderSent)),
+      );
+    }
   }
 }

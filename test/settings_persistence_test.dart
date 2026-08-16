@@ -232,6 +232,22 @@ void main() {
       restarted.dispose();
     });
 
+    test('alarm style persists with a stable value across restart', () async {
+      final repo = FakeSettingsRepository();
+
+      final first = restartContainer(repo);
+      final notifier = first.read(reminderStyleProvider.notifier);
+      await notifier.ready;
+      await notifier.setStyle(ReminderStyle.alarmStyle);
+      expect(await repo.getValue(AppConstants.reminderStyleKey), 'alarmStyle');
+      first.dispose();
+
+      final restarted = restartContainer(repo);
+      await restarted.read(reminderStyleProvider.notifier).ready;
+      expect(restarted.read(reminderStyleProvider), ReminderStyle.alarmStyle);
+      restarted.dispose();
+    });
+
     test('unknown persisted value falls back to standard', () async {
       final repo = FakeSettingsRepository();
       await repo.setValue(AppConstants.reminderStyleKey, 'alarm');

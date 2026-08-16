@@ -705,7 +705,41 @@
   "reminderPermissionExplanation": "RehabTrack-ს სჭირდება შეტყობინების ნებართვა მედიკამენტების და გაზომვების შეხსენებების ჩვენებისთვის.",
   "exactAlarmExplanation": "ზუსტი მაღვიძარას ნებართვა საშუალებას აძლევს შეხსენებებს გამოჩნდეს ზუსტად დაგეგმილ დროს. მის გარეშე, შეხსენების დრო შეიძლება იყოს ნაკლებად ზუსტი.",
   "alarmStyleReminders": "მაღვიძარას სტილის პრეზენტაცია",
+  "alarmStyle": "მაღვიძარას სტილი",
+  "alarmStyleDescription": "სრულეკრანიანი მაღვიძარა უძლიერესი ხმით და ვიბრაციით, რომელიც ჩაკეტილ ეკრანზეც კი წყვეტს",
+  "alarmStyleCapabilityAvailable": "სრულეკრანიანი მაღვიძარა ხელმისაწვდომია",
+  "alarmStyleCapabilityNotAvailable": "მაღვიძარას სტილის შეხსენებები გამოჩნდება გამორჩეული გაფრთხილებით, რადგან სრულეკრანიანი წვდომა არ არის ხელმისაწვდომი",
+  "alarmStyleCapabilityNotificationPermissionMissing": "შეტყობინების ნებართვა აუცილებელია მაღვიძარას სტილის შეხსენებების ჩვენებისთვის",
+  "alarmStyleCapabilityExactAlarmMissing": "ზუსტი მაღვიძარას წვდომა აუცილებელია ზუსტი დროისთვის",
+  "alarmStyleCapabilityChannelDisabled": "მაღვიძარას შეტყობინების არხი გამორთულია; ჩართეთ Android შეტყობინებების პარამეტრებში",
+  "alarmStyleCapabilityUnsupported": "სრულეკრანიანი მაღვიძარა საჭიროებს Android 14-ს ან უფრო ახალს; მაღვიძარას სტილის შეხსენებები იყენებს გამორჩეულ გაფრთხილებას",
+  "manageAlarmStyleAccess": "მაღვიძარას წვდომის მართვა",
+  "manageAlarmStyleAccessDescription": "გახსენით სისტემის პარამეტრები სრულეკრანიანი შეტყობინებების დასაშვებად ან ასაკრძალად",
+  "fullScreenRemindersAllowed": "სრულეკრანიანი შეხსენებები ნებადართულია",
+  "fullScreenRemindersNotAllowed": "სრულეკრანიანი შეხსენებები არ არის ნებადართული",
+  "testAlarmStyleTile": "მაღვიძარას სტილის ტესტური შეხსენება",
+  "alarmStyleUnavailable": "მაღვიძარას სტილის შეხსენებები ამ მოწყობილობაზე ხელმისაწვდომი არ არის",
   "lockScreenReminderDetails": "სრული შეხსენების დეტალების ჩვენება ჩაკეტილ ეკრანზე",
+  "alarmReminder": "მაღვიძარა",
+  "alarmDismissed": "მაღვიძარა გამორთულია",
+  "scheduledHealthReminder": "თქვენ გაქვთ დაგეგმილი ჯანმრთელობის შეხსენება",
+  "doctorVisitReminder": "ექიმთან ვიზიტის შეხსენება",
+  "measurementToRecord": "ჩაიწერეთ {type} {time}-ზე",
+  "@measurementToRecord": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dismissAlarm": "გათიშვა",
+  "dismissTestAlarm": "ტესტური მაღვიძარას გათიშვა",
+  "testAlarmStyleReminder": "მაღვიძარას სტილის ტესტი",
+  "testAlarmStyleBody": "ეს არის მაღვიძარას სტილის პრეზენტაციის ტესტი. გასაჩერებლად დააჭირეთ გათიშვას.",
+  "dismissFailed": "მაღვიძარას გათიშვა ვერ მოხერხდა",
   "noPermission": "ნებართვა არ არის",
   "channelDisabled": "არხი გამორთულია",
   "scheduleSaved": "გრაფიკი შენახულია",

@@ -34,11 +34,13 @@ class _RecordingNotificationService extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {
     scheduledNotifications.add({
       'id': id,
       'scheduledDate': scheduledDate,
       'channelId': channelId,
+      'fullScreenIntent': fullScreenIntent,
     });
   }
 
@@ -55,6 +57,7 @@ class _RecordingNotificationService extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {}
 
   @override
@@ -97,11 +100,13 @@ void main() {
     test('persists stable values, not localized labels', () {
       expect(ReminderStyle.standard.storageValue, 'standard');
       expect(ReminderStyle.prominent.storageValue, 'prominent');
+      expect(ReminderStyle.alarmStyle.storageValue, 'alarmStyle');
     });
 
     test('parses persisted values', () {
       expect(ReminderStyle.fromStorageValue('standard'), ReminderStyle.standard);
       expect(ReminderStyle.fromStorageValue('prominent'), ReminderStyle.prominent);
+      expect(ReminderStyle.fromStorageValue('alarmStyle'), ReminderStyle.alarmStyle);
     });
 
     test('unknown or missing values fall back to standard', () {
@@ -149,6 +154,23 @@ void main() {
             eventChannelId: eventChannel,
           ),
           NotificationService.prominentChannelId,
+        );
+      }
+    });
+
+    test('alarm style routes all event types to the alarm channel', () {
+      const eventChannels = [
+        NotificationService.medicationChannelId,
+        NotificationService.measurementChannelId,
+        NotificationService.doctorVisitChannelId,
+      ];
+      for (final eventChannel in eventChannels) {
+        expect(
+          NotificationService.channelForReminderStyle(
+            style: ReminderStyle.alarmStyle,
+            eventChannelId: eventChannel,
+          ),
+          NotificationService.alarmChannelId,
         );
       }
     });
@@ -270,11 +292,119 @@ void main() {
       expect(standardIds, prominentIds);
       expect(standardIds, isNotEmpty);
     });
+
+    test('alarm style requests full-screen intent only when capability allows',
+        () async {
+      final fsiService = _RecordingNotificationService();
+      final fallbackService = _RecordingNotificationService();
+      final startDate = futureStartDate();
+
+      final fsiScheduler = NotificationScheduler(
+        notificationService: fsiService,
+        reminderStyle: ReminderStyle.alarmStyle,
+        fullScreenIntentForAlarm: true,
+      );
+      final fallbackScheduler = NotificationScheduler(
+        notificationService: fallbackService,
+        reminderStyle: ReminderStyle.alarmStyle,
+        fullScreenIntentForAlarm: false,
+      );
+
+      Future<void> schedule(NotificationScheduler scheduler) =>
+          scheduler.scheduleOccurrences(
+            scheduleId: 7,
+            title: 'Medication',
+            body: 'Take now',
+            config: const DailySchedule(times: ['10:00']),
+            channelId: NotificationService.medicationChannelId,
+            startDate: startDate,
+            isMeasurement: false,
+          );
+
+      await schedule(fsiScheduler);
+      await schedule(fallbackScheduler);
+
+      expect(
+        fsiService.scheduledNotifications
+            .every((e) => e['fullScreenIntent'] == true),
+        isTrue,
+      );
+      expect(fsiService.scheduledNotifications, isNotEmpty);
+      expect(
+        fallbackService.scheduledNotifications
+            .every((e) => e['fullScreenIntent'] == false),
+        isTrue,
+      );
+      expect(fallbackService.scheduledNotifications, isNotEmpty);
+    });
+
+    test('alarm style schedules on the alarm channel with full-screen intent',
+        () async {
+      final service = _RecordingNotificationService();
+      final scheduler = NotificationScheduler(
+        notificationService: service,
+        reminderStyle: ReminderStyle.alarmStyle,
+        fullScreenIntentForAlarm: true,
+      );
+
+      await scheduler.scheduleOccurrences(
+        scheduleId: 9,
+        title: 'Medication',
+        body: 'Take now',
+        config: const DailySchedule(times: ['10:00']),
+        channelId: NotificationService.medicationChannelId,
+        startDate: futureStartDate(),
+        isMeasurement: false,
+      );
+
+      expect(service.scheduledNotifications, isNotEmpty);
+      expect(
+        service.scheduledNotifications.map((e) => e['channelId']).toSet(),
+        {NotificationService.alarmChannelId},
+      );
+      expect(
+        service.scheduledNotifications
+            .every((e) => e['fullScreenIntent'] == true),
+        isTrue,
+      );
+    });
+
+    test('non-alarm styles never request full-screen intent', () async {
+      for (final style in [ReminderStyle.standard, ReminderStyle.prominent]) {
+        final service = _RecordingNotificationService();
+        final scheduler = NotificationScheduler(
+          notificationService: service,
+          reminderStyle: style,
+          fullScreenIntentForAlarm: true,
+        );
+        await scheduler.scheduleOccurrences(
+          scheduleId: 11,
+          title: 'Medication',
+          body: 'Take now',
+          config: const DailySchedule(times: ['10:00']),
+          channelId: NotificationService.medicationChannelId,
+          startDate: futureStartDate(),
+          isMeasurement: false,
+        );
+        expect(service.scheduledNotifications, isNotEmpty);
+        expect(
+          service.scheduledNotifications
+              .every((e) => e['fullScreenIntent'] == false),
+          isTrue,
+        );
+      }
+    });
   });
 
   group('Test notification IDs', () {
     test('stable test IDs never collide with real notification ID ranges', () {
       expect(NotificationService.testMedicationNotificationId, isNot(
+        NotificationService.testMeasurementNotificationId,
+      ));
+      expect(NotificationService.testAlarmNotificationId, isNot(
+        NotificationService.testMedicationNotificationId,
+      ));
+      expect(NotificationService.testAlarmNotificationId, isNot(
         NotificationService.testMeasurementNotificationId,
       ));
 
@@ -285,6 +415,12 @@ void main() {
       );
       expect(
         NotificationService.testMeasurementNotificationId,
+        greaterThan(NotificationService.snoozeNotificationId(
+          NotificationService.doctorVisitNotificationId(1),
+        )),
+      );
+      expect(
+        NotificationService.testAlarmNotificationId,
         greaterThan(NotificationService.snoozeNotificationId(
           NotificationService.doctorVisitNotificationId(1),
         )),

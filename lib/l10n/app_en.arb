@@ -705,7 +705,41 @@
   "reminderPermissionExplanation": "RehabTrack needs notification permission to show reminders for medications and measurements.",
   "exactAlarmExplanation": "Exact alarm permission allows reminders to appear at the precise scheduled time. Without it, reminder timing may be less precise.",
   "alarmStyleReminders": "Alarm-style presentation",
+  "alarmStyle": "Alarm-style",
+  "alarmStyleDescription": "Full-screen alarms with the strongest sound and vibration that interrupt even on the lock screen",
+  "alarmStyleCapabilityAvailable": "Full-screen alarms available",
+  "alarmStyleCapabilityNotAvailable": "Alarm-style reminders present as prominent alerts because full-screen access is not available",
+  "alarmStyleCapabilityNotificationPermissionMissing": "Notification permission is required to show alarm-style reminders",
+  "alarmStyleCapabilityExactAlarmMissing": "Exact alarm access is required for precise alarm timing",
+  "alarmStyleCapabilityChannelDisabled": "The alarm notification channel is disabled; enable it in Android notification settings",
+  "alarmStyleCapabilityUnsupported": "Full-screen alarms require Android 14 or later; alarm-style reminders use a prominent alert instead",
+  "manageAlarmStyleAccess": "Manage alarm-style access",
+  "manageAlarmStyleAccessDescription": "Open system settings to allow or deny full-screen notifications",
+  "fullScreenRemindersAllowed": "Full-screen reminders are allowed",
+  "fullScreenRemindersNotAllowed": "Full-screen reminders are not allowed",
+  "testAlarmStyleTile": "Test alarm-style reminder",
+  "alarmStyleUnavailable": "Alarm-style reminders are not available on this device",
   "lockScreenReminderDetails": "Show full reminder details on lock screen",
+  "alarmReminder": "Alarm",
+  "alarmDismissed": "Alarm dismissed",
+  "scheduledHealthReminder": "You have a scheduled health reminder",
+  "doctorVisitReminder": "Doctor visit reminder",
+  "measurementToRecord": "Record {type} at {time}",
+  "@measurementToRecord": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dismissAlarm": "Dismiss",
+  "dismissTestAlarm": "Dismiss test alarm",
+  "testAlarmStyleReminder": "Alarm-style test",
+  "testAlarmStyleBody": "This is a test of the alarm-style presentation. Press Dismiss to stop it.",
+  "dismissFailed": "Could not dismiss the alarm",
   "noPermission": "No permission",
   "channelDisabled": "Channel disabled",
   "scheduleSaved": "Schedule saved",
