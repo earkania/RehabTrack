@@ -742,11 +742,9 @@
       }
     }
   },
-  "dismissAlarm": "გათიშვა",
   "dismissTestAlarm": "ტესტური მაღვიძარას გათიშვა",
   "testAlarmStyleReminder": "მაღვიძარას სტილის ტესტი",
   "testAlarmStyleBody": "ეს არის მაღვიძარას სტილის პრეზენტაციის ტესტი. გასაჩერებლად დააჭირეთ გათიშვას.",
-  "dismissFailed": "მაღვიძარას გათიშვა ვერ მოხერხდა",
   "noPermission": "ნებართვა არ არის",
   "channelDisabled": "არხი გამორთულია",
   "scheduleSaved": "გრაფიკი შენახულია",

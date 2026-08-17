@@ -195,22 +195,19 @@ final exactAlarmPermissionProvider = FutureProvider<bool>((ref) async {
 });
 
 final notificationInitializerProvider = FutureProvider<void>((ref) async {
-  final bridge = ref.watch(notificationActionBridgeProvider);
-
   ref.onDispose(() {
     debugPrint('notificationInitializerProvider disposed');
   });
 
-  await bridge.initialize();
+  // Schedule recovery must build reminders with the persisted reminder style,
+  // not the in-memory default (standard) that exists before the setting loads.
+  // Without this wait, recovery re-schedules every occurrence on the plain
+  // per-event channels, so alarm-style reminders arrive silently as ordinary
+  // heads-up notifications instead of the full-screen alarm presentation.
+  await ref.read(reminderStyleProvider.notifier).ready;
 
-  // Request notification permission on Android 13+.
   final service = ref.watch(notificationServiceProvider);
-  final hasPermission = await service.hasNotificationPermission();
-  if (!hasPermission) {
-    debugPrint('[notificationInitializerProvider] requesting notification permission');
-    final granted = await service.requestNotificationPermission();
-    debugPrint('[notificationInitializerProvider] permission granted: $granted');
-  }
+  await service.waitForInitialization();
 
   // Probe alarm-style capability so the full-screen-intent allowance is known
   // before any reminder is scheduled in this process. The settings screen also
@@ -222,6 +219,24 @@ final notificationInitializerProvider = FutureProvider<void>((ref) async {
   } catch (e, stack) {
     debugPrint('[notificationInitializerProvider] capability probe failed: $e');
     debugPrint('[notificationInitializerProvider] $stack');
+  }
+
+  // Rebuild the bridge now that the persisted style is hydrated and the
+  // full-screen allowance is resolved. An earlier capture would keep a
+  // scheduler snapshot built from the default style and a false full-screen
+  // allowance, and schedule recovery on the wrong channel. Read (not watch) so
+  // invalidating the bridge cannot re-run this initializer mid-startup.
+  ref.invalidate(notificationActionBridgeProvider);
+  final bridge = ref.read(notificationActionBridgeProvider);
+
+  await bridge.initialize();
+
+  // Request notification permission on Android 13+.
+  final hasPermission = await service.hasNotificationPermission();
+  if (!hasPermission) {
+    debugPrint('[notificationInitializerProvider] requesting notification permission');
+    final granted = await service.requestNotificationPermission();
+    debugPrint('[notificationInitializerProvider] permission granted: $granted');
   }
 
   // Process any pending actions that were stored by the background callback.

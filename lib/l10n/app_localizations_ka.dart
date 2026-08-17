@@ -1871,9 +1871,6 @@ class AppLocalizationsKa extends AppLocalizations {
   }
 
   @override
-  String get dismissAlarm => 'გათიშვა';
-
-  @override
   String get dismissTestAlarm => 'ტესტური მაღვიძარას გათიშვა';
 
   @override
@@ -1882,9 +1879,6 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get testAlarmStyleBody =>
       'ეს არის მაღვიძარას სტილის პრეზენტაციის ტესტი. გასაჩერებლად დააჭირეთ გათიშვას.';
-
-  @override
-  String get dismissFailed => 'მაღვიძარას გათიშვა ვერ მოხერხდა';
 
   @override
   String get noPermission => 'ნებართვა არ არის';

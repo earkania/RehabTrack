@@ -3542,12 +3542,6 @@ abstract class AppLocalizations {
   /// **'Record {type} at {time}'**
   String measurementToRecord(String type, String time);
 
-  /// No description provided for @dismissAlarm.
-  ///
-  /// In en, this message translates to:
-  /// **'Dismiss'**
-  String get dismissAlarm;
-
   /// No description provided for @dismissTestAlarm.
   ///
   /// In en, this message translates to:
@@ -3565,12 +3559,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This is a test of the alarm-style presentation. Press Dismiss to stop it.'**
   String get testAlarmStyleBody;
-
-  /// No description provided for @dismissFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not dismiss the alarm'**
-  String get dismissFailed;
 
   /// No description provided for @noPermission.
   ///

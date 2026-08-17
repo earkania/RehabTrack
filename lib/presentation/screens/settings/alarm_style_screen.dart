@@ -100,7 +100,6 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
       return _TestAlarmView(
         active: active,
         onDismiss: () => _dismissTestAlarm(active),
-        onClose: () => _closeOnly(active),
       );
     }
 
@@ -110,7 +109,6 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
       return _TestAlarmView(
         active: active,
         onDismiss: () => _dismissInvalid(active),
-        onClose: () => _closeOnly(active),
       );
     }
 
@@ -142,11 +140,6 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
               icon: const Icon(Icons.skip_next_outlined),
               label: Text(l10n.skip),
             ),
-            OutlinedButton.icon(
-              onPressed: () => _runDismiss(active),
-              icon: const Icon(Icons.notifications_off_outlined),
-              label: Text(l10n.dismissAlarm),
-            ),
           ],
         );
       case ReminderType.measurement:
@@ -175,11 +168,6 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
               icon: const Icon(Icons.skip_next_outlined),
               label: Text(l10n.skip),
             ),
-            OutlinedButton.icon(
-              onPressed: () => _runDismiss(active),
-              icon: const Icon(Icons.notifications_off_outlined),
-              label: Text(l10n.dismissAlarm),
-            ),
           ],
         );
       case ReminderType.doctorVisit:
@@ -199,11 +187,6 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
               onPressed: () => _runDoctoVisitSnooze(active),
               icon: const Icon(Icons.snooze_outlined),
               label: Text(l10n.snooze),
-            ),
-            OutlinedButton.icon(
-              onPressed: () => _runDismiss(active),
-              icon: const Icon(Icons.notifications_off_outlined),
-              label: Text(l10n.dismissAlarm),
             ),
           ],
         );
@@ -234,31 +217,6 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
     }
   }
 
-  Future<void> _runDismiss(AlarmPresentation active) async {
-    final reminder = _reminder;
-    if (reminder == null) {
-      await ref
-          .read(notificationServiceProvider)
-          .cancelNotification(active.notificationId);
-      if (!mounted) return;
-      _finish(active);
-      return;
-    }
-    final result = await ref
-        .read(notificationActionBridgeProvider)
-        .executeUiAction(
-          actionType: NotificationActionType.dismiss,
-          payload: reminder,
-          notificationId: active.notificationId,
-        );
-    if (!mounted) return;
-    if (result == ActionResult.success) {
-      _finish(active);
-    } else {
-      _showError(l10n.dismissFailed);
-    }
-  }
-
   Future<void> _dismissTestAlarm(AlarmPresentation active) async {
     await ref
         .read(notificationServiceProvider)
@@ -273,13 +231,6 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
         .cancelNotification(active.notificationId);
     if (!mounted) return;
     _finish(active);
-  }
-
-  /// Navigation-only close: dismisses the presentation without cancelling the
-  /// active notification (used by the top-right X on a test alarm).
-  void _closeOnly(AlarmPresentation active) {
-    ref.read(activeAlarmPresentationProvider.notifier).state = null;
-    context.go(AppRoutes.home);
   }
 
   Future<void> _runMeasurementRecordNow(
@@ -424,26 +375,11 @@ class _AlarmScaffold extends ConsumerWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        l10n.alarmReminder,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                      IconButton(
-                        tooltip: l10n.close,
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          ref
-                              .read(activeAlarmPresentationProvider.notifier)
-                              .state = null;
-                          context.go(AppRoutes.home);
-                        },
-                      ),
-                    ],
+                  Text(
+                    l10n.alarmReminder,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                   const Spacer(),
                   Icon(
@@ -624,12 +560,10 @@ class _TestAlarmView extends StatelessWidget {
   const _TestAlarmView({
     required this.active,
     required this.onDismiss,
-    required this.onClose,
   });
 
   final AlarmPresentation active;
   final VoidCallback onDismiss;
-  final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
@@ -643,23 +577,13 @@ class _TestAlarmView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
+              Text(
                     l10n.alarmReminder,
                     style: theme.textTheme.labelLarge?.copyWith(
                       color: theme.colorScheme.primary,
                     ),
                   ),
-                  IconButton(
-                    tooltip: l10n.close,
-                    icon: const Icon(Icons.close),
-                    onPressed: onClose,
-                  ),
-                ],
-              ),
-              const Spacer(),
+                  const Spacer(),
               Icon(
                 Icons.notifications_active,
                 size: 72,

@@ -742,11 +742,9 @@
       }
     }
   },
-  "dismissAlarm": "Dismiss",
   "dismissTestAlarm": "Dismiss test alarm",
   "testAlarmStyleReminder": "Alarm-style test",
   "testAlarmStyleBody": "This is a test of the alarm-style presentation. Press Dismiss to stop it.",
-  "dismissFailed": "Could not dismiss the alarm",
   "noPermission": "No permission",
   "channelDisabled": "Channel disabled",
   "scheduleSaved": "Schedule saved",

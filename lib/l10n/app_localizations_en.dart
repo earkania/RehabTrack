@@ -1871,9 +1871,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get dismissAlarm => 'Dismiss';
-
-  @override
   String get dismissTestAlarm => 'Dismiss test alarm';
 
   @override
@@ -1882,9 +1879,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get testAlarmStyleBody =>
       'This is a test of the alarm-style presentation. Press Dismiss to stop it.';
-
-  @override
-  String get dismissFailed => 'Could not dismiss the alarm';
 
   @override
   String get noPermission => 'No permission';
