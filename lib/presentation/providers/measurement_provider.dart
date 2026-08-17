@@ -4,9 +4,11 @@ import 'package:rehab_track/domain/entities/measurement_chart.dart';
 import 'package:rehab_track/domain/entities/measurement_data_point.dart';
 import 'package:rehab_track/domain/entities/measurement_period.dart';
 import 'package:rehab_track/domain/entities/measurement_statistics.dart';
+import 'package:rehab_track/domain/entities/measurement_time_of_day_filter.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/domain/entities/reading_status_summary.dart';
 import 'package:rehab_track/domain/services/measurement_chart_builder.dart';
+import 'package:rehab_track/domain/services/measurement_time_of_day_classifier.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 
@@ -76,7 +78,21 @@ final measurementRecordValuesProvider =
 
 // --- Trend / Chart providers ---
 
-typedef TrendParams = ({int measurementTypeId, MeasurementPeriod period});
+/// The selected time-of-day dimension for the Measurement Trends screen.
+///
+/// Auto-disposed so a brand-new Trends screen (after the previous one was
+/// fully removed) starts at [MeasurementTimeOfDayFilter.all], while the
+/// selection survives normal rebuilds for the current screen session.
+final measurementTrendTimeOfDayFilterProvider =
+    StateProvider.autoDispose<MeasurementTimeOfDayFilter>(
+  (ref) => MeasurementTimeOfDayFilter.all,
+);
+
+typedef TrendParams = ({
+  int measurementTypeId,
+  MeasurementPeriod period,
+  MeasurementTimeOfDayFilter timeOfDay,
+});
 
 class TrendData {
   final List<MeasurementDataPoint> dataPoints;
@@ -122,14 +138,19 @@ final trendDataProvider =
         final recordIds = records.map((r) => r.id!).toList();
         final allValues = await repo.getValuesForRecords(recordIds);
 
-        final dataPoints = records
-            .map(
-              (r) => MeasurementDataPoint(
-                record: r,
-                values: allValues[r.id!] ?? [],
-              ),
-            )
-            .toList();
+        final dataPoints = MeasurementTimeOfDayClassifier.filterDataPoints(
+          dataPoints: records
+              .map(
+                (r) => MeasurementDataPoint(
+                  record: r,
+                  values: allValues[r.id!] ?? [],
+                ),
+              )
+              .toList(),
+          timeOfDay: params.timeOfDay,
+        );
+
+        if (dataPoints.isEmpty) return TrendData.empty;
 
         final type = await repo.getMeasurementType(
           params.measurementTypeId,

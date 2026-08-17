@@ -1225,6 +1225,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToLoadTrends => 'Failed to load trends';
 
   @override
+  String get timeOfDay => 'Time of day';
+
+  @override
+  String get selected => 'selected';
+
+  @override
+  String get allReadings => 'All readings';
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get morningReadings => 'Morning readings';
+
+  @override
+  String get midday => 'Midday';
+
+  @override
+  String get middayReadings => 'Midday readings';
+
+  @override
+  String get evening => 'Evening';
+
+  @override
+  String get eveningReadings => 'Evening readings';
+
+  @override
+  String get night => 'Night';
+
+  @override
+  String get nightReadings => 'Night readings';
+
+  @override
+  String get noMorningReadings => 'No morning readings in the selected period';
+
+  @override
+  String get noMiddayReadings => 'No midday readings in the selected period';
+
+  @override
+  String get noEveningReadings => 'No evening readings in the selected period';
+
+  @override
+  String get noNightReadings => 'No night readings in the selected period';
+
+  @override
+  String get adjustTrendFilters => 'Try a different date range or time of day';
+
+  @override
   String get statusSummary => 'Status Summary';
 
   @override
