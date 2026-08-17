@@ -1221,6 +1221,54 @@ class AppLocalizationsKa extends AppLocalizations {
   String get failedToLoadTrends => 'ტრენდების ჩატვირთვა ვერ მოხერხდა';
 
   @override
+  String get timeOfDay => 'დღის დრო';
+
+  @override
+  String get selected => 'არჩეულია';
+
+  @override
+  String get allReadings => 'ყველა ჩანაწერი';
+
+  @override
+  String get morning => 'დილა';
+
+  @override
+  String get morningReadings => 'დილის გაზომვები';
+
+  @override
+  String get midday => 'შუადღე';
+
+  @override
+  String get middayReadings => 'შუადღის გაზომვები';
+
+  @override
+  String get evening => 'საღამო';
+
+  @override
+  String get eveningReadings => 'საღამოს გაზომვები';
+
+  @override
+  String get night => 'ღამე';
+
+  @override
+  String get nightReadings => 'ღამის გაზომვები';
+
+  @override
+  String get noMorningReadings => 'არჩეულ პერიოდში დილის გაზომვები არ არის';
+
+  @override
+  String get noMiddayReadings => 'არჩეულ პერიოდში შუადღის გაზომვები არ არის';
+
+  @override
+  String get noEveningReadings => 'არჩეულ პერიოდში საღამოს გაზომვები არ არის';
+
+  @override
+  String get noNightReadings => 'არჩეულ პერიოდში ღამის გაზომვები არ არის';
+
+  @override
+  String get adjustTrendFilters => 'სცადეთ სხვა პერიოდი ან დღის დრო';
+
+  @override
   String get statusSummary => 'სტატუსის შეჯამება';
 
   @override

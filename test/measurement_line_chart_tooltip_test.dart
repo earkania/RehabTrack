@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rehab_track/domain/entities/measurement_chart.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/utils/measurement_chart_axis.dart';
 import 'package:rehab_track/presentation/widgets/charts/measurement_line_chart.dart';
 
 const _leftPad = 8.0;
@@ -109,14 +109,19 @@ Offset _spotPixel(
 }) {
   final size = _canvasSize(tester);
 
-  final minY = values.reduce(math.min);
-  final maxY = values.reduce(math.max);
-  final padding = (maxY - minY) * 0.15;
-  final adjustedMinY = math.max(0.0, minY - padding);
-  final adjustedMaxY = maxY + padding;
+  final chart = tester.widget<LineChart>(find.byType(LineChart));
+  final allValues = <double>[
+    for (final bar in chart.data.lineBarsData)
+      for (final spot in bar.spots) spot.y,
+  ];
+  var maxPoints = 0;
+  for (final bar in chart.data.lineBarsData) {
+    if (bar.spots.length > maxPoints) maxPoints = bar.spots.length;
+  }
+  final axis = computeMeasurementChartAxis(values: allValues);
 
-  final x = index / (values.length - 1) * size.width;
-  final y = (1 - (values[index] - adjustedMinY) / (adjustedMaxY - adjustedMinY)) *
+  final x = maxPoints <= 1 ? 0.0 : index / (maxPoints - 1) * size.width;
+  final y = (1 - (values[index] - axis.minY) / (axis.maxY - axis.minY)) *
       size.height;
 
   final leafFinder = find.byWidgetPredicate(

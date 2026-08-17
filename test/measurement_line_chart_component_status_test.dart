@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ import 'package:rehab_track/domain/entities/measurement_data_point.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/domain/services/measurement_chart_builder.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/utils/measurement_chart_axis.dart';
 import 'package:rehab_track/presentation/utils/reading_status_color.dart';
 import 'package:rehab_track/presentation/widgets/charts/measurement_line_chart.dart';
 
@@ -128,6 +128,49 @@ List<MeasurementChartSeries> _bloodPressureSeries() {
   );
 }
 
+List<MeasurementChartSeries> _singleSeries({
+  required String typeKey,
+  required String fieldKey,
+  required String label,
+  required String unit,
+  required List<double> values,
+}) {
+  final t1 = DateTime(2026, 7, 1, 9, 0);
+  final dataPoints = [
+    for (var i = 0; i < values.length; i++)
+      MeasurementDataPoint(
+        record: _record(id: i + 1, timestamp: t1.add(Duration(days: i))),
+        values: [_value(fieldKey: fieldKey, numericValue: values[i], unit: unit)],
+      ),
+  ];
+  return MeasurementChartBuilder.buildSeries(
+    typeKey: typeKey,
+    dataPoints: dataPoints,
+    fields: [
+      MeasurementTypeField(
+        measurementTypeId: 1,
+        fieldKey: fieldKey,
+        label: label,
+        createdAt: t1,
+      ),
+    ],
+  );
+}
+
+/// Collects the left (Y) axis labels from the rendered chart. Bottom date
+/// labels never match the pure-numeric pattern, so this only picks up the
+/// numeric tick texts.
+List<String> _yAxisLabels(WidgetTester tester) {
+  final numeric = RegExp(r'^-?\d+(\.\d+)?$');
+  return tester
+      .widgetList<Text>(
+        find.descendant(of: find.byType(LineChart), matching: find.byType(Text)),
+      )
+      .map((t) => t.data ?? t.textSpan?.toPlainText() ?? '')
+      .where(numeric.hasMatch)
+      .toList();
+}
+
 Future<void> _pumpChart(
   WidgetTester tester, {
   required List<MeasurementChartSeries> series,
@@ -185,14 +228,19 @@ Offset _spotPixel(
   final leafH = _chartHeight - _topPad - _bottomPad;
   final size = Size(leafW - _leftReserved, leafH - _bottomReserved);
 
-  final minY = values.reduce(math.min);
-  final maxY = values.reduce(math.max);
-  final padding = (maxY - minY) * 0.15;
-  final adjustedMinY = math.max(0.0, minY - padding);
-  final adjustedMaxY = maxY + padding;
+  final chart = tester.widget<LineChart>(find.byType(LineChart));
+  final allValues = <double>[
+    for (final bar in chart.data.lineBarsData)
+      for (final spot in bar.spots) spot.y,
+  ];
+  var maxPoints = 0;
+  for (final bar in chart.data.lineBarsData) {
+    if (bar.spots.length > maxPoints) maxPoints = bar.spots.length;
+  }
+  final axis = computeMeasurementChartAxis(values: allValues);
 
-  final x = index / (values.length - 1) * size.width;
-  final y = (1 - (values[index] - adjustedMinY) / (adjustedMaxY - adjustedMinY)) *
+  final x = maxPoints <= 1 ? 0.0 : index / (maxPoints - 1) * size.width;
+  final y = (1 - (values[index] - axis.minY) / (axis.maxY - axis.minY)) *
       size.height;
 
   final leafFinder = find.byWidgetPredicate(
@@ -661,6 +709,70 @@ void main() {
               'above the value with no repeated header or extra spacing');
 
       await _release(tester, gesture);
+    });
+  });
+
+  group('Y-axis scale', () {
+    testWidgets('blood pressure shows one clean 40..140 tick sequence',
+        (tester) async {
+      final series = _bloodPressureSeries();
+      await _pumpChart(tester, series: series);
+
+      final data = tester.widget<LineChart>(find.byType(LineChart)).data;
+      expect(data.minY, 40);
+      expect(data.maxY, 140);
+
+      final labels = _yAxisLabels(tester).toSet();
+      expect(labels, {'40', '60', '80', '100', '120', '140'},
+          reason: 'the y-axis must show the canonical tick sequence only');
+      expect(labels, isNot(contains('42.3')));
+      expect(labels, isNot(contains('143.7')));
+    });
+
+    testWidgets('readings 54 and 132 stay inside the clean bounds',
+        (tester) async {
+      final series = _singleSeries(
+        typeKey: 'blood_pressure',
+        fieldKey: 'systolic',
+        label: 'Systolic',
+        unit: 'mmHg',
+        values: const [54, 132],
+      );
+      await _pumpChart(tester, series: series);
+
+      final data = tester.widget<LineChart>(find.byType(LineChart)).data;
+      expect(data.minY, 40,
+          reason: 'bounds are aligned outward to the clean tick boundary');
+      expect(data.maxY, 140);
+      expect(data.minY, lessThanOrEqualTo(54),
+          reason: 'the lowest reading must never be clipped');
+      expect(data.maxY, greaterThanOrEqualTo(132),
+          reason: 'the highest reading must never be clipped');
+
+      final labels = _yAxisLabels(tester).toSet();
+      expect(labels, {'40', '60', '80', '100', '120', '140'});
+      expect(labels, isNot(contains('42.3')));
+      expect(labels, isNot(contains('143.7')));
+    });
+
+    testWidgets('a decimal measurement keeps readable numeric ticks',
+        (tester) async {
+      final series = _singleSeries(
+        typeKey: 'weight',
+        fieldKey: 'weight',
+        label: 'Weight',
+        unit: 'kg',
+        values: const [71.3, 74.8],
+      );
+      await _pumpChart(tester, series: series);
+
+      final labels = _yAxisLabels(tester);
+      expect(labels.length, inInclusiveRange(4, 7));
+      for (final label in labels) {
+        expect(double.tryParse(label), isNotNull,
+            reason: 'every y-axis label must be a clean number');
+        expect(label, isNot(contains('99999')));
+      }
     });
   });
 }

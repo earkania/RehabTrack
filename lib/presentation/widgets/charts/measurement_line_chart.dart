@@ -2,10 +2,11 @@ import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:rehab_track/domain/entities/measurement_chart.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/utils/localized_date_format.dart';
+import 'package:rehab_track/presentation/utils/measurement_chart_axis.dart';
 import 'package:rehab_track/presentation/utils/reading_status_color.dart';
 
 class MeasurementLineChart extends StatefulWidget {
@@ -127,20 +128,16 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
     if (values.isEmpty) {
       return Offset.zero;
     }
-    final minY = values.reduce(math.min);
-    final maxY = values.reduce(math.max);
-    final padding = (maxY - minY) * 0.15;
-    final adjustedMinY = (minY - padding).clamp(0.0, double.infinity);
-    final adjustedMaxY = maxY + padding;
+    final axis = computeMeasurementChartAxis(values: values);
 
     final deltaX = (maxPoints - 1).toDouble();
-    final deltaY = adjustedMaxY - adjustedMinY;
+    final deltaY = axis.maxY - axis.minY;
 
     final x = deltaX == 0 ? 0.0 : topSpot.x / deltaX * box.size.width;
     final y = deltaY == 0
         ? box.size.height
         : box.size.height -
-            (topSpot.y - adjustedMinY) / deltaY * box.size.height;
+            (topSpot.y - axis.minY) / deltaY * box.size.height;
 
     return box.localToGlobal(Offset(x, y));
   }
@@ -356,11 +353,7 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
     if (allPoints.isEmpty) return const SizedBox.shrink();
 
     final allValues = allPoints.map((p) => p.numericValue).toList();
-    final minY = allValues.reduce((a, b) => a < b ? a : b);
-    final maxY = allValues.reduce((a, b) => a > b ? a : b);
-    final padding = (maxY - minY) * 0.15;
-    final adjustedMinY = (minY - padding).clamp(0.0, double.infinity);
-    final adjustedMaxY = maxY + padding;
+    final axis = computeMeasurementChartAxis(values: allValues);
 
     final seriesColors = [
       colorScheme.primary,
@@ -438,12 +431,12 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
         ),
         child: LineChart(
           LineChartData(
-            minY: adjustedMinY,
-            maxY: adjustedMaxY,
+            minY: axis.minY,
+            maxY: axis.maxY,
             gridData: FlGridData(
               show: true,
               drawVerticalLine: false,
-              horizontalInterval: _calculateInterval(adjustedMinY, adjustedMaxY),
+              horizontalInterval: axis.interval,
               getDrawingHorizontalLine: (value) => FlLine(
                 color: colorScheme.outlineVariant.withValues(alpha: 0.5),
                 strokeWidth: 0.5,
@@ -454,10 +447,11 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 40,
+                  interval: axis.interval,
                   getTitlesWidget: (value, meta) => Padding(
                     padding: const EdgeInsets.only(right: 4),
                     child: Text(
-                      _formatAxisValue(value),
+                      axis.format(value),
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontSize: 10,
                       ),
@@ -546,13 +540,6 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
     return result;
   }
 
-  String _formatAxisValue(double value) {
-    if (value == value.roundToDouble()) {
-      return value.toInt().toString();
-    }
-    return value.toStringAsFixed(1);
-  }
-
   String _formatValue(double value) {
     if (value == value.roundToDouble()) {
       return value.toInt().toString();
@@ -564,26 +551,16 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
     final now = DateTime.now();
     final diff = now.difference(date);
     if (diff.inDays < 1) {
-      return DateFormat.Hm().format(date);
+      return LocalizedDateFormat.hourMinute(context, date);
     }
     if (diff.inDays < 30) {
-      return DateFormat('d MMM').format(date);
+      return LocalizedDateFormat.dayShortMonth(context, date);
     }
-    return DateFormat('MMM yy').format(date);
+    return LocalizedDateFormat.shortMonthYear(context, date);
   }
 
   String _formatFullDate(DateTime date) {
-    return DateFormat('dd.MM.yyyy HH:mm').format(date);
-  }
-
-  double _calculateInterval(double min, double max) {
-    final range = max - min;
-    if (range <= 0) return 1;
-    if (range <= 10) return 2;
-    if (range <= 50) return 10;
-    if (range <= 100) return 20;
-    if (range <= 200) return 40;
-    return (range / 5).ceilToDouble();
+    return LocalizedDateFormat.numericFullDateTime(context, date);
   }
 
   double _calculateDateInterval(int pointCount) {

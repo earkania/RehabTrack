@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/measurement_period.dart';
+import 'package:rehab_track/domain/entities/measurement_time_of_day_filter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
@@ -13,6 +14,7 @@ import 'package:rehab_track/presentation/widgets/empty_state.dart';
 import 'package:rehab_track/presentation/widgets/measurements/measurement_period_selector.dart';
 import 'package:rehab_track/presentation/widgets/measurements/measurement_statistics_card.dart';
 import 'package:rehab_track/presentation/widgets/measurements/measurement_status_summary_card.dart';
+import 'package:rehab_track/presentation/widgets/measurements/measurement_time_of_day_selector.dart';
 
 class MeasurementTrendsScreen extends ConsumerStatefulWidget {
   final int measurementTypeId;
@@ -56,35 +58,25 @@ class _MeasurementTrendsScreenState
           if (type == null) return Center(child: Text(l10n.error));
 
           final typeName = MeasurementLocalizer.typeName(l10n, type.key);
+          final selectedTimeOfDay = ref.watch(
+            measurementTrendTimeOfDayFilterProvider,
+          );
           final trendParams = (
             measurementTypeId: widget.measurementTypeId,
             period: _selectedPeriod,
+            timeOfDay: selectedTimeOfDay,
           );
           final trendAsync = ref.watch(trendDataProvider(trendParams));
 
           return trendAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => _buildError(l10n),
-            data: (trendData) {
-              if (trendData.dataPoints.isEmpty) {
-                return EmptyState(
-                  icon: Icons.show_chart,
-                  title: l10n.noTrendData,
-                  subtitle: l10n.addFirstReading,
-                  actionLabel: l10n.addReading,
-                  onAction: () => context.push(
-                    AppRoutes.measurementAdd(widget.measurementTypeId),
-                  ),
-                );
-              }
-
-              return _buildContent(
-                l10n,
-                typeName,
-                type.key ?? '',
-                trendData,
-              );
-            },
+            data: (trendData) => _buildContent(
+              l10n,
+              typeName,
+              type.key ?? '',
+              trendData,
+            ),
           );
         },
       ),
@@ -97,8 +89,13 @@ class _MeasurementTrendsScreenState
     String typeKey,
     TrendData trendData,
   ) {
+    final selectedTimeOfDay = ref.watch(
+      measurementTrendTimeOfDayFilterProvider,
+    );
     final hasOneReading = trendData.dataPoints.length == 1;
-    final showChart = !hasOneReading;
+    final isEmpty = trendData.dataPoints.isEmpty;
+    final filterEmpty =
+        isEmpty && selectedTimeOfDay != MeasurementTimeOfDayFilter.all;
 
     return CustomScrollView(
       slivers: [
@@ -119,64 +116,125 @@ class _MeasurementTrendsScreenState
                     setState(() => _selectedPeriod = period);
                   },
                 ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  l10n.timeOfDay,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                MeasurementTimeOfDaySelector(
+                  selected: selectedTimeOfDay,
+                  onChanged: (filter) {
+                    ref
+                        .read(measurementTrendTimeOfDayFilterProvider.notifier)
+                        .state = filter;
+                  },
+                ),
               ],
             ),
           ),
         ),
-        if (showChart)
+        if (isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: filterEmpty
+                ? _buildFilteredEmptyState(l10n, selectedTimeOfDay)
+                : _buildNoDataState(l10n),
+          )
+        else ...[
+          if (hasOneReading)
+            SliverToBoxAdapter(
+              child: _OneReadingCard(
+                trendData: trendData,
+                typeKey: typeKey,
+              ),
+            )
+          else
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+                child: MeasurementLineChart(
+                  series: trendData.chartSeries,
+                  typeKey: typeKey,
+                ),
+              ),
+            ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.sm),
-              child: MeasurementLineChart(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: MeasurementStatisticsCard(
+                fieldStatistics: trendData.fieldStatistics,
                 series: trendData.chartSeries,
                 typeKey: typeKey,
+                ranges: trendData.ranges,
               ),
             ),
           ),
-        if (hasOneReading)
           SliverToBoxAdapter(
-            child: _OneReadingCard(
-              trendData: trendData,
-              typeKey: typeKey,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              child: MeasurementStatusSummaryCard(
+                summary: trendData.statusSummary,
+              ),
             ),
           ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            child: MeasurementStatisticsCard(
-              fieldStatistics: trendData.fieldStatistics,
-              series: trendData.chartSeries,
-              typeKey: typeKey,
-              ranges: trendData.ranges,
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.sm,
+                AppSpacing.md,
+                AppSpacing.lg,
+              ),
+              child: MeasurementChartLegend(
+                series: trendData.chartSeries,
+                showIrregularHeartbeat: typeKey == 'blood_pressure',
+              ),
             ),
           ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            child: MeasurementStatusSummaryCard(
-              summary: trendData.statusSummary,
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              AppSpacing.sm,
-              AppSpacing.md,
-              AppSpacing.lg,
-            ),
-            child: MeasurementChartLegend(
-              series: trendData.chartSeries,
-              showIrregularHeartbeat: typeKey == 'blood_pressure',
-            ),
-          ),
-        ),
+        ],
       ],
+    );
+  }
+
+  Widget _buildNoDataState(AppLocalizations l10n) {
+    return EmptyState(
+      icon: Icons.show_chart,
+      title: l10n.noTrendData,
+      subtitle: l10n.addFirstReading,
+      actionLabel: l10n.addReading,
+      onAction: () => context.push(
+        AppRoutes.measurementAdd(widget.measurementTypeId),
+      ),
+    );
+  }
+
+  Widget _buildFilteredEmptyState(
+    AppLocalizations l10n,
+    MeasurementTimeOfDayFilter filter,
+  ) {
+    final String title;
+    switch (filter) {
+      case MeasurementTimeOfDayFilter.all:
+        title = l10n.noTrendData;
+      case MeasurementTimeOfDayFilter.morning:
+        title = l10n.noMorningReadings;
+      case MeasurementTimeOfDayFilter.midday:
+        title = l10n.noMiddayReadings;
+      case MeasurementTimeOfDayFilter.evening:
+        title = l10n.noEveningReadings;
+      case MeasurementTimeOfDayFilter.night:
+        title = l10n.noNightReadings;
+    }
+    return EmptyState(
+      icon: Icons.filter_alt_off,
+      title: title,
+      subtitle: l10n.adjustTrendFilters,
     );
   }
 

@@ -2342,6 +2342,102 @@ abstract class AppLocalizations {
   /// **'Failed to load trends'**
   String get failedToLoadTrends;
 
+  /// No description provided for @timeOfDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Time of day'**
+  String get timeOfDay;
+
+  /// No description provided for @selected.
+  ///
+  /// In en, this message translates to:
+  /// **'selected'**
+  String get selected;
+
+  /// No description provided for @allReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'All readings'**
+  String get allReadings;
+
+  /// No description provided for @morning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morning;
+
+  /// No description provided for @morningReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning readings'**
+  String get morningReadings;
+
+  /// No description provided for @midday.
+  ///
+  /// In en, this message translates to:
+  /// **'Midday'**
+  String get midday;
+
+  /// No description provided for @middayReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Midday readings'**
+  String get middayReadings;
+
+  /// No description provided for @evening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get evening;
+
+  /// No description provided for @eveningReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening readings'**
+  String get eveningReadings;
+
+  /// No description provided for @night.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get night;
+
+  /// No description provided for @nightReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Night readings'**
+  String get nightReadings;
+
+  /// No description provided for @noMorningReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'No morning readings in the selected period'**
+  String get noMorningReadings;
+
+  /// No description provided for @noMiddayReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'No midday readings in the selected period'**
+  String get noMiddayReadings;
+
+  /// No description provided for @noEveningReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'No evening readings in the selected period'**
+  String get noEveningReadings;
+
+  /// No description provided for @noNightReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'No night readings in the selected period'**
+  String get noNightReadings;
+
+  /// No description provided for @adjustTrendFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different date range or time of day'**
+  String get adjustTrendFilters;
+
   /// No description provided for @statusSummary.
   ///
   /// In en, this message translates to:
