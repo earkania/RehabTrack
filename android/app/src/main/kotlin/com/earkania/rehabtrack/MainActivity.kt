@@ -4,9 +4,14 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.Ringtone
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.os.StatFs
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
@@ -29,11 +34,27 @@ class MainActivity : FlutterActivity() {
     private val CREATE_DOCUMENT_REQUEST = 2001
     private val OPEN_DOCUMENT_REQUEST = 2002
     private val OPEN_DOCUMENTS_REQUEST = 2003
+    private val PICK_RINGTONE_REQUEST = 2004
 
     private var pendingCreateResult: MethodChannel.Result? = null
     private var pendingCreateBytes: ByteArray? = null
     private var pendingOpenResult: MethodChannel.Result? = null
     private var pendingOpenDocsResult: MethodChannel.Result? = null
+    private var pendingRingtoneResult: MethodChannel.Result? = null
+
+    /// Looping alarm player for the Alarm-style presentation and its settings
+    /// preview. Playback uses USAGE_ALARM so it follows the same alarm volume
+    /// and Do Not Disturb policy as the notification channel's own sound.
+    private var alarmPlayer: Ringtone? = null
+    private var previewPlayer: Ringtone? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val stopPreviewRunnable = Runnable {
+        previewPlayer?.stop()
+        previewPlayer = null
+    }
+
+    /// Max preview length before the sound stops itself (~12 s).
+    private val PREVIEW_DURATION_MS = 12_000L
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -48,8 +69,44 @@ class MainActivity : FlutterActivity() {
                 "hasExactAlarmPermission" -> {
                     result.success(hasExactAlarmPermission())
                 }
+                "canUseFullScreenIntent" -> {
+                    result.success(canUseFullScreenIntent())
+                }
+                "getAndroidSdkInt" -> {
+                    result.success(Build.VERSION.SDK_INT)
+                }
+                "openFullScreenIntentSettings" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        openFullScreenIntentSettings(result)
+                    } else {
+                        result.success(false)
+                    }
+                }
                 "getTimeZone" -> {
                     result.success(TimeZone.getDefault().id)
+                }
+                "getDefaultAlarmSoundUri" -> {
+                    result.success(getDefaultAlarmSoundUri())
+                }
+                "getRingtoneTitle" -> {
+                    result.success(ringtoneTitle(call.argument<String>("uri")))
+                }
+                "pickAlarmSound" -> {
+                    pickAlarmSound(call, result)
+                }
+                "startAlarmSound" -> {
+                    playAlarmSound(call, result, isPreview = false)
+                }
+                "stopAlarmSound" -> {
+                    stopAlarmSound()
+                    result.success(true)
+                }
+                "startAlarmSoundPreview" -> {
+                    playAlarmSound(call, result, isPreview = true)
+                }
+                "stopAlarmSoundPreview" -> {
+                    stopAlarmSoundPreview()
+                    result.success(true)
                 }
                 "openImageWithPhotos" -> {
                     openImageWithPhotos(call, result)
@@ -192,6 +249,7 @@ class MainActivity : FlutterActivity() {
             CREATE_DOCUMENT_REQUEST -> handleCreateDocumentResult(resultCode, data)
             OPEN_DOCUMENT_REQUEST -> handleOpenDocumentResult(resultCode, data)
             OPEN_DOCUMENTS_REQUEST -> handleOpenDocumentsResult(resultCode, data)
+            PICK_RINGTONE_REQUEST -> handlePickRingtoneResult(resultCode, data)
         }
     }
 
@@ -477,6 +535,155 @@ class MainActivity : FlutterActivity() {
         } else {
             true
         }
+    }
+
+    /**
+     * Whether the app may present full-screen alarms on this device.
+     *
+     * Full-screen intents are only supported on API 34+ and require either the
+     * USE_FULL_SCREEN_INTENT permission or a granted exemption for alarm apps.
+     * Below API 34 (or when neither applies) Android degrades the presentation
+     * to a heads-up notification, which the Alarm-style fallback handles.
+     */
+    private fun canUseFullScreenIntent(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            notificationManager.canUseFullScreenIntent()
+        } else {
+            false
+        }
+    }
+
+    /** Opens the system "Full screen content" settings page for this app. */
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private fun openFullScreenIntentSettings(result: MethodChannel.Result) {
+        try {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
+                data = android.net.Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+            result.success(true)
+        } catch (e: Exception) {
+            result.error("OPEN_FULL_SCREEN_SETTINGS_ERROR", e.message, null)
+        }
+    }
+
+    /** Returns the device's default alarm sound URI (falls back to ringtone/notification). */
+    private fun getDefaultAlarmSoundUri(): String? {
+        val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        if (alarmUri != null) return alarmUri.toString()
+        val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+        if (ringtoneUri != null) return ringtoneUri.toString()
+        return null
+    }
+
+    /** Resolves the human-readable title for a ringtone/alarm URI, or null. */
+    private fun ringtoneTitle(uri: String?): String? {
+        if (uri.isNullOrEmpty()) return null
+        return try {
+            RingtoneManager.getRingtone(applicationContext, Uri.parse(uri))
+                ?.getTitle(applicationContext)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /** Launches the system alarm-sound picker and resolves the chosen URI + title. */
+    private fun pickAlarmSound(call: MethodCall, result: MethodChannel.Result) {
+        if (pendingRingtoneResult != null) {
+            result.error("OPERATION_IN_PROGRESS", "a sound picker is already open", null)
+            return
+        }
+        pendingRingtoneResult = result
+        val currentUri = call.argument<String>("currentUri")
+        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Alarm sound")
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            if (!currentUri.isNullOrEmpty()) {
+                putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, Uri.parse(currentUri))
+            }
+        }
+        try {
+            startActivityForResult(intent, PICK_RINGTONE_REQUEST)
+        } catch (e: Exception) {
+            pendingRingtoneResult = null
+            result.error("RINGTONE_PICKER_ERROR", e.message, null)
+        }
+    }
+
+    private fun handlePickRingtoneResult(resultCode: Int, data: Intent?) {
+        val result = pendingRingtoneResult ?: return
+        pendingRingtoneResult = null
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            // User dismissed the picker (or chose a null/silent sound).
+            result.success(null)
+            return
+        }
+        val pickedUri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+        } ?: data.data
+        if (pickedUri == null) {
+            result.success(null)
+            return
+        }
+        val title = ringtoneTitle(pickedUri.toString())
+        val payload = JSONObject()
+            .put("uri", pickedUri.toString())
+            .put("title", title ?: JSONObject.NULL)
+        result.success(payload.toString())
+    }
+
+    /** Plays [uri] (or the default alarm sound when null) as an alarm loop. */
+    private fun playAlarmSound(call: MethodCall, result: MethodChannel.Result, isPreview: Boolean) {
+        val uri = call.argument<String>("uri")
+        val source = if (uri.isNullOrEmpty()) getDefaultAlarmSoundUri() else uri
+        if (source == null) {
+            result.error("NO_ALARM_SOUND", "no alarm sound available", null)
+            return
+        }
+        try {
+            val ringtone = RingtoneManager.getRingtone(applicationContext, Uri.parse(source))
+                ?: throw IllegalStateException("could not load ringtone")
+            ringtone.audioAttributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            ringtone.isLooping = true
+            if (isPreview) {
+                stopAlarmSoundPreview()
+                previewPlayer = ringtone
+                ringtone.play()
+                mainHandler.removeCallbacks(stopPreviewRunnable)
+                mainHandler.postDelayed(stopPreviewRunnable, PREVIEW_DURATION_MS)
+            } else {
+                stopAlarmSoundPreview()
+                stopAlarmSound()
+                alarmPlayer = ringtone
+                ringtone.play()
+            }
+            result.success(true)
+        } catch (e: Exception) {
+            result.error("PLAY_ERROR", e.message, null)
+        }
+    }
+
+    /** Stops the looping alarm player immediately. */
+    private fun stopAlarmSound() {
+        alarmPlayer?.stop()
+        alarmPlayer = null
+    }
+
+    /** Stops a playing preview immediately and cancels its auto-stop timer. */
+    private fun stopAlarmSoundPreview() {
+        mainHandler.removeCallbacks(stopPreviewRunnable)
+        previewPlayer?.stop()
+        previewPlayer = null
     }
 
     /** Opens an image file directly in the Google Photos app, falling back to a generic viewer. */

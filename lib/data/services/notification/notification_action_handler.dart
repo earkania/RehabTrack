@@ -31,4 +31,9 @@ typedef NotificationActionCallback = void Function(
 
 /// Invoked when a notification body is tapped (no action button pressed). The
 /// payload allows routing doctor-visit notifications to the matching visit.
-typedef NotificationTapCallback = void Function(String? payload);
+/// [notificationId] is the id of the tapped notification (used to dismiss an
+/// active Alarm-style presentation).
+typedef NotificationTapCallback = void Function(
+  int? notificationId,
+  String? payload,
+);

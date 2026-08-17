@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../../domain/entities/reminder_style.dart';
 import '../../../domain/entities/schedule_config.dart';
 import 'notification_service.dart';
 
@@ -11,6 +12,8 @@ class NotificationScheduler {
     this.playSound = true,
     this.enableVibration = true,
     this.notificationVisibility = NotificationVisibility.public,
+    this.reminderStyle = ReminderStyle.standard,
+    this.fullScreenIntentForAlarm = false,
   });
 
   final NotificationService _notificationService;
@@ -18,7 +21,30 @@ class NotificationScheduler {
   final bool enableVibration;
   final NotificationVisibility notificationVisibility;
 
+  /// Selects which channel presents scheduled reminders. Standard style keeps
+  /// the per-event channels; prominent style routes everything through the
+  /// dedicated prominent channel; alarm style routes everything through the
+  /// dedicated alarm channel. Changing this later through settings reschedules
+  /// future pending notifications with the new channel.
+  final ReminderStyle reminderStyle;
+
+  /// When true and [reminderStyle] is [ReminderStyle.alarmStyle], scheduled
+  /// reminders request a full-screen intent presentation (requires Android 14+
+  /// and the `USE_FULL_SCREEN_INTENT` exemption). When false, alarm-style
+  /// reminders still use the alarm channel but present as a heads-up alert.
+  final bool fullScreenIntentForAlarm;
+
   static const _schedulingHorizonDays = 30;
+
+  String _resolveChannelId(String eventChannelId) {
+    return NotificationService.channelForReminderStyle(
+      style: reminderStyle,
+      eventChannelId: eventChannelId,
+    );
+  }
+
+  bool _useFullScreenIntent() =>
+      reminderStyle == ReminderStyle.alarmStyle && fullScreenIntentForAlarm;
 
   Future<List<int>> scheduleOccurrences({
     required int scheduleId,
@@ -85,12 +111,13 @@ class NotificationScheduler {
           body: body,
           scheduledDate: occ.dateTime,
           payload: occPayload,
-          channelId: channelId,
+          channelId: _resolveChannelId(channelId),
           includeActions: includeActions,
           isMeasurement: isMeasurement,
           playSound: playSound ?? this.playSound,
           enableVibration: enableVibration ?? this.enableVibration,
           visibility: visibility ?? notificationVisibility,
+          fullScreenIntent: _useFullScreenIntent(),
         );
         scheduledIds.add(notificationId);
       } catch (_) {}
@@ -119,13 +146,14 @@ class NotificationScheduler {
       body: body,
       scheduledDate: scheduledDate,
       payload: payload,
-      channelId: channelId,
+      channelId: _resolveChannelId(channelId),
       includeActions: includeActions,
       isMeasurement: isMeasurement,
       isDoctorVisit: isDoctorVisit,
       playSound: playSound ?? this.playSound,
       enableVibration: enableVibration ?? this.enableVibration,
       visibility: visibility ?? notificationVisibility,
+      fullScreenIntent: _useFullScreenIntent(),
     );
     return notificationId;
   }

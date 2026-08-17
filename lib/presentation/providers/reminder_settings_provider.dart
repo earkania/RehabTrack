@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/core/constants/app_constants.dart';
+import 'package:rehab_track/domain/entities/alarm_sound_selection.dart';
+import 'package:rehab_track/domain/entities/reminder_style.dart';
 import 'package:rehab_track/domain/repositories/settings_repository.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 
@@ -42,6 +44,22 @@ final reminderVibrationEnabledProvider =
 final defaultSnoozeDurationProvider =
     StateNotifierProvider<SnoozeDurationNotifier, int>((ref) {
   return SnoozeDurationNotifier(
+    ref.read(settingsRepositoryProvider),
+  );
+});
+
+final reminderStyleProvider =
+    StateNotifierProvider<ReminderStyleNotifier, ReminderStyle>((ref) {
+  return ReminderStyleNotifier(
+    ref.read(settingsRepositoryProvider),
+  );
+});
+
+/// The user-selected Alarm-style alarm sound (native alarm player), or null
+/// when the system default alarm sound is used.
+final alarmSoundProvider =
+    StateNotifierProvider<AlarmSoundNotifier, AlarmSoundSelection?>((ref) {
+  return AlarmSoundNotifier(
     ref.read(settingsRepositoryProvider),
   );
 });
@@ -102,6 +120,80 @@ class SnoozeDurationNotifier extends StateNotifier<int> {
       AppConstants.defaultSnoozeDurationKey,
       minutes.toString(),
     );
+  }
+}
+
+class ReminderStyleNotifier extends StateNotifier<ReminderStyle> {
+  final SettingsRepository _settingsRepository;
+  Future<void>? _loadFuture;
+
+  ReminderStyleNotifier(this._settingsRepository)
+      : super(ReminderStyle.standard) {
+    _loadFuture = _load();
+  }
+
+  Future<void> get ready => _loadFuture ?? Future.value();
+
+  Future<void> _load() async {
+    final raw = await _settingsRepository.getValue(AppConstants.reminderStyleKey);
+    if (raw != null) {
+      state = ReminderStyle.fromStorageValue(raw);
+    }
+  }
+
+  Future<void> setStyle(ReminderStyle style) async {
+    state = style;
+    await _settingsRepository.setValue(
+      AppConstants.reminderStyleKey,
+      style.storageValue,
+    );
+  }
+}
+
+/// Persists the user's Alarm-style alarm sound selection. A null state means
+/// the system default alarm sound is used.
+class AlarmSoundNotifier extends StateNotifier<AlarmSoundSelection?> {
+  final SettingsRepository _settingsRepository;
+  Future<void>? _loadFuture;
+
+  AlarmSoundNotifier(this._settingsRepository) : super(null) {
+    _loadFuture = _load();
+  }
+
+  Future<void> get ready => _loadFuture ?? Future.value();
+
+  Future<void> _load() async {
+    final uri = await _settingsRepository.getValue(
+      AppConstants.alarmSoundUriKey,
+    );
+    if (uri == null || uri.isEmpty) return;
+    final title = await _settingsRepository.getValue(
+      AppConstants.alarmSoundTitleKey,
+    );
+    state = AlarmSoundSelection(uri: uri, title: title);
+  }
+
+  Future<void> setAlarmSound(AlarmSoundSelection selection) async {
+    state = selection;
+    await _settingsRepository.setValue(
+      AppConstants.alarmSoundUriKey,
+      selection.uri,
+    );
+    if (selection.title == null || selection.title!.isEmpty) {
+      await _settingsRepository.remove(AppConstants.alarmSoundTitleKey);
+    } else {
+      await _settingsRepository.setValue(
+        AppConstants.alarmSoundTitleKey,
+        selection.title!,
+      );
+    }
+  }
+
+  /// Clears the selection, falling back to the system default alarm sound.
+  Future<void> clear() async {
+    state = null;
+    await _settingsRepository.remove(AppConstants.alarmSoundUriKey);
+    await _settingsRepository.remove(AppConstants.alarmSoundTitleKey);
   }
 }
 

@@ -53,6 +53,7 @@ import 'package:rehab_track/presentation/screens/settings/manage_backups_screen.
 import 'package:rehab_track/presentation/screens/settings/patient_profile_view_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_edit_screen.dart';
 import 'package:rehab_track/presentation/screens/settings/notification_diagnostics_screen.dart';
+import 'package:rehab_track/presentation/screens/settings/alarm_style_screen.dart';
 import 'package:rehab_track/presentation/screens/common/module_placeholder_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -104,6 +105,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+      // Alarm-style full-screen presentation (top-level: no nav bar, full-screen)
+      GoRoute(
+        path: AppRoutes.alarm,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: AlarmStyleScreen(),
+        ),
       ),
       // Health
       GoRoute(

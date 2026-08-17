@@ -5,11 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/router/app_routes.dart';
+import '../../data/services/notification/alarm_presentation.dart';
+import '../../data/services/notification/alarm_style_capability_service.dart';
 import '../../data/services/notification/notification_action_bridge.dart';
 import '../../data/services/notification/notification_action_handler.dart';
 import '../../data/services/notification/notification_scheduler.dart';
 import '../../data/services/notification/notification_service.dart';
 import '../../data/services/notification/schedule_recovery_service.dart';
+import '../../domain/entities/reminder_style.dart';
 import '../../domain/entities/scheduled_measurement.dart';
 import 'database_provider.dart';
 import 'profile_provider.dart';
@@ -31,14 +34,49 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
   return service;
 });
 
+/// Synchronous, last-known full-screen allowance for alarm-style reminders.
+/// Kept in sync by [alarmStyleCapabilityProvider]; the scheduler reads this so
+/// it never blocks on a platform call when building notification details.
+final alarmFullScreenAllowedProvider = StateProvider<bool>((ref) => false);
+
+/// The currently active Alarm-style presentation to show on the Alarm screen.
+/// Set when an alarm notification is opened; cleared when the presentation is
+/// acknowledged (dismissed or completed).
+final activeAlarmPresentationProvider =
+    StateProvider<AlarmPresentation?>((ref) => null);
+
+/// Probe alarm-style capability on the current device and mirrors the
+/// full-screen allowance into [alarmFullScreenAllowedProvider].
+final alarmStyleCapabilityProvider =
+    FutureProvider<AlarmStyleCapability>((ref) async {
+  final service = ref.watch(alarmStyleCapabilityServiceProvider);
+  final capability = await service.check();
+  ref.read(alarmFullScreenAllowedProvider.notifier).state =
+      capability.fullScreenAllowed == true;
+  return capability;
+});
+
+/// Service used to inspect alarm-style capability and to open the system
+/// "Full screen content" settings for this app.
+final alarmStyleCapabilityServiceProvider =
+    Provider<AlarmStyleCapabilityService>((ref) {
+  return AlarmStyleCapabilityService(
+    notificationService: ref.watch(notificationServiceProvider),
+  );
+});
+
 final notificationSchedulerProvider = Provider<NotificationScheduler>((ref) {
   final service = ref.watch(notificationServiceProvider);
   final soundEnabled = ref.watch(reminderSoundEnabledProvider);
   final vibrationEnabled = ref.watch(reminderVibrationEnabledProvider);
+  final style = ref.watch(reminderStyleProvider);
+  final fullScreenAllowed = ref.watch(alarmFullScreenAllowedProvider);
   return NotificationScheduler(
     notificationService: service,
     playSound: soundEnabled,
     enableVibration: vibrationEnabled,
+    reminderStyle: style,
+    fullScreenIntentForAlarm: fullScreenAllowed,
   );
 });
 
@@ -71,11 +109,46 @@ final notificationActionBridgeProvider =
     showDetailsOnLockScreen: () {
       return ref.read(showDetailsOnLockScreenProvider);
     },
+    isAlarmStyleActive: () {
+      return ref.read(reminderStyleProvider) == ReminderStyle.alarmStyle;
+    },
+    onAlarmPresent: (notificationId, payload) {
+      ref.read(activeAlarmPresentationProvider.notifier).state =
+          AlarmPresentation(
+        notificationId: notificationId ?? 0,
+        payload: payload,
+      );
+      final service = ref.read(notificationServiceProvider);
+      // When a custom alarm sound is configured, hand audio over to the native
+      // alarm player and cancel the fired notification so the channel's
+      // default alarm sound stops immediately and the two never overlap.
+      // Without a selection the channel sound plays unchanged (system default).
+      final alarmSound = ref.read(alarmSoundProvider);
+      if (alarmSound != null) {
+        service.startAlarmSound(uri: alarmSound.uri);
+        service.cancelNotification(notificationId ?? 0);
+      }
+      // A real alarm must cut off any settings preview still playing.
+      service.stopAlarmSoundPreview();
+      try {
+        ref.read(routerProvider).push(AppRoutes.alarm);
+      } catch (_) {
+        // Navigation may fail during cold-start before the router is ready;
+        // the initializer re-checks the active presentation after startup.
+      }
+    },
     onActionProcessed: (actionType, payload) {
       ref.invalidate(todayAgendaProvider);
       final now = DateTime.now();
       ref.read(selectedAgendaDateProvider.notifier).state =
           DateTime(now.year, now.month, now.day);
+      // When an Alarm-style presentation is active the Alarm screen owns the
+      // navigation (it decides success vs inline-error before leaving); the
+      // generic notification routing below would yank the user away before the
+      // Alarm screen could react to a failed action.
+      if (ref.read(activeAlarmPresentationProvider) != null) {
+        return;
+      }
       try {
         if (actionType == NotificationActionType.measurementRecordNow &&
             payload.measurementTypeId != null) {
@@ -122,16 +195,43 @@ final exactAlarmPermissionProvider = FutureProvider<bool>((ref) async {
 });
 
 final notificationInitializerProvider = FutureProvider<void>((ref) async {
-  final bridge = ref.watch(notificationActionBridgeProvider);
-
   ref.onDispose(() {
     debugPrint('notificationInitializerProvider disposed');
   });
 
+  // Schedule recovery must build reminders with the persisted reminder style,
+  // not the in-memory default (standard) that exists before the setting loads.
+  // Without this wait, recovery re-schedules every occurrence on the plain
+  // per-event channels, so alarm-style reminders arrive silently as ordinary
+  // heads-up notifications instead of the full-screen alarm presentation.
+  await ref.read(reminderStyleProvider.notifier).ready;
+
+  final service = ref.watch(notificationServiceProvider);
+  await service.waitForInitialization();
+
+  // Probe alarm-style capability so the full-screen-intent allowance is known
+  // before any reminder is scheduled in this process. The settings screen also
+  // probes on open, but reminders can be scheduled from other flows (e.g. the
+  // doctor-visit form) before Settings is ever shown. A probe failure must not
+  // abort the rest of startup; the allowance simply stays at its default.
+  try {
+    await ref.read(alarmStyleCapabilityProvider.future);
+  } catch (e, stack) {
+    debugPrint('[notificationInitializerProvider] capability probe failed: $e');
+    debugPrint('[notificationInitializerProvider] $stack');
+  }
+
+  // Rebuild the bridge now that the persisted style is hydrated and the
+  // full-screen allowance is resolved. An earlier capture would keep a
+  // scheduler snapshot built from the default style and a false full-screen
+  // allowance, and schedule recovery on the wrong channel. Read (not watch) so
+  // invalidating the bridge cannot re-run this initializer mid-startup.
+  ref.invalidate(notificationActionBridgeProvider);
+  final bridge = ref.read(notificationActionBridgeProvider);
+
   await bridge.initialize();
 
   // Request notification permission on Android 13+.
-  final service = ref.watch(notificationServiceProvider);
   final hasPermission = await service.hasNotificationPermission();
   if (!hasPermission) {
     debugPrint('[notificationInitializerProvider] requesting notification permission');
@@ -144,6 +244,14 @@ final notificationInitializerProvider = FutureProvider<void>((ref) async {
 
   // Check if app was launched by a notification action (terminated process case).
   await bridge.processAppLaunchAction();
+
+  // Alarm-style cold-start presentation is intentionally NOT handled here.
+  // It needs the persisted reminder style hydrated (reminderStyleProvider loads
+  // from the database asynchronously) and a router that is attached, neither of
+  // which is guaranteed while this initializer runs (it is read from main()
+  // before runApp and can be disposed before the style loads). RehabTrackApp
+  // runs the cold-start alarm presentation after the first frame instead, where
+  // the router is ready, the style is loaded, and navigation is guaranteed.
 
   // Invalidate the agenda so it re-fetches after any actions processed above.
   // The onActionProcessed callback on the bridge also handles live taps, but
@@ -209,5 +317,31 @@ final reminderToggleWatcherProvider = Provider<void>((ref) {
     if (profileId == null) return;
     await service.cancelAllNotifications();
     await bridge.recoverAll(profileId);
+  });
+
+  // Re-schedule all notifications when the reminder style changes, since
+  // future pending notifications must move to the channel for the new style.
+  // Occurrences already past or intentionally skipped/completed are not
+  // re-scheduled because recovery only produces future occurrences.
+  ref.listen(reminderStyleProvider, (prev, next) async {
+    if (prev == null || prev == next) return;
+    final profileId = ref.read(currentActiveProfileIdProvider);
+    if (profileId == null) return;
+    await service.cancelAllNotifications();
+    await bridge.recoverAll(profileId);
+  });
+});
+
+/// Drives the native alarm sound player in sync with the active Alarm-style
+/// presentation lifecycle. Whenever a presentation is acknowledged (cleared:
+/// taken, dismissed, snoozed, skipped, closed, record-now, or navigating to
+/// details) the sound stops immediately. Kept separate from
+/// [reminderToggleWatcherProvider] because it is audio-only and never
+/// reschedules notifications.
+final alarmSoundLifecycleProvider = Provider<void>((ref) {
+  ref.listen(activeAlarmPresentationProvider, (prev, next) {
+    if (prev != null && next == null) {
+      ref.read(notificationServiceProvider).stopAlarmSound();
+    }
   });
 });

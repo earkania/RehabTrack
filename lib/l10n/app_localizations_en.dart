@@ -1677,6 +1677,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reminderVibration => 'Vibration';
 
   @override
+  String get reminderStyle => 'Reminder style';
+
+  @override
+  String get reminderStyleStandard => 'Standard';
+
+  @override
+  String get reminderStyleStandardDescription =>
+      'Balanced alerts with the usual sound and vibration';
+
+  @override
+  String get reminderStyleProminent => 'Prominent';
+
+  @override
+  String get reminderStyleProminentDescription =>
+      'High-attention alerts that interrupt more strongly';
+
+  @override
   String get defaultSnoozeDuration => 'Default snooze duration';
 
   @override
@@ -1761,8 +1778,107 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alarmStyleReminders => 'Alarm-style presentation';
 
   @override
+  String get alarmStyle => 'Alarm-style';
+
+  @override
+  String get alarmStyleDescription =>
+      'Full-screen alarms with the strongest sound and vibration that interrupt even on the lock screen';
+
+  @override
+  String get alarmStyleCapabilityAvailable => 'Full-screen alarms available';
+
+  @override
+  String get alarmStyleCapabilityNotAvailable =>
+      'Alarm-style reminders present as prominent alerts because full-screen access is not available';
+
+  @override
+  String get alarmStyleCapabilityNotificationPermissionMissing =>
+      'Notification permission is required to show alarm-style reminders';
+
+  @override
+  String get alarmStyleCapabilityExactAlarmMissing =>
+      'Exact alarm access is required for precise alarm timing';
+
+  @override
+  String get alarmStyleCapabilityChannelDisabled =>
+      'The alarm notification channel is disabled; enable it in Android notification settings';
+
+  @override
+  String get alarmStyleCapabilityUnsupported =>
+      'Full-screen alarms require Android 14 or later; alarm-style reminders use a prominent alert instead';
+
+  @override
+  String get manageAlarmStyleAccess => 'Manage alarm-style access';
+
+  @override
+  String get manageAlarmStyleAccessDescription =>
+      'Open system settings to allow or deny full-screen notifications';
+
+  @override
+  String get fullScreenRemindersAllowed => 'Full-screen reminders are allowed';
+
+  @override
+  String get fullScreenRemindersNotAllowed =>
+      'Full-screen reminders are not allowed';
+
+  @override
+  String get testAlarmStyleTile => 'Test alarm-style reminder';
+
+  @override
+  String get alarmSound => 'Alarm sound';
+
+  @override
+  String get alarmSoundSystemDefault => 'System default';
+
+  @override
+  String get alarmSoundCustom => 'Custom sound';
+
+  @override
+  String get alarmSoundChoose => 'Choose sound';
+
+  @override
+  String get alarmSoundTest => 'Test sound';
+
+  @override
+  String get alarmSoundStopTest => 'Stop test';
+
+  @override
+  String get alarmSoundPreviewFailed => 'Could not play the sound preview';
+
+  @override
+  String get alarmStyleUnavailable =>
+      'Alarm-style reminders are not available on this device';
+
+  @override
   String get lockScreenReminderDetails =>
       'Show full reminder details on lock screen';
+
+  @override
+  String get alarmReminder => 'Alarm';
+
+  @override
+  String get alarmDismissed => 'Alarm dismissed';
+
+  @override
+  String get scheduledHealthReminder => 'You have a scheduled health reminder';
+
+  @override
+  String get doctorVisitReminder => 'Doctor visit reminder';
+
+  @override
+  String measurementToRecord(String type, String time) {
+    return 'Record $type at $time';
+  }
+
+  @override
+  String get dismissTestAlarm => 'Dismiss test alarm';
+
+  @override
+  String get testAlarmStyleReminder => 'Alarm-style test';
+
+  @override
+  String get testAlarmStyleBody =>
+      'This is a test of the alarm-style presentation. Press Dismiss to stop it.';
 
   @override
   String get noPermission => 'No permission';

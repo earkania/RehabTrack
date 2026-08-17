@@ -40,6 +40,7 @@ class _RecordingNotificationService extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {
     scheduled.add({
       'id': id,
@@ -65,6 +66,7 @@ class _RecordingNotificationService extends NotificationService {
     bool playSound = true,
     bool enableVibration = true,
     NotificationVisibility visibility = NotificationVisibility.public,
+    bool fullScreenIntent = false,
   }) async {}
 
   @override

@@ -8,6 +8,9 @@ class AppRoutes {
   static const profile = '/profile';
   static const settings = '/settings';
 
+  // Alarm style (top-level, outside the shell so it can be full-screen)
+  static const alarm = '/alarm';
+
   // Settings
   static const settingsApp = '/settings/app';
   static const settingsBackupRestore = '/settings/backup-restore';

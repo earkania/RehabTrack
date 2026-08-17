@@ -37,6 +37,24 @@ class ReminderPayload {
 
   DateTime? get occurrenceDateTime => DateTime.tryParse(occurrenceTime);
 
+  ReminderPayload copyWith({int? notificationId}) {
+    return ReminderPayload(
+      type: type,
+      profileId: profileId,
+      scheduleId: scheduleId,
+      occurrenceTime: occurrenceTime,
+      medicationId: medicationId,
+      measurementTypeId: measurementTypeId,
+      medicationLogId: medicationLogId,
+      measurementReminderLogId: measurementReminderLogId,
+      measurementRecordId: measurementRecordId,
+      visitId: visitId,
+      snoozeSourceOccurrence: snoozeSourceOccurrence,
+      notificationId: notificationId ?? this.notificationId,
+      version: version,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'v': version,
         't': type.name,
