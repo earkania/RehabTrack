@@ -1825,6 +1825,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get testAlarmStyleTile => 'Test alarm-style reminder';
 
   @override
+  String get alarmSound => 'Alarm sound';
+
+  @override
+  String get alarmSoundSystemDefault => 'System default';
+
+  @override
+  String get alarmSoundCustom => 'Custom sound';
+
+  @override
+  String get alarmSoundChoose => 'Choose sound';
+
+  @override
+  String get alarmSoundTest => 'Test sound';
+
+  @override
+  String get alarmSoundStopTest => 'Stop test';
+
+  @override
+  String get alarmSoundPreviewFailed => 'Could not play the sound preview';
+
+  @override
   String get alarmStyleUnavailable =>
       'Alarm-style reminders are not available on this device';
 

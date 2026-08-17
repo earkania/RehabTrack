@@ -1824,6 +1824,27 @@ class AppLocalizationsKa extends AppLocalizations {
   String get testAlarmStyleTile => 'მაღვიძარას სტილის ტესტური შეხსენება';
 
   @override
+  String get alarmSound => 'განგაშის ხმა';
+
+  @override
+  String get alarmSoundSystemDefault => 'სისტემის ნაგულისხმევი';
+
+  @override
+  String get alarmSoundCustom => 'მომხმარებლის ხმა';
+
+  @override
+  String get alarmSoundChoose => 'ხმის არჩევა';
+
+  @override
+  String get alarmSoundTest => 'ხმის ტესტირება';
+
+  @override
+  String get alarmSoundStopTest => 'ტესტის შეჩერება';
+
+  @override
+  String get alarmSoundPreviewFailed => 'ხმის გადახედვა ვერ დაუკრა';
+
+  @override
   String get alarmStyleUnavailable =>
       'მაღვიძარას სტილის შეხსენებები ამ მოწყობილობაზე ხელმისაწვდომი არ არის';
 

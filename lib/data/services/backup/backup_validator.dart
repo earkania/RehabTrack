@@ -433,6 +433,11 @@ class BackupValidator {
   /// Unknown/undocumented future keys are tolerated (a documented policy: do
   /// not fail merely because a newer version added an optional key). Known
   /// keys must have stable value types.
+  ///
+  /// Both typed values and string-encoded values are accepted: the app persists
+  /// every setting as a string (`'10'`, `'true'`) so archives the app itself
+  /// creates carry all-string values, while other producers may write typed
+  /// values. A string that cannot be parsed as the required type is rejected.
   bool _validatePreferencesJson(Uint8List bytes) {
     Object? decoded;
     try {
@@ -444,27 +449,42 @@ class BackupValidator {
     final map = decoded.cast<String, Object?>();
     for (final MapEntry(key: key, value: value) in map.entries) {
       if (!_knownPreferenceKeys.contains(key)) continue;
-      final bool typeOk;
+      final bool valid;
       switch (key) {
         case _languageKey:
-          typeOk = value is String;
+        case _alarmSoundUriKey:
+        case _alarmSoundTitleKey:
+          valid = value is String;
           break;
         case _snoozeKey:
         case _gracePeriodKey:
-          typeOk = value is int;
+          valid = value is int ||
+              (value is String && int.tryParse(value.trim()) != null);
           break;
         default:
-          typeOk = value is bool;
+          valid = value is bool ||
+              (value is String && _toBool(value) != null);
       }
-      if (!typeOk) return false;
+      if (!valid) return false;
     }
     return true;
+  }
+
+  /// Parses a stored boolean string (`'true'`/`'false'`, case-insensitive) or
+  /// returns null when [value] is not a boolean string.
+  static bool? _toBool(String value) {
+    final normalized = value.trim().toLowerCase();
+    if (normalized == 'true') return true;
+    if (normalized == 'false') return false;
+    return null;
   }
 }
 
 const String _languageKey = 'app_language';
 const String _gracePeriodKey = 'next_item_grace_period_minutes';
 const String _snoozeKey = 'default_snooze_duration';
+const String _alarmSoundUriKey = 'alarm_sound_uri';
+const String _alarmSoundTitleKey = 'alarm_sound_title';
 const Set<String> _knownPreferenceKeys = {
   'app_language',
   'next_item_grace_period_minutes',
@@ -475,4 +495,6 @@ const Set<String> _knownPreferenceKeys = {
   'reminder_vibration_enabled',
   'show_patient_name_in_notifications',
   'show_details_on_lock_screen',
+  'alarm_sound_uri',
+  'alarm_sound_title',
 };

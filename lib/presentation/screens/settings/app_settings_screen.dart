@@ -129,6 +129,7 @@ class AppSettingsScreen extends ConsumerWidget {
             onTap: () => _showReminderStyleDialog(context, ref, l10n, reminderStyle),
           ),
           if (reminderStyle == ReminderStyle.alarmStyle) ...[
+            const _AlarmSoundSection(),
             const _AlarmStyleStatusTiles(),
           ],
           ListTile(
@@ -645,5 +646,159 @@ class _AlarmStyleStatusTiles extends ConsumerWidget {
         SnackBar(content: Text(l10n.testReminderSent)),
       );
     }
+  }
+}
+
+/// The "Alarm sound" selection and test tiles, shown only when Alarm-style is
+/// the selected reminder style.
+///
+/// The selected sound is played by the native alarm player (Ringtone on the
+/// USAGE_ALARM stream) — never by mutating the notification channel. A null
+/// selection keeps the system default alarm sound.
+class _AlarmSoundSection extends ConsumerStatefulWidget {
+  const _AlarmSoundSection();
+
+  @override
+  ConsumerState<_AlarmSoundSection> createState() => _AlarmSoundSectionState();
+}
+
+class _AlarmSoundSectionState extends ConsumerState<_AlarmSoundSection>
+    with WidgetsBindingObserver {
+  bool _previewPlaying = false;
+  NotificationService? _service;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Do not read `ref` in dispose (riverpod forbids it once the element
+    // starts unmounting), so capture the service up front.
+    _service = ref.read(notificationServiceProvider);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _service?.stopAlarmSoundPreview();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Leaving/backgrounding the settings screen must stop the preview.
+    if (state == AppLifecycleState.paused) {
+      _stopPreview();
+    }
+  }
+
+  Future<void> _stopPreview() async {
+    if (!_previewPlaying) return;
+    setState(() => _previewPlaying = false);
+    await ref.read(notificationServiceProvider).stopAlarmSoundPreview();
+  }
+
+  Future<void> _togglePreview() async {
+    if (_previewPlaying) {
+      await _stopPreview();
+      return;
+    }
+    final l10n = AppLocalizations.of(context)!;
+    final selection = ref.read(alarmSoundProvider);
+    final started = await ref
+        .read(notificationServiceProvider)
+        .startAlarmSoundPreview(uri: selection?.uri);
+    if (!mounted) return;
+    if (started) {
+      setState(() => _previewPlaying = true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.alarmSoundPreviewFailed)),
+      );
+    }
+  }
+
+  void _showAlarmSoundDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final selection = ref.read(alarmSoundProvider);
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return SimpleDialog(
+          title: Text(l10n.alarmSound),
+          children: [
+            ListTile(
+              leading: Icon(
+                selection == null
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                color: selection == null
+                    ? Theme.of(ctx).colorScheme.primary
+                    : null,
+              ),
+              title: Text(l10n.alarmSoundSystemDefault),
+              onTap: () {
+                ref.read(alarmSoundProvider.notifier).clear();
+                Navigator.pop(ctx);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.music_note_outlined),
+              title: Text(l10n.alarmSoundChoose),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickSound();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _pickSound() async {
+    final selection = ref.read(alarmSoundProvider);
+    final picked = await ref
+        .read(notificationServiceProvider)
+        .pickAlarmSound(currentUri: selection?.uri);
+    if (!mounted) return;
+    if (picked == null) return; // User dismissed the picker.
+    await ref.read(alarmSoundProvider.notifier).setAlarmSound(picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final selection = ref.watch(alarmSoundProvider);
+    final subtitle = selection == null
+        ? l10n.alarmSoundSystemDefault
+        : (selection.title?.isNotEmpty == true
+            ? selection.title!
+            : l10n.alarmSoundCustom);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          leading: const Icon(Icons.music_note_outlined),
+          title: Text(l10n.alarmSound),
+          subtitle: Text(subtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: _showAlarmSoundDialog,
+        ),
+        ListTile(
+          leading: Icon(
+            _previewPlaying
+                ? Icons.stop_circle_outlined
+                : Icons.play_circle_outline,
+          ),
+          title: Text(
+            _previewPlaying ? l10n.alarmSoundStopTest : l10n.alarmSoundTest,
+          ),
+          onTap: _togglePreview,
+        ),
+        const Divider(),
+      ],
+    );
   }
 }

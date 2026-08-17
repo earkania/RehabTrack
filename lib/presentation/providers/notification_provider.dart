@@ -118,6 +118,18 @@ final notificationActionBridgeProvider =
         notificationId: notificationId ?? 0,
         payload: payload,
       );
+      final service = ref.read(notificationServiceProvider);
+      // When a custom alarm sound is configured, hand audio over to the native
+      // alarm player and cancel the fired notification so the channel's
+      // default alarm sound stops immediately and the two never overlap.
+      // Without a selection the channel sound plays unchanged (system default).
+      final alarmSound = ref.read(alarmSoundProvider);
+      if (alarmSound != null) {
+        service.startAlarmSound(uri: alarmSound.uri);
+        service.cancelNotification(notificationId ?? 0);
+      }
+      // A real alarm must cut off any settings preview still playing.
+      service.stopAlarmSoundPreview();
       try {
         ref.read(routerProvider).push(AppRoutes.alarm);
       } catch (_) {
@@ -302,5 +314,19 @@ final reminderToggleWatcherProvider = Provider<void>((ref) {
     if (profileId == null) return;
     await service.cancelAllNotifications();
     await bridge.recoverAll(profileId);
+  });
+});
+
+/// Drives the native alarm sound player in sync with the active Alarm-style
+/// presentation lifecycle. Whenever a presentation is acknowledged (cleared:
+/// taken, dismissed, snoozed, skipped, closed, record-now, or navigating to
+/// details) the sound stops immediately. Kept separate from
+/// [reminderToggleWatcherProvider] because it is audio-only and never
+/// reschedules notifications.
+final alarmSoundLifecycleProvider = Provider<void>((ref) {
+  ref.listen(activeAlarmPresentationProvider, (prev, next) {
+    if (prev != null && next == null) {
+      ref.read(notificationServiceProvider).stopAlarmSound();
+    }
   });
 });

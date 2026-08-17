@@ -45,6 +45,8 @@ void main() {
       AppConstants.showPatientNameInNotificationsKey: 'false',
       AppConstants.showDetailsOnLockScreenKey: 'false',
       AppConstants.reminderStyleKey: 'alarmStyle',
+      AppConstants.alarmSoundUriKey: 'content://media/alarm1',
+      AppConstants.alarmSoundTitleKey: 'Morning Alarm',
     });
 
     final json = jsonDecode(await PreferencesExporter(repo).exportJson());
@@ -59,6 +61,8 @@ void main() {
       AppConstants.showPatientNameInNotificationsKey: 'false',
       AppConstants.showDetailsOnLockScreenKey: 'false',
       AppConstants.reminderStyleKey: 'alarmStyle',
+      AppConstants.alarmSoundUriKey: 'content://media/alarm1',
+      AppConstants.alarmSoundTitleKey: 'Morning Alarm',
     });
   });
 

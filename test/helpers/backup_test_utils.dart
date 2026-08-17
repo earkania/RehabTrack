@@ -168,10 +168,12 @@ Uint8List buildValidBackupZip({
   int fileCount = 0,
   int profiles = 2,
   String appVersion = '1.2.0',
+  Map<String, Object?>? preferences,
 }) {
   final db = buildSqliteBytes(schema: schema, profiles: profiles);
-  final prefs =
-      Uint8List.fromList(utf8.encode(jsonEncode({'app_language': 'en'})));
+  final prefs = Uint8List.fromList(
+    utf8.encode(jsonEncode(preferences ?? {'app_language': 'en'})),
+  );
   final manifest = buildManifestJson(
     schema: schema,
     formatVersion: formatVersion,

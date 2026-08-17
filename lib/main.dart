@@ -36,6 +36,9 @@ Future<void> main() async {
   container.read(notificationInitializerProvider);
   // Activate the reminder-toggle watcher so it reacts to changes.
   container.read(reminderToggleWatcherProvider);
+  // Activate the alarm-sound lifecycle watcher so the native alarm player
+  // stops whenever an Alarm-style presentation is acknowledged.
+  container.read(alarmSoundLifecycleProvider);
 
   // Block the first frame until persisted settings have been loaded. Without
   // this, providers start at their in-memory defaults and consumers such as
@@ -64,4 +67,5 @@ Future<void> _warmUpPersistedSettings(ProviderContainer container) async {
   await container.read(showPatientNameInNotificationsProvider.notifier).ready;
   await container.read(showDetailsOnLockScreenProvider.notifier).ready;
   await container.read(reminderStyleProvider.notifier).ready;
+  await container.read(alarmSoundProvider.notifier).ready;
 }

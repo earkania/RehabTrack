@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
+import '../../../domain/entities/alarm_sound_selection.dart';
 import '../../../domain/entities/reminder_style.dart';
 import 'notification_action_handler.dart';
 import 'pending_action_store.dart';
@@ -458,6 +459,83 @@ class NotificationService {
     } catch (_) {
       return null;
     }
+  }
+
+  /// Resolves the human-readable title for a ringtone/alarm [uri], or null
+  /// when the URI cannot be resolved on this device.
+  Future<String?> getRingtoneTitle(String uri) async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      return await channel.invokeMethod<String>(
+        'getRingtoneTitle',
+        {'uri': uri},
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Opens the system alarm-sound picker. Returns the chosen selection, or
+  /// null when the user dismisses the picker without choosing.
+  Future<AlarmSoundSelection?> pickAlarmSound({String? currentUri}) async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      final raw = await channel.invokeMethod<String>(
+        'pickAlarmSound',
+        {'currentUri': currentUri},
+      );
+      if (raw == null || raw.isEmpty) return null;
+      return AlarmSoundSelection.fromJsonString(raw);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Starts looping the given alarm sound through the native alarm player.
+  /// A null [uri] plays the system default alarm sound. Returns true when the
+  /// sound started successfully.
+  Future<bool> startAlarmSound({String? uri}) async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      return await channel.invokeMethod<bool>(
+            'startAlarmSound',
+            {'uri': uri},
+          ) ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Stops the native alarm sound player immediately.
+  Future<void> stopAlarmSound() async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      await channel.invokeMethod<void>('stopAlarmSound');
+    } catch (_) {}
+  }
+
+  /// Plays the given alarm sound as a short preview that auto-stops after
+  /// ~12 seconds. A null [uri] plays the system default alarm sound.
+  Future<bool> startAlarmSoundPreview({String? uri}) async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      return await channel.invokeMethod<bool>(
+            'startAlarmSoundPreview',
+            {'uri': uri},
+          ) ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Stops a playing alarm sound preview immediately.
+  Future<void> stopAlarmSoundPreview() async {
+    const channel = MethodChannel('com.earkania.rehabtrack/notifications');
+    try {
+      await channel.invokeMethod<void>('stopAlarmSoundPreview');
+    } catch (_) {}
   }
 
 

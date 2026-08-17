@@ -8,6 +8,7 @@ import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/data/services/notification/alarm_presentation.dart';
 import 'package:rehab_track/data/services/notification/notification_action_bridge.dart';
 import 'package:rehab_track/data/services/notification/notification_action_handler.dart';
+import 'package:rehab_track/data/services/notification/notification_service.dart';
 import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/scheduled_measurement.dart';
@@ -34,21 +35,49 @@ class AlarmStyleScreen extends ConsumerStatefulWidget {
   ConsumerState<AlarmStyleScreen> createState() => _AlarmStyleScreenState();
 }
 
-class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen> {
+class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
+    with WidgetsBindingObserver {
   AlarmPresentation? _active;
+  AlarmPresentation? _lastActive;
   ReminderPayload? _reminder;
+  NotificationService? _service;
   bool _submitted = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _active = ref.read(activeAlarmPresentationProvider);
     _reminder = _active?.reminder;
+    _lastActive = _active;
+    // Do not read `ref` in dispose (riverpod forbids it once the element
+    // starts unmounting), so capture the service up front.
+    _service = ref.read(notificationServiceProvider);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    // Leaving the screen without acknowledging (e.g. back navigation) must not
+    // leave the alarm sound playing.
+    if (_lastActive != null) {
+      _service?.stopAlarmSound();
+    }
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Backgrounding the app must not leave the alarm sound playing.
+    if (state == AppLifecycleState.paused) {
+      _service?.stopAlarmSound();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final active = ref.watch(activeAlarmPresentationProvider);
+    _lastActive = active;
 
     // An acknowledgment already submitted: show the confirmation without
     // scheduling any fallback navigation, so the app's own post-frame

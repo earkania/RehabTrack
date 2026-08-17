@@ -31,6 +31,12 @@ class AppConstants {
   static const String showPatientNameInNotificationsKey = 'show_patient_name_in_notifications';
   static const String showDetailsOnLockScreenKey = 'show_details_on_lock_screen';
 
+  /// Settings keys for the user-selected Alarm-style alarm sound, stored as a
+  /// ringtone URI plus its resolved display title. Absence of the URI key
+  /// means the system default alarm sound is used.
+  static const String alarmSoundUriKey = 'alarm_sound_uri';
+  static const String alarmSoundTitleKey = 'alarm_sound_title';
+
   /// Settings key holding the ISO 8601 timestamp of the last successful backup.
   /// Written only after the archive has been stored AND passed its integrity
   /// self-check. Never overwritten by a restore.

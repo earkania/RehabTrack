@@ -283,6 +283,66 @@ void main() {
       expect(outcome.result, BackupValidationResult.invalidBackupPreferences);
     });
   });
+
+  group('BackupValidator.preferences encoding', () {
+    test('accepts the app own export shape with all-string values', () async {
+      final outcome = await validate(buildValidBackupZip(
+        schema: _currentSchema,
+        preferences: {
+          'app_language': 'en',
+          'next_item_grace_period_minutes': '30',
+          'default_snooze_duration': '10',
+          'medication_reminders_enabled': 'true',
+          'measurement_reminders_enabled': 'false',
+          'reminder_sound_enabled': 'true',
+          'reminder_vibration_enabled': 'false',
+          'show_patient_name_in_notifications': 'true',
+          'show_details_on_lock_screen': 'false',
+          'alarm_sound_uri':
+              'content://media/internal/audio/media/42',
+          'alarm_sound_title': 'Morning Alarm',
+        },
+      ));
+      expect(outcome.result, BackupValidationResult.valid);
+    });
+
+    test('accepts typed integer and boolean values', () async {
+      final outcome = await validate(buildValidBackupZip(
+        schema: _currentSchema,
+        preferences: {
+          'next_item_grace_period_minutes': 30,
+          'default_snooze_duration': 10,
+          'medication_reminders_enabled': true,
+          'reminder_sound_enabled': false,
+        },
+      ));
+      expect(outcome.result, BackupValidationResult.valid);
+    });
+
+    test('rejects a non-numeric string for an integer preference', () async {
+      final outcome = await validate(buildValidBackupZip(
+        schema: _currentSchema,
+        preferences: {'next_item_grace_period_minutes': 'thirty'},
+      ));
+      expect(outcome.result, BackupValidationResult.invalidBackupPreferences);
+    });
+
+    test('rejects a non-boolean string for a boolean preference', () async {
+      final outcome = await validate(buildValidBackupZip(
+        schema: _currentSchema,
+        preferences: {'medication_reminders_enabled': 'maybe'},
+      ));
+      expect(outcome.result, BackupValidationResult.invalidBackupPreferences);
+    });
+
+    test('accepts boolean strings case-insensitively', () async {
+      final outcome = await validate(buildValidBackupZip(
+        schema: _currentSchema,
+        preferences: {'reminder_sound_enabled': 'TRUE'},
+      ));
+      expect(outcome.result, BackupValidationResult.valid);
+    });
+  });
 }
 
 Uint8List _utf8(String text) => Uint8List.fromList(utf8.encode(text));

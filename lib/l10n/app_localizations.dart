@@ -3458,6 +3458,48 @@ abstract class AppLocalizations {
   /// **'Test alarm-style reminder'**
   String get testAlarmStyleTile;
 
+  /// No description provided for @alarmSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm sound'**
+  String get alarmSound;
+
+  /// No description provided for @alarmSoundSystemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get alarmSoundSystemDefault;
+
+  /// No description provided for @alarmSoundCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom sound'**
+  String get alarmSoundCustom;
+
+  /// No description provided for @alarmSoundChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose sound'**
+  String get alarmSoundChoose;
+
+  /// No description provided for @alarmSoundTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Test sound'**
+  String get alarmSoundTest;
+
+  /// No description provided for @alarmSoundStopTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop test'**
+  String get alarmSoundStopTest;
+
+  /// No description provided for @alarmSoundPreviewFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not play the sound preview'**
+  String get alarmSoundPreviewFailed;
+
   /// No description provided for @alarmStyleUnavailable.
   ///
   /// In en, this message translates to:
