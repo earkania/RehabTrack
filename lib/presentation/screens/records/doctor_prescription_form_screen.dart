@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:intl/intl.dart';
 
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/doctor_prescription.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/doctor_prescription_provider.dart';
@@ -144,7 +144,9 @@ class _DoctorPrescriptionFormScreenState
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.prescriptionDate),
               subtitle: Text(
-                DateFormat.yMMMd().format(_prescriptionDate),
+                AppDateFormatter.of(context).formatMediumDate(
+                  _prescriptionDate,
+                ),
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               trailing: const Icon(Icons.calendar_today),

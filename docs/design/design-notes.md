@@ -391,6 +391,10 @@ Examples:
 - This ensures Georgian month names are used when the app language is Georgian
 - Pattern: `fullMonthDayYear` (yMMMMd) for date navigation header, `shortMonthDayYear` (yMMMd) for AppBar subtitle, `hourMinute` (Hm) for agenda item times
 - No hardcoded locale strings — all date formatting is locale-aware
+- **Superseded 2026-08-18** by the centralized `AppDateFormatter` policy below.
+  `lib/presentation/utils/localized_date_format.dart` was removed; every
+  user-visible date now goes through `AppDateFormatter`
+  (`lib/domain/services/app_date_formatter.dart`).
 
 ### Shared date field widget
 - `DateField` widget in `lib/presentation/widgets/common/date_field.dart` is the standard date picker field
@@ -1307,3 +1311,112 @@ data.
 
 No calorie tracking / meal planning / nutrition database / AI suggestions; no
 commit/push.
+
+---
+
+# Date & Time Formatting Policy — Approved Design (2026-08-18)
+
+All user-visible dates and times go through the single centralized formatter
+`AppDateFormatter` (`lib/domain/services/app_date_formatter.dart`). Widgets
+resolve it with `AppDateFormatter.of(context)`; tests construct it directly with
+a `Locale`.
+
+## Locale authority
+
+- The **application-selected locale** (RehabTrack language setting) is
+  authoritative, never the device locale. `AppDateFormatter.of(context)` reads
+  `Localizations.localeOf(context)`, which follows the `localeProvider`
+  state wired into `MaterialApp.locale` in `lib/app.dart`.
+- Switching the app language updates every visible date live (no restart) — see
+  `test/common_widgets_test.dart` "DateField locale switch".
+- Material date pickers (`showDatePicker`, `showTimePicker`) already receive the
+  app locale through `AppLocalizations.localizationsDelegates` /
+  `supportedLocales` (en, ka), which include
+  `GlobalMaterialLocalizations.delegate`.
+
+## Canonical format roles (intl locale skeletons — no hardcoded patterns in UI)
+
+| Role | Method | English example | Georgian example |
+|---|---|---|---|
+| Short Date | `formatShortDate` (`dd.MM.yyyy`) | 01.08.2026 | 01.08.2026 |
+| Medium Date | `formatMediumDate` (`yMMMd`) | Aug 12, 2026 | 12 აგვ. 2026 |
+| Long Date | `formatLongDate` (`yMMMMd`) | August 12, 2026 | 12 აგვისტო, 2026 |
+| Time | `formatTime` (`Hm`, 24-hour) | 22:57 | 22:57 |
+| Short Date + Time | `formatShortDateTime` | 01.08.2026 22:57 | 01.08.2026 22:57 |
+| Medium Date + Time | `formatMediumDateTime` | Aug 12, 2026, 22:57 | 12 აგვ. 2026, 22:57 |
+| Chart axis (day/month) | `formatMonthDay` (`d MMM`) | 12 Aug | 12 აგვ |
+| Chart axis (month/year) | `formatMonthYear` (`MMM yy`) | Aug 26 | აგვ 26 |
+| Weekday (relative fallback) | `formatWeekday` (`EEEE`) | Wednesday | ოთხშაბათი |
+
+Role usage:
+- **Short Date:** measurement/medication schedule rows, compact list rows, date
+  fields (the shared `DateField`), birth date, backup list rows.
+- **Medium Date:** lab/prescription/doctor-visit dates, edit-screen date
+  headings, backup details.
+- **Long Date:** prominent headers (Today date navigation, doctor visit
+  details/form).
+- **Short Date + Time:** measurement/medication history rows, measurement
+  entry/edit, chart tooltips, notification-friendly timestamps.
+- **Medium Date + Time:** prominent detail timestamps (lab/prescription/doctor
+  visit details, Backup & Restore last operation times).
+
+## Fixed numeric Short Date convention
+
+- The canonical numeric Short Date is a **RehabTrack UI convention**, not a
+  locale default: `formatShortDate` always renders zero-padded `dd.MM.yyyy`
+  (e.g. `01.08.2026`, `09.08.2026`, `31.12.2026`) for **every supported
+  language**. Day and month always use exactly two digits.
+- Locale-dependent numeric ordering (e.g. `8/12/2026`, `12.8.2026`) is **not**
+  used for the canonical Short Date. The pattern is implemented once inside the
+  formatter (`DateFormat('dd.MM.yyyy')`); screens never hand-build
+  day/month/year concatenations.
+- **Short Date + Time** reuses the same canonical date component:
+  `dd.MM.yyyy HH:mm` (e.g. `01.08.2026 22:57`). The time portion keeps the
+  centralized 24-hour policy above.
+- Only the **numeric Short Date** role is fixed. Every **textual** role
+  (Medium Date, Long Date, chart axes, weekday) remains locale-aware and follows
+  the selected RehabTrack language.
+- `DateField` (all date-selector display fields) shows the canonical
+  `dd.MM.yyyy` after a picker selection; the Material picker dialog itself keeps
+  its normal localized presentation.
+
+## Time format decision
+
+The app consistently used 24-hour time (`Hm`/`HH:mm`) everywhere, including
+stored schedule times and notification payloads. Standardizing on the device
+12/24-hour preference would have spread inconsistent AM/PM behavior, so **24-hour
+time is preserved app-wide and centralized** in `formatTime`. Mold annotations
+are not used.
+
+## What stays unchanged (machine / storage)
+
+- Database timestamps, JSON values, backup manifests, notification payloads,
+  reminder occurrence times and internal ISO-8601 values keep their stable
+  machine formats (`DateTime.toIso8601String()`, `normalizeTime()` in
+  `lib/domain/entities/measurement.dart`, etc.).
+- Backup filenames stay deterministic and non-localized:
+  `RehabTrack-Backup-yyyy-MM-dd_HH-mm.rtb` (`backup_service.dart`).
+- Notification body time strings (`reminder_content_formatter.dart`) produce the
+  canonical 24-hour "HH:mm" and are intentionally not routed through the UI
+  formatter (no locale access in the notification service); output matches
+  `formatTime` for all supported locales.
+- Debug/log output (`notification_diagnostics_screen.dart`) is not localized.
+
+## Timezone
+
+Unchanged. No offsets are added or subtracted; `AppDateFormatter` renders the
+fields of the `DateTime` it is given (existing local/tz logic elsewhere is
+preserved), so times continue to represent the correct local wall clock
+(Asia/Tbilisi behavior included).
+
+## Tests
+
+- `test/app_date_formatter_test.dart` — unit tests for every role in English and
+  Georgian, including zero-padded `dd.MM.yyyy` examples (`01.08.2026`,
+  `09.08.2026`, `01.12.2026`, `31.12.2026`) identical for both locales, "no
+  English month names in Georgian", and "no timezone shift".
+- `test/common_widgets_test.dart` — DateField renders the canonical
+  `dd.MM.yyyy` in both en/ka and the textual Medium Date switches live when the
+  app locale changes.
+- `test/measurement_line_chart_*`, `test/backup_preview_test.dart` assert the
+  canonical English outputs for chart tooltips / axis and backup mediums dates.

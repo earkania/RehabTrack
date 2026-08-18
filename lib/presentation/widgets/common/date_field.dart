@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 
 class DateField extends StatelessWidget {
   final String label;
@@ -18,7 +19,7 @@ class DateField extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final displayText = date != null
-        ? '${date!.day.toString().padLeft(2, '0')}.${date!.month.toString().padLeft(2, '0')}.${date!.year}'
+        ? AppDateFormatter.of(context).formatShortDate(date!)
         : label;
 
     return InkWell(

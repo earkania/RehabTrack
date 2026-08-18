@@ -7,12 +7,12 @@ import 'package:rehab_track/domain/backup/backup_availability.dart';
 import 'package:rehab_track/domain/backup/backup_result.dart';
 import 'package:rehab_track/domain/backup/backup_validation_result.dart';
 import 'package:rehab_track/domain/backup/restore_phase.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/backup_provider.dart';
 import 'package:rehab_track/presentation/providers/restore_apply_provider.dart';
 import 'package:rehab_track/presentation/providers/restore_provider.dart';
 import 'package:rehab_track/presentation/screens/settings/backup_preview_screen.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 /// Backup & Restore screen.
 ///
@@ -314,8 +314,7 @@ class _BackupAndRestoreScreenState
   }
 
   String _formatDateTime(BuildContext context, DateTime time) {
-    return '${LocalizedDateFormat.fullMonthDayYear(context, time)}, '
-        '${LocalizedDateFormat.hourMinute(context, time)}';
+    return AppDateFormatter.of(context).formatMediumDateTime(time);
   }
 }
 

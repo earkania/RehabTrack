@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:intl/intl.dart';
 
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/lab_analysis.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/lab_analysis_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
@@ -153,7 +153,7 @@ class _LabAnalysisFormScreenState extends ConsumerState<LabAnalysisFormScreen> {
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.analysisDate),
               subtitle: Text(
-                DateFormat.yMMMd().format(_analysisDate),
+                AppDateFormatter.of(context).formatMediumDate(_analysisDate),
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               trailing: const Icon(Icons.calendar_today),
@@ -180,7 +180,8 @@ class _LabAnalysisFormScreenState extends ConsumerState<LabAnalysisFormScreen> {
               title: Text(l10n.resultReceivedDate),
               subtitle: Text(
                 _resultReceivedDate != null
-                    ? DateFormat.yMMMd().format(_resultReceivedDate!)
+                    ? AppDateFormatter.of(context)
+                        .formatMediumDate(_resultReceivedDate!)
                     : l10n.notSet,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),

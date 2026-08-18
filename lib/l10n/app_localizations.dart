@@ -2846,6 +2846,18 @@ abstract class AppLocalizations {
   /// **'Today'**
   String get returnToToday;
 
+  /// No description provided for @scheduleStartsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts on {date}'**
+  String scheduleStartsOn(String date);
+
+  /// No description provided for @scheduleUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Until {date}'**
+  String scheduleUntil(String date);
+
   /// No description provided for @nothingScheduledForThisDay.
   ///
   /// In en, this message translates to:

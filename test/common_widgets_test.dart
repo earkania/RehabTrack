@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/widgets/common/date_field.dart';
 import 'package:rehab_track/presentation/widgets/medication/time_picker_field.dart';
@@ -159,6 +160,51 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.close));
       expect(removed, isTrue);
+    });
+  });
+
+  group('DateField locale switch', () {
+    Widget build(Locale? locale) {
+      return MaterialApp(
+        locale: locale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Column(
+            children: [
+              DateField(
+                label: 'Start Date',
+                date: DateTime(2026, 3, 15),
+                onTap: () {},
+              ),
+              Builder(
+                builder: (context) => Text(
+                  AppDateFormatter.of(context)
+                      .formatMediumDate(DateTime(2026, 3, 15)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    testWidgets('short date stays canonical dd.MM.yyyy across locales',
+        (tester) async {
+      await tester.pumpWidget(build(const Locale('en')));
+      expect(find.text('15.03.2026'), findsOneWidget);
+
+      await tester.pumpWidget(build(const Locale('ka')));
+      expect(find.text('15.03.2026'), findsOneWidget);
+    });
+
+    testWidgets('textual medium date updates live; Georgian stays Georgian',
+        (tester) async {
+      await tester.pumpWidget(build(const Locale('en')));
+      expect(find.text('Mar 15, 2026'), findsOneWidget);
+
+      await tester.pumpWidget(build(const Locale('ka')));
+      expect(find.text('15 მარ. 2026'), findsOneWidget);
     });
   });
 }

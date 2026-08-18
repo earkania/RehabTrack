@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/domain/services/today_relative_time.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/utils/today_relative_time_format.dart';
 
@@ -61,7 +61,7 @@ class TodayRelativeTimeLabel extends ConsumerWidget {
 
     final spoken = semanticTodayRelativeTime(relativeTime, l10n);
     final timeStr =
-        LocalizedDateFormat.hourMinute(context, item.scheduledDateTime);
+        AppDateFormatter.of(context).formatTime(item.scheduledDateTime);
     final semanticLabel =
         '${_displayTitle(item, l10n)}, ${l10n.scheduledAt(timeStr)}, $spoken';
 

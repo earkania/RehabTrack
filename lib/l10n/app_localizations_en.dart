@@ -1493,6 +1493,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get returnToToday => 'Today';
 
   @override
+  String scheduleStartsOn(String date) {
+    return 'Starts on $date';
+  }
+
+  @override
+  String scheduleUntil(String date) {
+    return 'Until $date';
+  }
+
+  @override
   String get nothingScheduledForThisDay => 'Nothing scheduled for this day';
 
   @override

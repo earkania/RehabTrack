@@ -7,6 +7,7 @@ import 'package:rehab_track/domain/entities/default_reference_ranges.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/domain/services/blood_pressure_status_evaluator.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/domain/services/reading_status_calculator.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
@@ -296,7 +297,7 @@ class _RecordTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _formatDate(record.timestamp),
+                _formatDate(context, record.timestamp),
                 style: theme.textTheme.bodySmall,
               ),
               if (record.irregularHeartbeatDetected == true)
@@ -534,12 +535,8 @@ class _RecordTile extends StatelessWidget {
     return repo.getValuesForRecord(record.id!);
   }
 
-  String _formatDate(DateTime dt) {
-    return '${dt.day.toString().padLeft(2, '0')}.'
-        '${dt.month.toString().padLeft(2, '0')}.'
-        '${dt.year} '
-        '${dt.hour.toString().padLeft(2, '0')}:'
-        '${dt.minute.toString().padLeft(2, '0')}';
+  String _formatDate(BuildContext context, DateTime dt) {
+    return AppDateFormatter.of(context).formatShortDateTime(dt);
   }
 }
 

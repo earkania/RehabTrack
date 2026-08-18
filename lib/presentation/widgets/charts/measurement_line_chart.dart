@@ -4,8 +4,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:rehab_track/domain/entities/measurement_chart.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/utils/measurement_chart_axis.dart';
 import 'package:rehab_track/presentation/utils/reading_status_color.dart';
 
@@ -550,17 +550,18 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
   String _formatDateAxis(DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
+    final formatter = AppDateFormatter.of(context);
     if (diff.inDays < 1) {
-      return LocalizedDateFormat.hourMinute(context, date);
+      return formatter.formatTime(date);
     }
     if (diff.inDays < 30) {
-      return LocalizedDateFormat.dayShortMonth(context, date);
+      return formatter.formatMonthDay(date);
     }
-    return LocalizedDateFormat.shortMonthYear(context, date);
+    return formatter.formatMonthYear(date);
   }
 
   String _formatFullDate(DateTime date) {
-    return LocalizedDateFormat.numericFullDateTime(context, date);
+    return AppDateFormatter.of(context).formatShortDateTime(date);
   }
 
   double _calculateDateInterval(int pointCount) {

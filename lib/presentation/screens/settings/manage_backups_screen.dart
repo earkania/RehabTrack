@@ -5,11 +5,11 @@ import 'package:rehab_track/data/services/backup/backup_import_service.dart';
 import 'package:rehab_track/data/services/backup/backup_management_service.dart';
 import 'package:rehab_track/domain/backup/backup_validation_result.dart';
 import 'package:rehab_track/domain/backup/registered_backup.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/manage_backups_provider.dart';
 import 'package:rehab_track/presentation/providers/restore_provider.dart';
 import 'package:rehab_track/presentation/screens/settings/backup_preview_screen.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 /// Lists the backups this app created or imported, with details, restore,
 /// share, delete and "Remove from List" actions, plus a "Import Existing
@@ -228,7 +228,7 @@ class _BackupListTile extends StatelessWidget {
 
     final subtitle = <String>[
       if (backup.createdAt != null)
-        LocalizedDateFormat.fullMonthDayYear(context, backup.createdAt!),
+        AppDateFormatter.of(context).formatShortDate(backup.createdAt!),
       if (backup.fileSize != null) _formatBytes(backup.fileSize!),
     ].join(' · ');
 
@@ -372,8 +372,7 @@ class _BackupDetailsDialogState
               _DetailLine(
                 icon: Icons.schedule,
                 label: l10n.backupDate(
-                  LocalizedDateFormat.fullMonthDayYear(
-                    context,
+                  AppDateFormatter.of(context).formatMediumDate(
                     backup.createdAt!,
                   ),
                 ),

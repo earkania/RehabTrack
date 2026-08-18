@@ -12,6 +12,7 @@ import 'package:rehab_track/data/services/notification/notification_service.dart
 import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/scheduled_measurement.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/reminder_settings_provider.dart';
@@ -354,7 +355,7 @@ class _AlarmScaffold extends ConsumerWidget {
     final reminder = active.reminder;
     final Future<_AlarmContent> contentFuture = reminder == null
         ? Future.value(const _AlarmContent.empty())
-        : _loadContent(ref, reminder, l10n);
+        : _loadContent(context, ref, reminder, l10n);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -406,7 +407,7 @@ class _AlarmScaffold extends ConsumerWidget {
                   if (!detailsHidden && scheduledAt != null) ...[
                     const SizedBox(height: 8),
                     Text(
-                      l10n.scheduledAt(_formatTime(scheduledAt!)),
+                      l10n.scheduledAt(_formatTime(context, scheduledAt!)),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -426,6 +427,7 @@ class _AlarmScaffold extends ConsumerWidget {
   }
 
   Future<_AlarmContent> _loadContent(
+    BuildContext context,
     WidgetRef ref,
     ReminderPayload reminder,
     AppLocalizations l10n,
@@ -434,7 +436,7 @@ class _AlarmScaffold extends ConsumerWidget {
       case ReminderType.medication:
         return _loadMedication(ref, reminder, l10n);
       case ReminderType.measurement:
-        return _loadMeasurement(ref, reminder, l10n);
+        return _loadMeasurement(context, ref, reminder, l10n);
       case ReminderType.doctorVisit:
         return _loadDoctorVisit(ref, reminder, l10n);
     }
@@ -460,10 +462,12 @@ class _AlarmScaffold extends ConsumerWidget {
   }
 
   Future<_AlarmContent> _loadMeasurement(
+    BuildContext context,
     WidgetRef ref,
     ReminderPayload reminder,
     AppLocalizations l10n,
   ) async {
+    final formatter = AppDateFormatter.of(context);
     final typeId = reminder.measurementTypeId;
     if (typeId == null) return const _AlarmContent.empty();
     final repo = ref.read(measurementRepositoryProvider);
@@ -475,7 +479,7 @@ class _AlarmScaffold extends ConsumerWidget {
       title: type.name,
       item: l10n.measurementToRecord(
         type.name,
-        _formatTime(reminder.occurrenceDateTime ?? DateTime.now()),
+        formatter.formatTime(reminder.occurrenceDateTime ?? DateTime.now()),
       ),
     );
   }
@@ -539,10 +543,8 @@ class _AlarmScaffold extends ConsumerWidget {
     return parts.join(' \u2014 ');
   }
 
-  String _formatTime(DateTime dt) {
-    final h = dt.hour.toString().padLeft(2, '0');
-    final m = dt.minute.toString().padLeft(2, '0');
-    return '$h:$m';
+  String _formatTime(BuildContext context, DateTime dt) {
+    return AppDateFormatter.of(context).formatTime(dt);
   }
 }
 

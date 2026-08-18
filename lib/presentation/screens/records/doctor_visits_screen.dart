@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
 import 'package:rehab_track/domain/enums/enums.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/doctor_visit_provider.dart';
 import 'package:rehab_track/presentation/utils/doctor_visit_localizer.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 
 enum _VisitViewMode { upcoming, history }
@@ -176,8 +176,8 @@ class _VisitTile extends StatelessWidget {
             Text(secondary, maxLines: 1, overflow: TextOverflow.ellipsis),
           Text(
             isUpcomingList
-                ? '${LocalizedDateFormat.shortMonthDayYear(context, visit.scheduledDateTime)}'
-                    ' · ${LocalizedDateFormat.hourMinute(context, visit.scheduledDateTime)}'
+                ? '${AppDateFormatter.of(context).formatMediumDate(visit.scheduledDateTime)}'
+                    ' · ${AppDateFormatter.of(context).formatTime(visit.scheduledDateTime)}'
                 : _terminalSubtitle(context),
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
@@ -228,8 +228,9 @@ class _VisitTile extends StatelessWidget {
   }
 
   String _terminalSubtitle(BuildContext context) {
-    final time = '${LocalizedDateFormat.shortMonthDayYear(context, visit.scheduledDateTime)}'
-        ' · ${LocalizedDateFormat.hourMinute(context, visit.scheduledDateTime)}';
+    final formatter = AppDateFormatter.of(context);
+    final time =
+        '${formatter.formatMediumDate(visit.scheduledDateTime)} · ${formatter.formatTime(visit.scheduledDateTime)}';
     if (visit.reason != null && visit.reason!.trim().isNotEmpty) {
       return '$time · ${visit.reason!.trim()}';
     }

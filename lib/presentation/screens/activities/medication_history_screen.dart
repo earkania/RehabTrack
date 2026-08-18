@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/domain/entities/adherence_stats.dart';
 import 'package:rehab_track/domain/entities/history_period.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
@@ -268,7 +269,9 @@ class _LogList extends StatelessWidget {
           child: ListTile(
             leading: StatusChip(status: log.status),
             title: Text(
-              _formatDateTime(log.scheduledTime),
+              AppDateFormatter.of(context).formatShortDateTime(
+                log.scheduledTime,
+              ),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             subtitle: Column(
@@ -276,7 +279,9 @@ class _LogList extends StatelessWidget {
               children: [
                 if (log.takenTime != null)
                   Text(
-                    l10n.takenAt(_formatTime(log.takenTime!)),
+                    l10n.takenAt(
+                      AppDateFormatter.of(context).formatTime(log.takenTime!),
+                    ),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color:
                               Theme.of(context).colorScheme.onSurfaceVariant,
@@ -303,15 +308,6 @@ class _LogList extends StatelessWidget {
         );
       },
     );
-  }
-
-  String _formatDateTime(DateTime dt) {
-    return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year} '
-        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-  }
-
-  String _formatTime(DateTime dt) {
-    return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
   String _formatIntakeSnapshot(MedicationLog log, AppLocalizations l10n) {

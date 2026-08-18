@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/doctor_prescription.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/doctor_prescription_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
@@ -403,6 +403,7 @@ class _PrescriptionListTile extends StatelessWidget {
 
   String _formatDate(BuildContext context, DateTime date) {
     final l10n = AppLocalizations.of(context)!;
+    final formatter = AppDateFormatter.of(context);
     final now = DateTime.now();
     final diff = date.difference(now).inDays.abs();
 
@@ -411,9 +412,9 @@ class _PrescriptionListTile extends StatelessWidget {
     } else if (diff == 1) {
       return l10n.tomorrow;
     } else if (diff < 7) {
-      return DateFormat.EEEE().format(date);
+      return formatter.formatWeekday(date);
     } else {
-      return DateFormat.yMMMd().format(date);
+      return formatter.formatMediumDate(date);
     }
   }
 }

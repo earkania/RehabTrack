@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
@@ -251,11 +252,12 @@ class _ScheduleCard extends StatelessWidget {
       scheduleLabel = '${l10n.everyNDaysLabel} (${schedule.intervalDays})';
     }
 
+    final formatter = AppDateFormatter.of(context);
     final startDateStr = schedule.startDate != null
-        ? '${schedule.startDate!.day}.${schedule.startDate!.month}.${schedule.startDate!.year}'
+        ? formatter.formatShortDate(schedule.startDate!)
         : null;
     final endDateStr = schedule.endDate != null
-        ? '${schedule.endDate!.day}.${schedule.endDate!.month}.${schedule.endDate!.year}'
+        ? formatter.formatShortDate(schedule.endDate!)
         : null;
 
     return Card(
@@ -300,7 +302,7 @@ class _ScheduleCard extends StatelessWidget {
                   ),
                   if (startDateStr != null || endDateStr != null)
                     Text(
-                      _buildDateLine(startDateStr, endDateStr),
+                      _buildDateLine(l10n, startDateStr, endDateStr),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -359,15 +361,19 @@ class _ScheduleCard extends StatelessWidget {
     );
   }
 
-  String _buildDateLine(String? startDate, String? endDate) {
+  String _buildDateLine(
+    AppLocalizations l10n,
+    String? startDate,
+    String? endDate,
+  ) {
     if (startDate != null && endDate != null) {
       return '$startDate – $endDate';
     }
     if (startDate != null) {
-      return 'Starts $startDate';
+      return l10n.scheduleStartsOn(startDate);
     }
     if (endDate != null) {
-      return 'Until $endDate';
+      return l10n.scheduleUntil(endDate);
     }
     return '';
   }

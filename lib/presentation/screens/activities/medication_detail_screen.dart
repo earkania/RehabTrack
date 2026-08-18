@@ -6,6 +6,7 @@ import 'package:rehab_track/domain/entities/history_period.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/medication_alternative.dart';
 import 'package:rehab_track/domain/entities/schedule_config.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/medication_provider.dart';
@@ -90,12 +91,12 @@ class MedicationDetailScreen extends ConsumerWidget {
               if (medication.startDate != null)
                 _DetailRow(
                   label: l10n.startDate,
-                  value: _formatDate(medication.startDate!),
+                  value: _formatDate(context, medication.startDate!),
                 ),
               if (medication.endDate != null)
                 _DetailRow(
                   label: l10n.endDate,
-                  value: _formatDate(medication.endDate!),
+                  value: _formatDate(context, medication.endDate!),
                 ),
               if (medication.notes != null && medication.notes!.isNotEmpty)
                 _DetailRow(
@@ -335,7 +336,9 @@ class MedicationDetailScreen extends ConsumerWidget {
                         if (schedule.startDate != null) ...[
                           const SizedBox(width: 12),
                           Text(
-                            _formatDate(schedule.startDate!),
+                            AppDateFormatter.of(context).formatShortDate(
+                              schedule.startDate!,
+                            ),
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -493,8 +496,8 @@ class MedicationDetailScreen extends ConsumerWidget {
     return '$typeLabel\n$intakeLine';
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+  String _formatDate(BuildContext context, DateTime date) {
+    return AppDateFormatter.of(context).formatMediumDate(date);
   }
 
   void _confirmDeactivate(

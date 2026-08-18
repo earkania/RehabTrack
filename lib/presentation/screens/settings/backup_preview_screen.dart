@@ -10,10 +10,10 @@ import 'package:rehab_track/domain/backup/backup_preview.dart';
 import 'package:rehab_track/domain/restore/restore_apply_phase.dart';
 import 'package:rehab_track/domain/restore/restore_failure.dart';
 import 'package:rehab_track/domain/restore/restore_result.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/restore_apply_provider.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 /// Shows the safe metadata of a validated backup and lets the user confirm or
 /// cancel before restore.
@@ -66,8 +66,7 @@ class _BackupPreviewScreenState extends ConsumerState<BackupPreviewScreen> {
           const SizedBox(height: 8),
           _DetailRow(
             label: l10n.backupDate(
-              LocalizedDateFormat.fullMonthDayYear(
-                context,
+              AppDateFormatter.of(context).formatMediumDate(
                 widget.preview.backupCreatedAt,
               ),
             ),
@@ -268,8 +267,7 @@ Future<void> _runRestore(BuildContext context) async {
     }
 
     if (failure.succeeded) {
-      final date = LocalizedDateFormat.fullMonthDayYear(
-        context,
+      final date = AppDateFormatter.of(context).formatMediumDate(
         widget.preview.backupCreatedAt,
       );
       await _showAlertDialog(

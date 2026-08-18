@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -13,6 +12,7 @@ import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/care_contact.dart';
 import 'package:rehab_track/domain/entities/doctor_prescription.dart';
 import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/doctor_prescription_provider.dart';
 import 'package:rehab_track/presentation/providers/doctor_visit_provider.dart';
@@ -317,7 +317,9 @@ class _DoctorPrescriptionDetailsScreenState
 
           _DetailRow(
             label: AppLocalizations.of(context)!.prescriptionDate,
-            value: DateFormat.yMMMd().format(prescription.prescriptionDate),
+            value: AppDateFormatter.of(context).formatMediumDate(
+              prescription.prescriptionDate,
+            ),
           ),
           const SizedBox(height: 8),
 
@@ -415,8 +417,9 @@ class _DoctorPrescriptionDetailsScreenState
     if (visit.reason != null && visit.reason!.trim().isNotEmpty) {
       return visit.reason!;
     }
-    final date = DateFormat.yMMMd().format(visit.scheduledDateTime);
-    final time = DateFormat.Hm().format(visit.scheduledDateTime);
+    final formatter = AppDateFormatter.of(context);
+    final date = formatter.formatMediumDate(visit.scheduledDateTime);
+    final time = formatter.formatTime(visit.scheduledDateTime);
     return '$date $time';
   }
 
