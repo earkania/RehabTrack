@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/today/today_relative_time_label.dart';
@@ -20,7 +20,7 @@ class TodayNextItemCard extends ConsumerWidget {
 
     if (nextItem == null) return const SizedBox.shrink();
 
-    final timeStr = LocalizedDateFormat.hourMinute(context, nextItem.effectiveTime);
+    final timeStr = AppDateFormatter.of(context).formatTime(nextItem.effectiveTime);
     final isMedication = nextItem.type == TodayAgendaItemType.medication;
 
     final strength = nextItem.strength;

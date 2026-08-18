@@ -602,6 +602,22 @@
   "previousDay": "Previous day",
   "nextDay": "Next day",
   "returnToToday": "Today",
+  "scheduleStartsOn": "Starts on {date}",
+  "@scheduleStartsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleUntil": "Until {date}",
+  "@scheduleUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "nothingScheduledForThisDay": "Nothing scheduled for this day",
   "firstPlannedItem": "First planned item",
   "scheduledAt": "Scheduled at {time}",

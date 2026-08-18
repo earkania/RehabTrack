@@ -11,6 +11,7 @@ import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
+import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/common/date_field.dart';
 import 'package:rehab_track/data/services/notification/notification_scheduler.dart';
 import 'package:rehab_track/data/services/notification/notification_service.dart';
@@ -280,7 +281,13 @@ class _MeasurementScheduleScreenState
       measurementTypeProvider(widget.measurementTypeId),
     );
 
-    final typeName = typeAsync.valueOrNull?.name ?? 'Measurement';
+    final typeName = typeAsync.when(
+      loading: () => '',
+      error: (_, _) => '',
+      data: (type) => type != null
+          ? MeasurementLocalizer.typeName(l10n, type.key)
+          : '',
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -295,10 +302,11 @@ class _MeasurementScheduleScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              typeName,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            if (typeName.isNotEmpty)
+              Text(
+                typeName,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             const SizedBox(height: AppSpacing.md),
             _buildScheduleTypeSelector(l10n),
             const SizedBox(height: AppSpacing.md),

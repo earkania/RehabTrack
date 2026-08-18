@@ -602,6 +602,22 @@
   "previousDay": "წინა დღე",
   "nextDay": "მომდევნო დღე",
   "returnToToday": "დღეს",
+  "scheduleStartsOn": "იწყება {date}",
+  "@scheduleStartsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleUntil": "{date}-მდე",
+  "@scheduleUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "nothingScheduledForThisDay": "ამ დღისთვის არაფერია დაგეგმილი",
   "firstPlannedItem": "პირველი დაგეგმილი ელემენტი",
   "scheduledAt": "დაგეგმილია {time}",

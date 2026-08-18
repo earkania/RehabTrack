@@ -4,11 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
 import 'package:rehab_track/domain/enums/enums.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/doctor_visit_provider.dart';
 import 'package:rehab_track/presentation/utils/doctor_visit_localizer.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 /// Visit details with status transitions. Terminal states (completed,
 /// cancelled, missed) are preserved in History and never auto-reopened; only
@@ -129,8 +129,8 @@ class _VisitDetailsView extends ConsumerWidget {
           ],
           const SizedBox(height: 16),
           Text(
-            '${LocalizedDateFormat.fullMonthDayYear(context, visit.scheduledDateTime)}'
-            ' · ${LocalizedDateFormat.hourMinute(context, visit.scheduledDateTime)}',
+            '${AppDateFormatter.of(context).formatLongDate(visit.scheduledDateTime)}'
+            ' · ${AppDateFormatter.of(context).formatTime(visit.scheduledDateTime)}',
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall,
           ),

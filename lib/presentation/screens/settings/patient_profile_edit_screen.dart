@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
@@ -251,7 +252,7 @@ class _PatientProfileEditScreenState
             title: Text(l10n.birthDateLabel),
             subtitle: Text(
               _birthDate != null
-                  ? '${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}'
+                  ? AppDateFormatter.of(context).formatShortDate(_birthDate!)
                   : l10n.selectDate,
             ),
             trailing: const Icon(Icons.calendar_today),

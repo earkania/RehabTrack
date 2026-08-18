@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
+import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 class DateNavigationBar extends ConsumerWidget {
   const DateNavigationBar({super.key});
@@ -13,8 +14,9 @@ class DateNavigationBar extends ConsumerWidget {
     final today = DateTime(now.year, now.month, now.day);
     final isToday = selectedDate.isAtSameMomentAs(today);
 
-    final dateLabel = LocalizedDateFormat.fullMonthDayYear(context, selectedDate);
+    final dateLabel = AppDateFormatter.of(context).formatLongDate(selectedDate);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -22,7 +24,7 @@ class DateNavigationBar extends ConsumerWidget {
         children: [
           IconButton(
             icon: const Icon(Icons.chevron_left),
-            tooltip: 'Previous day',
+            tooltip: l10n.previousDay,
             onPressed: () {
               final newDate = selectedDate.subtract(const Duration(days: 1));
               ref.read(selectedAgendaDateProvider.notifier).state = newDate;
@@ -60,7 +62,7 @@ class DateNavigationBar extends ConsumerWidget {
             visible: !isToday,
             child: IconButton(
               icon: const Icon(Icons.today),
-              tooltip: 'Return to today',
+              tooltip: l10n.returnToToday,
               onPressed: () {
                 ref.read(selectedAgendaDateProvider.notifier).state = today;
               },
@@ -73,7 +75,7 @@ class DateNavigationBar extends ConsumerWidget {
                   ? theme.colorScheme.onSurface.withValues(alpha: 0.38)
                   : null,
             ),
-            tooltip: 'Next day',
+            tooltip: l10n.nextDay,
             onPressed: isToday
                 ? null
                 : () {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
@@ -191,8 +192,7 @@ class _MeasurementEntryScreenState
       contentPadding: EdgeInsets.zero,
       leading: const Icon(Icons.calendar_today),
       title: Text(
-        '${_measuredAt.day}.${_measuredAt.month}.${_measuredAt.year} '
-        '${_measuredAt.hour.toString().padLeft(2, '0')}:${_measuredAt.minute.toString().padLeft(2, '0')}',
+        AppDateFormatter.of(context).formatShortDateTime(_measuredAt),
       ),
       subtitle: Text(l10n.measuredAt),
       trailing: const Icon(Icons.edit_calendar),

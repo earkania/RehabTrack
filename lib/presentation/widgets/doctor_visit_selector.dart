@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
-import 'package:intl/intl.dart';
 
 import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/doctor_visit_provider.dart';
 
@@ -148,9 +148,9 @@ String _visitTitle(BuildContext context, DoctorVisitRecord visit) {
   if (visit.reason != null && visit.reason!.trim().isNotEmpty) {
     return visit.reason!;
   }
-  final date = DateFormat.yMMMd().format(visit.scheduledDateTime);
-  final time = DateFormat.Hm().format(visit.scheduledDateTime);
-  return '$date $time';
+  return AppDateFormatter.of(context).formatMediumDateTime(
+    visit.scheduledDateTime,
+  );
 }
 
 String _visitLabel(BuildContext context, DoctorVisitRecord? visit) {
@@ -216,7 +216,9 @@ class _VisitSelectionDialog extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     subtitle: Text(
-                      '${DateFormat.yMMMd().format(visit.scheduledDateTime)} at ${DateFormat.Hm().format(visit.scheduledDateTime)}',
+                      AppDateFormatter.of(context).formatMediumDateTime(
+                        visit.scheduledDateTime,
+                      ),
                     ),
 trailing: Icon(
   initialSelection == visit.id

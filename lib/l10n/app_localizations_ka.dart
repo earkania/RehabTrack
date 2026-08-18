@@ -1489,6 +1489,16 @@ class AppLocalizationsKa extends AppLocalizations {
   String get returnToToday => 'დღეს';
 
   @override
+  String scheduleStartsOn(String date) {
+    return 'იწყება $date';
+  }
+
+  @override
+  String scheduleUntil(String date) {
+    return '$date-მდე';
+  }
+
+  @override
   String get nothingScheduledForThisDay => 'ამ დღისთვის არაფერია დაგეგმილი';
 
   @override

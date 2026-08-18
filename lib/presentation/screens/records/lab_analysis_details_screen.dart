@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:open_filex/open_filex.dart';
-
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/care_contact.dart';
 import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
 import 'package:rehab_track/domain/entities/lab_analysis.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/lab_analysis_provider.dart';
 import 'package:rehab_track/presentation/providers/doctor_visit_provider.dart';
@@ -325,7 +324,7 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
   }
 
   String _formatDate(BuildContext context, DateTime date) {
-    return DateFormat.yMMMd().format(date);
+    return AppDateFormatter.of(context).formatMediumDate(date);
   }
 
   String _contactName(CareContact? contact) {
@@ -341,8 +340,9 @@ class _LabAnalysisDetailsScreenState extends ConsumerState<LabAnalysisDetailsScr
     if (visit.reason != null && visit.reason!.trim().isNotEmpty) {
       return visit.reason!;
     }
-    final date = DateFormat.yMMMd().format(visit.scheduledDateTime);
-    final time = DateFormat.Hm().format(visit.scheduledDateTime);
+    final formatter = AppDateFormatter.of(context);
+    final date = formatter.formatMediumDate(visit.scheduledDateTime);
+    final time = formatter.formatTime(visit.scheduledDateTime);
     return '$date $time';
   }
 

@@ -5,13 +5,13 @@ import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
 import 'package:rehab_track/domain/entities/medication.dart';
 import 'package:rehab_track/domain/entities/today_agenda.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
 import 'package:rehab_track/presentation/utils/dosage_form_localizer.dart';
 import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 import 'package:rehab_track/presentation/widgets/today/today_background.dart';
 import 'package:rehab_track/presentation/widgets/today/today_measurement_reading.dart';
 import 'package:rehab_track/presentation/widgets/today/today_relative_time_label.dart';
@@ -28,7 +28,7 @@ class TodayAgendaItemWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final timeStr = LocalizedDateFormat.hourMinute(context, item.effectiveTime);
+    final timeStr = AppDateFormatter.of(context).formatTime(item.effectiveTime);
     final now = DateTime.now();
     final graceMinutes = ref.watch(nextItemGracePeriodProvider);
     final gracePeriod = Duration(minutes: graceMinutes);

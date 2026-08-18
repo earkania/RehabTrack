@@ -57,7 +57,7 @@ void main() {
     expect(find.text('Backup preview'), findsOneWidget);
     expect(find.text('Compatible'), findsOneWidget);
     expect(find.text('Backup details'), findsOneWidget);
-    expect(find.textContaining('August 5, 2026'), findsOneWidget);
+    expect(find.textContaining('Aug 5, 2026'), findsOneWidget);
     expect(find.text('App version: 1.2.0'), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
     // No sensitive data is rendered.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
@@ -161,7 +162,7 @@ class PatientProfileViewScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           _buildSection(l10n.personalInformation, [
             _buildInfoTile(Icons.cake_outlined, l10n.birthDateLabel,
-                _formatDate(profile.birthDate, l10n)),
+                _formatDate(context, profile.birthDate, l10n)),
             _buildInfoTile(Icons.person_outlined, l10n.gender,
                 profile.gender ?? l10n.unavailable),
             _buildInfoTile(Icons.bloodtype_outlined, l10n.bloodType,
@@ -229,9 +230,13 @@ class PatientProfileViewScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDate(DateTime? date, AppLocalizations l10n) {
+  String _formatDate(
+    BuildContext context,
+    DateTime? date,
+    AppLocalizations l10n,
+  ) {
     if (date == null) return l10n.unavailable;
-    return '${date.day}/${date.month}/${date.year}';
+    return AppDateFormatter.of(context).formatShortDate(date);
   }
 
   String _relationshipLabel(Relationship relationship) {

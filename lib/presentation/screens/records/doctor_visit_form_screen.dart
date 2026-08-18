@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rehab_track/domain/entities/care_contact.dart';
 import 'package:rehab_track/domain/entities/doctor_visit_record.dart';
 import 'package:rehab_track/domain/enums/enums.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/care_contact_provider.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/doctor_visit_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/utils/doctor_visit_localizer.dart';
-import 'package:rehab_track/presentation/utils/localized_date_format.dart';
 
 /// Shared Doctor Visit create/edit form. Used by the add and edit routes.
 class DoctorVisitFormScreen extends ConsumerStatefulWidget {
@@ -159,8 +159,8 @@ class _DoctorVisitFormScreenState extends ConsumerState<DoctorVisitFormScreen> {
             leading: const Icon(Icons.calendar_today_outlined),
             title: Text(l10n.scheduledDateTime),
             subtitle: Text(
-              '${LocalizedDateFormat.fullMonthDayYear(context, _scheduledDateTime)}'
-              ' · ${LocalizedDateFormat.hourMinute(context, _scheduledDateTime)}',
+              '${AppDateFormatter.of(context).formatLongDate(_scheduledDateTime)}'
+              ' · ${AppDateFormatter.of(context).formatTime(_scheduledDateTime)}',
             ),
             trailing: const Icon(Icons.edit_outlined, size: 20),
             onTap: () => _pickDateTime(context, l10n),
