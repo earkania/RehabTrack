@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -353,94 +355,133 @@ class _BackupDetailsDialogState
     final backup = widget.backup;
     final unavailable = !backup.available;
 
-    return AlertDialog(
-      title: Text(backup.displayLabel),
-      content: SingleChildScrollView(
+    // A custom Dialog (not AlertDialog) because AlertDialog wraps its content
+    // in an IntrinsicWidth, which cannot contain the LayoutBuilder used by the
+    // responsive action footer. The structure mirrors the M3 AlertDialog
+    // column layout so the dialog keeps its native appearance and semantics.
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (unavailable) ...[
-              _DetailLine(
-                icon: Icons.cloud_off,
-                label: l10n.manageBackupsUnavailableDetail,
-                emphasized: true,
-              ),
-              const SizedBox(height: 8),
-            ],
-            if (backup.createdAt != null)
-              _DetailLine(
-                icon: Icons.schedule,
-                label: l10n.backupDate(
-                  AppDateFormatter.of(context).formatMediumDate(
-                    backup.createdAt!,
-                  ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Center(
+                child: Icon(
+                  unavailable
+                      ? Icons.cloud_off
+                      : Icons.settings_backup_restore,
+                  size: 24,
+                  color: unavailable
+                      ? theme.colorScheme.error
+                      : theme.colorScheme.primary,
                 ),
               ),
-            if (backup.fileSize != null)
-              _DetailLine(
-                icon: Icons.data_usage,
-                label: '${l10n.backupSize}: ${_formatBytes(backup.fileSize!)}',
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              child: Text(
+                backup.displayLabel,
+                style: theme.textTheme.headlineSmall,
               ),
-            if (backup.backupFormatVersion != null)
-              _DetailLine(
-                icon: Icons.category_outlined,
-                label: l10n.backupFormatVersion(
-                  backup.backupFormatVersion!.toString(),
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (unavailable) ...[
+                      _DetailLine(
+                        icon: Icons.cloud_off,
+                        label: l10n.manageBackupsUnavailableDetail,
+                        emphasized: true,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    if (backup.createdAt != null)
+                      _DetailLine(
+                        icon: Icons.schedule,
+                        label: l10n.backupDate(
+                          AppDateFormatter.of(context).formatMediumDate(
+                            backup.createdAt!,
+                          ),
+                        ),
+                      ),
+                    if (backup.fileSize != null)
+                      _DetailLine(
+                        icon: Icons.data_usage,
+                        label:
+                            '${l10n.backupSize}: ${_formatBytes(backup.fileSize!)}',
+                      ),
+                    if (backup.backupFormatVersion != null)
+                      _DetailLine(
+                        icon: Icons.category_outlined,
+                        label: l10n.backupFormatVersion(
+                          backup.backupFormatVersion!.toString(),
+                        ),
+                      ),
+                    if (backup.databaseSchemaVersion != null)
+                      _DetailLine(
+                        icon: Icons.storage_outlined,
+                        label: l10n.databaseVersion(
+                          backup.databaseSchemaVersion!.toString(),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            if (backup.databaseSchemaVersion != null)
-              _DetailLine(
-                icon: Icons.storage_outlined,
-                label: l10n.databaseVersion(
-                  backup.databaseSchemaVersion!.toString(),
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+              child: _ResponsiveDialogActions(
+                actions: _actions(l10n),
               ),
+            ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: _deleting || _removing || !backup.available
-              ? null
-              : () => _share(context),
-          child: Text(l10n.manageBackupsShare),
-        ),
-        if (unavailable)
-          TextButton(
-            onPressed: _removing ? null : () => _confirmRemoveFromList(context),
-            child: Text(l10n.removeFromList),
-          )
-        else
-          TextButton(
-            onPressed: _deleting ? null : () => _confirmDelete(context),
-            style: TextButton.styleFrom(
-              foregroundColor: theme.colorScheme.error,
-            ),
-            child: Text(l10n.manageBackupsDelete),
-          ),
-        TextButton(
-          onPressed:
-              _deleting || _removing ? null : () => Navigator.of(context).pop(),
-          child: Text(l10n.close),
-        ),
-        FilledButton(
-          onPressed: _deleting || _removing || !backup.available
-              ? null
-              : () => _confirmRestore(context),
-          child: Text(l10n.manageBackupsRestore),
-        ),
-      ],
-      actionsOverflowAlignment: OverflowBarAlignment.end,
-      actionsOverflowDirection: VerticalDirection.up,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      icon: Icon(
-        unavailable ? Icons.cloud_off : Icons.settings_backup_restore,
-        color: unavailable
-            ? theme.colorScheme.error
-            : theme.colorScheme.primary,
-      ),
     );
+  }
+
+  List<_BackupDialogAction> _actions(AppLocalizations l10n) {
+    final backup = widget.backup;
+    final unavailable = !backup.available;
+    return [
+      _BackupDialogAction(
+        label: l10n.manageBackupsShare,
+        enabled: !_deleting && !_removing && backup.available,
+        onPressed: () => _share(context),
+      ),
+      if (unavailable)
+        _BackupDialogAction(
+          label: l10n.removeFromList,
+          enabled: !_removing,
+          onPressed: () => _confirmRemoveFromList(context),
+        )
+      else
+        _BackupDialogAction(
+          label: l10n.manageBackupsDelete,
+          enabled: !_deleting,
+          onPressed: () => _confirmDelete(context),
+          style: _BackupDialogActionStyle.destructive,
+        ),
+      _BackupDialogAction(
+        label: l10n.close,
+        enabled: !_deleting && !_removing,
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      _BackupDialogAction(
+        label: l10n.manageBackupsRestore,
+        enabled: !_deleting && !_removing && backup.available,
+        onPressed: () => _confirmRestore(context),
+        style: _BackupDialogActionStyle.primary,
+      ),
+    ];
   }
 
   Future<void> _share(BuildContext context) async {
@@ -606,6 +647,153 @@ class _BackupDetailsDialogState
       BackupValidationResult.storageFailure => l10n.backupStorageFailure,
       _ => l10n.invalidBackupFile,
     };
+  }
+}
+
+/// Semantic treatment of a dialog action button.
+enum _BackupDialogActionStyle { secondary, destructive, primary }
+
+/// Data describing one action button in the Backup Details dialog footer.
+class _BackupDialogAction {
+  const _BackupDialogAction({
+    required this.label,
+    required this.enabled,
+    required this.onPressed,
+    this.style = _BackupDialogActionStyle.secondary,
+  });
+
+  final String label;
+  final bool enabled;
+  final VoidCallback onPressed;
+  final _BackupDialogActionStyle style;
+}
+
+/// Responsive action footer for the Backup Details dialog.
+///
+/// Lays the actions in a single horizontal row when they fit the available
+/// width, and switches to a full-width vertical stack when they do not (long
+/// localized labels, large text, narrow screens). This replaces the dialog's
+/// default `OverflowBar` footer, which stacks overflowing actions at their own
+/// intrinsic widths, right-aligned — producing the uneven column seen with long
+/// Georgian labels.
+///
+/// Layout decisions are made explicitly from measured label widths, so the
+/// result is deterministic, language-independent and text-scale aware.
+class _ResponsiveDialogActions extends StatelessWidget {
+  const _ResponsiveDialogActions({required this.actions});
+
+  final List<_BackupDialogAction> actions;
+
+  /// Horizontal/vertical gap between adjacent action buttons.
+  static const double _spacing = 8;
+
+  /// Material 3 button minimum width for Text/Filled buttons.
+  static const double _minButtonWidth = 64;
+
+  /// Matches the explicit `contentPadding` applied to every action button below
+  /// (`EdgeInsets.symmetric(horizontal: 16)`).
+  static const double _buttonHorizontalPadding = 32;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textScaler = MediaQuery.textScalerOf(context);
+    final labelStyle = theme.textTheme.labelLarge!;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textDirection = Directionality.of(context);
+        var requiredWidth = 0.0;
+        for (var i = 0; i < actions.length; i++) {
+          if (i > 0) requiredWidth += _spacing;
+          requiredWidth += _estimateButtonWidth(
+            actions[i].label,
+            labelStyle,
+            textScaler,
+            textDirection,
+          );
+        }
+
+        final fits = requiredWidth <= constraints.maxWidth;
+        return fits ? _buildRow(context) : _buildColumn(context);
+      },
+    );
+  }
+
+  double _estimateButtonWidth(
+    String label,
+    TextStyle style,
+    TextScaler textScaler,
+    TextDirection textDirection,
+  ) {
+    final painter = TextPainter(
+      text: TextSpan(text: label, style: style),
+      textDirection: textDirection,
+      textScaler: textScaler,
+    )..layout();
+    return math.max(
+      _minButtonWidth,
+      painter.width + _buttonHorizontalPadding,
+    );
+  }
+
+  Widget _buildRow(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        for (var i = 0; i < actions.length; i++) ...[
+          if (i > 0) SizedBox(width: _spacing),
+          _buildButton(context, actions[i]),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildColumn(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < actions.length; i++) ...[
+            if (i > 0) SizedBox(height: _spacing),
+            _buildButton(context, actions[i]),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButton(BuildContext context, _BackupDialogAction action) {
+    final theme = Theme.of(context);
+    final onPressed = action.enabled ? action.onPressed : null;
+    const padding = EdgeInsets.symmetric(horizontal: 16);
+
+    switch (action.style) {
+      case _BackupDialogActionStyle.primary:
+        return FilledButton(
+          onPressed: onPressed,
+          style: FilledButton.styleFrom(padding: padding),
+          child: Text(action.label),
+        );
+      case _BackupDialogActionStyle.destructive:
+        return TextButton(
+          onPressed: onPressed,
+          style: TextButton.styleFrom(
+            padding: padding,
+            foregroundColor: theme.colorScheme.error,
+          ),
+          child: Text(action.label),
+        );
+      case _BackupDialogActionStyle.secondary:
+        return TextButton(
+          onPressed: onPressed,
+          style: TextButton.styleFrom(padding: padding),
+          child: Text(action.label),
+        );
+    }
   }
 }
 

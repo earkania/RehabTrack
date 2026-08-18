@@ -143,6 +143,9 @@ Widget _wrap(
   FakeSettingsRepository settings,
   FakeStorageGateway gateway, {
   BackupImportService? importService,
+  Locale? locale,
+  ThemeData? theme,
+  TextScaler? textScaler,
 }) {
   final registry = BackupRegistry(settings);
   final service = BackupManagementService(registry, gateway);
@@ -161,7 +164,16 @@ Widget _wrap(
     overrides: [
       manageBackupsProvider.overrideWith((ref) => controller),
     ],
-    child: const MaterialApp(
+    child: MaterialApp(
+      locale: locale,
+      theme: theme ?? ThemeData(),
+      builder: textScaler == null
+          ? null
+          : (context, child) => MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: textScaler),
+                child: child!,
+              ),
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -678,5 +690,183 @@ void main() {
     );
     expect(restoreButton.onPressed, isNull);
     expect(shareButton.onPressed, isNull);
+  });
+
+  group('Backup Details action layout', () {
+    late Locale locale;
+
+    void usePhoneViewport(WidgetTester tester) {
+      tester.view.physicalSize = const Size(1080, 2340);
+      tester.view.devicePixelRatio = 2.625;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    }
+
+    Future<void> openDetails(
+        WidgetTester tester, {
+        TextScaler? textScaler,
+      }) async {
+      final settings = FakeSettingsRepository();
+      await seed(settings, [
+        RegisteredBackup(
+          contentUri: 'content://doc/1',
+          displayName: 'Morning Backup.rtb',
+          createdAt: DateTime(2026, 8, 1),
+          fileSize: 2048,
+        ),
+      ]);
+      await tester.pumpWidget(_wrap(
+        settings,
+        FakeStorageGateway(),
+        locale: locale,
+        textScaler: textScaler,
+      ));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Morning Backup.rtb'));
+      await tester.pumpAndSettle();
+    }
+
+    Rect buttonRect(WidgetTester tester, String label) {
+      return tester.getRect(
+        find.ancestor(
+          of: find.text(label),
+          matching: find.byWidgetPredicate(
+            (w) => w is TextButton || w is FilledButton,
+          ),
+        ),
+      );
+    }
+
+    setUp(() {
+      locale = const Locale('en');
+    });
+
+    testWidgets('English renders the actions in one horizontal row',
+        (tester) async {
+      await openDetails(tester);
+
+      final share = buttonRect(tester, 'Share');
+      final delete = buttonRect(tester, 'Delete');
+      final close = buttonRect(tester, 'Close');
+      final restore = buttonRect(tester, 'Restore');
+
+      expect(share.top, closeTo(delete.top, 0.5));
+      expect(delete.top, closeTo(close.top, 0.5));
+      expect(close.top, closeTo(restore.top, 0.5));
+      expect(share.bottom, closeTo(restore.bottom, 0.5));
+
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.widgetWithText(FilledButton, 'Restore'),
+            )
+            .onPressed,
+        isNotNull,
+      );
+      final deleteButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Delete'),
+      );
+      final error =
+          Theme.of(tester.element(find.text('Delete'))).colorScheme.error;
+      expect(deleteButton.style?.foregroundColor?.resolve({}), error);
+    });
+
+    testWidgets('Georgian on a phone switches to full-width equal buttons',
+        (tester) async {
+      locale = const Locale('ka');
+      usePhoneViewport(tester);
+      await openDetails(tester);
+
+      final share = buttonRect(tester, 'გაზიარება');
+      final delete = buttonRect(tester, 'წაშლა');
+      final close = buttonRect(tester, 'დახურვა');
+      final restore = buttonRect(tester, 'აღდგენა');
+
+      expect(share.left, closeTo(delete.left, 0.5));
+      expect(delete.left, closeTo(close.left, 0.5));
+      expect(close.left, closeTo(restore.left, 0.5));
+      expect(share.width, closeTo(delete.width, 0.5));
+      expect(delete.width, closeTo(close.width, 0.5));
+      expect(close.width, closeTo(restore.width, 0.5));
+      expect(restore.right, closeTo(restore.left + restore.width, 0.5));
+
+      expect(delete.top, greaterThan(share.top));
+      expect(close.top, greaterThan(delete.top));
+      expect(restore.top, greaterThan(close.top));
+
+      expect(
+        tester.widget<FilledButton>(
+          find.widgetWithText(FilledButton, 'აღდგენა'),
+        ),
+        isA<FilledButton>(),
+      );
+      final deleteButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'წაშლა'),
+      );
+      final error =
+          Theme.of(tester.element(find.text('წაშლა'))).colorScheme.error;
+      expect(deleteButton.style?.foregroundColor?.resolve({}), error);
+    });
+
+    testWidgets('English large text avoids overflow with equal-width buttons',
+        (tester) async {
+      locale = const Locale('en');
+      usePhoneViewport(tester);
+      await openDetails(tester, textScaler: const TextScaler.linear(2.0));
+
+      final share = buttonRect(tester, 'Share');
+      final restore = buttonRect(tester, 'Restore');
+      expect(share.left, closeTo(restore.left, 0.5));
+      expect(share.width, closeTo(restore.width, 0.5));
+      expect(restore.top, greaterThan(share.top));
+    });
+
+    testWidgets('Georgian large text avoids overflow with equal-width buttons',
+        (tester) async {
+      locale = const Locale('ka');
+      usePhoneViewport(tester);
+      await openDetails(tester, textScaler: const TextScaler.linear(2.0));
+
+      final share = buttonRect(tester, 'გაზიარება');
+      final restore = buttonRect(tester, 'აღდგენა');
+      expect(share.left, closeTo(restore.left, 0.5));
+      expect(share.width, closeTo(restore.width, 0.5));
+      expect(restore.top, greaterThan(share.top));
+    });
+
+    testWidgets('the dialog renders in light and dark themes', (tester) async {
+      for (final isDark in [false, true]) {
+        final settings = FakeSettingsRepository();
+        await seed(settings, [
+          RegisteredBackup(
+            contentUri: 'content://doc/1',
+            displayName: 'Morning Backup.rtb',
+            createdAt: DateTime(2026, 8, 1),
+          ),
+        ]);
+        await tester.pumpWidget(_wrap(
+          settings,
+          FakeStorageGateway(),
+          theme: ThemeData(brightness: isDark ? Brightness.dark : Brightness.light),
+        ));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Morning Backup.rtb'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Share'), findsOneWidget);
+        expect(find.text('Delete'), findsWidgets);
+        expect(find.text('Restore'), findsOneWidget);
+        expect(
+          tester.widget<FilledButton>(
+            find.widgetWithText(FilledButton, 'Restore'),
+          ),
+          isA<FilledButton>(),
+        );
+
+        // Close the dialog between theme iterations.
+        await tester.tap(find.text('Close'));
+        await tester.pumpAndSettle();
+      }
+    });
   });
 }
