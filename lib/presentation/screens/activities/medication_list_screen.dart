@@ -29,9 +29,7 @@ class MedicationListScreen extends ConsumerWidget {
               ref.read(showInactiveMedicationsProvider.notifier).state =
                   !showInactive;
             },
-            tooltip: showInactive
-                ? l10n.medications
-                : l10n.showDeactivated,
+            tooltip: showInactive ? l10n.medications : l10n.showDeactivated,
             icon: Icon(
               showInactive ? Icons.medication : Icons.archive_outlined,
             ),
@@ -89,9 +87,8 @@ class MedicationListScreen extends ConsumerWidget {
               final medication = medications[index];
               return MedicationCard(
                 medication: medication,
-                onTap: () => context.push(
-                  AppRoutes.medicationDetail(medication.id!),
-                ),
+                onTap: () =>
+                    context.push(AppRoutes.medicationDetail(medication.id!)),
               );
             },
           );

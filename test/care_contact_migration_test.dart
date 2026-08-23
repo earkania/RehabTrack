@@ -24,10 +24,10 @@ void main() {
     return db.AppDatabase.forTesting(NativeDatabase(dbFile()));
   }
 
-  test('schema version is 18', () {
+  test('schema version is 19', () {
     final database = db.AppDatabase.test();
     addTearDown(database.close);
-    expect(database.schemaVersion, 18);
+    expect(database.schemaVersion, 19);
   });
 
   test('care_contacts table and indexes exist after fresh create', () async {
@@ -447,7 +447,7 @@ void main() {
     expect(medicationId, greaterThan(0));
   });
 
-  test('upgrading from version 17 creates the diet tables and preserves data',
+  test('upgrading from version 18 creates the activity tables and preserves data',
       () async {
     // 1. Open a fresh file DB at the current schema and seed a profile.
     var database = await openFileDb();
@@ -462,22 +462,22 @@ void main() {
       ),
     );
 
-    // 2. Simulate a v17 database: the diet tables were not present in v17.
+    // 2. Simulate a v18 database: the activity tables were not present in v18.
     //    Drop the legacy scaffolding tables if present and mark user_version
-    //    as 17 so reopening runs the real onUpgrade path.
+    //    as 18 so reopening runs the real onUpgrade path.
     final tables = await database
         .customSelect('SELECT name FROM sqlite_master WHERE type = \'table\'')
         .get();
     final tableNames = tables.map((r) => r.read<String>('name')).toSet();
-    for (final table in ['diet_items', 'diet_plans']) {
+    for (final table in ['activities', 'activity_sessions']) {
       if (tableNames.contains(table)) {
         await database.customStatement('DROP TABLE $table');
       }
     }
-    await database.customStatement('PRAGMA user_version = 17');
+    await database.customStatement('PRAGMA user_version = 18');
     await database.close();
 
-    // 3. Reopen — drift detects 17 < 18 and applies the migration.
+    // 3. Reopen — drift detects 18 < 19 and applies the migration.
     database = await openFileDb();
     addTearDown(database.close);
 
@@ -488,55 +488,58 @@ void main() {
     expect(profiles, hasLength(1));
     expect(profiles.single.firstName, 'Existing');
 
-    // 5. Both diet tables exist after migration, with their indexes.
+    // 5. Both activity tables exist after migration, with their indexes.
     final reopenedTables = await database
         .customSelect('SELECT name FROM sqlite_master WHERE type = \'table\'')
         .get();
     final reopenedTableNames =
         reopenedTables.map((r) => r.read<String>('name')).toSet();
-    expect(reopenedTableNames, contains('diet_items'));
-    expect(reopenedTableNames, contains('diet_guidance_rules'));
+    expect(reopenedTableNames, contains('activities'));
+    expect(reopenedTableNames, contains('activity_sessions'));
 
-    final dietIndexes = await database
+    final activityIndexes = await database
         .customSelect(
           'SELECT name FROM sqlite_master WHERE type = \'index\' '
-          'AND tbl_name = \'diet_items\'',
+          'AND tbl_name = \'activities\'',
         )
         .get();
-    final dietIndexNames = dietIndexes.map((r) => r.read<String>('name')).toSet();
-    expect(dietIndexNames, containsAll([
-      'diet_items_profile_idx',
-      'diet_items_category_idx',
-      'diet_items_archived_idx',
-      'diet_items_name_idx',
+    final activityIndexNames =
+        activityIndexes.map((r) => r.read<String>('name')).toSet();
+    expect(activityIndexNames, containsAll([
+      'activities_profile_idx',
+      'activities_category_idx',
+      'activities_archived_idx',
+      'activities_name_idx',
     ]));
 
-    // 6. A food item can be written through the DAO after migration.
-    final foodId = await database.dietDao.insertFoodItem(
-      db.DietItemsCompanion.insert(
+    // 6. An activity can be written through the DAO after migration.
+    final activityId = await database.activityDao.insertActivity(
+      db.ActivitiesCompanion.insert(
         profileId: profileId,
-        name: 'Apples',
-        category: 'allowed',
+        name: 'Morning walk',
+        category: 'exercise',
         createdAt: DateTime(2025),
         updatedAt: DateTime(2025),
       ),
     );
-    expect(foodId, greaterThan(0));
-    final savedFood = await database.dietDao.getFoodItem(foodId, profileId);
-    expect(savedFood!.name, 'Apples');
+    expect(activityId, greaterThan(0));
+    final savedActivity = await database.activityDao.getActivity(activityId, profileId);
+    expect(savedActivity!.name, 'Morning walk');
 
-    // 7. A guidance rule can also be written.
-    final ruleId = await database.dietDao.insertGuidanceRule(
-      db.DietGuidanceRulesCompanion.insert(
+    // 7. A session can be recorded against the activity.
+    final sessionId = await database.activityDao.insertSession(
+      db.ActivitySessionsCompanion.insert(
+        activityId: activityId,
         profileId: profileId,
-        title: 'Drink water',
-        category: 'hydration',
+        mode: 'timed_countdown',
+        status: 'completed',
+        startedAt: DateTime(2025, 1, 1, 10),
+        endedAt: Value(DateTime(2025, 1, 1, 10, 30)),
+        plannedDurationSeconds: const Value(1800),
         createdAt: DateTime(2025),
         updatedAt: DateTime(2025),
       ),
     );
-    expect(ruleId, greaterThan(0));
-    final savedRule = await database.dietDao.getGuidanceRule(ruleId, profileId);
-    expect(savedRule!.title, 'Drink water');
+    expect(sessionId, greaterThan(0));
   });
 }

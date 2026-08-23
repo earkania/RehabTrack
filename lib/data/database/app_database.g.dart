@@ -20046,6 +20046,1511 @@ class DoctorPrescriptionMedicationsCompanion
   }
 }
 
+class $ActivitiesTable extends Activities
+    with TableInfo<$ActivitiesTable, Activity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivitiesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _recommendedTimeMinutesMeta =
+      const VerificationMeta('recommendedTimeMinutes');
+  @override
+  late final GeneratedColumn<int> recommendedTimeMinutes = GeneratedColumn<int>(
+    'recommended_time_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    category,
+    description,
+    recommendedTimeMinutes,
+    isArchived,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activities';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Activity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('recommended_time_minutes')) {
+      context.handle(
+        _recommendedTimeMinutesMeta,
+        recommendedTimeMinutes.isAcceptableOrUnknown(
+          data['recommended_time_minutes']!,
+          _recommendedTimeMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Activity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Activity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      recommendedTimeMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}recommended_time_minutes'],
+      ),
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivitiesTable createAlias(String alias) {
+    return $ActivitiesTable(attachedDatabase, alias);
+  }
+}
+
+class Activity extends DataClass implements Insertable<Activity> {
+  final int id;
+  final int profileId;
+  final String name;
+  final String category;
+  final String? description;
+  final int? recommendedTimeMinutes;
+  final bool isArchived;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const Activity({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    required this.category,
+    this.description,
+    this.recommendedTimeMinutes,
+    required this.isArchived,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['name'] = Variable<String>(name);
+    map['category'] = Variable<String>(category);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    if (!nullToAbsent || recommendedTimeMinutes != null) {
+      map['recommended_time_minutes'] = Variable<int>(recommendedTimeMinutes);
+    }
+    map['is_archived'] = Variable<bool>(isArchived);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ActivitiesCompanion toCompanion(bool nullToAbsent) {
+    return ActivitiesCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      category: Value(category),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      recommendedTimeMinutes: recommendedTimeMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recommendedTimeMinutes),
+      isArchived: Value(isArchived),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Activity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Activity(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      category: serializer.fromJson<String>(json['category']),
+      description: serializer.fromJson<String?>(json['description']),
+      recommendedTimeMinutes: serializer.fromJson<int?>(
+        json['recommendedTimeMinutes'],
+      ),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'name': serializer.toJson<String>(name),
+      'category': serializer.toJson<String>(category),
+      'description': serializer.toJson<String?>(description),
+      'recommendedTimeMinutes': serializer.toJson<int?>(recommendedTimeMinutes),
+      'isArchived': serializer.toJson<bool>(isArchived),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  Activity copyWith({
+    int? id,
+    int? profileId,
+    String? name,
+    String? category,
+    Value<String?> description = const Value.absent(),
+    Value<int?> recommendedTimeMinutes = const Value.absent(),
+    bool? isArchived,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => Activity(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    category: category ?? this.category,
+    description: description.present ? description.value : this.description,
+    recommendedTimeMinutes: recommendedTimeMinutes.present
+        ? recommendedTimeMinutes.value
+        : this.recommendedTimeMinutes,
+    isArchived: isArchived ?? this.isArchived,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Activity copyWithCompanion(ActivitiesCompanion data) {
+    return Activity(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      category: data.category.present ? data.category.value : this.category,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      recommendedTimeMinutes: data.recommendedTimeMinutes.present
+          ? data.recommendedTimeMinutes.value
+          : this.recommendedTimeMinutes,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Activity(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('category: $category, ')
+          ..write('description: $description, ')
+          ..write('recommendedTimeMinutes: $recommendedTimeMinutes, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    name,
+    category,
+    description,
+    recommendedTimeMinutes,
+    isArchived,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Activity &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.category == this.category &&
+          other.description == this.description &&
+          other.recommendedTimeMinutes == this.recommendedTimeMinutes &&
+          other.isArchived == this.isArchived &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ActivitiesCompanion extends UpdateCompanion<Activity> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> name;
+  final Value<String> category;
+  final Value<String?> description;
+  final Value<int?> recommendedTimeMinutes;
+  final Value<bool> isArchived;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const ActivitiesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.category = const Value.absent(),
+    this.description = const Value.absent(),
+    this.recommendedTimeMinutes = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  ActivitiesCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String name,
+    required String category,
+    this.description = const Value.absent(),
+    this.recommendedTimeMinutes = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : profileId = Value(profileId),
+       name = Value(name),
+       category = Value(category),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Activity> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? name,
+    Expression<String>? category,
+    Expression<String>? description,
+    Expression<int>? recommendedTimeMinutes,
+    Expression<bool>? isArchived,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (category != null) 'category': category,
+      if (description != null) 'description': description,
+      if (recommendedTimeMinutes != null)
+        'recommended_time_minutes': recommendedTimeMinutes,
+      if (isArchived != null) 'is_archived': isArchived,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  ActivitiesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? profileId,
+    Value<String>? name,
+    Value<String>? category,
+    Value<String?>? description,
+    Value<int?>? recommendedTimeMinutes,
+    Value<bool>? isArchived,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return ActivitiesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      recommendedTimeMinutes:
+          recommendedTimeMinutes ?? this.recommendedTimeMinutes,
+      isArchived: isArchived ?? this.isArchived,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (recommendedTimeMinutes.present) {
+      map['recommended_time_minutes'] = Variable<int>(
+        recommendedTimeMinutes.value,
+      );
+    }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivitiesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('category: $category, ')
+          ..write('description: $description, ')
+          ..write('recommendedTimeMinutes: $recommendedTimeMinutes, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivitySessionsTable extends ActivitySessions
+    with TableInfo<$ActivitySessionsTable, ActivitySession> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivitySessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _activityIdMeta = const VerificationMeta(
+    'activityId',
+  );
+  @override
+  late final GeneratedColumn<int> activityId = GeneratedColumn<int>(
+    'activity_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES activities (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _modeMeta = const VerificationMeta('mode');
+  @override
+  late final GeneratedColumn<String> mode = GeneratedColumn<String>(
+    'mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _plannedDurationSecondsMeta =
+      const VerificationMeta('plannedDurationSeconds');
+  @override
+  late final GeneratedColumn<int> plannedDurationSeconds = GeneratedColumn<int>(
+    'planned_duration_seconds',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _restDurationSecondsMeta =
+      const VerificationMeta('restDurationSeconds');
+  @override
+  late final GeneratedColumn<int> restDurationSeconds = GeneratedColumn<int>(
+    'rest_duration_seconds',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endedAt = GeneratedColumn<DateTime>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
+    'completed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accumulatedSecondsMeta =
+      const VerificationMeta('accumulatedSeconds');
+  @override
+  late final GeneratedColumn<int> accumulatedSeconds = GeneratedColumn<int>(
+    'accumulated_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lastResumedAtMeta = const VerificationMeta(
+    'lastResumedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastResumedAt =
+      GeneratedColumn<DateTime>(
+        'last_resumed_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _completedIntervalsMeta =
+      const VerificationMeta('completedIntervals');
+  @override
+  late final GeneratedColumn<int> completedIntervals = GeneratedColumn<int>(
+    'completed_intervals',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    activityId,
+    profileId,
+    mode,
+    plannedDurationSeconds,
+    restDurationSeconds,
+    startedAt,
+    endedAt,
+    completedAt,
+    status,
+    accumulatedSeconds,
+    lastResumedAt,
+    completedIntervals,
+    notes,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activity_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivitySession> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('activity_id')) {
+      context.handle(
+        _activityIdMeta,
+        activityId.isAcceptableOrUnknown(data['activity_id']!, _activityIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_activityIdMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('mode')) {
+      context.handle(
+        _modeMeta,
+        mode.isAcceptableOrUnknown(data['mode']!, _modeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_modeMeta);
+    }
+    if (data.containsKey('planned_duration_seconds')) {
+      context.handle(
+        _plannedDurationSecondsMeta,
+        plannedDurationSeconds.isAcceptableOrUnknown(
+          data['planned_duration_seconds']!,
+          _plannedDurationSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('rest_duration_seconds')) {
+      context.handle(
+        _restDurationSecondsMeta,
+        restDurationSeconds.isAcceptableOrUnknown(
+          data['rest_duration_seconds']!,
+          _restDurationSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('accumulated_seconds')) {
+      context.handle(
+        _accumulatedSecondsMeta,
+        accumulatedSeconds.isAcceptableOrUnknown(
+          data['accumulated_seconds']!,
+          _accumulatedSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_resumed_at')) {
+      context.handle(
+        _lastResumedAtMeta,
+        lastResumedAt.isAcceptableOrUnknown(
+          data['last_resumed_at']!,
+          _lastResumedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('completed_intervals')) {
+      context.handle(
+        _completedIntervalsMeta,
+        completedIntervals.isAcceptableOrUnknown(
+          data['completed_intervals']!,
+          _completedIntervalsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivitySession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivitySession(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      activityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}activity_id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      mode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mode'],
+      )!,
+      plannedDurationSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}planned_duration_seconds'],
+      ),
+      restDurationSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}rest_duration_seconds'],
+      ),
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}started_at'],
+      )!,
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}ended_at'],
+      ),
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}completed_at'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      accumulatedSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}accumulated_seconds'],
+      )!,
+      lastResumedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_resumed_at'],
+      ),
+      completedIntervals: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}completed_intervals'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivitySessionsTable createAlias(String alias) {
+    return $ActivitySessionsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivitySession extends DataClass implements Insertable<ActivitySession> {
+  final int id;
+  final int activityId;
+  final int profileId;
+  final String mode;
+  final int? plannedDurationSeconds;
+  final int? restDurationSeconds;
+  final DateTime startedAt;
+  final DateTime? endedAt;
+  final DateTime? completedAt;
+  final String status;
+  final int accumulatedSeconds;
+  final DateTime? lastResumedAt;
+  final int completedIntervals;
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ActivitySession({
+    required this.id,
+    required this.activityId,
+    required this.profileId,
+    required this.mode,
+    this.plannedDurationSeconds,
+    this.restDurationSeconds,
+    required this.startedAt,
+    this.endedAt,
+    this.completedAt,
+    required this.status,
+    required this.accumulatedSeconds,
+    this.lastResumedAt,
+    required this.completedIntervals,
+    this.notes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['activity_id'] = Variable<int>(activityId);
+    map['profile_id'] = Variable<int>(profileId);
+    map['mode'] = Variable<String>(mode);
+    if (!nullToAbsent || plannedDurationSeconds != null) {
+      map['planned_duration_seconds'] = Variable<int>(plannedDurationSeconds);
+    }
+    if (!nullToAbsent || restDurationSeconds != null) {
+      map['rest_duration_seconds'] = Variable<int>(restDurationSeconds);
+    }
+    map['started_at'] = Variable<DateTime>(startedAt);
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<DateTime>(endedAt);
+    }
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<DateTime>(completedAt);
+    }
+    map['status'] = Variable<String>(status);
+    map['accumulated_seconds'] = Variable<int>(accumulatedSeconds);
+    if (!nullToAbsent || lastResumedAt != null) {
+      map['last_resumed_at'] = Variable<DateTime>(lastResumedAt);
+    }
+    map['completed_intervals'] = Variable<int>(completedIntervals);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ActivitySessionsCompanion toCompanion(bool nullToAbsent) {
+    return ActivitySessionsCompanion(
+      id: Value(id),
+      activityId: Value(activityId),
+      profileId: Value(profileId),
+      mode: Value(mode),
+      plannedDurationSeconds: plannedDurationSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(plannedDurationSeconds),
+      restDurationSeconds: restDurationSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(restDurationSeconds),
+      startedAt: Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+      status: Value(status),
+      accumulatedSeconds: Value(accumulatedSeconds),
+      lastResumedAt: lastResumedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastResumedAt),
+      completedIntervals: Value(completedIntervals),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ActivitySession.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivitySession(
+      id: serializer.fromJson<int>(json['id']),
+      activityId: serializer.fromJson<int>(json['activityId']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      mode: serializer.fromJson<String>(json['mode']),
+      plannedDurationSeconds: serializer.fromJson<int?>(
+        json['plannedDurationSeconds'],
+      ),
+      restDurationSeconds: serializer.fromJson<int?>(
+        json['restDurationSeconds'],
+      ),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      endedAt: serializer.fromJson<DateTime?>(json['endedAt']),
+      completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+      status: serializer.fromJson<String>(json['status']),
+      accumulatedSeconds: serializer.fromJson<int>(json['accumulatedSeconds']),
+      lastResumedAt: serializer.fromJson<DateTime?>(json['lastResumedAt']),
+      completedIntervals: serializer.fromJson<int>(json['completedIntervals']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'activityId': serializer.toJson<int>(activityId),
+      'profileId': serializer.toJson<int>(profileId),
+      'mode': serializer.toJson<String>(mode),
+      'plannedDurationSeconds': serializer.toJson<int?>(plannedDurationSeconds),
+      'restDurationSeconds': serializer.toJson<int?>(restDurationSeconds),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'endedAt': serializer.toJson<DateTime?>(endedAt),
+      'completedAt': serializer.toJson<DateTime?>(completedAt),
+      'status': serializer.toJson<String>(status),
+      'accumulatedSeconds': serializer.toJson<int>(accumulatedSeconds),
+      'lastResumedAt': serializer.toJson<DateTime?>(lastResumedAt),
+      'completedIntervals': serializer.toJson<int>(completedIntervals),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ActivitySession copyWith({
+    int? id,
+    int? activityId,
+    int? profileId,
+    String? mode,
+    Value<int?> plannedDurationSeconds = const Value.absent(),
+    Value<int?> restDurationSeconds = const Value.absent(),
+    DateTime? startedAt,
+    Value<DateTime?> endedAt = const Value.absent(),
+    Value<DateTime?> completedAt = const Value.absent(),
+    String? status,
+    int? accumulatedSeconds,
+    Value<DateTime?> lastResumedAt = const Value.absent(),
+    int? completedIntervals,
+    Value<String?> notes = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ActivitySession(
+    id: id ?? this.id,
+    activityId: activityId ?? this.activityId,
+    profileId: profileId ?? this.profileId,
+    mode: mode ?? this.mode,
+    plannedDurationSeconds: plannedDurationSeconds.present
+        ? plannedDurationSeconds.value
+        : this.plannedDurationSeconds,
+    restDurationSeconds: restDurationSeconds.present
+        ? restDurationSeconds.value
+        : this.restDurationSeconds,
+    startedAt: startedAt ?? this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+    completedAt: completedAt.present ? completedAt.value : this.completedAt,
+    status: status ?? this.status,
+    accumulatedSeconds: accumulatedSeconds ?? this.accumulatedSeconds,
+    lastResumedAt: lastResumedAt.present
+        ? lastResumedAt.value
+        : this.lastResumedAt,
+    completedIntervals: completedIntervals ?? this.completedIntervals,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ActivitySession copyWithCompanion(ActivitySessionsCompanion data) {
+    return ActivitySession(
+      id: data.id.present ? data.id.value : this.id,
+      activityId: data.activityId.present
+          ? data.activityId.value
+          : this.activityId,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      mode: data.mode.present ? data.mode.value : this.mode,
+      plannedDurationSeconds: data.plannedDurationSeconds.present
+          ? data.plannedDurationSeconds.value
+          : this.plannedDurationSeconds,
+      restDurationSeconds: data.restDurationSeconds.present
+          ? data.restDurationSeconds.value
+          : this.restDurationSeconds,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+      status: data.status.present ? data.status.value : this.status,
+      accumulatedSeconds: data.accumulatedSeconds.present
+          ? data.accumulatedSeconds.value
+          : this.accumulatedSeconds,
+      lastResumedAt: data.lastResumedAt.present
+          ? data.lastResumedAt.value
+          : this.lastResumedAt,
+      completedIntervals: data.completedIntervals.present
+          ? data.completedIntervals.value
+          : this.completedIntervals,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivitySession(')
+          ..write('id: $id, ')
+          ..write('activityId: $activityId, ')
+          ..write('profileId: $profileId, ')
+          ..write('mode: $mode, ')
+          ..write('plannedDurationSeconds: $plannedDurationSeconds, ')
+          ..write('restDurationSeconds: $restDurationSeconds, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('status: $status, ')
+          ..write('accumulatedSeconds: $accumulatedSeconds, ')
+          ..write('lastResumedAt: $lastResumedAt, ')
+          ..write('completedIntervals: $completedIntervals, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    activityId,
+    profileId,
+    mode,
+    plannedDurationSeconds,
+    restDurationSeconds,
+    startedAt,
+    endedAt,
+    completedAt,
+    status,
+    accumulatedSeconds,
+    lastResumedAt,
+    completedIntervals,
+    notes,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivitySession &&
+          other.id == this.id &&
+          other.activityId == this.activityId &&
+          other.profileId == this.profileId &&
+          other.mode == this.mode &&
+          other.plannedDurationSeconds == this.plannedDurationSeconds &&
+          other.restDurationSeconds == this.restDurationSeconds &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt &&
+          other.completedAt == this.completedAt &&
+          other.status == this.status &&
+          other.accumulatedSeconds == this.accumulatedSeconds &&
+          other.lastResumedAt == this.lastResumedAt &&
+          other.completedIntervals == this.completedIntervals &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ActivitySessionsCompanion extends UpdateCompanion<ActivitySession> {
+  final Value<int> id;
+  final Value<int> activityId;
+  final Value<int> profileId;
+  final Value<String> mode;
+  final Value<int?> plannedDurationSeconds;
+  final Value<int?> restDurationSeconds;
+  final Value<DateTime> startedAt;
+  final Value<DateTime?> endedAt;
+  final Value<DateTime?> completedAt;
+  final Value<String> status;
+  final Value<int> accumulatedSeconds;
+  final Value<DateTime?> lastResumedAt;
+  final Value<int> completedIntervals;
+  final Value<String?> notes;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const ActivitySessionsCompanion({
+    this.id = const Value.absent(),
+    this.activityId = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.mode = const Value.absent(),
+    this.plannedDurationSeconds = const Value.absent(),
+    this.restDurationSeconds = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.status = const Value.absent(),
+    this.accumulatedSeconds = const Value.absent(),
+    this.lastResumedAt = const Value.absent(),
+    this.completedIntervals = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  ActivitySessionsCompanion.insert({
+    this.id = const Value.absent(),
+    required int activityId,
+    required int profileId,
+    required String mode,
+    this.plannedDurationSeconds = const Value.absent(),
+    this.restDurationSeconds = const Value.absent(),
+    required DateTime startedAt,
+    this.endedAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    required String status,
+    this.accumulatedSeconds = const Value.absent(),
+    this.lastResumedAt = const Value.absent(),
+    this.completedIntervals = const Value.absent(),
+    this.notes = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : activityId = Value(activityId),
+       profileId = Value(profileId),
+       mode = Value(mode),
+       startedAt = Value(startedAt),
+       status = Value(status),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ActivitySession> custom({
+    Expression<int>? id,
+    Expression<int>? activityId,
+    Expression<int>? profileId,
+    Expression<String>? mode,
+    Expression<int>? plannedDurationSeconds,
+    Expression<int>? restDurationSeconds,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? endedAt,
+    Expression<DateTime>? completedAt,
+    Expression<String>? status,
+    Expression<int>? accumulatedSeconds,
+    Expression<DateTime>? lastResumedAt,
+    Expression<int>? completedIntervals,
+    Expression<String>? notes,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (activityId != null) 'activity_id': activityId,
+      if (profileId != null) 'profile_id': profileId,
+      if (mode != null) 'mode': mode,
+      if (plannedDurationSeconds != null)
+        'planned_duration_seconds': plannedDurationSeconds,
+      if (restDurationSeconds != null)
+        'rest_duration_seconds': restDurationSeconds,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (status != null) 'status': status,
+      if (accumulatedSeconds != null) 'accumulated_seconds': accumulatedSeconds,
+      if (lastResumedAt != null) 'last_resumed_at': lastResumedAt,
+      if (completedIntervals != null) 'completed_intervals': completedIntervals,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  ActivitySessionsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? activityId,
+    Value<int>? profileId,
+    Value<String>? mode,
+    Value<int?>? plannedDurationSeconds,
+    Value<int?>? restDurationSeconds,
+    Value<DateTime>? startedAt,
+    Value<DateTime?>? endedAt,
+    Value<DateTime?>? completedAt,
+    Value<String>? status,
+    Value<int>? accumulatedSeconds,
+    Value<DateTime?>? lastResumedAt,
+    Value<int>? completedIntervals,
+    Value<String?>? notes,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return ActivitySessionsCompanion(
+      id: id ?? this.id,
+      activityId: activityId ?? this.activityId,
+      profileId: profileId ?? this.profileId,
+      mode: mode ?? this.mode,
+      plannedDurationSeconds:
+          plannedDurationSeconds ?? this.plannedDurationSeconds,
+      restDurationSeconds: restDurationSeconds ?? this.restDurationSeconds,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      completedAt: completedAt ?? this.completedAt,
+      status: status ?? this.status,
+      accumulatedSeconds: accumulatedSeconds ?? this.accumulatedSeconds,
+      lastResumedAt: lastResumedAt ?? this.lastResumedAt,
+      completedIntervals: completedIntervals ?? this.completedIntervals,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (activityId.present) {
+      map['activity_id'] = Variable<int>(activityId.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (mode.present) {
+      map['mode'] = Variable<String>(mode.value);
+    }
+    if (plannedDurationSeconds.present) {
+      map['planned_duration_seconds'] = Variable<int>(
+        plannedDurationSeconds.value,
+      );
+    }
+    if (restDurationSeconds.present) {
+      map['rest_duration_seconds'] = Variable<int>(restDurationSeconds.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<DateTime>(endedAt.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<DateTime>(completedAt.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (accumulatedSeconds.present) {
+      map['accumulated_seconds'] = Variable<int>(accumulatedSeconds.value);
+    }
+    if (lastResumedAt.present) {
+      map['last_resumed_at'] = Variable<DateTime>(lastResumedAt.value);
+    }
+    if (completedIntervals.present) {
+      map['completed_intervals'] = Variable<int>(completedIntervals.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivitySessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('activityId: $activityId, ')
+          ..write('profileId: $profileId, ')
+          ..write('mode: $mode, ')
+          ..write('plannedDurationSeconds: $plannedDurationSeconds, ')
+          ..write('restDurationSeconds: $restDurationSeconds, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('status: $status, ')
+          ..write('accumulatedSeconds: $accumulatedSeconds, ')
+          ..write('lastResumedAt: $lastResumedAt, ')
+          ..write('completedIntervals: $completedIntervals, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -20101,6 +21606,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $DoctorPrescriptionAttachmentsTable(this);
   late final $DoctorPrescriptionMedicationsTable doctorPrescriptionMedications =
       $DoctorPrescriptionMedicationsTable(this);
+  late final $ActivitiesTable activities = $ActivitiesTable(this);
+  late final $ActivitySessionsTable activitySessions = $ActivitySessionsTable(
+    this,
+  );
   late final Index careContactsProfileIdx = Index(
     'care_contacts_profile_idx',
     'CREATE INDEX care_contacts_profile_idx ON care_contacts (profile_id)',
@@ -20257,6 +21766,38 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'doctor_prescription_medications_profile_idx',
     'CREATE INDEX doctor_prescription_medications_profile_idx ON doctor_prescription_medications (profile_id)',
   );
+  late final Index activitiesProfileIdx = Index(
+    'activities_profile_idx',
+    'CREATE INDEX activities_profile_idx ON activities (profile_id)',
+  );
+  late final Index activitiesCategoryIdx = Index(
+    'activities_category_idx',
+    'CREATE INDEX activities_category_idx ON activities (category)',
+  );
+  late final Index activitiesArchivedIdx = Index(
+    'activities_archived_idx',
+    'CREATE INDEX activities_archived_idx ON activities (is_archived)',
+  );
+  late final Index activitiesNameIdx = Index(
+    'activities_name_idx',
+    'CREATE INDEX activities_name_idx ON activities (name)',
+  );
+  late final Index activitySessionsActivityIdx = Index(
+    'activity_sessions_activity_idx',
+    'CREATE INDEX activity_sessions_activity_idx ON activity_sessions (activity_id)',
+  );
+  late final Index activitySessionsProfileIdx = Index(
+    'activity_sessions_profile_idx',
+    'CREATE INDEX activity_sessions_profile_idx ON activity_sessions (profile_id)',
+  );
+  late final Index activitySessionsStatusIdx = Index(
+    'activity_sessions_status_idx',
+    'CREATE INDEX activity_sessions_status_idx ON activity_sessions (status)',
+  );
+  late final Index activitySessionsStartedIdx = Index(
+    'activity_sessions_started_idx',
+    'CREATE INDEX activity_sessions_started_idx ON activity_sessions (started_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -20293,6 +21834,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     doctorPrescriptions,
     doctorPrescriptionAttachments,
     doctorPrescriptionMedications,
+    activities,
+    activitySessions,
     careContactsProfileIdx,
     careContactsTypeIdx,
     careContactsArchivedIdx,
@@ -20332,6 +21875,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     doctorPrescriptionAttachmentsProfileIdx,
     doctorPrescriptionMedicationsPrescriptionIdx,
     doctorPrescriptionMedicationsProfileIdx,
+    activitiesProfileIdx,
+    activitiesCategoryIdx,
+    activitiesArchivedIdx,
+    activitiesNameIdx,
+    activitySessionsActivityIdx,
+    activitySessionsProfileIdx,
+    activitySessionsStatusIdx,
+    activitySessionsStartedIdx,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -20458,6 +22009,27 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       result: [
         TableUpdate('doctor_prescription_medications', kind: UpdateKind.delete),
       ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('activities', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'activities',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('activity_sessions', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('activity_sessions', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -20928,6 +22500,44 @@ final class $$ProfilesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _doctorPrescriptionMedicationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ActivitiesTable, List<Activity>>
+  _activitiesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.activities,
+    aliasName: 'profiles__id__activities__profile_id',
+  );
+
+  $$ActivitiesTableProcessedTableManager get activitiesRefs {
+    final manager = $$ActivitiesTableTableManager(
+      $_db,
+      $_db.activities,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_activitiesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ActivitySessionsTable, List<ActivitySession>>
+  _activitySessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.activitySessions,
+    aliasName: 'profiles__id__activity_sessions__profile_id',
+  );
+
+  $$ActivitySessionsTableProcessedTableManager get activitySessionsRefs {
+    final manager = $$ActivitySessionsTableTableManager(
+      $_db,
+      $_db.activitySessions,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activitySessionsRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -21556,6 +23166,56 @@ class $$ProfilesTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> activitiesRefs(
+    Expression<bool> Function($$ActivitiesTableFilterComposer f) f,
+  ) {
+    final $$ActivitiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activities,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitiesTableFilterComposer(
+            $db: $db,
+            $table: $db.activities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activitySessionsRefs(
+    Expression<bool> Function($$ActivitySessionsTableFilterComposer f) f,
+  ) {
+    final $$ActivitySessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activitySessions,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitySessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.activitySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -22268,6 +23928,56 @@ class $$ProfilesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> activitiesRefs<T extends Object>(
+    Expression<T> Function($$ActivitiesTableAnnotationComposer a) f,
+  ) {
+    final $$ActivitiesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activities,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitiesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.activities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> activitySessionsRefs<T extends Object>(
+    Expression<T> Function($$ActivitySessionsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivitySessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activitySessions,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitySessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.activitySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -22304,6 +24014,8 @@ class $$ProfilesTableTableManager
             bool doctorPrescriptionsRefs,
             bool doctorPrescriptionAttachmentsRefs,
             bool doctorPrescriptionMedicationsRefs,
+            bool activitiesRefs,
+            bool activitySessionsRefs,
           })
         > {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
@@ -22439,6 +24151,8 @@ class $$ProfilesTableTableManager
                 doctorPrescriptionsRefs = false,
                 doctorPrescriptionAttachmentsRefs = false,
                 doctorPrescriptionMedicationsRefs = false,
+                activitiesRefs = false,
+                activitySessionsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -22465,6 +24179,8 @@ class $$ProfilesTableTableManager
                       db.doctorPrescriptionAttachments,
                     if (doctorPrescriptionMedicationsRefs)
                       db.doctorPrescriptionMedications,
+                    if (activitiesRefs) db.activities,
+                    if (activitySessionsRefs) db.activitySessions,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -22889,6 +24605,48 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (activitiesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          Activity
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._activitiesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activitiesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activitySessionsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          ActivitySession
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._activitySessionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activitySessionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -22930,6 +24688,8 @@ typedef $$ProfilesTableProcessedTableManager =
         bool doctorPrescriptionsRefs,
         bool doctorPrescriptionAttachmentsRefs,
         bool doctorPrescriptionMedicationsRefs,
+        bool activitiesRefs,
+        bool activitySessionsRefs,
       })
     >;
 typedef $$MedicationsTableCreateCompanionBuilder =
@@ -39115,6 +40875,1124 @@ typedef $$DoctorPrescriptionMedicationsTableProcessedTableManager =
       DoctorPrescriptionMedication,
       PrefetchHooks Function({bool prescriptionId, bool profileId})
     >;
+typedef $$ActivitiesTableCreateCompanionBuilder =
+    ActivitiesCompanion Function({
+      Value<int> id,
+      required int profileId,
+      required String name,
+      required String category,
+      Value<String?> description,
+      Value<int?> recommendedTimeMinutes,
+      Value<bool> isArchived,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$ActivitiesTableUpdateCompanionBuilder =
+    ActivitiesCompanion Function({
+      Value<int> id,
+      Value<int> profileId,
+      Value<String> name,
+      Value<String> category,
+      Value<String?> description,
+      Value<int?> recommendedTimeMinutes,
+      Value<bool> isArchived,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$ActivitiesTableReferences
+    extends BaseReferences<_$AppDatabase, $ActivitiesTable, Activity> {
+  $$ActivitiesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('activities__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$ActivitySessionsTable, List<ActivitySession>>
+  _activitySessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.activitySessions,
+    aliasName: 'activities__id__activity_sessions__activity_id',
+  );
+
+  $$ActivitySessionsTableProcessedTableManager get activitySessionsRefs {
+    final manager = $$ActivitySessionsTableTableManager(
+      $_db,
+      $_db.activitySessions,
+    ).filter((f) => f.activityId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activitySessionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ActivitiesTableFilterComposer
+    extends Composer<_$AppDatabase, $ActivitiesTable> {
+  $$ActivitiesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get recommendedTimeMinutes => $composableBuilder(
+    column: $table.recommendedTimeMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> activitySessionsRefs(
+    Expression<bool> Function($$ActivitySessionsTableFilterComposer f) f,
+  ) {
+    final $$ActivitySessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activitySessions,
+      getReferencedColumn: (t) => t.activityId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitySessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.activitySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ActivitiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ActivitiesTable> {
+  $$ActivitiesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get recommendedTimeMinutes => $composableBuilder(
+    column: $table.recommendedTimeMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivitiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ActivitiesTable> {
+  $$ActivitiesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get recommendedTimeMinutes => $composableBuilder(
+    column: $table.recommendedTimeMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> activitySessionsRefs<T extends Object>(
+    Expression<T> Function($$ActivitySessionsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivitySessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activitySessions,
+      getReferencedColumn: (t) => t.activityId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitySessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.activitySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ActivitiesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ActivitiesTable,
+          Activity,
+          $$ActivitiesTableFilterComposer,
+          $$ActivitiesTableOrderingComposer,
+          $$ActivitiesTableAnnotationComposer,
+          $$ActivitiesTableCreateCompanionBuilder,
+          $$ActivitiesTableUpdateCompanionBuilder,
+          (Activity, $$ActivitiesTableReferences),
+          Activity,
+          PrefetchHooks Function({bool profileId, bool activitySessionsRefs})
+        > {
+  $$ActivitiesTableTableManager(_$AppDatabase db, $ActivitiesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivitiesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivitiesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ActivitiesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<int?> recommendedTimeMinutes = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ActivitiesCompanion(
+                id: id,
+                profileId: profileId,
+                name: name,
+                category: category,
+                description: description,
+                recommendedTimeMinutes: recommendedTimeMinutes,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int profileId,
+                required String name,
+                required String category,
+                Value<String?> description = const Value.absent(),
+                Value<int?> recommendedTimeMinutes = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => ActivitiesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                name: name,
+                category: category,
+                description: description,
+                recommendedTimeMinutes: recommendedTimeMinutes,
+                isArchived: isArchived,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivitiesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, activitySessionsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (activitySessionsRefs) db.activitySessions,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable: $$ActivitiesTableReferences
+                                        ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$ActivitiesTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (activitySessionsRefs)
+                        await $_getPrefetchedData<
+                          Activity,
+                          $ActivitiesTable,
+                          ActivitySession
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ActivitiesTableReferences
+                              ._activitySessionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ActivitiesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activitySessionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.activityId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ActivitiesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ActivitiesTable,
+      Activity,
+      $$ActivitiesTableFilterComposer,
+      $$ActivitiesTableOrderingComposer,
+      $$ActivitiesTableAnnotationComposer,
+      $$ActivitiesTableCreateCompanionBuilder,
+      $$ActivitiesTableUpdateCompanionBuilder,
+      (Activity, $$ActivitiesTableReferences),
+      Activity,
+      PrefetchHooks Function({bool profileId, bool activitySessionsRefs})
+    >;
+typedef $$ActivitySessionsTableCreateCompanionBuilder =
+    ActivitySessionsCompanion Function({
+      Value<int> id,
+      required int activityId,
+      required int profileId,
+      required String mode,
+      Value<int?> plannedDurationSeconds,
+      Value<int?> restDurationSeconds,
+      required DateTime startedAt,
+      Value<DateTime?> endedAt,
+      Value<DateTime?> completedAt,
+      required String status,
+      Value<int> accumulatedSeconds,
+      Value<DateTime?> lastResumedAt,
+      Value<int> completedIntervals,
+      Value<String?> notes,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$ActivitySessionsTableUpdateCompanionBuilder =
+    ActivitySessionsCompanion Function({
+      Value<int> id,
+      Value<int> activityId,
+      Value<int> profileId,
+      Value<String> mode,
+      Value<int?> plannedDurationSeconds,
+      Value<int?> restDurationSeconds,
+      Value<DateTime> startedAt,
+      Value<DateTime?> endedAt,
+      Value<DateTime?> completedAt,
+      Value<String> status,
+      Value<int> accumulatedSeconds,
+      Value<DateTime?> lastResumedAt,
+      Value<int> completedIntervals,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$ActivitySessionsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $ActivitySessionsTable, ActivitySession> {
+  $$ActivitySessionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ActivitiesTable _activityIdTable(_$AppDatabase db) => db.activities
+      .createAlias('activity_sessions__activity_id__activities__id');
+
+  $$ActivitiesTableProcessedTableManager get activityId {
+    final $_column = $_itemColumn<int>('activity_id')!;
+
+    final manager = $$ActivitiesTableTableManager(
+      $_db,
+      $_db.activities,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_activityIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('activity_sessions__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ActivitySessionsTableFilterComposer
+    extends Composer<_$AppDatabase, $ActivitySessionsTable> {
+  $$ActivitySessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get plannedDurationSeconds => $composableBuilder(
+    column: $table.plannedDurationSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get restDurationSeconds => $composableBuilder(
+    column: $table.restDurationSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get accumulatedSeconds => $composableBuilder(
+    column: $table.accumulatedSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastResumedAt => $composableBuilder(
+    column: $table.lastResumedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get completedIntervals => $composableBuilder(
+    column: $table.completedIntervals,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ActivitiesTableFilterComposer get activityId {
+    final $$ActivitiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.activityId,
+      referencedTable: $db.activities,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitiesTableFilterComposer(
+            $db: $db,
+            $table: $db.activities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivitySessionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ActivitySessionsTable> {
+  $$ActivitySessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get plannedDurationSeconds => $composableBuilder(
+    column: $table.plannedDurationSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get restDurationSeconds => $composableBuilder(
+    column: $table.restDurationSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get accumulatedSeconds => $composableBuilder(
+    column: $table.accumulatedSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastResumedAt => $composableBuilder(
+    column: $table.lastResumedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completedIntervals => $composableBuilder(
+    column: $table.completedIntervals,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ActivitiesTableOrderingComposer get activityId {
+    final $$ActivitiesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.activityId,
+      referencedTable: $db.activities,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitiesTableOrderingComposer(
+            $db: $db,
+            $table: $db.activities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivitySessionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ActivitySessionsTable> {
+  $$ActivitySessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get mode =>
+      $composableBuilder(column: $table.mode, builder: (column) => column);
+
+  GeneratedColumn<int> get plannedDurationSeconds => $composableBuilder(
+    column: $table.plannedDurationSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get restDurationSeconds => $composableBuilder(
+    column: $table.restDurationSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get accumulatedSeconds => $composableBuilder(
+    column: $table.accumulatedSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastResumedAt => $composableBuilder(
+    column: $table.lastResumedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get completedIntervals => $composableBuilder(
+    column: $table.completedIntervals,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ActivitiesTableAnnotationComposer get activityId {
+    final $$ActivitiesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.activityId,
+      referencedTable: $db.activities,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivitiesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.activities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivitySessionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ActivitySessionsTable,
+          ActivitySession,
+          $$ActivitySessionsTableFilterComposer,
+          $$ActivitySessionsTableOrderingComposer,
+          $$ActivitySessionsTableAnnotationComposer,
+          $$ActivitySessionsTableCreateCompanionBuilder,
+          $$ActivitySessionsTableUpdateCompanionBuilder,
+          (ActivitySession, $$ActivitySessionsTableReferences),
+          ActivitySession,
+          PrefetchHooks Function({bool activityId, bool profileId})
+        > {
+  $$ActivitySessionsTableTableManager(
+    _$AppDatabase db,
+    $ActivitySessionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivitySessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivitySessionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ActivitySessionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> activityId = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<String> mode = const Value.absent(),
+                Value<int?> plannedDurationSeconds = const Value.absent(),
+                Value<int?> restDurationSeconds = const Value.absent(),
+                Value<DateTime> startedAt = const Value.absent(),
+                Value<DateTime?> endedAt = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int> accumulatedSeconds = const Value.absent(),
+                Value<DateTime?> lastResumedAt = const Value.absent(),
+                Value<int> completedIntervals = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ActivitySessionsCompanion(
+                id: id,
+                activityId: activityId,
+                profileId: profileId,
+                mode: mode,
+                plannedDurationSeconds: plannedDurationSeconds,
+                restDurationSeconds: restDurationSeconds,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                completedAt: completedAt,
+                status: status,
+                accumulatedSeconds: accumulatedSeconds,
+                lastResumedAt: lastResumedAt,
+                completedIntervals: completedIntervals,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int activityId,
+                required int profileId,
+                required String mode,
+                Value<int?> plannedDurationSeconds = const Value.absent(),
+                Value<int?> restDurationSeconds = const Value.absent(),
+                required DateTime startedAt,
+                Value<DateTime?> endedAt = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+                required String status,
+                Value<int> accumulatedSeconds = const Value.absent(),
+                Value<DateTime?> lastResumedAt = const Value.absent(),
+                Value<int> completedIntervals = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => ActivitySessionsCompanion.insert(
+                id: id,
+                activityId: activityId,
+                profileId: profileId,
+                mode: mode,
+                plannedDurationSeconds: plannedDurationSeconds,
+                restDurationSeconds: restDurationSeconds,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                completedAt: completedAt,
+                status: status,
+                accumulatedSeconds: accumulatedSeconds,
+                lastResumedAt: lastResumedAt,
+                completedIntervals: completedIntervals,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivitySessionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({activityId = false, profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (activityId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.activityId,
+                                referencedTable:
+                                    $$ActivitySessionsTableReferences
+                                        ._activityIdTable(db),
+                                referencedColumn:
+                                    $$ActivitySessionsTableReferences
+                                        ._activityIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$ActivitySessionsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$ActivitySessionsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ActivitySessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ActivitySessionsTable,
+      ActivitySession,
+      $$ActivitySessionsTableFilterComposer,
+      $$ActivitySessionsTableOrderingComposer,
+      $$ActivitySessionsTableAnnotationComposer,
+      $$ActivitySessionsTableCreateCompanionBuilder,
+      $$ActivitySessionsTableUpdateCompanionBuilder,
+      (ActivitySession, $$ActivitySessionsTableReferences),
+      ActivitySession,
+      PrefetchHooks Function({bool activityId, bool profileId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -39208,4 +42086,8 @@ class $AppDatabaseManager {
         _db,
         _db.doctorPrescriptionMedications,
       );
+  $$ActivitiesTableTableManager get activities =>
+      $$ActivitiesTableTableManager(_db, _db.activities);
+  $$ActivitySessionsTableTableManager get activitySessions =>
+      $$ActivitySessionsTableTableManager(_db, _db.activitySessions);
 }

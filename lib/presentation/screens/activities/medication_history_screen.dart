@@ -28,8 +28,7 @@ class _MedicationHistoryScreenState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final medicationAsync =
-        ref.watch(medicationProvider(widget.medicationId));
+    final medicationAsync = ref.watch(medicationProvider(widget.medicationId));
 
     return Scaffold(
       appBar: AppBar(
@@ -61,10 +60,7 @@ class _MedicationHistoryScreenState
     AppLocalizations l10n,
     Medication medication,
   ) {
-    final params = (
-      medicationId: widget.medicationId,
-      period: _selectedPeriod,
-    );
+    final params = (medicationId: widget.medicationId, period: _selectedPeriod);
     final logsAsync = ref.watch(medicationAllLogsProvider(params));
     final stats = ref.watch(medicationAdherenceStatsProvider(params));
 
@@ -100,8 +96,7 @@ class _MedicationHistoryScreenState
         // Log list
         Expanded(
           child: logsAsync.when(
-            loading: () =>
-                const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (_, _) => Center(child: Text(l10n.error)),
             data: (logs) {
               if (logs.isEmpty) {
@@ -110,8 +105,7 @@ class _MedicationHistoryScreenState
                   title: l10n.noLogsYet,
                   subtitle: l10n.noLogsDescription,
                   actionLabel: l10n.logDoseNow,
-                  onAction: () =>
-                      _showLogDoseDialog(context, ref, l10n),
+                  onAction: () => _showLogDoseDialog(context, ref, l10n),
                 );
               }
               return _LogList(logs: logs, l10n: l10n);
@@ -142,14 +136,12 @@ class _MedicationHistoryScreenState
       );
       try {
         final repo = ref.read(medicationRepositoryProvider);
-        final schedules = await repo
-            .watchSchedules(widget.medicationId)
-            .first;
+        final schedules = await repo.watchSchedules(widget.medicationId).first;
         if (schedules.isEmpty) {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.noSchedulesAvailable)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(l10n.noSchedulesAvailable)));
           }
           return;
         }
@@ -157,19 +149,22 @@ class _MedicationHistoryScreenState
           medicationScheduleId: schedules.first.id!,
         );
         await repo.logDose(scheduleLog);
-        ref.invalidate(medicationAllLogsProvider(
-          (medicationId: widget.medicationId, period: _selectedPeriod),
-        ));
+        ref.invalidate(
+          medicationAllLogsProvider((
+            medicationId: widget.medicationId,
+            period: _selectedPeriod,
+          )),
+        );
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.doseLogged)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.doseLogged)));
         }
       } catch (_) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.logDoseError)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.logDoseError)));
         }
       }
     });
@@ -232,16 +227,16 @@ class _StatTile extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                ),
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -269,9 +264,9 @@ class _LogList extends StatelessWidget {
           child: ListTile(
             leading: StatusChip(status: log.status),
             title: Text(
-              AppDateFormatter.of(context).formatShortDateTime(
-                log.scheduledTime,
-              ),
+              AppDateFormatter.of(
+                context,
+              ).formatShortDateTime(log.scheduledTime),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             subtitle: Column(
@@ -283,17 +278,15 @@ class _LogList extends StatelessWidget {
                       AppDateFormatter.of(context).formatTime(log.takenTime!),
                     ),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 if (intakeStr.isNotEmpty)
                   Text(
                     intakeStr,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
               ],
             ),
@@ -350,24 +343,15 @@ class _LogDoseDialogState extends State<_LogDoseDialog> {
           Text(
             widget.l10n.selectStatus,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 8),
           SegmentedButton<String>(
             segments: [
-              ButtonSegment(
-                value: 'taken',
-                label: Text(widget.l10n.taken),
-              ),
-              ButtonSegment(
-                value: 'missed',
-                label: Text(widget.l10n.missed),
-              ),
-              ButtonSegment(
-                value: 'skipped',
-                label: Text(widget.l10n.skipped),
-              ),
+              ButtonSegment(value: 'taken', label: Text(widget.l10n.taken)),
+              ButtonSegment(value: 'missed', label: Text(widget.l10n.missed)),
+              ButtonSegment(value: 'skipped', label: Text(widget.l10n.skipped)),
             ],
             selected: {_selectedStatus},
             onSelectionChanged: (selected) {

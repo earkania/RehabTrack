@@ -29,8 +29,9 @@ class _EditAlternativeScreenState extends ConsumerState<EditAlternativeScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final alternativeAsync =
-          ref.read(medicationAlternativeProvider(widget.alternativeId));
+      final alternativeAsync = ref.read(
+        medicationAlternativeProvider(widget.alternativeId),
+      );
       final current = alternativeAsync.value;
       if (current == null) {
         if (mounted) {
@@ -60,22 +61,17 @@ class _EditAlternativeScreenState extends ConsumerState<EditAlternativeScreen> {
       await repo.updateAlternative(updated);
 
       final components = data.components
-          .map((c) =>
-              c.copyWith(medicationAlternativeId: widget.alternativeId))
+          .map((c) => c.copyWith(medicationAlternativeId: widget.alternativeId))
           .toList();
-      await repo.replaceAlternativeComponents(
-        widget.alternativeId,
-        components,
-      );
+      await repo.replaceAlternativeComponents(widget.alternativeId, components);
 
       if (mounted) {
-        ref.invalidate(
-            medicationAlternativesProvider(widget.medicationId));
+        ref.invalidate(medicationAlternativesProvider(widget.medicationId));
         ref.invalidate(medicationAlternativeProvider(widget.alternativeId));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text(AppLocalizations.of(context)!.alternativeUpdated)),
+            content: Text(AppLocalizations.of(context)!.alternativeUpdated),
+          ),
         );
         context.pop();
       }
@@ -123,21 +119,20 @@ class _EditAlternativeScreenState extends ConsumerState<EditAlternativeScreen> {
       await repo.deleteAlternative(widget.alternativeId);
 
       if (mounted) {
-        ref.invalidate(
-            medicationAlternativesProvider(widget.medicationId));
+        ref.invalidate(medicationAlternativesProvider(widget.medicationId));
         ref.invalidate(medicationAlternativeProvider(widget.alternativeId));
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.alternativeDeleted)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.alternativeDeleted)));
           context.pop();
         }
       }
     } catch (e) {
       if (mounted && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.error)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.error)));
       }
     }
   }
@@ -145,8 +140,9 @@ class _EditAlternativeScreenState extends ConsumerState<EditAlternativeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final alternativeAsync =
-        ref.watch(medicationAlternativeProvider(widget.alternativeId));
+    final alternativeAsync = ref.watch(
+      medicationAlternativeProvider(widget.alternativeId),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -160,9 +156,7 @@ class _EditAlternativeScreenState extends ConsumerState<EditAlternativeScreen> {
       ),
       body: alternativeAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Text(l10n.error),
-        ),
+        error: (error, stack) => Center(child: Text(l10n.error)),
         data: (alternative) {
           if (alternative == null) {
             return Center(child: Text(l10n.error));
@@ -211,8 +205,9 @@ class _EditAlternativeBody extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(child: Text(l10n.error)),
       data: (components) {
-        final initialData =
-            MedicationAlternativeFormData.fromAlternative(alternative);
+        final initialData = MedicationAlternativeFormData.fromAlternative(
+          alternative,
+        );
         return MedicationAlternativeForm(
           initialData: initialData,
           existingComponents: components,

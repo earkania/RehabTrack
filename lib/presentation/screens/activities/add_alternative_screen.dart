@@ -25,8 +25,7 @@ class _AddAlternativeScreenState extends ConsumerState<AddAlternativeScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final medicationAsync =
-          ref.read(medicationProvider(widget.medicationId));
+      final medicationAsync = ref.read(medicationProvider(widget.medicationId));
       final medication = medicationAsync.value;
       if (medication == null) {
         if (mounted) {
@@ -49,20 +48,16 @@ class _AddAlternativeScreenState extends ConsumerState<AddAlternativeScreen> {
       final alternativeId = await repo.createAlternative(alternative);
 
       final components = data.components
-          .map((c) =>
-              c.copyWith(medicationAlternativeId: alternativeId))
+          .map((c) => c.copyWith(medicationAlternativeId: alternativeId))
           .toList();
-      await repo.replaceAlternativeComponents(
-        alternativeId,
-        components,
-      );
+      await repo.replaceAlternativeComponents(alternativeId, components);
 
       if (mounted) {
-        ref.invalidate(
-            medicationAlternativesProvider(widget.medicationId));
+        ref.invalidate(medicationAlternativesProvider(widget.medicationId));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(AppLocalizations.of(context)!.alternativeAdded)),
+            content: Text(AppLocalizations.of(context)!.alternativeAdded),
+          ),
         );
         context.pop();
       }
@@ -82,9 +77,7 @@ class _AddAlternativeScreenState extends ConsumerState<AddAlternativeScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.addAlternative),
-      ),
+      appBar: AppBar(title: Text(l10n.addAlternative)),
       body: MedicationAlternativeForm(
         initialData: MedicationAlternativeFormData(),
         onSave: _onSave,

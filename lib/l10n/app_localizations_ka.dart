@@ -3255,4 +3255,249 @@ class AppLocalizationsKa extends AppLocalizations {
   String semanticMinutesOverdue(int minutes) {
     return '$minutes წუთია ვადაგადაცილებული';
   }
+
+  @override
+  String get activity => 'აქტივობა';
+
+  @override
+  String get addActivity => 'აქტივობის დამატება';
+
+  @override
+  String get editActivity => 'აქტივობის რედაქტირება';
+
+  @override
+  String get activityName => 'აქტივობის სახელი';
+
+  @override
+  String get activityNameHint => 'მაგ., დილის სეირნობა';
+
+  @override
+  String get activityNameRequired => 'აქტივობის სახელი სავალდებულოა';
+
+  @override
+  String get activityCategory => 'კატეგორია';
+
+  @override
+  String get activityDescription => 'აღწერა';
+
+  @override
+  String get activityDescriptionHint =>
+      'სურვილისამებრ ინფორმაცია აქტივობის შესახებ';
+
+  @override
+  String get recommendedTimeMinutes => 'რეკომენდებული ხანგრძლივობა (წუთი)';
+
+  @override
+  String get recommendedTimeMinutesHint => 'მაგ., 30';
+
+  @override
+  String get saveActivity => 'აქტივობის შენახვა';
+
+  @override
+  String get updateActivity => 'აქტივობის განახლება';
+
+  @override
+  String get exercise => 'ვარჯიში';
+
+  @override
+  String get rehabilitation => 'რეაბილიტაცია';
+
+  @override
+  String get physiotherapy => 'ფიზიოთერაპია';
+
+  @override
+  String get generalWellness => 'ზოგადი ჯანმრთელობა';
+
+  @override
+  String get otherCategory => 'სხვა';
+
+  @override
+  String get allCategories => 'ყველა კატეგორია';
+
+  @override
+  String get searchActivities => 'აქტივობების ძებნა';
+
+  @override
+  String get activitiesEmpty => 'აქტივობები ჯერ არ არის';
+
+  @override
+  String get activitiesEmptySubtitle =>
+      'დაამატეთ აქტივობა, რომლის თვალყურის დევნებაც გსურთ';
+
+  @override
+  String get noActivitiesFound => 'თქვენი ძებნის შესაბამისი აქტივობა არ არის';
+
+  @override
+  String get showArchivedActivities => 'დაარქივებული აქტივობების ჩვენება';
+
+  @override
+  String get showingArchivedActivities => 'დაარქივებული აქტივობები ნაჩვენებია';
+
+  @override
+  String get archiveActivity => 'არქივირება';
+
+  @override
+  String get archiveActivityConfirmation =>
+      'დაარქივოთ ეს აქტივობა? ის სიიდან დაიმალება, მაგრამ მისი აღდგენა შესაძლებელია.';
+
+  @override
+  String get restoreActivity => 'აღდგენა';
+
+  @override
+  String get confirmDeleteActivity => 'წავშალოთ ეს აქტივობა სამუდამოდ?';
+
+  @override
+  String get activityHasSessions =>
+      'ამ აქტივობას აქვს სესიების ისტორია. წაშლის ნაცვლად დაარქივეთ.';
+
+  @override
+  String get activityArchived => 'აქტივობა დაარქივდა';
+
+  @override
+  String get activityRestored => 'აქტივობა აღდგა';
+
+  @override
+  String get activityDeleted => 'აქტივობა წაიშალა';
+
+  @override
+  String get activitySaved => 'აქტივობა შენახულია';
+
+  @override
+  String get activityUpdated => 'აქტივობა განახლდა';
+
+  @override
+  String get activeSession => 'მიმდინარე სესია';
+
+  @override
+  String get continueSession => 'გაგრძელება';
+
+  @override
+  String get sessionMode => 'რეჟიმი';
+
+  @override
+  String get timedSession => 'ტაიმერი — საპირისპირო დათვლა';
+
+  @override
+  String get timedInterval => 'ტაიმერი — ინტერვალი';
+
+  @override
+  String get untimedSession => 'მექანიკური (უხანგრძლივო)';
+
+  @override
+  String get workDuration => 'სამუშაო ხანგრძლივობა';
+
+  @override
+  String get restDuration => 'დასვენების ხანგრძლივობა';
+
+  @override
+  String get workInterval => 'სამუშაო';
+
+  @override
+  String get restInterval => 'დასვენება';
+
+  @override
+  String get intervalsCompleted => 'დასრულებული ინტერვალები';
+
+  @override
+  String get startSession => 'სესიის დაწყება';
+
+  @override
+  String get newSession => 'ახალი სესია';
+
+  @override
+  String get pauseSession => 'პაუზა';
+
+  @override
+  String get resumeSession => 'გაგრძელება';
+
+  @override
+  String get finishSession => 'დასრულება';
+
+  @override
+  String get cancelSession => 'სესიის გაუქმება';
+
+  @override
+  String get cancelSessionConfirmation =>
+      'გავაუქმოთ ეს სესია? დაფიქსირებული დრო არ შეინახება.';
+
+  @override
+  String get sessionRunning => 'სესია მიმდინარეობს';
+
+  @override
+  String get sessionPaused => 'სესია პაუზირებულია';
+
+  @override
+  String get sessionCompleted => 'სესია დასრულდა';
+
+  @override
+  String get sessionCancelled => 'სესია გაუქმდა';
+
+  @override
+  String get recordSession => 'სესიის ჩაწერა';
+
+  @override
+  String get actualDuration => 'ფაქტობრივი ხანგრძლივობა';
+
+  @override
+  String get sessionLabel => 'ნიშანი / ჩანაწერი';
+
+  @override
+  String get sessionLabelHint =>
+      'სურვილისამებრ ნიშანი ან ჩანაწერი ამ სესიისთვის';
+
+  @override
+  String get saveSession => 'სესიის შენახვა';
+
+  @override
+  String get sessionHistory => 'სესიების ისტორია';
+
+  @override
+  String get sessionDetails => 'სესიის დეტალები';
+
+  @override
+  String get sessionNotFound => 'სესია ვერ მოიძებნა';
+
+  @override
+  String get recordedAt => 'დაწყება';
+
+  @override
+  String get endedAt => 'დასრულება';
+
+  @override
+  String get completedOn => 'დასრულდა';
+
+  @override
+  String get completedStatus => 'დასრულებული';
+
+  @override
+  String get cancelledStatus => 'გაუქმებული';
+
+  @override
+  String get pausedStatus => 'პაუზის დროს დასრულდა';
+
+  @override
+  String get countdownMode => 'ტაიმერი';
+
+  @override
+  String get intervalMode => 'ინტერვალი';
+
+  @override
+  String get manualMode => 'მექანიკური';
+
+  @override
+  String get deleteSession => 'სესიის წაშლა';
+
+  @override
+  String get confirmDeleteSession => 'წავშალოთ ეს სესია სამუდამოდ?';
+
+  @override
+  String get sessionDeleted => 'სესია წაიშალა';
+
+  @override
+  String get yesterday => 'გუშინ';
+
+  @override
+  String xMinutes(int minutes) {
+    return '$minutes წთ';
+  }
 }

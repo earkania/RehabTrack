@@ -958,7 +958,6 @@
   "confirmRemoveBackupFromList": "Remove this backup from the list? Its file is no longer available, so nothing will be deleted from storage.",
   "backupRemovedFromList": "Backup removed from list",
   "available": "Available",
-  "unavailable": "Unavailable",
   "unknownAvailability": "Availability unknown",
   "fileUnavailable": "File unavailable",
   "refreshingBackupAvailability": "Refreshing backup availability",
@@ -1100,7 +1099,6 @@
   "prefilledFromMedication": "Copied from My Medications — edit the details as needed before saving.",
   "attachmentRenamed": "Attachment renamed",
   "attachmentRemoved": "Attachment removed",
-  "renameAttachment": "Rename",
   "foods": "Foods",
   "generalGuidance": "General Guidance",
   "searchFoods": "Search foods",
@@ -1283,6 +1281,326 @@
   },
   "semanticMinutesOverdue": "{minutes} minutes overdue",
   "@semanticMinutesOverdue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "activity": "Activity",
+  "@activity": {
+    "description": "Activity feature"
+  },
+  "addActivity": "Add Activity",
+  "@addActivity": {
+    "description": "Activity feature"
+  },
+  "editActivity": "Edit Activity",
+  "@editActivity": {
+    "description": "Activity feature"
+  },
+  "activityName": "Activity Name",
+  "@activityName": {
+    "description": "Activity feature"
+  },
+  "activityNameHint": "e.g., Morning walk",
+  "@activityNameHint": {
+    "description": "Activity feature"
+  },
+  "activityNameRequired": "Activity name is required",
+  "@activityNameRequired": {
+    "description": "Activity feature"
+  },
+  "activityCategory": "Category",
+  "@activityCategory": {
+    "description": "Activity feature"
+  },
+  "activityDescription": "Description",
+  "@activityDescription": {
+    "description": "Activity feature"
+  },
+  "activityDescriptionHint": "Optional details about this activity",
+  "@activityDescriptionHint": {
+    "description": "Activity feature"
+  },
+  "recommendedTimeMinutes": "Recommended Duration (minutes)",
+  "@recommendedTimeMinutes": {
+    "description": "Activity feature"
+  },
+  "recommendedTimeMinutesHint": "e.g., 30",
+  "@recommendedTimeMinutesHint": {
+    "description": "Activity feature"
+  },
+  "saveActivity": "Save Activity",
+  "@saveActivity": {
+    "description": "Activity feature"
+  },
+  "updateActivity": "Update Activity",
+  "@updateActivity": {
+    "description": "Activity feature"
+  },
+  "exercise": "Exercise",
+  "@exercise": {
+    "description": "Activity feature"
+  },
+  "rehabilitation": "Rehabilitation",
+  "@rehabilitation": {
+    "description": "Activity feature"
+  },
+  "physiotherapy": "Physiotherapy",
+  "@physiotherapy": {
+    "description": "Activity feature"
+  },
+  "generalWellness": "General Wellness",
+  "@generalWellness": {
+    "description": "Activity feature"
+  },
+  "otherCategory": "Other",
+  "@otherCategory": {
+    "description": "Activity feature"
+  },
+  "allCategories": "All Categories",
+  "@allCategories": {
+    "description": "Activity feature"
+  },
+  "searchActivities": "Search activities",
+  "@searchActivities": {
+    "description": "Activity feature"
+  },
+  "activitiesEmpty": "No activities yet",
+  "@activitiesEmpty": {
+    "description": "Activity feature"
+  },
+  "activitiesEmptySubtitle": "Add an activity you want to track",
+  "@activitiesEmptySubtitle": {
+    "description": "Activity feature"
+  },
+  "noActivitiesFound": "No activities match your search",
+  "@noActivitiesFound": {
+    "description": "Activity feature"
+  },
+  "showArchivedActivities": "Show archived activities",
+  "@showArchivedActivities": {
+    "description": "Activity feature"
+  },
+  "showingArchivedActivities": "Showing archived activities",
+  "@showingArchivedActivities": {
+    "description": "Activity feature"
+  },
+  "archiveActivity": "Archive",
+  "@archiveActivity": {
+    "description": "Activity feature"
+  },
+  "archiveActivityConfirmation": "Archive this activity? It will be hidden from the list but can be restored.",
+  "@archiveActivityConfirmation": {
+    "description": "Activity feature"
+  },
+  "restoreActivity": "Restore",
+  "@restoreActivity": {
+    "description": "Activity feature"
+  },
+  "confirmDeleteActivity": "Delete this activity permanently?",
+  "@confirmDeleteActivity": {
+    "description": "Activity feature"
+  },
+  "activityHasSessions": "This activity has session history. Archive it instead of deleting.",
+  "@activityHasSessions": {
+    "description": "Activity feature"
+  },
+  "activityArchived": "Activity archived",
+  "@activityArchived": {
+    "description": "Activity feature"
+  },
+  "activityRestored": "Activity restored",
+  "@activityRestored": {
+    "description": "Activity feature"
+  },
+  "activityDeleted": "Activity deleted",
+  "@activityDeleted": {
+    "description": "Activity feature"
+  },
+  "activitySaved": "Activity saved",
+  "@activitySaved": {
+    "description": "Activity feature"
+  },
+  "activityUpdated": "Activity updated",
+  "@activityUpdated": {
+    "description": "Activity feature"
+  },
+  "activeSession": "Active Session",
+  "@activeSession": {
+    "description": "Activity feature"
+  },
+  "continueSession": "Continue",
+  "@continueSession": {
+    "description": "Activity feature"
+  },
+  "sessionMode": "Mode",
+  "@sessionMode": {
+    "description": "Activity feature"
+  },
+  "timedSession": "Timed - Countdown",
+  "@timedSession": {
+    "description": "Activity feature"
+  },
+  "timedInterval": "Timed - Interval",
+  "@timedInterval": {
+    "description": "Activity feature"
+  },
+  "untimedSession": "Manual (Untimed)",
+  "@untimedSession": {
+    "description": "Activity feature"
+  },
+  "workDuration": "Work Duration",
+  "@workDuration": {
+    "description": "Activity feature"
+  },
+  "restDuration": "Rest Duration",
+  "@restDuration": {
+    "description": "Activity feature"
+  },
+  "workInterval": "Work",
+  "@workInterval": {
+    "description": "Activity feature"
+  },
+  "restInterval": "Rest",
+  "@restInterval": {
+    "description": "Activity feature"
+  },
+  "intervalsCompleted": "Intervals completed",
+  "@intervalsCompleted": {
+    "description": "Activity feature"
+  },
+  "startSession": "Start Session",
+  "@startSession": {
+    "description": "Activity feature"
+  },
+  "newSession": "New Session",
+  "@newSession": {
+    "description": "Activity feature"
+  },
+  "pauseSession": "Pause",
+  "@pauseSession": {
+    "description": "Activity feature"
+  },
+  "resumeSession": "Resume",
+  "@resumeSession": {
+    "description": "Activity feature"
+  },
+  "finishSession": "Finish",
+  "@finishSession": {
+    "description": "Activity feature"
+  },
+  "cancelSession": "Cancel Session",
+  "@cancelSession": {
+    "description": "Activity feature"
+  },
+  "cancelSessionConfirmation": "Cancel this session? The time recorded will not be saved.",
+  "@cancelSessionConfirmation": {
+    "description": "Activity feature"
+  },
+  "sessionRunning": "Session running",
+  "@sessionRunning": {
+    "description": "Activity feature"
+  },
+  "sessionPaused": "Session paused",
+  "@sessionPaused": {
+    "description": "Activity feature"
+  },
+  "sessionCompleted": "Session completed",
+  "@sessionCompleted": {
+    "description": "Activity feature"
+  },
+  "sessionCancelled": "Session cancelled",
+  "@sessionCancelled": {
+    "description": "Activity feature"
+  },
+  "recordSession": "Record Session",
+  "@recordSession": {
+    "description": "Activity feature"
+  },
+  "actualDuration": "Actual Duration",
+  "@actualDuration": {
+    "description": "Activity feature"
+  },
+  "sessionLabel": "Label / Note",
+  "@sessionLabel": {
+    "description": "Activity feature"
+  },
+  "sessionLabelHint": "Optional label or note for this session",
+  "@sessionLabelHint": {
+    "description": "Activity feature"
+  },
+  "saveSession": "Save Session",
+  "@saveSession": {
+    "description": "Activity feature"
+  },
+  "sessionHistory": "Session History",
+  "@sessionHistory": {
+    "description": "Activity feature"
+  },
+  "sessionDetails": "Session Details",
+  "@sessionDetails": {
+    "description": "Activity feature"
+  },
+  "sessionNotFound": "Session not found",
+  "@sessionNotFound": {
+    "description": "Activity feature"
+  },
+  "recordedAt": "Started",
+  "@recordedAt": {
+    "description": "Activity feature"
+  },
+  "endedAt": "Ended",
+  "@endedAt": {
+    "description": "Activity feature"
+  },
+  "completedOn": "Completed",
+  "@completedOn": {
+    "description": "Activity feature"
+  },
+  "completedStatus": "Completed",
+  "@completedStatus": {
+    "description": "Activity feature"
+  },
+  "cancelledStatus": "Cancelled",
+  "@cancelledStatus": {
+    "description": "Activity feature"
+  },
+  "pausedStatus": "Ended while paused",
+  "@pausedStatus": {
+    "description": "Activity feature"
+  },
+  "countdownMode": "Countdown",
+  "@countdownMode": {
+    "description": "Activity feature"
+  },
+  "intervalMode": "Interval",
+  "@intervalMode": {
+    "description": "Activity feature"
+  },
+  "manualMode": "Manual",
+  "@manualMode": {
+    "description": "Activity feature"
+  },
+  "deleteSession": "Delete Session",
+  "@deleteSession": {
+    "description": "Activity feature"
+  },
+  "confirmDeleteSession": "Delete this session permanently?",
+  "@confirmDeleteSession": {
+    "description": "Activity feature"
+  },
+  "sessionDeleted": "Session deleted",
+  "@sessionDeleted": {
+    "description": "Activity feature"
+  },
+  "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Activity feature"
+  },
+  "xMinutes": "{minutes} min",
+  "@xMinutes": {
     "placeholders": {
       "minutes": {
         "type": "int"

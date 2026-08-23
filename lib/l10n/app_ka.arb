@@ -515,7 +515,7 @@
   "systolicShort": "სისტ.",
   "diastolicShort": "დიასტ.",
   "pulseShort": "პულსი",
-  "unavailable": "მიუწვდომელი",
+  "unavailable": "მიუწვდომელია",
   "withinConfiguredRange": "კონფიგურირებულ დიაპაზონში",
   "belowConfiguredRange": "კონფიგურირებულ დიაპაზონზე დაბალი",
   "aboveConfiguredRange": "კონფიგურირებულ დიაპაზონზე მაღალი",
@@ -958,7 +958,6 @@
   "confirmRemoveBackupFromList": "წავშალოთ ეს სარეზერვო ასლი სიიდან? მისი ფაილი აღარ არის ხელმისაწვდომი, ამიტომ საცავში არაფერი წაიშლება.",
   "backupRemovedFromList": "სარეზერვო ასლი ამოღებულია სიიდან",
   "available": "ხელმისაწვდომია",
-  "unavailable": "მიუწვდომელია",
   "unknownAvailability": "მდგომარეობა უცნობია",
   "fileUnavailable": "ფაილი მიუწვდომელია",
   "refreshingBackupAvailability": "სარეზერვო ასლების მდგომარეობა განახლდება",
@@ -983,7 +982,7 @@
   "openAttachment": "გახსნა",
   "shareAttachment": "გაზიარება",
   "removeAttachment": "წაშლა",
-  "renameAttachment": "სახელის შეცვლა",
+  "renameAttachment": "გადარქმევა",
   "pdf": "PDF",
   "image": "სურათი",
   "cardiology": "კარდიოლოგია",
@@ -1100,7 +1099,6 @@
   "prefilledFromMedication": "დაკოპირებულია ჩემი მედიკამენტებიდან — შეცვალეთ წვრილმანები გადარჩენამდე.",
   "attachmentRenamed": "დამატებითი ფაილი დაარქვეს",
   "attachmentRemoved": "დამატებითი ფაილი წაიშალა",
-  "renameAttachment": "გადარქმევა",
   "foods": "საკვები",
   "generalGuidance": "ზოგადი რეკომენდაციები",
   "searchFoods": "საკვების ძებნა",
@@ -1283,6 +1281,326 @@
   },
   "semanticMinutesOverdue": "{minutes} წუთია ვადაგადაცილებული",
   "@semanticMinutesOverdue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "activity": "აქტივობა",
+  "@activity": {
+    "description": "Activity feature"
+  },
+  "addActivity": "აქტივობის დამატება",
+  "@addActivity": {
+    "description": "Activity feature"
+  },
+  "editActivity": "აქტივობის რედაქტირება",
+  "@editActivity": {
+    "description": "Activity feature"
+  },
+  "activityName": "აქტივობის სახელი",
+  "@activityName": {
+    "description": "Activity feature"
+  },
+  "activityNameHint": "მაგ., დილის სეირნობა",
+  "@activityNameHint": {
+    "description": "Activity feature"
+  },
+  "activityNameRequired": "აქტივობის სახელი სავალდებულოა",
+  "@activityNameRequired": {
+    "description": "Activity feature"
+  },
+  "activityCategory": "კატეგორია",
+  "@activityCategory": {
+    "description": "Activity feature"
+  },
+  "activityDescription": "აღწერა",
+  "@activityDescription": {
+    "description": "Activity feature"
+  },
+  "activityDescriptionHint": "სურვილისამებრ ინფორმაცია აქტივობის შესახებ",
+  "@activityDescriptionHint": {
+    "description": "Activity feature"
+  },
+  "recommendedTimeMinutes": "რეკომენდებული ხანგრძლივობა (წუთი)",
+  "@recommendedTimeMinutes": {
+    "description": "Activity feature"
+  },
+  "recommendedTimeMinutesHint": "მაგ., 30",
+  "@recommendedTimeMinutesHint": {
+    "description": "Activity feature"
+  },
+  "saveActivity": "აქტივობის შენახვა",
+  "@saveActivity": {
+    "description": "Activity feature"
+  },
+  "updateActivity": "აქტივობის განახლება",
+  "@updateActivity": {
+    "description": "Activity feature"
+  },
+  "exercise": "ვარჯიში",
+  "@exercise": {
+    "description": "Activity feature"
+  },
+  "rehabilitation": "რეაბილიტაცია",
+  "@rehabilitation": {
+    "description": "Activity feature"
+  },
+  "physiotherapy": "ფიზიოთერაპია",
+  "@physiotherapy": {
+    "description": "Activity feature"
+  },
+  "generalWellness": "ზოგადი ჯანმრთელობა",
+  "@generalWellness": {
+    "description": "Activity feature"
+  },
+  "otherCategory": "სხვა",
+  "@otherCategory": {
+    "description": "Activity feature"
+  },
+  "allCategories": "ყველა კატეგორია",
+  "@allCategories": {
+    "description": "Activity feature"
+  },
+  "searchActivities": "აქტივობების ძებნა",
+  "@searchActivities": {
+    "description": "Activity feature"
+  },
+  "activitiesEmpty": "აქტივობები ჯერ არ არის",
+  "@activitiesEmpty": {
+    "description": "Activity feature"
+  },
+  "activitiesEmptySubtitle": "დაამატეთ აქტივობა, რომლის თვალყურის დევნებაც გსურთ",
+  "@activitiesEmptySubtitle": {
+    "description": "Activity feature"
+  },
+  "noActivitiesFound": "თქვენი ძებნის შესაბამისი აქტივობა არ არის",
+  "@noActivitiesFound": {
+    "description": "Activity feature"
+  },
+  "showArchivedActivities": "დაარქივებული აქტივობების ჩვენება",
+  "@showArchivedActivities": {
+    "description": "Activity feature"
+  },
+  "showingArchivedActivities": "დაარქივებული აქტივობები ნაჩვენებია",
+  "@showingArchivedActivities": {
+    "description": "Activity feature"
+  },
+  "archiveActivity": "არქივირება",
+  "@archiveActivity": {
+    "description": "Activity feature"
+  },
+  "archiveActivityConfirmation": "დაარქივოთ ეს აქტივობა? ის სიიდან დაიმალება, მაგრამ მისი აღდგენა შესაძლებელია.",
+  "@archiveActivityConfirmation": {
+    "description": "Activity feature"
+  },
+  "restoreActivity": "აღდგენა",
+  "@restoreActivity": {
+    "description": "Activity feature"
+  },
+  "confirmDeleteActivity": "წავშალოთ ეს აქტივობა სამუდამოდ?",
+  "@confirmDeleteActivity": {
+    "description": "Activity feature"
+  },
+  "activityHasSessions": "ამ აქტივობას აქვს სესიების ისტორია. წაშლის ნაცვლად დაარქივეთ.",
+  "@activityHasSessions": {
+    "description": "Activity feature"
+  },
+  "activityArchived": "აქტივობა დაარქივდა",
+  "@activityArchived": {
+    "description": "Activity feature"
+  },
+  "activityRestored": "აქტივობა აღდგა",
+  "@activityRestored": {
+    "description": "Activity feature"
+  },
+  "activityDeleted": "აქტივობა წაიშალა",
+  "@activityDeleted": {
+    "description": "Activity feature"
+  },
+  "activitySaved": "აქტივობა შენახულია",
+  "@activitySaved": {
+    "description": "Activity feature"
+  },
+  "activityUpdated": "აქტივობა განახლდა",
+  "@activityUpdated": {
+    "description": "Activity feature"
+  },
+  "activeSession": "მიმდინარე სესია",
+  "@activeSession": {
+    "description": "Activity feature"
+  },
+  "continueSession": "გაგრძელება",
+  "@continueSession": {
+    "description": "Activity feature"
+  },
+  "sessionMode": "რეჟიმი",
+  "@sessionMode": {
+    "description": "Activity feature"
+  },
+  "timedSession": "ტაიმერი — საპირისპირო დათვლა",
+  "@timedSession": {
+    "description": "Activity feature"
+  },
+  "timedInterval": "ტაიმერი — ინტერვალი",
+  "@timedInterval": {
+    "description": "Activity feature"
+  },
+  "untimedSession": "მექანიკური (უხანგრძლივო)",
+  "@untimedSession": {
+    "description": "Activity feature"
+  },
+  "workDuration": "სამუშაო ხანგრძლივობა",
+  "@workDuration": {
+    "description": "Activity feature"
+  },
+  "restDuration": "დასვენების ხანგრძლივობა",
+  "@restDuration": {
+    "description": "Activity feature"
+  },
+  "workInterval": "სამუშაო",
+  "@workInterval": {
+    "description": "Activity feature"
+  },
+  "restInterval": "დასვენება",
+  "@restInterval": {
+    "description": "Activity feature"
+  },
+  "intervalsCompleted": "დასრულებული ინტერვალები",
+  "@intervalsCompleted": {
+    "description": "Activity feature"
+  },
+  "startSession": "სესიის დაწყება",
+  "@startSession": {
+    "description": "Activity feature"
+  },
+  "newSession": "ახალი სესია",
+  "@newSession": {
+    "description": "Activity feature"
+  },
+  "pauseSession": "პაუზა",
+  "@pauseSession": {
+    "description": "Activity feature"
+  },
+  "resumeSession": "გაგრძელება",
+  "@resumeSession": {
+    "description": "Activity feature"
+  },
+  "finishSession": "დასრულება",
+  "@finishSession": {
+    "description": "Activity feature"
+  },
+  "cancelSession": "სესიის გაუქმება",
+  "@cancelSession": {
+    "description": "Activity feature"
+  },
+  "cancelSessionConfirmation": "გავაუქმოთ ეს სესია? დაფიქსირებული დრო არ შეინახება.",
+  "@cancelSessionConfirmation": {
+    "description": "Activity feature"
+  },
+  "sessionRunning": "სესია მიმდინარეობს",
+  "@sessionRunning": {
+    "description": "Activity feature"
+  },
+  "sessionPaused": "სესია პაუზირებულია",
+  "@sessionPaused": {
+    "description": "Activity feature"
+  },
+  "sessionCompleted": "სესია დასრულდა",
+  "@sessionCompleted": {
+    "description": "Activity feature"
+  },
+  "sessionCancelled": "სესია გაუქმდა",
+  "@sessionCancelled": {
+    "description": "Activity feature"
+  },
+  "recordSession": "სესიის ჩაწერა",
+  "@recordSession": {
+    "description": "Activity feature"
+  },
+  "actualDuration": "ფაქტობრივი ხანგრძლივობა",
+  "@actualDuration": {
+    "description": "Activity feature"
+  },
+  "sessionLabel": "ნიშანი / ჩანაწერი",
+  "@sessionLabel": {
+    "description": "Activity feature"
+  },
+  "sessionLabelHint": "სურვილისამებრ ნიშანი ან ჩანაწერი ამ სესიისთვის",
+  "@sessionLabelHint": {
+    "description": "Activity feature"
+  },
+  "saveSession": "სესიის შენახვა",
+  "@saveSession": {
+    "description": "Activity feature"
+  },
+  "sessionHistory": "სესიების ისტორია",
+  "@sessionHistory": {
+    "description": "Activity feature"
+  },
+  "sessionDetails": "სესიის დეტალები",
+  "@sessionDetails": {
+    "description": "Activity feature"
+  },
+  "sessionNotFound": "სესია ვერ მოიძებნა",
+  "@sessionNotFound": {
+    "description": "Activity feature"
+  },
+  "recordedAt": "დაწყება",
+  "@recordedAt": {
+    "description": "Activity feature"
+  },
+  "endedAt": "დასრულება",
+  "@endedAt": {
+    "description": "Activity feature"
+  },
+  "completedOn": "დასრულდა",
+  "@completedOn": {
+    "description": "Activity feature"
+  },
+  "completedStatus": "დასრულებული",
+  "@completedStatus": {
+    "description": "Activity feature"
+  },
+  "cancelledStatus": "გაუქმებული",
+  "@cancelledStatus": {
+    "description": "Activity feature"
+  },
+  "pausedStatus": "პაუზის დროს დასრულდა",
+  "@pausedStatus": {
+    "description": "Activity feature"
+  },
+  "countdownMode": "ტაიმერი",
+  "@countdownMode": {
+    "description": "Activity feature"
+  },
+  "intervalMode": "ინტერვალი",
+  "@intervalMode": {
+    "description": "Activity feature"
+  },
+  "manualMode": "მექანიკური",
+  "@manualMode": {
+    "description": "Activity feature"
+  },
+  "deleteSession": "სესიის წაშლა",
+  "@deleteSession": {
+    "description": "Activity feature"
+  },
+  "confirmDeleteSession": "წავშალოთ ეს სესია სამუდამოდ?",
+  "@confirmDeleteSession": {
+    "description": "Activity feature"
+  },
+  "sessionDeleted": "სესია წაიშალა",
+  "@sessionDeleted": {
+    "description": "Activity feature"
+  },
+  "yesterday": "გუშინ",
+  "@yesterday": {
+    "description": "Activity feature"
+  },
+  "xMinutes": "{minutes} წთ",
+  "@xMinutes": {
     "placeholders": {
       "minutes": {
         "type": "int"

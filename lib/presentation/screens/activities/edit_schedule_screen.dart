@@ -31,8 +31,9 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final scheduleAsync =
-          ref.read(medicationScheduleProvider(widget.scheduleId));
+      final scheduleAsync = ref.read(
+        medicationScheduleProvider(widget.scheduleId),
+      );
       final current = scheduleAsync.value;
       if (current == null) {
         if (mounted) {
@@ -48,13 +49,13 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
         scheduleConfig: data.toScheduleConfig(),
         intakeQuantity: data.intakeQuantity,
         dosageForm: data.dosageForm,
-        customDosageForm:
-            data.customDosageForm.isNotEmpty ? data.customDosageForm : null,
+        customDosageForm: data.customDosageForm.isNotEmpty
+            ? data.customDosageForm
+            : null,
         clearCustomDosageForm: data.customDosageForm.isEmpty,
         startDate: data.startDate,
         endDate: data.endDate,
-        instructions:
-            data.instructions.isNotEmpty ? data.instructions : null,
+        instructions: data.instructions.isNotEmpty ? data.instructions : null,
         active: data.active,
       );
 
@@ -66,7 +67,9 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
         ref.invalidate(medicationScheduleProvider(widget.scheduleId));
         ref.invalidate(todayAgendaProvider);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.scheduleUpdated)),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.scheduleUpdated),
+          ),
         );
         context.pop();
       }
@@ -74,7 +77,8 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(AppLocalizations.of(context)!.failedToSaveSchedule)),
+            content: Text(AppLocalizations.of(context)!.failedToSaveSchedule),
+          ),
         );
       }
     } finally {
@@ -113,17 +117,16 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
       if (mounted) {
         ref.invalidate(medicationSchedulesProvider(widget.medicationId));
         ref.invalidate(todayAgendaProvider);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.scheduleDeleted)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.scheduleDeleted)));
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(l10n.failedToDeleteSchedule)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.failedToDeleteSchedule)));
       }
     }
   }
@@ -131,8 +134,9 @@ class _EditScheduleScreenState extends ConsumerState<EditScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheduleAsync =
-        ref.watch(medicationScheduleProvider(widget.scheduleId));
+    final scheduleAsync = ref.watch(
+      medicationScheduleProvider(widget.scheduleId),
+    );
 
     return Scaffold(
       appBar: AppBar(

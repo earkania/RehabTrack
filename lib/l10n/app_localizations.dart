@@ -6109,6 +6109,480 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{minutes} minutes overdue'**
   String semanticMinutesOverdue(int minutes);
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get activity;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Add Activity'**
+  String get addActivity;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Activity'**
+  String get editActivity;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Activity Name'**
+  String get activityName;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Morning walk'**
+  String get activityNameHint;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Activity name is required'**
+  String get activityNameRequired;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get activityCategory;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get activityDescription;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Optional details about this activity'**
+  String get activityDescriptionHint;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended Duration (minutes)'**
+  String get recommendedTimeMinutes;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 30'**
+  String get recommendedTimeMinutesHint;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Save Activity'**
+  String get saveActivity;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Update Activity'**
+  String get updateActivity;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise'**
+  String get exercise;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Rehabilitation'**
+  String get rehabilitation;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Physiotherapy'**
+  String get physiotherapy;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'General Wellness'**
+  String get generalWellness;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get otherCategory;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'All Categories'**
+  String get allCategories;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Search activities'**
+  String get searchActivities;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'No activities yet'**
+  String get activitiesEmpty;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Add an activity you want to track'**
+  String get activitiesEmptySubtitle;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'No activities match your search'**
+  String get noActivitiesFound;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Show archived activities'**
+  String get showArchivedActivities;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Showing archived activities'**
+  String get showingArchivedActivities;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archiveActivity;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this activity? It will be hidden from the list but can be restored.'**
+  String get archiveActivityConfirmation;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restoreActivity;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this activity permanently?'**
+  String get confirmDeleteActivity;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'This activity has session history. Archive it instead of deleting.'**
+  String get activityHasSessions;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Activity archived'**
+  String get activityArchived;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Activity restored'**
+  String get activityRestored;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Activity deleted'**
+  String get activityDeleted;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Activity saved'**
+  String get activitySaved;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Activity updated'**
+  String get activityUpdated;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Active Session'**
+  String get activeSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Mode'**
+  String get sessionMode;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Timed - Countdown'**
+  String get timedSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Timed - Interval'**
+  String get timedInterval;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Manual (Untimed)'**
+  String get untimedSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Work Duration'**
+  String get workDuration;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Rest Duration'**
+  String get restDuration;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Work'**
+  String get workInterval;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Rest'**
+  String get restInterval;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Intervals completed'**
+  String get intervalsCompleted;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Start Session'**
+  String get startSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'New Session'**
+  String get newSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get pauseSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get resumeSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get finishSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Session'**
+  String get cancelSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this session? The time recorded will not be saved.'**
+  String get cancelSessionConfirmation;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session running'**
+  String get sessionRunning;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session paused'**
+  String get sessionPaused;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session completed'**
+  String get sessionCompleted;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session cancelled'**
+  String get sessionCancelled;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Record Session'**
+  String get recordSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Actual Duration'**
+  String get actualDuration;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Label / Note'**
+  String get sessionLabel;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Optional label or note for this session'**
+  String get sessionLabelHint;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Save Session'**
+  String get saveSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session History'**
+  String get sessionHistory;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session Details'**
+  String get sessionDetails;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session not found'**
+  String get sessionNotFound;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get recordedAt;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get endedAt;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedOn;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedStatus;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelledStatus;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Ended while paused'**
+  String get pausedStatus;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Countdown'**
+  String get countdownMode;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Interval'**
+  String get intervalMode;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get manualMode;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Session'**
+  String get deleteSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this session permanently?'**
+  String get confirmDeleteSession;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session deleted'**
+  String get sessionDeleted;
+
+  /// Activity feature
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @xMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String xMinutes(int minutes);
 }
 
 class _AppLocalizationsDelegate

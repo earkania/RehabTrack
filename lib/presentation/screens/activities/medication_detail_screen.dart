@@ -25,10 +25,10 @@ class MedicationDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final medicationAsync = ref.watch(medicationProvider(medicationId));
-    final schedulesAsync =
-        ref.watch(medicationSchedulesProvider(medicationId));
-    final alternativesAsync =
-        ref.watch(medicationAlternativesProvider(medicationId));
+    final schedulesAsync = ref.watch(medicationSchedulesProvider(medicationId));
+    final alternativesAsync = ref.watch(
+      medicationAlternativesProvider(medicationId),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -51,9 +51,7 @@ class MedicationDetailScreen extends ConsumerWidget {
       ),
       body: medicationAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Text(l10n.error),
-        ),
+        error: (error, stack) => Center(child: Text(l10n.error)),
         data: (medication) {
           if (medication == null) {
             return Center(child: Text(l10n.error));
@@ -65,10 +63,7 @@ class MedicationDetailScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text(
-                medication.name,
-                style: textTheme.headlineSmall,
-              ),
+              Text(medication.name, style: textTheme.headlineSmall),
               const SizedBox(height: 8),
               if (medication.description != null &&
                   medication.description!.isNotEmpty)
@@ -99,10 +94,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                   value: _formatDate(context, medication.endDate!),
                 ),
               if (medication.notes != null && medication.notes!.isNotEmpty)
-                _DetailRow(
-                  label: l10n.notes,
-                  value: medication.notes!,
-                ),
+                _DetailRow(label: l10n.notes, value: medication.notes!),
               const Divider(height: 32),
 
               // Schedules Section
@@ -117,8 +109,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                   if (medication.active)
                     IconButton(
                       onPressed: () {
-                        context.push(
-                            AppRoutes.scheduleAdd(medicationId));
+                        context.push(AppRoutes.scheduleAdd(medicationId));
                       },
                       icon: const Icon(Icons.add_circle_outline),
                       tooltip: l10n.addSchedule,
@@ -149,8 +140,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                   if (medication.active)
                     IconButton(
                       onPressed: () {
-                        context.push(
-                            AppRoutes.alternativeAdd(medicationId));
+                        context.push(AppRoutes.alternativeAdd(medicationId));
                       },
                       icon: const Icon(Icons.add_circle_outline),
                       tooltip: l10n.addAlternative,
@@ -180,8 +170,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      context.push(
-                          AppRoutes.medicationHistory(medicationId));
+                      context.push(AppRoutes.medicationHistory(medicationId));
                     },
                     icon: const Icon(Icons.history),
                     tooltip: l10n.viewHistory,
@@ -189,13 +178,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              _buildHistoryPreview(
-                context,
-                ref,
-                l10n,
-                colorScheme,
-                textTheme,
-              ),
+              _buildHistoryPreview(context, ref, l10n, colorScheme, textTheme),
 
               const Divider(height: 32),
 
@@ -213,10 +196,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                 )
               else
                 ListTile(
-                  leading: Icon(
-                    Icons.restart_alt,
-                    color: colorScheme.primary,
-                  ),
+                  leading: Icon(Icons.restart_alt, color: colorScheme.primary),
                   title: Text(
                     l10n.reactivate,
                     style: TextStyle(color: colorScheme.primary),
@@ -336,9 +316,9 @@ class MedicationDetailScreen extends ConsumerWidget {
                         if (schedule.startDate != null) ...[
                           const SizedBox(width: 12),
                           Text(
-                            AppDateFormatter.of(context).formatShortDate(
-                              schedule.startDate!,
-                            ),
+                            AppDateFormatter.of(
+                              context,
+                            ).formatShortDate(schedule.startDate!),
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -348,7 +328,8 @@ class MedicationDetailScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                isThreeLine: schedule.instructions != null &&
+                isThreeLine:
+                    schedule.instructions != null &&
                     schedule.instructions!.isNotEmpty,
                 onTap: () {
                   context.push(
@@ -384,8 +365,9 @@ class MedicationDetailScreen extends ConsumerWidget {
               Text(l10n.error),
               const SizedBox(height: 8),
               TextButton(
-                onPressed: () => ref
-                    .invalidate(medicationAlternativesProvider(medicationId)),
+                onPressed: () => ref.invalidate(
+                  medicationAlternativesProvider(medicationId),
+                ),
                 child: Text(l10n.retry),
               ),
             ],
@@ -427,19 +409,19 @@ class MedicationDetailScreen extends ConsumerWidget {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    final stats = ref.watch(medicationAdherenceStatsProvider(
-      (medicationId: medicationId, period: HistoryPeriod.last30Days),
-    ));
+    final stats = ref.watch(
+      medicationAdherenceStatsProvider((
+        medicationId: medicationId,
+        period: HistoryPeriod.last30Days,
+      )),
+    );
 
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(
-              Icons.pie_chart_outline,
-              color: colorScheme.primary,
-            ),
+            Icon(Icons.pie_chart_outline, color: colorScheme.primary),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -462,10 +444,7 @@ class MedicationDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
           ],
         ),
       ),
@@ -473,19 +452,23 @@ class MedicationDetailScreen extends ConsumerWidget {
   }
 
   IconData _scheduleIcon(String type) => switch (type) {
-        'daily' => Icons.today,
-        'interval_days' => Icons.date_range,
-        _ => Icons.schedule,
-      };
+    'daily' => Icons.today,
+    'interval_days' => Icons.date_range,
+    _ => Icons.schedule,
+  };
 
   String _formatScheduleSummary(
-      MedicationSchedule schedule, AppLocalizations l10n) {
+    MedicationSchedule schedule,
+    AppLocalizations l10n,
+  ) {
     final config = schedule.scheduleConfig;
     final timesStr = config.times.join(', ');
     final typeLabel = switch (config) {
       DailySchedule() => l10n.dailyAt(timesStr),
-      IntervalDaysSchedule(:final intervalDays) =>
-        l10n.everyNDays(intervalDays, timesStr),
+      IntervalDaysSchedule(:final intervalDays) => l10n.everyNDays(
+        intervalDays,
+        timesStr,
+      ),
     };
     final intakeLine = DosageFormLocalizer.localizeWithQuantity(
       schedule.intakeQuantity,
@@ -532,8 +515,7 @@ class MedicationDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     AppLocalizations l10n,
   ) async {
-    final medicationAsync =
-        ref.read(medicationProvider(medicationId));
+    final medicationAsync = ref.read(medicationProvider(medicationId));
     final current = medicationAsync.value;
     if (current == null) return;
 
@@ -550,16 +532,16 @@ class MedicationDetailScreen extends ConsumerWidget {
         ref.invalidate(medicationProvider(medicationId));
         ref.invalidate(medicationListProvider);
         ref.invalidate(todayAgendaProvider);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.medicationUpdated)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.medicationUpdated)));
         context.pop();
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.error)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.error)));
       }
     }
   }
@@ -596,17 +578,13 @@ class MedicationDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     AppLocalizations l10n,
   ) async {
-    final medicationAsync =
-        ref.read(medicationProvider(medicationId));
+    final medicationAsync = ref.read(medicationProvider(medicationId));
     final current = medicationAsync.value;
     if (current == null) return;
 
     try {
       final repo = ref.read(medicationRepositoryProvider);
-      final updated = current.copyWith(
-        active: true,
-        updatedAt: DateTime.now(),
-      );
+      final updated = current.copyWith(active: true, updatedAt: DateTime.now());
       await repo.updateMedication(updated);
 
       if (context.mounted) {
@@ -614,16 +592,16 @@ class MedicationDetailScreen extends ConsumerWidget {
         ref.invalidate(medicationListProvider);
         ref.invalidate(medicationInactiveListProvider);
         ref.invalidate(todayAgendaProvider);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.medicationUpdated)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.medicationUpdated)));
         context.pop();
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.error)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.error)));
       }
     }
   }
@@ -646,15 +624,13 @@ class _ComponentsSection extends ConsumerWidget {
       error: (_, _) => const SizedBox.shrink(),
       data: (components) {
         if (components.isEmpty) return const SizedBox.shrink();
-        final hasNames =
-            components.any((c) => c.componentName != null && c.componentName!.isNotEmpty);
+        final hasNames = components.any(
+          (c) => c.componentName != null && c.componentName!.isNotEmpty,
+        );
         final doseText = hasNames
             ? ComponentFormatter.formatComponentsDetailed(components)
             : ComponentFormatter.formatComponents(components);
-        return _DetailRow(
-          label: l10n.doseAmount,
-          value: doseText,
-        );
+        return _DetailRow(label: l10n.doseAmount, value: doseText);
       },
     );
   }
@@ -665,11 +641,7 @@ class _DetailRow extends StatelessWidget {
   final String value;
   final Color? valueColor;
 
-  const _DetailRow({
-    required this.label,
-    required this.value,
-    this.valueColor,
-  });
+  const _DetailRow({required this.label, required this.value, this.valueColor});
 
   @override
   Widget build(BuildContext context) {
@@ -683,16 +655,16 @@ class _DetailRow extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: valueColor,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: valueColor),
             ),
           ),
         ],
