@@ -9,6 +9,7 @@ import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/lab_analysis_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/widgets/common/archived_toggle_button.dart';
+import 'package:rehab_track/presentation/widgets/common/list_toolbar_icons.dart';
 
 /// Lab Analyses list screen
 class LabAnalysesScreen extends ConsumerStatefulWidget {
@@ -93,7 +94,7 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
                       const SizedBox(width: 8),
                       // Filters
                       _CircleMenuButton<String>(
-                        icon: Icons.filter_list,
+                        icon: toolbarCategoryFilterIcon,
                         tooltip: l10n.filter,
                         selected: ref.watch(labAnalysisCategoryFilterProvider) !=
                             null,
@@ -131,7 +132,7 @@ class _LabAnalysesScreenState extends ConsumerState<LabAnalysesScreen> {
                       const SizedBox(width: 8),
                       // Sort
                       _CircleMenuButton<LabAnalysisSort>(
-                        icon: Icons.sort,
+                        icon: toolbarSortIcon,
                         tooltip: l10n.sort,
                         selected: ref.watch(labAnalysisSortProvider) !=
                             LabAnalysisSort.newestFirst,

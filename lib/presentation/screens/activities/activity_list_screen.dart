@@ -10,6 +10,7 @@ import 'package:rehab_track/presentation/providers/activity_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/screens/activities/activity_category_visuals.dart';
 import 'package:rehab_track/presentation/widgets/common/archived_toggle_button.dart';
+import 'package:rehab_track/presentation/widgets/common/list_toolbar_icons.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 
 /// Health → Activities. Shows the activity list for the active profile with
@@ -130,7 +131,7 @@ class _ActivityListScreenState extends ConsumerState<ActivityListScreen> {
           ),
           const SizedBox(width: 8),
           _CircleMenuButton<String>(
-            icon: Icons.filter_list,
+            icon: toolbarCategoryFilterIcon,
             tooltip: l10n.filter,
             selected: ref.watch(activityCategoryFilterProvider) != null,
             onSelected: (value) {
@@ -149,7 +150,7 @@ class _ActivityListScreenState extends ConsumerState<ActivityListScreen> {
           ),
           const SizedBox(width: 8),
           _CircleMenuButton<ActivitySort>(
-            icon: Icons.sort,
+            icon: toolbarSortIcon,
             tooltip: l10n.sort,
             selected:
                 ref.watch(activitySortProvider) != ActivitySort.alphabeticalAZ,

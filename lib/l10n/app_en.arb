@@ -1451,8 +1451,8 @@
   "@untimedSession": {
     "description": "Activity feature"
   },
-  "workDuration": "Work Duration",
-  "@workDuration": {
+  "activityDuration": "Activity Duration",
+  "@activityDuration": {
     "description": "Activity feature"
   },
   "restDuration": "Rest Duration",

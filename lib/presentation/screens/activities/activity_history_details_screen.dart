@@ -153,7 +153,7 @@ class ActivityHistoryDetailsScreen extends ConsumerWidget {
             session.plannedDurationSeconds != null)
           _DetailRow(
             icon: Icons.repeat_outlined,
-            label: l10n.workDuration,
+            label: l10n.activityDuration,
             value: l10n.xMinutes(session.plannedDurationSeconds! ~/ 60),
           ),
         if (session.modeEnum == SessionMode.timedInterval &&

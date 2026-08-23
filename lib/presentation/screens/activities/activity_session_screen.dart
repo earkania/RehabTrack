@@ -164,7 +164,7 @@ class _ActivitySessionScreenState extends ConsumerState<ActivitySessionScreen> {
           ),
           const SizedBox(height: 24),
           if (_mode == SessionMode.timedSession) ...[
-            Text(l10n.workDuration, style: theme.textTheme.titleMedium),
+            Text(l10n.activityDuration, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -179,7 +179,7 @@ class _ActivitySessionScreenState extends ConsumerState<ActivitySessionScreen> {
               ],
             ),
           ] else if (_mode == SessionMode.timedInterval) ...[
-            Text(l10n.workDuration, style: theme.textTheme.titleMedium),
+            Text(l10n.activityDuration, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,

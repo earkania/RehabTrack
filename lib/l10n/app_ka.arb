@@ -1451,8 +1451,8 @@
   "@untimedSession": {
     "description": "Activity feature"
   },
-  "workDuration": "სამუშაო ხანგრძლივობა",
-  "@workDuration": {
+  "activityDuration": "ხანგრძლივობა",
+  "@activityDuration": {
     "description": "Activity feature"
   },
   "restDuration": "დასვენების ხანგრძლივობა",

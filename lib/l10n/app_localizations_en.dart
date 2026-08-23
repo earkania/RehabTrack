@@ -3378,7 +3378,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get untimedSession => 'Manual (Untimed)';
 
   @override
-  String get workDuration => 'Work Duration';
+  String get activityDuration => 'Activity Duration';
 
   @override
   String get restDuration => 'Rest Duration';

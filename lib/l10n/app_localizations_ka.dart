@@ -3384,7 +3384,7 @@ class AppLocalizationsKa extends AppLocalizations {
   String get untimedSession => 'მექანიკური (უხანგრძლივო)';
 
   @override
-  String get workDuration => 'სამუშაო ხანგრძლივობა';
+  String get activityDuration => 'ხანგრძლივობა';
 
   @override
   String get restDuration => 'დასვენების ხანგრძლივობა';

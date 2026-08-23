@@ -6359,8 +6359,8 @@ abstract class AppLocalizations {
   /// Activity feature
   ///
   /// In en, this message translates to:
-  /// **'Work Duration'**
-  String get workDuration;
+  /// **'Activity Duration'**
+  String get activityDuration;
 
   /// Activity feature
   ///

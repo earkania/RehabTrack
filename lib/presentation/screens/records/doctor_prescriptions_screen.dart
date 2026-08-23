@@ -9,6 +9,7 @@ import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/doctor_prescription_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/widgets/common/archived_toggle_button.dart';
+import 'package:rehab_track/presentation/widgets/common/list_toolbar_icons.dart';
 
 /// Doctor Prescriptions list screen
 class DoctorPrescriptionsScreen extends ConsumerStatefulWidget {
@@ -91,7 +92,7 @@ class _DoctorPrescriptionsScreenState
                       ),
                       const SizedBox(width: 8),
                       _CircleMenuButton<DoctorPrescriptionFilter>(
-                        icon: Icons.filter_list,
+                        icon: toolbarCategoryFilterIcon,
                         tooltip: l10n.filter,
                         selected: ref.watch(doctorPrescriptionFilterProvider) !=
                             DoctorPrescriptionFilter.all,
@@ -117,7 +118,7 @@ class _DoctorPrescriptionsScreenState
                       ),
                       const SizedBox(width: 8),
                       _CircleMenuButton<DoctorPrescriptionSort>(
-                        icon: Icons.sort,
+                        icon: toolbarSortIcon,
                         tooltip: l10n.sort,
                         selected: ref.watch(doctorPrescriptionSortProvider) !=
                             DoctorPrescriptionSort.newestFirst,
