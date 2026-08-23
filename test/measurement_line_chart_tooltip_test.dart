@@ -138,6 +138,20 @@ Offset _spotPixel(
 
 Finder get _tooltip => find.byKey(MeasurementLineChart.tooltipKey);
 
+/// Expects [needles] to appear in [haystack] in exactly the given order.
+void _expectRowOrder(String haystack, List<String> needles) {
+  var last = -1;
+  var previous = 'tooltip start';
+  for (final needle in needles) {
+    final index = haystack.indexOf(needle);
+    expect(index, greaterThan(last),
+        reason: '"$needle" must appear after "$previous" '
+            'but was found at $index (text: $haystack)');
+    last = index;
+    previous = needle;
+  }
+}
+
 Future<TestGesture> _holdPoint(
   WidgetTester tester, {
   required List<double> values,
@@ -366,6 +380,142 @@ void main() {
       expect(rect.right, lessThanOrEqualTo(400));
       expect(rect.top, greaterThanOrEqualTo(0));
       expect(rect.bottom, lessThanOrEqualTo(800));
+
+      await _release(tester, gesture);
+    });
+
+    testWidgets(
+        'blood pressure tooltip rows always follow the canonical component '
+        'order: Systolic, Diastolic, Pulse (120/80/60)', (tester) async {
+      const systolic = <double>[120, 122];
+      const diastolic = <double>[80, 82];
+      const pulse = <double>[60, 62];
+      await _pumpChart(tester, series: [
+        _series('Systolic', systolic),
+        _series('Diastolic', diastolic),
+        _series('Pulse', pulse, unit: 'bpm', fieldKey: 'pulse'),
+      ]);
+
+      final gesture = await _holdPoint(tester, values: systolic, index: 0);
+
+      final text = _tooltipText(tester);
+      _expectRowOrder(text, ['Systolic', 'Diastolic', 'Pulse']);
+      // Values and units stay attached to their own component row.
+      expect(text, contains('120 mmHg'));
+      expect(text, contains('80 mmHg'));
+      expect(text, contains('60 bpm'));
+
+      await _release(tester, gesture);
+    });
+
+    testWidgets(
+        'blood pressure tooltip keeps canonical order when pulse exceeds '
+        'diastolic (120/68/70)', (tester) async {
+      const systolic = <double>[120, 121];
+      const diastolic = <double>[68, 66];
+      const pulse = <double>[70, 72];
+      await _pumpChart(tester, series: [
+        _series('Systolic', systolic,
+            status: ReadingStatus.aboveRange),
+        _series('Diastolic', diastolic),
+        _series('Pulse', pulse, unit: 'bpm', fieldKey: 'pulse',
+            status: ReadingStatus.belowRange),
+      ]);
+
+      final gesture = await _holdPoint(tester, values: systolic, index: 0);
+
+      final text = _tooltipText(tester);
+      // Y-descending order would render Pulse between Systolic and Diastolic.
+      _expectRowOrder(text, ['Systolic', 'Diastolic', 'Pulse']);
+
+      // Each status stays attached to its own component block.
+      final systolicBlock =
+          text.substring(text.indexOf('Systolic'), text.indexOf('Diastolic'));
+      final diastolicBlock =
+          text.substring(text.indexOf('Diastolic'), text.indexOf('Pulse'));
+      final pulseBlock = text.substring(text.indexOf('Pulse'));
+      expect(systolicBlock, contains('Above range'));
+      expect(systolicBlock, isNot(contains('Within range')));
+      expect(diastolicBlock, contains('Within range'));
+      expect(diastolicBlock, contains('68 mmHg'));
+      expect(pulseBlock, contains('Below range'));
+      expect(pulseBlock, contains('70 bpm'));
+
+      await _release(tester, gesture);
+    });
+
+    testWidgets(
+        'blood pressure tooltip keeps canonical order when pulse is the '
+        'highest value (100/90/120)', (tester) async {
+      const systolic = <double>[100, 102];
+      const diastolic = <double>[90, 91];
+      const pulse = <double>[120, 118];
+      await _pumpChart(tester, series: [
+        _series('Systolic', systolic),
+        _series('Diastolic', diastolic),
+        _series('Pulse', pulse, unit: 'bpm', fieldKey: 'pulse'),
+      ]);
+
+      final gesture = await _holdPoint(tester, values: systolic, index: 0);
+
+      _expectRowOrder(_tooltipText(tester),
+          ['Systolic', 'Diastolic', 'Pulse']);
+
+      await _release(tester, gesture);
+    });
+
+    testWidgets(
+        'blood pressure tooltip keeps canonical order when values are '
+        'value-descending already (160/100/50)', (tester) async {
+      const systolic = <double>[160, 158];
+      const diastolic = <double>[100, 99];
+      const pulse = <double>[50, 52];
+      await _pumpChart(tester, series: [
+        _series('Systolic', systolic),
+        _series('Diastolic', diastolic),
+        _series('Pulse', pulse, unit: 'bpm', fieldKey: 'pulse'),
+      ]);
+
+      final gesture = await _holdPoint(tester, values: systolic, index: 0);
+
+      _expectRowOrder(_tooltipText(tester),
+          ['Systolic', 'Diastolic', 'Pulse']);
+
+      await _release(tester, gesture);
+    });
+
+    testWidgets(
+        'blood pressure tooltip canonical order holds in Georgian '
+        '(120/68/70)', (tester) async {
+      const systolic = <double>[120, 121];
+      const diastolic = <double>[68, 66];
+      const pulse = <double>[70, 72];
+      await _pumpChart(
+        tester,
+        series: [
+          _series('სისტოლური', systolic, status: ReadingStatus.aboveRange),
+          _series('დიასტოლური', diastolic),
+          _series('პულსი', pulse,
+              unit: 'bpm',
+              fieldKey: 'pulse',
+              status: ReadingStatus.belowRange),
+        ],
+        locale: const Locale('ka'),
+      );
+
+      final gesture = await _holdPoint(tester, values: systolic, index: 0);
+
+      final text = _tooltipText(tester);
+      _expectRowOrder(text, ['სისტოლური', 'დიასტოლური', 'პულსი']);
+      expect(text, contains('ნორმაზე მაღალი'));
+      expect(text, contains('ნორმის ფარგლებში'));
+      expect(text, contains('ნორმაზე დაბალი'));
+
+      final systolicBlock = text.substring(
+          text.indexOf('სისტოლური'), text.indexOf('დიასტოლური'));
+      final pulseBlock = text.substring(text.indexOf('პულსი'));
+      expect(systolicBlock, contains('ნორმაზე მაღალი'));
+      expect(pulseBlock, contains('ნორმაზე დაბალი'));
 
       await _release(tester, gesture);
     });

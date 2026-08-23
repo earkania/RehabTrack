@@ -241,6 +241,14 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
     ThemeData theme,
     AppLocalizations l10n,
   ) {
+    // Component rows follow each measurement type's canonical component
+    // order, which is the order of [widget.series] (blood pressure:
+    // systolic, diastolic, pulse; other types: field displayOrder). The
+    // touched spots arrive in Y-value order and must not drive row order.
+    final componentRank = <String, int>{
+      for (var i = 0; i < widget.series.length; i++) widget.series[i].fieldKey: i,
+    };
+
     final readings = <int, _TooltipReading>{};
     final readingOrder = <int>[];
 
@@ -264,8 +272,21 @@ class _MeasurementLineChartState extends State<MeasurementLineChart> {
           unit: point.unit,
           status: point.effectiveStatus,
           irregularHeartbeatDetected: point.irregularHeartbeatDetected,
+          fieldKey: s.fieldKey,
+          sequence: reading.components.length,
         ),
       );
+    }
+
+    // Sort by stable component identity (series field key), with the arrival
+    // sequence as a deterministic tie-breaker for repeated keys.
+    for (final reading in readings.values) {
+      reading.components.sort((a, b) {
+        final ra = componentRank[a.fieldKey] ?? componentRank.length;
+        final rb = componentRank[b.fieldKey] ?? componentRank.length;
+        if (ra != rb) return ra.compareTo(rb);
+        return a.sequence.compareTo(b.sequence);
+      });
     }
 
     return [
@@ -585,6 +606,8 @@ class _TooltipComponent {
     required this.unit,
     required this.status,
     required this.irregularHeartbeatDetected,
+    required this.fieldKey,
+    required this.sequence,
   });
 
   final String label;
@@ -592,4 +615,10 @@ class _TooltipComponent {
   final String unit;
   final ReadingStatus status;
   final bool irregularHeartbeatDetected;
+
+  /// Stable component identity used for canonical row ordering.
+  final String fieldKey;
+
+  /// Arrival order, used only as a deterministic tie-breaker.
+  final int sequence;
 }
