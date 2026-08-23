@@ -41,9 +41,15 @@ class _RehabTrackAppState extends ConsumerState<RehabTrackApp> {
     final presentation = ref.read(activeAlarmPresentationProvider);
     if (presentation == null) return;
     final router = ref.read(routerProvider);
-    final current =
-        router.routerDelegate.currentConfiguration.uri.toString();
-    if (current == AppRoutes.alarm) return;
+    // NOTE: currentConfiguration.uri does NOT reflect push()ed routes
+    // (imperative matches are excluded), so it stays '/' after onAlarmPresent
+    // pushed the alarm route. Comparing against it made this method push a
+    // SECOND AlarmStyleScreen on every cold start; the buried duplicate then
+    // fought the top one over the shared presentation. Compare the top-most
+    // matched location instead.
+    final config = router.routerDelegate.currentConfiguration;
+    final topPath = config.isEmpty ? '' : config.last.matchedLocation;
+    if (topPath == AppRoutes.alarm) return;
     router.push(AppRoutes.alarm);
   }
 

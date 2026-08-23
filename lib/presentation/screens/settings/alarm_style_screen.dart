@@ -92,7 +92,15 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
     // was acknowledged elsewhere. Fall back to Today without trapping the user.
     if (active == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.go(AppRoutes.home);
+        if (!mounted) return;
+        // Only bail out when this screen is still the top-most route. A
+        // duplicate AlarmStyleScreen buried deeper in the stack shares this
+        // provider state; its fallback must never override an in-flight
+        // handoff navigation (Record Now -> Add Measurement, Details ->
+        // visit details) which lands on a different top route.
+        final config = ref.read(routerProvider).routerDelegate.currentConfiguration;
+        final topPath = config.isEmpty ? '' : config.last.matchedLocation;
+        if (topPath == AppRoutes.alarm) context.go(AppRoutes.home);
       });
       return const Scaffold(body: SizedBox());
     }
@@ -254,9 +262,19 @@ class _AlarmStyleScreenState extends ConsumerState<AlarmStyleScreen>
         scheduledOccurrenceTime: MeasurementOccurrenceTime.normalize(scheduledTime),
         reminderScheduleId: reminder.scheduleId,
       );
+      // Mark submitted BEFORE clearing the presentation. Otherwise the
+      // rebuild lands in the stale-route fallback below (active == null &&
+      // !_submitted), whose post-frame go(Home) races in after the
+      // Add Measurement push and leaves the user on Today instead of the form.
+      setState(() => _submitted = true);
       ref.read(activeAlarmPresentationProvider.notifier).state = null;
-      context.go(AppRoutes.home);
-      context.push(AppRoutes.measurementAdd(typeId), extra: extra);
+      // Defer navigation so the alarm route finishes unmounting first,
+      // mirroring [_finishToDetails].
+      final router = ref.read(routerProvider);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        router.go(AppRoutes.home);
+        router.push(AppRoutes.measurementAdd(typeId), extra: extra);
+      });
     } else {
       _showError(l10n.actionFailed);
     }
