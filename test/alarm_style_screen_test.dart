@@ -12,6 +12,7 @@ import 'package:rehab_track/data/services/notification/reminder_payload.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/notification_provider.dart';
 import 'package:rehab_track/presentation/providers/today_provider.dart';
+import 'package:rehab_track/presentation/screens/health/measurement_entry_screen.dart';
 
 void main() {
   const testNotificationId = 5000001;
@@ -291,6 +292,138 @@ void main() {
       // No medical log was created for the occurrence.
       final logs = await database.medicationDao.getLogs(77);
       expect(logs, isEmpty);
+    });
+    testWidgets(
+        'Blood pressure alarm Record Now opens Add Measurement, not Today',
+        (tester) async {
+      final profileId = await insertProfile();
+      await database.into(database.measurementTypes).insert(
+        db.MeasurementTypesCompanion.insert(
+          name: 'Blood Pressure',
+          unit: 'mmHg',
+          measurementCategory: 'vital',
+          key: const Value('blood_pressure'),
+          isSystem: const Value(true),
+          displayOrder: const Value(0),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+
+      final container = await pumpAlarm(
+        tester,
+        ReminderPayload(
+          type: ReminderType.measurement,
+          profileId: profileId,
+          scheduleId: 88,
+          occurrenceTime: '2026-08-01T10:00:00',
+          measurementTypeId: 1,
+        ),
+      );
+      final router = container.read(routerProvider);
+
+      expect(find.text('Record Now'), findsOneWidget);
+
+      await tester.tap(find.text('Record Now'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      // The entry form for the reminded type is on top — not Today.
+      expect(find.byType(MeasurementEntryScreen), findsOneWidget);
+      expect(
+        router.routerDelegate.currentConfiguration.last.matchedLocation,
+        '/measurements/measurement/1/add',
+      );
+
+      // The alarm presentation was consumed exactly once.
+      expect(container.read(activeAlarmPresentationProvider), isNull);
+
+      // Record Now itself must not log any values; only saving the form does.
+      final records = await database.select(database.measurementRecords).get();
+      expect(records, isEmpty);
+    });
+
+    testWidgets(
+        'Record Now survives a duplicate alarm screen deeper in the stack '
+        '(cold-start double presentation)', (tester) async {
+      await insertProfile();
+      await database.into(database.measurementTypes).insert(
+        db.MeasurementTypesCompanion.insert(
+          name: 'Blood Pressure',
+          unit: 'mmHg',
+          measurementCategory: 'vital',
+          key: const Value('blood_pressure'),
+          isSystem: const Value(true),
+          displayOrder: const Value(0),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+
+      final container = await pumpAlarm(tester, measurementPayload());
+      final router = container.read(routerProvider);
+
+      // On a real device the alarm route used to be pushed twice on cold
+      // start (onAlarmPresent + the uri-based re-check, which cannot see
+      // imperative pushes). Two AlarmStyleScreen instances end up stacked;
+      // simulate exactly that.
+      router.push(AppRoutes.alarm);
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Record Now'), findsAtLeastNWidgets(1));
+
+      // The visible (top-most) alarm handles the tap.
+      await tester.tap(find.text('Record Now').last);
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      // The buried duplicate's stale-route fallback must not wipe the
+      // Add Measurement handoff.
+      expect(find.byType(MeasurementEntryScreen), findsOneWidget);
+      expect(
+        router.routerDelegate.currentConfiguration.last.matchedLocation,
+        '/measurements/measurement/1/add',
+      );
+      expect(container.read(activeAlarmPresentationProvider), isNull);
+    });
+
+    testWidgets('Malformed alarm payload falls back to dismiss-only view',
+        (tester) async {
+      final container = buildContainer();
+      container.read(activeAlarmPresentationProvider.notifier).state =
+          AlarmPresentation(
+        notificationId: testNotificationId,
+        payload: 'not-a-valid-payload',
+      );
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const RehabTrackApp(),
+        ),
+      );
+      await tester.pump();
+
+      final router = container.read(routerProvider);
+      router.go(AppRoutes.alarm);
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pumpAndSettle();
+
+      // No medical actions are offered for an unrecognized payload.
+      expect(find.text('Dismiss test alarm'), findsOneWidget);
+      expect(find.text('Record Now'), findsNothing);
+
+      await tester.tap(find.text('Dismiss test alarm'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pumpAndSettle();
+
+      // Falls back safely to Today without trapping or crashing.
+      expect(
+        router.routerDelegate.currentConfiguration.last.matchedLocation,
+        '/',
+      );
     });
   });
 }
