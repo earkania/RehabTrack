@@ -385,11 +385,21 @@ class _DoctorPrescriptionFormScreenState
       }
 
       if (mounted) {
-        if (context.mounted) {
+        // Capture lookups before popping: the form's context is deactivated
+        // by the pop below.
+        final messenger = ScaffoldMessenger.of(context);
+        final savedMessage = AppLocalizations.of(context)!.prescriptionSaved;
+        if (context.canPop()) {
+          // Return to wherever the form was pushed from (list after add,
+          // details after edit) so the existing navigation stack survives.
+          // The list refreshes itself through repository watch streams.
+          context.pop(true);
+        } else {
+          // Deep-linked form with nothing beneath it: fall back to the list.
           context.go(AppRoutes.recordsPrescriptions);
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.prescriptionSaved)),
+        messenger.showSnackBar(
+          SnackBar(content: Text(savedMessage)),
         );
       }
     } catch (e) {

@@ -24,8 +24,7 @@ class _EditMedicationScreenState extends ConsumerState<EditMedicationScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final medicationAsync =
-          ref.read(medicationProvider(widget.medicationId));
+      final medicationAsync = ref.read(medicationProvider(widget.medicationId));
       final current = medicationAsync.value;
       if (current == null) {
         if (mounted) {
@@ -52,17 +51,15 @@ class _EditMedicationScreenState extends ConsumerState<EditMedicationScreen> {
       final components = data.components
           .map((c) => c.copyWith(medicationId: widget.medicationId))
           .toList();
-      await repo.replaceMedicationComponents(
-        widget.medicationId,
-        components,
-      );
+      await repo.replaceMedicationComponents(widget.medicationId, components);
 
       if (mounted) {
         ref.invalidate(medicationProvider(widget.medicationId));
         ref.invalidate(medicationListProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(AppLocalizations.of(context)!.medicationUpdated)),
+            content: Text(AppLocalizations.of(context)!.medicationUpdated),
+          ),
         );
         context.pop();
       }
@@ -80,18 +77,13 @@ class _EditMedicationScreenState extends ConsumerState<EditMedicationScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final medicationAsync =
-        ref.watch(medicationProvider(widget.medicationId));
+    final medicationAsync = ref.watch(medicationProvider(widget.medicationId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.editMedication),
-      ),
+      appBar: AppBar(title: Text(l10n.editMedication)),
       body: medicationAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Text(l10n.error),
-        ),
+        error: (error, stack) => Center(child: Text(l10n.error)),
         data: (medication) {
           if (medication == null) {
             return Center(child: Text(l10n.error));

@@ -25,8 +25,7 @@ class _AddScheduleScreenState extends ConsumerState<AddScheduleScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final medicationAsync =
-          ref.read(medicationProvider(widget.medicationId));
+      final medicationAsync = ref.read(medicationProvider(widget.medicationId));
       final medication = medicationAsync.value;
       if (medication == null) {
         if (mounted) {
@@ -43,12 +42,12 @@ class _AddScheduleScreenState extends ConsumerState<AddScheduleScreen> {
         scheduleConfig: data.toScheduleConfig(),
         intakeQuantity: data.intakeQuantity,
         dosageForm: data.dosageForm,
-        customDosageForm:
-            data.customDosageForm.isNotEmpty ? data.customDosageForm : null,
+        customDosageForm: data.customDosageForm.isNotEmpty
+            ? data.customDosageForm
+            : null,
         startDate: data.startDate,
         endDate: data.endDate,
-        instructions:
-            data.instructions.isNotEmpty ? data.instructions : null,
+        instructions: data.instructions.isNotEmpty ? data.instructions : null,
         active: data.active,
       );
 
@@ -67,7 +66,8 @@ class _AddScheduleScreenState extends ConsumerState<AddScheduleScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(AppLocalizations.of(context)!.failedToSaveSchedule)),
+            content: Text(AppLocalizations.of(context)!.failedToSaveSchedule),
+          ),
         );
       }
     } finally {
@@ -80,9 +80,7 @@ class _AddScheduleScreenState extends ConsumerState<AddScheduleScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.addSchedule),
-      ),
+      appBar: AppBar(title: Text(l10n.addSchedule)),
       body: MedicationScheduleForm(
         initialData: ScheduleFormData(),
         onSave: _onSave,

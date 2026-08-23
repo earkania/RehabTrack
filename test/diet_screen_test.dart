@@ -406,7 +406,7 @@ void main() {
       expect(find.text('Limit drinks'), findsOneWidget);
       expect(find.text('Alcohol'), findsWidgets);
 
-      await tester.tap(find.byIcon(Icons.filter_list));
+      await tester.tap(find.byIcon(Icons.filter_alt));
       await tester.pumpAndSettle();
       await tester.tap(
         find.widgetWithText(PopupMenuItem<String>, 'Alcohol'),

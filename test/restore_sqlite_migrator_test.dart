@@ -45,10 +45,10 @@ void main() {
     );
 
     expect(result.fromSchemaVersion, 16);
-    expect(result.toSchemaVersion, 18);
+    expect(result.toSchemaVersion, AppDatabase.currentSchemaVersion);
 
     final db = sqlite.sqlite3.open(file.path, mode: sqlite.OpenMode.readOnly);
-    expect(db.userVersion, 18);
+    expect(db.userVersion, AppDatabase.currentSchemaVersion);
     final prescriptionTableNames = db
         .select(
           "SELECT name FROM sqlite_master "
@@ -71,9 +71,9 @@ void main() {
 
     final result = await const RestoreSqliteMigrator().migrateToCurrent(
       file: File(path),
-      fromSchemaVersion: 18,
+      fromSchemaVersion: AppDatabase.currentSchemaVersion,
     );
-    expect(result.toSchemaVersion, 18);
+    expect(result.toSchemaVersion, AppDatabase.currentSchemaVersion);
   });
 
   test('an unreadable database is rejected', () async {

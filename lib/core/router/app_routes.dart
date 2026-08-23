@@ -22,6 +22,16 @@ class AppRoutes {
   static const healthActivities = '/health/activities';
   static const healthDiet = '/health/diet';
 
+  // Activities
+  static const activityAdd = '/health/activities/new';
+  static String activityEdit(int id) => '/health/activities/$id/edit';
+  static const activitySessionActive = '/health/activities/session';
+  static String activitySession(int activityId) =>
+      '/health/activities/$activityId/session';
+  static const activityHistory = '/health/activities/history';
+  static String activitySessionDetails(int sessionId) =>
+      '/health/activities/history/$sessionId';
+
   // Diet
   static const healthDietFoodsAdd = '/health/diet/foods/new';
   static String healthDietFoodsDetails(int id) => '/health/diet/foods/$id';
@@ -36,16 +46,17 @@ class AppRoutes {
   static const recordsLabAnalyses = '/records/lab-analyses';
   static const recordsLabAnalysesAdd = '/records/lab-analyses/new';
   static const recordsLabAnalysesArchived = '/records/lab-analyses/archived';
-  static String recordsLabAnalysesDetails(int id) => '/records/lab-analyses/$id';
-  static String recordsLabAnalysesEdit(int id) => '/records/lab-analyses/$id/edit';
+  static String recordsLabAnalysesDetails(int id) =>
+      '/records/lab-analyses/$id';
+  static String recordsLabAnalysesEdit(int id) =>
+      '/records/lab-analyses/$id/edit';
   static const recordsDoctorVisits = '/records/doctor-visits';
   static const recordsReports = '/records/reports';
 
   // Doctor Prescriptions
   static const recordsPrescriptions = '/records/prescriptions';
   static const recordsPrescriptionsAdd = '/records/prescriptions/new';
-  static const recordsPrescriptionsArchived =
-      '/records/prescriptions/archived';
+  static const recordsPrescriptionsArchived = '/records/prescriptions/archived';
   static String recordsPrescriptionsDetails(int id) =>
       '/records/prescriptions/$id';
   static String recordsPrescriptionsEdit(int id) =>
@@ -71,8 +82,10 @@ class AppRoutes {
   static String careContactEdit(int id) => '/profile/contacts/$id/edit';
 
   // Measurements (deep links)
-  static String measurementAdd(int typeId) => '/measurements/measurement/$typeId/add';
-  static String measurementHistory(int typeId) => '/measurements/measurement/$typeId/history';
+  static String measurementAdd(int typeId) =>
+      '/measurements/measurement/$typeId/add';
+  static String measurementHistory(int typeId) =>
+      '/measurements/measurement/$typeId/history';
   static String measurementEdit(int recordId) =>
       '/measurements/measurement/record/$recordId/edit';
   static String measurementTrends(int typeId) =>
@@ -88,11 +101,14 @@ class AppRoutes {
   static const medicationAdd = '/medications/medication/add';
   static String medicationDetail(int id) => '/medications/medication/$id';
   static String medicationEdit(int id) => '/medications/medication/$id/edit';
-  static String medicationHistory(int id) => '/medications/medication/$id/history';
-  static String scheduleAdd(int medicationId) => '/medications/medication/$medicationId/schedule/add';
+  static String medicationHistory(int id) =>
+      '/medications/medication/$id/history';
+  static String scheduleAdd(int medicationId) =>
+      '/medications/medication/$medicationId/schedule/add';
   static String scheduleEdit(int medicationId, int scheduleId) =>
       '/medications/medication/$medicationId/schedule/$scheduleId/edit';
-  static String alternativeAdd(int medicationId) => '/medications/medication/$medicationId/alternative/add';
+  static String alternativeAdd(int medicationId) =>
+      '/medications/medication/$medicationId/alternative/add';
   static String alternativeEdit(int medicationId, int alternativeId) =>
       '/medications/medication/$medicationId/alternative/$alternativeId/edit';
 }

@@ -90,9 +90,7 @@ class _DoctorPrescriptionDetailsScreenState
             onSelected: (value) {
               switch (value) {
                 case 'edit':
-                  context.push(
-                    AppRoutes.recordsPrescriptionsEdit(widget.prescriptionId),
-                  );
+                  _editPrescription();
                   break;
                 case 'archive':
                   _archivePrescription();
@@ -145,6 +143,18 @@ class _DoctorPrescriptionDetailsScreenState
           ? const Center(child: CircularProgressIndicator())
           : _buildContent(),
     );
+  }
+
+  /// Opens the edit form and reloads the shown data when it returns after a
+  /// successful save, so details never go stale. Navigation is untouched: the
+  /// form pops straight back to this screen.
+  Future<void> _editPrescription() async {
+    final saved = await context.push<bool>(
+      AppRoutes.recordsPrescriptionsEdit(widget.prescriptionId),
+    );
+    if (saved == true && mounted) {
+      await _loadData();
+    }
   }
 
   Future<void> _archivePrescription() async {

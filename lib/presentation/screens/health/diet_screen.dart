@@ -9,6 +9,7 @@ import 'package:rehab_track/presentation/providers/diet_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/screens/health/diet_category_visuals.dart';
 import 'package:rehab_track/presentation/widgets/common/archived_toggle_button.dart';
+import 'package:rehab_track/presentation/widgets/common/list_toolbar_icons.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 
 /// Health → Diet. Two top-level sections — Foods (Food Guidance) and
@@ -176,7 +177,7 @@ class _DietScreenState extends ConsumerState<DietScreen> {
           ),
           const SizedBox(width: 8),
           _CircleMenuButton<String>(
-            icon: Icons.filter_list,
+            icon: toolbarCategoryFilterIcon,
             tooltip: l10n.filter,
             selected: ref.watch(dietFoodCategoryFilterProvider) != null,
             onSelected: (value) {
@@ -202,7 +203,7 @@ class _DietScreenState extends ConsumerState<DietScreen> {
           ),
           const SizedBox(width: 8),
           _CircleMenuButton<DietFoodSort>(
-            icon: Icons.sort,
+            icon: toolbarSortIcon,
             tooltip: l10n.sort,
             selected:
                 ref.watch(dietFoodSortProvider) != DietFoodSort.alphabeticalAZ,
@@ -251,7 +252,7 @@ class _DietScreenState extends ConsumerState<DietScreen> {
           ),
           const SizedBox(width: 8),
           _CircleMenuButton<String>(
-            icon: Icons.filter_list,
+            icon: toolbarCategoryFilterIcon,
             tooltip: l10n.filter,
             selected: ref.watch(dietGuidanceCategoryFilterProvider) != null,
             onSelected: (value) {

@@ -19,6 +19,7 @@ import 'package:rehab_track/data/database/tables/app_setting_table.dart';
 import 'package:rehab_track/data/database/tables/profile_reference_range_tables.dart';
 import 'package:rehab_track/data/database/tables/lab_analysis_tables.dart';
 import 'package:rehab_track/data/database/tables/doctor_prescription_tables.dart';
+import 'package:rehab_track/data/database/tables/activity_tables.dart';
 import 'package:rehab_track/data/database/seed_data.dart';
 import 'package:rehab_track/data/database/daos/profile_dao.dart';
 import 'package:rehab_track/data/database/daos/medication_dao.dart';
@@ -36,6 +37,7 @@ import 'package:rehab_track/data/database/daos/medication_alternative_components
 import 'package:rehab_track/data/database/daos/doctor_visit_dao.dart';
 import 'package:rehab_track/data/database/daos/lab_analysis_dao.dart';
 import 'package:rehab_track/data/database/daos/doctor_prescription_dao.dart';
+import 'package:rehab_track/data/database/daos/activity_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -72,11 +74,13 @@ part 'app_database.g.dart';
     DoctorPrescriptions,
     DoctorPrescriptionAttachments,
     DoctorPrescriptionMedications,
+    Activities,
+    ActivitySessions,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   /// Canonical current schema version used by the backup/restore validator.
-  static const int currentSchemaVersion = 18;
+  static const int currentSchemaVersion = 19;
 
   AppDatabase() : super(_openConnection());
 
@@ -107,6 +111,7 @@ DocumentDao get documentDao => DocumentDao(this);
   LabAnalysisDao get labAnalysisDao => LabAnalysisDao(this);
   DoctorPrescriptionDao get doctorPrescriptionDao =>
       DoctorPrescriptionDao(this);
+  ActivityDao get activityDao => ActivityDao(this);
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -288,6 +293,23 @@ DocumentDao get documentDao => DocumentDao(this);
         await m.createIndex(dietGuidanceRulesArchivedIdx);
         await m.createIndex(dietGuidanceRulesTitleIdx);
         await m.createIndex(dietGuidanceRulesSortIdx);
+      }
+      if (from < 19) {
+        // Activities module: patient-managed activity list, plus recorded
+        // sessions (timed countdown, interval, manual). Guarded drops keep
+        // the migration idempotent if a legacy table shares a name.
+        await m.deleteTable('activities');
+        await m.deleteTable('activity_sessions');
+        await m.createTable(activities);
+        await m.createTable(activitySessions);
+        await m.createIndex(activitiesProfileIdx);
+        await m.createIndex(activitiesCategoryIdx);
+        await m.createIndex(activitiesArchivedIdx);
+        await m.createIndex(activitiesNameIdx);
+        await m.createIndex(activitySessionsActivityIdx);
+        await m.createIndex(activitySessionsProfileIdx);
+        await m.createIndex(activitySessionsStatusIdx);
+        await m.createIndex(activitySessionsStartedIdx);
       }
     },
   );

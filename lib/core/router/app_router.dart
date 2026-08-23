@@ -24,6 +24,11 @@ import 'package:rehab_track/presentation/screens/records/records_dashboard_scree
 import 'package:rehab_track/presentation/screens/records/doctor_visits_screen.dart';
 import 'package:rehab_track/presentation/screens/records/doctor_visit_form_screen.dart';
 import 'package:rehab_track/presentation/screens/records/doctor_visit_details_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/activity_list_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/activity_form_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/activity_session_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/activity_history_screen.dart';
+import 'package:rehab_track/presentation/screens/activities/activity_history_details_screen.dart';
 import 'package:rehab_track/presentation/screens/profile/profile_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/profile/care_contacts_screen.dart';
 import 'package:rehab_track/presentation/screens/profile/add_care_contact_screen.dart';
@@ -76,42 +81,36 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: AppRoutes.home,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: TodayScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: TodayScreen()),
           ),
           GoRoute(
             path: AppRoutes.health,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HealthDashboardScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: HealthDashboardScreen()),
           ),
           GoRoute(
             path: AppRoutes.records,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: RecordsDashboardScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: RecordsDashboardScreen()),
           ),
           GoRoute(
             path: AppRoutes.profile,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: ProfileDashboardScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ProfileDashboardScreen()),
           ),
           GoRoute(
             path: AppRoutes.settings,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: SettingsDashboardScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SettingsDashboardScreen()),
           ),
         ],
       ),
       // Alarm-style full-screen presentation (top-level: no nav bar, full-screen)
       GoRoute(
         path: AppRoutes.alarm,
-        pageBuilder: (context, state) => const NoTransitionPage(
-          child: AlarmStyleScreen(),
-        ),
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: AlarmStyleScreen()),
       ),
       // Health
       GoRoute(
@@ -124,10 +123,51 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.healthActivities,
-        builder: (context, state) => ModulePlaceholderScreen(
-          icon: Icons.directions_walk_outlined,
-          title: AppLocalizations.of(context)!.activities,
-        ),
+        builder: (context, state) => const ActivityListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.activityAdd,
+        builder: (context, state) => const ActivityFormScreen(),
+      ),
+      GoRoute(
+        path: '/health/activities/:id/edit',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return ActivityFormScreen(activityId: id);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.activitySessionActive,
+        builder: (context, state) => const ActivitySessionScreen(),
+      ),
+      GoRoute(
+        path: '/health/activities/:id/session',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) {
+            return const _InvalidRouteScreen();
+          }
+          return ActivitySessionScreen(activityId: id);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.activityHistory,
+        builder: (context, state) => const ActivityHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/health/activities/history/:sessionId',
+        builder: (context, state) {
+          final sessionId = int.tryParse(
+            state.pathParameters['sessionId'] ?? '',
+          );
+          if (sessionId == null) {
+            return const _InvalidRouteScreen();
+          }
+          return ActivityHistoryDetailsScreen(sessionId: sessionId);
+        },
       ),
       GoRoute(
         path: AppRoutes.healthDiet,
@@ -232,8 +272,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.recordsPrescriptionsArchived,
-        builder: (context, state) =>
-            const ArchivedDoctorPrescriptionsScreen(),
+        builder: (context, state) => const ArchivedDoctorPrescriptionsScreen(),
       ),
       GoRoute(
         path: '/records/prescriptions/:id',
@@ -347,8 +386,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.medicationAdd,
-        builder: (context, state) =>
-            AddMedicationScreen(initialData: state.extra as MedicationFormData?),
+        builder: (context, state) => AddMedicationScreen(
+          initialData: state.extra as MedicationFormData?,
+        ),
       ),
       GoRoute(
         path: '/medications/medication/:id',
@@ -394,8 +434,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/medications/medication/:id/schedule/:scheduleId/edit',
         builder: (context, state) {
           final medicationId = int.tryParse(state.pathParameters['id'] ?? '');
-          final scheduleId =
-              int.tryParse(state.pathParameters['scheduleId'] ?? '');
+          final scheduleId = int.tryParse(
+            state.pathParameters['scheduleId'] ?? '',
+          );
           if (medicationId == null || scheduleId == null) {
             return const _InvalidRouteScreen();
           }
@@ -419,8 +460,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/medications/medication/:id/alternative/:alternativeId/edit',
         builder: (context, state) {
           final medicationId = int.tryParse(state.pathParameters['id'] ?? '');
-          final alternativeId =
-              int.tryParse(state.pathParameters['alternativeId'] ?? '');
+          final alternativeId = int.tryParse(
+            state.pathParameters['alternativeId'] ?? '',
+          );
           if (medicationId == null || alternativeId == null) {
             return const _InvalidRouteScreen();
           }
@@ -433,8 +475,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/measurements/measurement/:typeId/add',
         builder: (context, state) {
-          final typeId =
-              int.tryParse(state.pathParameters['typeId'] ?? '');
+          final typeId = int.tryParse(state.pathParameters['typeId'] ?? '');
           if (typeId == null) {
             return const _InvalidRouteScreen();
           }
@@ -448,8 +489,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/measurements/measurement/:typeId/history',
         builder: (context, state) {
-          final typeId =
-              int.tryParse(state.pathParameters['typeId'] ?? '');
+          final typeId = int.tryParse(state.pathParameters['typeId'] ?? '');
           if (typeId == null) {
             return const _InvalidRouteScreen();
           }
@@ -459,8 +499,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/measurements/measurement/:typeId/trends',
         builder: (context, state) {
-          final typeId =
-              int.tryParse(state.pathParameters['typeId'] ?? '');
+          final typeId = int.tryParse(state.pathParameters['typeId'] ?? '');
           if (typeId == null) {
             return const _InvalidRouteScreen();
           }
@@ -470,8 +509,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/measurements/measurement/record/:recordId/edit',
         builder: (context, state) {
-          final recordId =
-              int.tryParse(state.pathParameters['recordId'] ?? '');
+          final recordId = int.tryParse(state.pathParameters['recordId'] ?? '');
           if (recordId == null) {
             return const _InvalidRouteScreen();
           }
@@ -511,8 +549,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/measurements/measurement/:typeId/schedules',
         builder: (context, state) {
-          final typeId =
-              int.tryParse(state.pathParameters['typeId'] ?? '');
+          final typeId = int.tryParse(state.pathParameters['typeId'] ?? '');
           if (typeId == null) {
             return const _InvalidRouteScreen();
           }
@@ -522,8 +559,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/measurements/measurement/:typeId/schedule/add',
         builder: (context, state) {
-          final typeId =
-              int.tryParse(state.pathParameters['typeId'] ?? '');
+          final typeId = int.tryParse(state.pathParameters['typeId'] ?? '');
           if (typeId == null) {
             return const _InvalidRouteScreen();
           }
@@ -533,10 +569,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/measurements/measurement/:typeId/schedule/:scheduleId/edit',
         builder: (context, state) {
-          final typeId =
-              int.tryParse(state.pathParameters['typeId'] ?? '');
-          final scheduleId =
-              int.tryParse(state.pathParameters['scheduleId'] ?? '');
+          final typeId = int.tryParse(state.pathParameters['typeId'] ?? '');
+          final scheduleId = int.tryParse(
+            state.pathParameters['scheduleId'] ?? '',
+          );
           if (typeId == null || scheduleId == null) {
             return const _InvalidRouteScreen();
           }
@@ -734,9 +770,7 @@ class _CenteredNavigationBar extends StatelessWidget {
                                     maxLines: 2,
                                     overflow: TextOverflow.visible,
                                     style: theme.textTheme.labelMedium!
-                                        .copyWith(
-                                      color: colorScheme.onSurface,
-                                    ),
+                                        .copyWith(color: colorScheme.onSurface),
                                   ),
                                 ),
                               )

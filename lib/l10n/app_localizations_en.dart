@@ -3251,4 +3251,246 @@ class AppLocalizationsEn extends AppLocalizations {
   String semanticMinutesOverdue(int minutes) {
     return '$minutes minutes overdue';
   }
+
+  @override
+  String get activity => 'Activity';
+
+  @override
+  String get addActivity => 'Add Activity';
+
+  @override
+  String get editActivity => 'Edit Activity';
+
+  @override
+  String get activityName => 'Activity Name';
+
+  @override
+  String get activityNameHint => 'e.g., Morning walk';
+
+  @override
+  String get activityNameRequired => 'Activity name is required';
+
+  @override
+  String get activityCategory => 'Category';
+
+  @override
+  String get activityDescription => 'Description';
+
+  @override
+  String get activityDescriptionHint => 'Optional details about this activity';
+
+  @override
+  String get recommendedTimeMinutes => 'Recommended Duration (minutes)';
+
+  @override
+  String get recommendedTimeMinutesHint => 'e.g., 30';
+
+  @override
+  String get saveActivity => 'Save Activity';
+
+  @override
+  String get updateActivity => 'Update Activity';
+
+  @override
+  String get exercise => 'Exercise';
+
+  @override
+  String get rehabilitation => 'Rehabilitation';
+
+  @override
+  String get physiotherapy => 'Physiotherapy';
+
+  @override
+  String get generalWellness => 'General Wellness';
+
+  @override
+  String get otherCategory => 'Other';
+
+  @override
+  String get allCategories => 'All Categories';
+
+  @override
+  String get searchActivities => 'Search activities';
+
+  @override
+  String get activitiesEmpty => 'No activities yet';
+
+  @override
+  String get activitiesEmptySubtitle => 'Add an activity you want to track';
+
+  @override
+  String get noActivitiesFound => 'No activities match your search';
+
+  @override
+  String get showArchivedActivities => 'Show archived activities';
+
+  @override
+  String get showingArchivedActivities => 'Showing archived activities';
+
+  @override
+  String get archiveActivity => 'Archive';
+
+  @override
+  String get archiveActivityConfirmation =>
+      'Archive this activity? It will be hidden from the list but can be restored.';
+
+  @override
+  String get restoreActivity => 'Restore';
+
+  @override
+  String get confirmDeleteActivity => 'Delete this activity permanently?';
+
+  @override
+  String get activityHasSessions =>
+      'This activity has session history. Archive it instead of deleting.';
+
+  @override
+  String get activityArchived => 'Activity archived';
+
+  @override
+  String get activityRestored => 'Activity restored';
+
+  @override
+  String get activityDeleted => 'Activity deleted';
+
+  @override
+  String get activitySaved => 'Activity saved';
+
+  @override
+  String get activityUpdated => 'Activity updated';
+
+  @override
+  String get activeSession => 'Active Session';
+
+  @override
+  String get continueSession => 'Continue';
+
+  @override
+  String get sessionMode => 'Mode';
+
+  @override
+  String get timedSession => 'Timed - Countdown';
+
+  @override
+  String get timedInterval => 'Timed - Interval';
+
+  @override
+  String get untimedSession => 'Manual (Untimed)';
+
+  @override
+  String get activityDuration => 'Activity Duration';
+
+  @override
+  String get restDuration => 'Rest Duration';
+
+  @override
+  String get workInterval => 'Work';
+
+  @override
+  String get restInterval => 'Rest';
+
+  @override
+  String get intervalsCompleted => 'Intervals completed';
+
+  @override
+  String get startSession => 'Start Session';
+
+  @override
+  String get newSession => 'New Session';
+
+  @override
+  String get pauseSession => 'Pause';
+
+  @override
+  String get resumeSession => 'Resume';
+
+  @override
+  String get finishSession => 'Finish';
+
+  @override
+  String get cancelSession => 'Cancel Session';
+
+  @override
+  String get cancelSessionConfirmation =>
+      'Cancel this session? The time recorded will not be saved.';
+
+  @override
+  String get sessionRunning => 'Session running';
+
+  @override
+  String get sessionPaused => 'Session paused';
+
+  @override
+  String get sessionCompleted => 'Session completed';
+
+  @override
+  String get sessionCancelled => 'Session cancelled';
+
+  @override
+  String get recordSession => 'Record Session';
+
+  @override
+  String get actualDuration => 'Actual Duration';
+
+  @override
+  String get sessionLabel => 'Label / Note';
+
+  @override
+  String get sessionLabelHint => 'Optional label or note for this session';
+
+  @override
+  String get saveSession => 'Save Session';
+
+  @override
+  String get sessionHistory => 'Session History';
+
+  @override
+  String get sessionDetails => 'Session Details';
+
+  @override
+  String get sessionNotFound => 'Session not found';
+
+  @override
+  String get recordedAt => 'Started';
+
+  @override
+  String get endedAt => 'Ended';
+
+  @override
+  String get completedOn => 'Completed';
+
+  @override
+  String get completedStatus => 'Completed';
+
+  @override
+  String get cancelledStatus => 'Cancelled';
+
+  @override
+  String get pausedStatus => 'Ended while paused';
+
+  @override
+  String get countdownMode => 'Countdown';
+
+  @override
+  String get intervalMode => 'Interval';
+
+  @override
+  String get manualMode => 'Manual';
+
+  @override
+  String get deleteSession => 'Delete Session';
+
+  @override
+  String get confirmDeleteSession => 'Delete this session permanently?';
+
+  @override
+  String get sessionDeleted => 'Session deleted';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String xMinutes(int minutes) {
+    return '$minutes min';
+  }
 }

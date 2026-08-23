@@ -53,7 +53,9 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
       if (mounted) {
         ref.invalidate(medicationListProvider);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.medicationAdded)),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.medicationAdded),
+          ),
         );
         context.pop();
       }
@@ -73,9 +75,7 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.addMedication),
-      ),
+      appBar: AppBar(title: Text(l10n.addMedication)),
       body: MedicationForm(
         initialData: widget.initialData ?? MedicationFormData(),
         onSave: _onSave,

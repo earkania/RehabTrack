@@ -80,7 +80,7 @@ void main() {
       expect(find.text('Care Contacts'), findsWidgets);
     });
 
-    testWidgets('placeholder tile opens placeholder screen and back returns',
+    testWidgets('activities tile opens the activities screen and back returns',
         (tester) async {
       await pumpApp(tester);
       await goToTab(tester, Icons.health_and_safety_outlined);
@@ -89,7 +89,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.text('Coming soon'), findsOneWidget);
+      // The Activities list screen (AppBar title) is shown.
+      expect(find.text('Activities'), findsWidgets);
 
       await tester.pageBack();
       await tester.pump();
