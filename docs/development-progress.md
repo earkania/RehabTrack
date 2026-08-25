@@ -4604,3 +4604,132 @@ tracking, meal planning, nutrition database or AI suggestions. No commit/push.
 | `:app:compileDebugKotlin` | Passed |
 
 Not committed/pushed — feature branch `feature/diet` only.
+
+## Phase 11 — Reports v1: Health Report (2026-08-25)
+
+**Goal:** Replace the Records → Reports `ModulePlaceholderScreen` with a
+configurable Health Report: pick a name, a date range (7/30/90 days, all
+time, or custom) and any subset of eight canonical sections; Preview renders
+the prepared data on-screen and Share exports a PDF via the system share
+sheet. Deliberately out of scope (v1): templates, scheduled reports, cloud,
+AI summaries, medical interpretation/risk scores, charts inside the report,
+attachment file embedding, report persistence. No commit/push.
+
+### Key decisions
+
+- **Immutable `ReportData`.** `ReportBuilder` prepares the selected sections
+  once into an immutable model (`lib/domain/entities/report_data.dart`);
+  preview UI and PDF generator consume the SAME object so they can never
+  diverge. Values stay raw (DateTime/double/stable string identifiers);
+  localization happens at render time via a `ReportLocalization` bundle built
+  from `AppLocalizations` + `AppDateFormatter` (the app-selected locale — not
+  the device locale — stays authoritative).
+- **Half-open date ranges.** `ReportDateRangeResolver` produces
+  `[startInclusive, endExclusive)` day-aligned bounds (`last7Days`,
+  `last30Days`, `last90Days`, allTime unbounded, custom validated by
+  `ReportConfiguration.hasValidCustomRange`). Repositories querying
+  `timestamp <= to` use `ResolvedReportDateRange.inclusiveQueryEnd`
+  (end − 1s) because Drift stores second-precision timestamps.
+- **Section inclusion rules.** Patient summary is identity data (never
+  date-filtered). Medications = CURRENT ACTIVE only (no adherence inference),
+  documented in code. Measurements are range-filtered with per-component
+  descriptive stats (count/min/max/avg via `MeasurementStatistics`) using the
+  chart builder's canonical component order (BP: systolic/diastolic/pulse;
+  otherwise field displayOrder); legacy records without component rows fall
+  back to positional primary/secondary/tertiary columns. Readings tables cap
+  at 200 newest rows per type with an explicit localized "Showing latest N of
+  M" disclosure. Doctor visits / prescriptions / lab analyses use the
+  repositories' date-filtered searches (non-archived, newest first); contact
+  names resolve through `CareContactRepository.getContactById`. Diet shows
+  CURRENT guidance (not date-filtered), grouped by stable categories.
+  Activities include finished sessions (completed/cancelled) started in
+  range — running/paused never leak into reports.
+- **PDF rendering.** `pdf` package only (no printing). Bundled OFL fonts:
+  NotoSans regular/bold as primary + NotoSansGeorgian fallback chains on
+  every style, so EN and KA both render correctly. The generator is pure Dart
+  (pdf imports only) and unit-testable without a widget tree; fonts load
+  asynchronously through `reportPdfFontsProvider` (rootBundle). Filename
+  `RehabTrack_<TitleSlug>_<yyyy-MM-dd>.pdf`; non-ASCII titles collapse to
+  `RehabTrack_Report_...` for filesystem safety. Generated files go to the OS
+  temp dir; `pruneOldReportFiles()` keeps at most the 5 newest.
+- **Repository additions** (interface + impl): `DoctorVisitRepository.
+  getVisitsBetween`, `ActivityRepository.getSessionsBetween`,
+  `DoctorPrescriptionRepository.getAttachments`,
+  `LabAnalysisRepository.getAttachments` (DAOs already had one-shot getters;
+  attachments were previously watch-only). All half-open range semantics.
+- **Navigation.** `/records/reports` now builds `ReportConfigScreen`;
+  new `/records/reports/preview` receives `ReportData` via go_router extra.
+- **Configuration is temporary UI state** (not persisted); every Preview
+  rebuilds from live data.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| New tests | 18/18 passed (`report_date_range_test`, `report_builder_test`, `report_pdf_generator_test`, `report_config_screen_test`) |
+
+## Phase 11B — Reports v1: Persistent PDF Storage + Success Flow (2026-08-26)
+
+**Goal:** Generated report PDFs are saved persistently in a user-accessible
+Downloads location (`Downloads/RehabTrack`) so they survive app restarts and
+appear in Android Files / file manager. Generate now means Generate + Save
+atomically. After saving, a success bottom sheet offers Open, Share and Done
+— both reusing the same saved file (no second duplicate PDF). No commit/push.
+
+### Key decisions
+
+- **`ReportPdfGenerator.build()` returns `Uint8List`.** Persistence is the
+  caller's responsibility — the generator never touches the filesystem. The
+  old `generate()` wrapper and `pruneOldReportFiles()` temp-directory helper
+  are removed.
+- **`ReportStorageService` wraps a narrow new `MethodChannel`
+  (`com.earkania.rehabtrack/reports`) with three operations:**
+  `savePdfToDownloads`, `openSavedDocument`, `shareSavedDocument`. The
+  service never receives or returns raw file paths; downstream actions
+  operate exclusively via `content://` URIs wrapped in `SavedReportFile`.
+  `PlatformException` codes map directly to `ReportStorageException.code`.
+- **MediaStore Downloads (API 29+).** The primary path inserts into
+  `MediaStore.Downloads` with `IS_PENDING=1`, writes via `contentResolver`,
+  then clears `IS_PENDING`. On write failure the incomplete row is deleted
+  before rethrowing — no zero-byte stubs left behind. Filename collisions
+  are resolved deterministically (`_2`, `_3`, …) by querying the collection
+  for existing `DISPLAY_NAME` values in the same `RELATIVE_PATH`
+  (`Download/RehabTrack`).
+- **Legacy fallback (API 24–28).** `getExternalFilesDir(DIRECTORY_DOWNLOADS)/
+  RehabTrack` (app-specific external dir, permission-free, persistent).
+  Collisions handled the same way. The file is exposed for Open/Share via a
+  new dedicated `FileProvider` (`${applicationId}.reports.fileprovider`) with
+  `external-files-path Download/` in
+  `res/xml/report_file_paths.xml`. Manifest queries include
+  `ACTION_VIEW application/pdf` for Android 11+ package visibility so PDF
+  viewers resolve.
+- **Open uses `ACTION_VIEW` + `FLAG_GRANT_READ_URI_PERMISSION`.**
+  `resolveActivity` is deliberately NOT pre-checked (hidden by package
+  visibility on Android 11+); instead `ActivityNotFoundException` is caught
+  and mapped to `NO_VIEWER`. **Share** uses `ACTION_SEND` chooser — same
+  content URI, mime type and `FLAG_GRANT_READ`.
+- **No new storage permissions.** `MANAGE_EXTERNAL_STORAGE` and legacy
+  `WRITE_EXTERNAL_STORAGE` are not added. The legacy fallback path writes to
+  the app's own external files directory, which requires no permission.
+- **Backup interaction unchanged.** Generated report PDFs are not added to
+  `.rtb` backup manifests. They summarize data already in the database.
+- **Backup shareDocument reuse considered; not applied.** The backup
+  channel's `shareDocument` hard-codes `application/octet-stream` and is
+  SAF-oriented. A separate narrow channel keeps reports self-contained
+  (PDF mime, MediaStore-aware save, `NO_VIEWER` mapping).
+- **Preview screen flow.** AppBar action is now Generate (PDF icon) not
+  Share. Tapping Generate → build bytes → `savePdf` → success bottom sheet
+  (check icon, `savedTo` + logical location + filename, FilledButton Open,
+  OutlinedButton Share, TextButton Done). Share and Open both invoke
+  `ReportStorageService` on the same `SavedReportFile`; save is never
+  triggered a second time.
+- **Test harness.** The `drift` + `FakeAsync` interplay causes builder
+  stream `.first` calls to hang under `testWidgets`, so the preview flow
+  test bypasses `RehabTrackApp` entirely: it pumps a minimal
+  `MaterialApp.router` with one `GoRoute`, overrides
+  `reportStorageServiceProvider` with a recording fake, and navigates
+  directly to `ReportPreviewScreen`. This exercises the generate → save →
+  sheet → open/share/done path without home-screen periodic timers or
+  full-app router hydration side-effects.

@@ -53,4 +53,7 @@ abstract class LabAnalysisRepository {
 
   /// Update attachment metadata
   Future<void> updateAttachment(LabAnalysisAttachment attachment);
+
+  /// One-shot fetch of an analysis' attachments (sort order preserved).
+  Future<List<LabAnalysisAttachment>> getAttachments(int analysisId);
 }

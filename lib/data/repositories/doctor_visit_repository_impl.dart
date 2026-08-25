@@ -44,6 +44,20 @@ class DoctorVisitRepositoryImpl implements DoctorVisitRepository {
   }
 
   @override
+  Future<List<DoctorVisitRecord>> getVisitsBetween(
+    int profileId,
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) async {
+    final rows = await _database.doctorVisitDao.getVisitsBetween(
+      profileId,
+      startInclusive,
+      endExclusive,
+    );
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
   Future<int> createVisit(DoctorVisitRecord visit) async {
     final now = visit.createdAt;
     return _database.doctorVisitDao.insertVisit(

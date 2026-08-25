@@ -31,6 +31,7 @@ import java.util.TimeZone
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.earkania.rehabtrack/notifications"
     private val BACKUP_CHANNEL = "com.earkania.rehabtrack/backup"
+    private val REPORTS_CHANNEL = "com.earkania.rehabtrack/reports"
     private val CREATE_DOCUMENT_REQUEST = 2001
     private val OPEN_DOCUMENT_REQUEST = 2002
     private val OPEN_DOCUMENTS_REQUEST = 2003
@@ -151,6 +152,194 @@ class MainActivity : FlutterActivity() {
                 }
                 else -> result.notImplemented()
             }
+        }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, REPORTS_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "savePdfToDownloads" -> {
+                    val displayName = call.argument<String>("displayName")
+                    val mimeType = call.argument<String>("mimeType") ?: "application/pdf"
+                    val relativePath = call.argument<String>("relativePath") ?: "Download/RehabTrack"
+                    val bytes = call.argument<ByteArray>("bytes")
+                    if (displayName == null || bytes == null) {
+                        result.error("INVALID_ARGUMENTS", "displayName and bytes are required", null)
+                    } else {
+                        savePdfToDownloads(displayName, mimeType, relativePath, bytes, result)
+                    }
+                }
+                "openSavedDocument" -> {
+                    val contentUri = call.argument<String>("contentUri")
+                    val mimeType = call.argument<String>("mimeType") ?: "application/pdf"
+                    if (contentUri == null) {
+                        result.error("INVALID_ARGUMENTS", "contentUri is required", null)
+                    } else {
+                        openSavedDocument(contentUri, mimeType, result)
+                    }
+                }
+                "shareSavedDocument" -> {
+                    val contentUri = call.argument<String>("contentUri")
+                    val mimeType = call.argument<String>("mimeType") ?: "application/pdf"
+                    val displayName = call.argument<String>("displayName")
+                    if (contentUri == null) {
+                        result.error("INVALID_ARGUMENTS", "contentUri is required", null)
+                    } else {
+                        shareSavedDocument(contentUri, mimeType, displayName, result)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    /**
+     * Saves a report PDF persistently in a user-accessible Downloads folder.
+     *
+     * API 29+: inserts into MediaStore.Downloads under RELATIVE_PATH
+     * `Download/RehabTrack` (scoped storage — no storage permission needed).
+     * The entry is created with IS_PENDING so a failed write never leaves a
+     * broken zero-byte file; the pending row is deleted on failure.
+     *
+     * API < 29: writes into the app-specific external Downloads dir
+     * (`Android/data/<pkg>/files/Download/RehabTrack`) — still permission-free
+     * and persistent; the file is exposed for open/share through our own
+     * FileProvider (`${packageName}.reports.fileprovider`).
+     *
+     * Filename collisions are resolved deterministically by appending `_2`,
+     * `_3`, … before the extension.
+     */
+    private fun savePdfToDownloads(
+        displayName: String,
+        mimeType: String,
+        relativePath: String,
+        bytes: ByteArray,
+        result: MethodChannel.Result,
+    ) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val safeName = uniqueMediaStoreDisplayName(displayName, mimeType, relativePath)
+                val values = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.Downloads.DISPLAY_NAME, safeName)
+                    put(android.provider.MediaStore.Downloads.MIME_TYPE, mimeType)
+                    put(android.provider.MediaStore.Downloads.RELATIVE_PATH, relativePath)
+                    put(android.provider.MediaStore.Downloads.IS_PENDING, 1)
+                }
+                val resolver = contentResolver
+                val collection = android.provider.MediaStore.Downloads.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                val uri = resolver.insert(collection, values)
+                    ?: throw IllegalStateException("MediaStore insert returned null")
+                try {
+                    resolver.openOutputStream(uri)?.use { stream ->
+                        stream.write(bytes)
+                        stream.flush()
+                    } ?: throw IllegalStateException("openOutputStream returned null")
+                } catch (e: Exception) {
+                    // Clean up the incomplete row so no zero-byte file remains.
+                    try {
+                        resolver.delete(uri, null, null)
+                    } catch (_: Exception) {
+                    }
+                    throw e
+                }
+                values.clear()
+                values.put(android.provider.MediaStore.Downloads.IS_PENDING, 0)
+                resolver.update(uri, values, null, null)
+                val size = queryDocumentSize(uri) ?: bytes.size.toLong()
+                result.success(reportPayload(safeName, uri.toString(), size, "Downloads/" + relativePath.substringAfter('/')).toString())
+            } else {
+                val dir = java.io.File(
+                    getExternalFilesDir(android.os.Environment.DIRECTORY_DOWNLOADS),
+                    relativePath.substringAfter('/'),
+                )
+                if (!dir.exists()) dir.mkdirs()
+                if (!dir.isDirectory) throw IllegalStateException("could not create $relativePath")
+                val target = uniqueFileDisplayName(dir, displayName)
+                val file = java.io.File(dir, target)
+                file.writeBytes(bytes)
+                val uri = FileProvider.getUriForFile(
+                    applicationContext,
+                    "$packageName.reports.fileprovider",
+                    file,
+                )
+                result.success(reportPayload(target, uri.toString(), file.length(), "App files/${relativePath.substringAfter('/')}").toString())
+            }
+        } catch (e: Exception) {
+            result.error("SAVE_ERROR", e.message, null)
+        }
+    }
+
+    /** Finds a collision-free name in MediaStore Downloads by probing `_2`, `_3`, … suffixes. */
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun uniqueMediaStoreDisplayName(displayName: String, mimeType: String, relativePath: String): String {
+        val resolver = contentResolver
+        val collection = android.provider.MediaStore.Downloads.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val projection = arrayOf(android.provider.MediaStore.Downloads._ID)
+        val stem = displayName.removeSuffix(".pdf")
+        var candidate = displayName
+        var n = 2
+        while (true) {
+            val selection = "${android.provider.MediaStore.Downloads.DISPLAY_NAME}=? AND ${android.provider.MediaStore.Downloads.RELATIVE_PATH}=?"
+            val cursor = resolver.query(collection, projection, selection, arrayOf(candidate, relativePath), null)
+            val taken = cursor?.use { it.count > 0 } ?: false
+            if (!taken) return candidate
+            candidate = "${stem}_$n.pdf"
+            n++
+        }
+    }
+
+    /** Finds a collision-free name inside [dir] by appending `_2`, `_3`, … suffixes. */
+    private fun uniqueFileDisplayName(dir: java.io.File, displayName: String): String {
+        val stem = displayName.removeSuffix(".pdf")
+        var candidate = displayName
+        var n = 2
+        while (java.io.File(dir, candidate).exists()) {
+            candidate = "${stem}_$n.pdf"
+            n++
+        }
+        return candidate
+    }
+
+    /** Shared JSON payload describing a saved report document. */
+    private fun reportPayload(displayName: String, contentUri: String, size: Long, logicalLocation: String): JSONObject {
+        return JSONObject()
+            .put("displayName", displayName)
+            .put("contentUri", contentUri)
+            .put("mimeType", "application/pdf")
+            .put("size", size)
+            .put("createdAt", System.currentTimeMillis())
+            .put("logicalLocation", logicalLocation)
+    }
+
+    /** Opens the saved report with an installed PDF viewer via ACTION_VIEW. */
+    private fun openSavedDocument(contentUri: String, mimeType: String, result: MethodChannel.Result) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(Uri.parse(contentUri), mimeType)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            // No resolveActivity pre-check here: Android 11+ package visibility
+            // filtering can hide viewers even when they are installed. Let the
+            // system resolve and catch ActivityNotFoundException instead.
+            startActivity(intent)
+            result.success(true)
+        } catch (e: android.content.ActivityNotFoundException) {
+            result.error("NO_VIEWER", "no installed viewer for $mimeType", null)
+        } catch (e: Exception) {
+            result.error("OPEN_ERROR", e.message, null)
+        }
+    }
+
+    /** Shares the saved report through the system share sheet (ACTION_SEND chooser). */
+    private fun shareSavedDocument(contentUri: String, mimeType: String, displayName: String?, result: MethodChannel.Result) {
+        try {
+            val share = Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, Uri.parse(contentUri))
+                if (!displayName.isNullOrEmpty()) putExtra(Intent.EXTRA_TITLE, displayName)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(share, null))
+            result.success(true)
+        } catch (e: Exception) {
+            result.error("SHARE_ERROR", e.message, null)
         }
     }
 

@@ -3493,4 +3493,166 @@ class AppLocalizationsEn extends AppLocalizations {
   String xMinutes(int minutes) {
     return '$minutes min';
   }
+
+  @override
+  String get reportCreateTitle => 'Create Report';
+
+  @override
+  String get reportNameLabel => 'Report Name';
+
+  @override
+  String get reportDateRangeLabel => 'Date Range';
+
+  @override
+  String get reportRangeLastWeek => 'Last 7 days';
+
+  @override
+  String get reportRangeLastMonth => 'Last 30 days';
+
+  @override
+  String get reportRangeLast3Months => 'Last 3 months';
+
+  @override
+  String get reportRangeLast6Months => 'Last 6 months';
+
+  @override
+  String get reportRangeLastYear => 'Last year';
+
+  @override
+  String get reportRangeAllTime => 'All time';
+
+  @override
+  String get reportRangeCustom => 'Custom range';
+
+  @override
+  String get reportSectionsLabel => 'Sections to include';
+
+  @override
+  String get reportCustomStartDate => 'From';
+
+  @override
+  String get reportCustomEndDate => 'To';
+
+  @override
+  String get reportPreview => 'Preview';
+
+  @override
+  String get reportErrorNoSections => 'Select at least one section';
+
+  @override
+  String get reportErrorInvalidTitle => 'Enter a report name';
+
+  @override
+  String get reportErrorInvalidRange => 'Check the custom date range';
+
+  @override
+  String get reportErrorGeneric => 'Couldn\'t generate the report';
+
+  @override
+  String get reportPreviewTitle => 'Report Preview';
+
+  @override
+  String get reportSharePdf => 'Share PDF';
+
+  @override
+  String reportGeneratedAt(String dateTime) {
+    return 'Generated: $dateTime';
+  }
+
+  @override
+  String get reportPeriodLabel => 'Period';
+
+  @override
+  String get reportPatientSummary => 'Patient Summary';
+
+  @override
+  String get reportBirthDateLabel => 'Birth Date';
+
+  @override
+  String get reportStatMin => 'Min';
+
+  @override
+  String get reportStatMax => 'Max';
+
+  @override
+  String get reportStatAvg => 'Avg';
+
+  @override
+  String reportShowingLatest(int included, int total) {
+    return 'Showing latest $included of $total readings';
+  }
+
+  @override
+  String reportAttachmentsCount(int count) {
+    return 'Attachments ($count)';
+  }
+
+  @override
+  String get reportGenderOther => 'Other';
+
+  @override
+  String get reportEmptyPeriodNote => 'Nothing recorded for this period.';
+
+  @override
+  String reportActivitySummary(int count, int completed, int cancelled) {
+    return '$count sessions: $completed completed, $cancelled cancelled';
+  }
+
+  @override
+  String get reportTotalActiveTime => 'Total active time';
+
+  @override
+  String get reportSessionHistoryHeading => 'Session History';
+
+  @override
+  String get reportDietFoodsHeading => 'Foods';
+
+  @override
+  String get reportDefaultTitle => 'Health Summary';
+
+  @override
+  String get reportDietGuidanceHeading => 'General Guidance';
+
+  @override
+  String get reportDateLabel => 'Date';
+
+  @override
+  String get reportStatusLabel => 'Status';
+
+  @override
+  String get generatePdf => 'Generate PDF';
+
+  @override
+  String get reportGeneratedSuccessfully => 'Report generated successfully';
+
+  @override
+  String get savedTo => 'Saved to';
+
+  @override
+  String get downloadsFolder => 'Downloads';
+
+  @override
+  String get openReport => 'Open';
+
+  @override
+  String get shareReport => 'Share';
+
+  @override
+  String get doneAction => 'Done';
+
+  @override
+  String get reportFileSaved => 'Report saved';
+
+  @override
+  String get couldNotSaveReport => 'Couldn\'t save the report';
+
+  @override
+  String get couldNotOpenReport => 'No app found to open the report';
+
+  @override
+  String get couldNotShareReport => 'Couldn\'t share the report';
+
+  @override
+  String get reportStorageUnavailable =>
+      'Storage is unavailable. Free up space and try again.';
 }

@@ -52,6 +52,7 @@ class AppRoutes {
       '/records/lab-analyses/$id/edit';
   static const recordsDoctorVisits = '/records/doctor-visits';
   static const recordsReports = '/records/reports';
+  static const recordsReportsPreview = '/records/reports/preview';
 
   // Doctor Prescriptions
   static const recordsPrescriptions = '/records/prescriptions';

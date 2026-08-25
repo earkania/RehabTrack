@@ -66,6 +66,10 @@ abstract class DoctorPrescriptionRepository {
   /// Update attachment metadata
   Future<void> updateAttachment(DoctorPrescriptionAttachment attachment);
 
+  /// One-shot fetch of a prescription's attachments (sort order preserved).
+  Future<List<DoctorPrescriptionAttachment>> getAttachments(
+      int prescriptionId);
+
   /// Watch medications for a prescription
   Stream<List<DoctorPrescriptionMedication>> watchMedications(
       int prescriptionId);

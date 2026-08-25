@@ -66,6 +66,28 @@ class DoctorVisitDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
+  /// Non-archived visits within the half-open range
+  /// [startInclusive, endExclusive), newest first. Any status.
+  Future<List<DoctorVisitRecord>> getVisitsBetween(
+    int profileId,
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) {
+    return (select(doctorVisitRecords)
+          ..where((t) =>
+              t.profileId.equals(profileId) &
+              t.isArchived.equals(false) &
+              t.scheduledDateTime.isBiggerOrEqualValue(startInclusive) &
+              t.scheduledDateTime.isSmallerThanValue(endExclusive))
+          ..orderBy([
+            (t) => OrderingTerm(
+              expression: t.scheduledDateTime,
+              mode: OrderingMode.desc,
+            ),
+          ]))
+        .get();
+  }
+
   /// Counts non-archived open (still scheduled) visits referencing a contact,
   /// used to warn before deleting or archiving a contact that has upcoming
   /// visits.

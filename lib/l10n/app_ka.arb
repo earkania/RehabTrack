@@ -1606,5 +1606,238 @@
         "type": "int"
       }
     }
+  },
+  "reportCreateTitle": "ანგარიშის შექმნა",
+  "@reportCreateTitle": {
+    "description": "Reports feature"
+  },
+  "reportNameLabel": "ანგარიშის დასახელება",
+  "@reportNameLabel": {
+    "description": "Reports feature"
+  },
+  "reportDateRangeLabel": "პერიოდი",
+  "@reportDateRangeLabel": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastWeek": "ბოლო 7 დღე",
+  "@reportRangeLastWeek": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastMonth": "ბოლო 30 დღე",
+  "@reportRangeLastMonth": {
+    "description": "Reports feature"
+  },
+  "reportRangeLast3Months": "ბოლო 3 თვე",
+  "@reportRangeLast3Months": {
+    "description": "Reports feature"
+  },
+  "reportRangeLast6Months": "ბოლო 6 თვე",
+  "@reportRangeLast6Months": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastYear": "ბოლო წელი",
+  "@reportRangeLastYear": {
+    "description": "Reports feature"
+  },
+  "reportRangeAllTime": "ყველა ჩანაწერი",
+  "@reportRangeAllTime": {
+    "description": "Reports feature"
+  },
+  "reportRangeCustom": "მორგებული პერიოდი",
+  "@reportRangeCustom": {
+    "description": "Reports feature"
+  },
+  "reportSectionsLabel": "ჩასართავი განყოფილებები",
+  "@reportSectionsLabel": {
+    "description": "Reports feature"
+  },
+  "reportCustomStartDate": "-დან",
+  "@reportCustomStartDate": {
+    "description": "Reports feature"
+  },
+  "reportCustomEndDate": "-მდე",
+  "@reportCustomEndDate": {
+    "description": "Reports feature"
+  },
+  "reportPreview": "გადახედვა",
+  "@reportPreview": {
+    "description": "Reports feature"
+  },
+  "reportErrorNoSections": "აირჩიეთ მინიმუმ ერთი განყოფილება",
+  "@reportErrorNoSections": {
+    "description": "Reports feature"
+  },
+  "reportErrorInvalidTitle": "შეიყვანეთ ანგარიშის დასახელება",
+  "@reportErrorInvalidTitle": {
+    "description": "Reports feature"
+  },
+  "reportErrorInvalidRange": "შეამოწმეთ მორგებული პერიოდი",
+  "@reportErrorInvalidRange": {
+    "description": "Reports feature"
+  },
+  "reportErrorGeneric": "ანგარიშის გენერირება ვერ მოხერხდა",
+  "@reportErrorGeneric": {
+    "description": "Reports feature"
+  },
+  "reportPreviewTitle": "ანგარიშის გადახედვა",
+  "@reportPreviewTitle": {
+    "description": "Reports feature"
+  },
+  "reportSharePdf": "PDF-ის გაზიარება",
+  "@reportSharePdf": {
+    "description": "Reports feature"
+  },
+  "reportGeneratedAt": "შექმნის დრო: {dateTime}",
+  "@reportGeneratedAt": {
+    "description": "Reports feature",
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "reportPeriodLabel": "პერიოდი",
+  "@reportPeriodLabel": {
+    "description": "Reports feature"
+  },
+  "reportPatientSummary": "პაციენტის მონაცემები",
+  "@reportPatientSummary": {
+    "description": "Reports feature"
+  },
+  "reportBirthDateLabel": "დაბადების თარიღი",
+  "@reportBirthDateLabel": {
+    "description": "Reports feature"
+  },
+  "reportStatMin": "მინ",
+  "@reportStatMin": {
+    "description": "Reports feature"
+  },
+  "reportStatMax": "მაქს",
+  "@reportStatMax": {
+    "description": "Reports feature"
+  },
+  "reportStatAvg": "საშ.",
+  "@reportStatAvg": {
+    "description": "Reports feature"
+  },
+  "reportShowingLatest": "ნაჩვენებია ბოლო {included} / {total} გაზომვა",
+  "@reportShowingLatest": {
+    "description": "Reports feature",
+    "placeholders": {
+      "included": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportAttachmentsCount": "დანართები ({count})",
+  "@reportAttachmentsCount": {
+    "description": "Reports feature",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportGenderOther": "სხვა",
+  "@reportGenderOther": {
+    "description": "Reports feature"
+  },
+  "reportEmptyPeriodNote": "ამ პერიოდში ჩანაწერი არ არის.",
+  "@reportEmptyPeriodNote": {
+    "description": "Reports feature"
+  },
+  "reportActivitySummary": "{count} სეანსი: {completed} დასრულებული, {cancelled} გაუქმებული",
+  "@reportActivitySummary": {
+    "description": "Reports feature",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      },
+      "cancelled": {
+        "type": "int"
+      }
+    }
+  },
+  "reportTotalActiveTime": "საერთო აქტიური დრო",
+  "@reportTotalActiveTime": {
+    "description": "Reports feature"
+  },
+  "reportSessionHistoryHeading": "სეანსების ისტორია",
+  "@reportSessionHistoryHeading": {
+    "description": "Reports feature"
+  },
+  "reportDietFoodsHeading": "საკვები",
+  "@reportDietFoodsHeading": {
+    "description": "Reports feature"
+  },
+  "reportDefaultTitle": "ჯანმრთელობის მიმოხილვა",
+  "@reportDefaultTitle": {
+    "description": "Reports feature"
+  },
+  "reportDietGuidanceHeading": "ზოგადი რეკომენდაციები",
+  "@reportDietGuidanceHeading": {
+    "description": "Reports feature"
+  },
+  "reportDateLabel": "თარიღი",
+  "@reportDateLabel": {
+    "description": "Reports feature"
+  },
+  "reportStatusLabel": "სტატუსი",
+  "@reportStatusLabel": {
+    "description": "Reports feature"
+  },
+  "generatePdf": "PDF-ის გენერაცია",
+  "@generatePdf": {
+    "description": "Reports feature: action that renders and saves the report PDF"
+  },
+  "reportGeneratedSuccessfully": "ანგარიში წარმატებით შეიქმნა",
+  "@reportGeneratedSuccessfully": {
+    "description": "Reports feature: success confirmation after saving the PDF"
+  },
+  "savedTo": "შენახულია",
+  "@savedTo": {
+    "description": "Reports feature: prefix before the save location, e.g. Saved to: Downloads/RehabTrack"
+  },
+  "downloadsFolder": "ჩამოტვირთვები",
+  "@downloadsFolder": {
+    "description": "Reports feature: user-visible name of the system Downloads folder"
+  },
+  "openReport": "გახსნა",
+  "@openReport": {
+    "description": "Reports feature: opens the saved PDF in a viewer"
+  },
+  "shareReport": "გაზიარება",
+  "@shareReport": {
+    "description": "Reports feature: shares the saved PDF"
+  },
+  "doneAction": "მზადაა",
+  "@doneAction": {
+    "description": "Reports feature: closes the success dialog"
+  },
+  "reportFileSaved": "ანგარიში შენახულია",
+  "@reportFileSaved": {
+    "description": "Reports feature: short confirmation that the file was saved"
+  },
+  "couldNotSaveReport": "ანგარიშის შენახვა ვერ მოხერხდა",
+  "@couldNotSaveReport": {
+    "description": "Reports feature: error when the PDF cannot be persisted"
+  },
+  "couldNotOpenReport": "ანგარიშის გასახსნელი აპლიკაცია ვერ მოიძებნა",
+  "@couldNotOpenReport": {
+    "description": "Reports feature: no installed PDF viewer for the saved report"
+  },
+  "couldNotShareReport": "ანგარიშის გაზიარება ვერ მოხერხდა",
+  "@couldNotShareReport": {
+    "description": "Reports feature: error when sharing the saved report fails"
+  },
+  "reportStorageUnavailable": "მეხსიერება მიუწვდომელია. გაათავისუფლეთ ადგილი და სცადეთ ხელახლა.",
+  "@reportStorageUnavailable": {
+    "description": "Reports feature: storage full/unavailable while saving"
   }
 }

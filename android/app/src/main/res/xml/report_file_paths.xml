@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider paths for saved report PDFs on Android 9 and below, where
+     reports live in the app-specific external Downloads dir
+     (Android/data/<pkg>/files/Download/RehabTrack). -->
+<paths>
+    <external-files-path
+        name="report_downloads"
+        path="Download/" />
+</paths>

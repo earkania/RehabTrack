@@ -169,6 +169,23 @@ class ActivityDao extends DatabaseAccessor<AppDatabase> with _$ActivityDaoMixin 
     return query.watch();
   }
 
+  /// Finished (completed/cancelled) sessions started within the half-open
+  /// range [startInclusive, endExclusive), newest first.
+  Future<List<ActivitySession>> getSessionsBetween(
+    int profileId,
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) {
+    return (select(activitySessions)
+          ..where((t) =>
+              t.profileId.equals(profileId) &
+              t.status.isIn(['completed', 'cancelled']) &
+              t.startedAt.isBiggerOrEqualValue(startInclusive) &
+              t.startedAt.isSmallerThanValue(endExclusive))
+          ..orderBy([(t) => OrderingTerm.desc(t.startedAt)]))
+        .get();
+  }
+
   /// Permanently delete a session record.
   Future<int> deleteSession(int id, int profileId) {
     return (delete(activitySessions)

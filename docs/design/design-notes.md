@@ -1420,3 +1420,32 @@ preserved), so times continue to represent the correct local wall clock
   app locale changes.
 - `test/measurement_line_chart_*`, `test/backup_preview_test.dart` assert the
   canonical English outputs for chart tooltips / axis and backup mediums dates.
+
+## Health Report rendering (Reports v1)
+
+The report pipeline is `ReportBuilder → ReportData → {Preview UI, ReportPdfGenerator}`.
+Both renderers consume the same immutable `ReportData`; only
+`ReportLocalization` (labels + date/time closures built from
+`AppLocalizations`/`AppDateFormatter`) is renderer-specific. Rules:
+
+- Canonical section order is the enum declaration order in
+  `ReportSection` (profile, medications, measurements, doctorVisits,
+  doctorPrescriptions, labAnalyses, diet, activities). It is never localized,
+  re-sorted, or user-reorderable; users only include/exclude sections.
+- Date ranges are half-open `[startInclusive, endExclusive)` and day-aligned;
+  repositories with `<=` bounds receive `inclusiveQueryEnd` (−1s) to cover the
+  final second of the period under Drift's second-precision timestamps.
+- The PDF uses bundled NotoSans (Latin) with NotoSansGeorgian as a font
+  fallback chain on every text style — Georgian glyphs resolve automatically
+  while Latin text keeps its primary face.
+- No medical interpretation: statistics are count/min/max/avg only; statuses
+  are rendered from stable identifiers via localization maps.
+- The generator (`ReportPdfGenerator.build()`) is pure: it receives in-memory
+  `ReportFonts` + `ReportLocalization` + `ReportData` and returns
+  `Uint8List` PDF bytes. Persistence is handled by `ReportStorageService`
+  (platform channel `com.earkania.rehabtrack/reports`).
+- Persistent storage: API 29+ → `MediaStore.Downloads` (`Download/RehabTrack`,
+  `IS_PENDING` lifecycle, no storage permission). API 24–28 → app-specific
+  external `Download/RehabTrack` exposed via our own `FileProvider`. Open and
+  Share both use `content://` URIs; raw filesystem paths are never passed
+  between layers.

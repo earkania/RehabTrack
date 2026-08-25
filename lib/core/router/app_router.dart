@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rehab_track/domain/entities/report_data.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 
 import 'package:rehab_track/core/router/app_routes.dart';
@@ -12,6 +13,8 @@ import 'package:rehab_track/presentation/screens/records/doctor_prescriptions_sc
 import 'package:rehab_track/presentation/screens/records/doctor_prescription_form_screen.dart';
 import 'package:rehab_track/presentation/screens/records/doctor_prescription_details_screen.dart';
 import 'package:rehab_track/presentation/screens/records/archived_doctor_prescriptions_screen.dart';
+import 'package:rehab_track/presentation/screens/reports/report_config_screen.dart';
+import 'package:rehab_track/presentation/screens/reports/report_preview_screen.dart';
 import 'package:rehab_track/presentation/screens/today/today_screen.dart';
 import 'package:rehab_track/presentation/screens/health/health_dashboard_screen.dart';
 import 'package:rehab_track/presentation/screens/health/measurements_screen.dart';
@@ -316,10 +319,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.recordsReports,
-        builder: (context, state) => ModulePlaceholderScreen(
-          icon: Icons.assessment_outlined,
-          title: AppLocalizations.of(context)!.reports,
-        ),
+        builder: (context, state) => const ReportConfigScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.recordsReportsPreview,
+        builder: (context, state) {
+          final data = state.extra;
+          if (data is ReportData) {
+            return ReportPreviewScreen(data: data);
+          }
+          return const ReportConfigScreen();
+        },
       ),
       // Profile
       GoRoute(

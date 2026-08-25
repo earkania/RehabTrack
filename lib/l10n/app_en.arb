@@ -1606,5 +1606,238 @@
         "type": "int"
       }
     }
+  },
+  "reportCreateTitle": "Create Report",
+  "@reportCreateTitle": {
+    "description": "Reports feature"
+  },
+  "reportNameLabel": "Report Name",
+  "@reportNameLabel": {
+    "description": "Reports feature"
+  },
+  "reportDateRangeLabel": "Date Range",
+  "@reportDateRangeLabel": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastWeek": "Last 7 days",
+  "@reportRangeLastWeek": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastMonth": "Last 30 days",
+  "@reportRangeLastMonth": {
+    "description": "Reports feature"
+  },
+  "reportRangeLast3Months": "Last 3 months",
+  "@reportRangeLast3Months": {
+    "description": "Reports feature"
+  },
+  "reportRangeLast6Months": "Last 6 months",
+  "@reportRangeLast6Months": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastYear": "Last year",
+  "@reportRangeLastYear": {
+    "description": "Reports feature"
+  },
+  "reportRangeAllTime": "All time",
+  "@reportRangeAllTime": {
+    "description": "Reports feature"
+  },
+  "reportRangeCustom": "Custom range",
+  "@reportRangeCustom": {
+    "description": "Reports feature"
+  },
+  "reportSectionsLabel": "Sections to include",
+  "@reportSectionsLabel": {
+    "description": "Reports feature"
+  },
+  "reportCustomStartDate": "From",
+  "@reportCustomStartDate": {
+    "description": "Reports feature"
+  },
+  "reportCustomEndDate": "To",
+  "@reportCustomEndDate": {
+    "description": "Reports feature"
+  },
+  "reportPreview": "Preview",
+  "@reportPreview": {
+    "description": "Reports feature"
+  },
+  "reportErrorNoSections": "Select at least one section",
+  "@reportErrorNoSections": {
+    "description": "Reports feature"
+  },
+  "reportErrorInvalidTitle": "Enter a report name",
+  "@reportErrorInvalidTitle": {
+    "description": "Reports feature"
+  },
+  "reportErrorInvalidRange": "Check the custom date range",
+  "@reportErrorInvalidRange": {
+    "description": "Reports feature"
+  },
+  "reportErrorGeneric": "Couldn't generate the report",
+  "@reportErrorGeneric": {
+    "description": "Reports feature"
+  },
+  "reportPreviewTitle": "Report Preview",
+  "@reportPreviewTitle": {
+    "description": "Reports feature"
+  },
+  "reportSharePdf": "Share PDF",
+  "@reportSharePdf": {
+    "description": "Reports feature"
+  },
+  "reportGeneratedAt": "Generated: {dateTime}",
+  "@reportGeneratedAt": {
+    "description": "Reports feature",
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "reportPeriodLabel": "Period",
+  "@reportPeriodLabel": {
+    "description": "Reports feature"
+  },
+  "reportPatientSummary": "Patient Summary",
+  "@reportPatientSummary": {
+    "description": "Reports feature"
+  },
+  "reportBirthDateLabel": "Birth Date",
+  "@reportBirthDateLabel": {
+    "description": "Reports feature"
+  },
+  "reportStatMin": "Min",
+  "@reportStatMin": {
+    "description": "Reports feature"
+  },
+  "reportStatMax": "Max",
+  "@reportStatMax": {
+    "description": "Reports feature"
+  },
+  "reportStatAvg": "Avg",
+  "@reportStatAvg": {
+    "description": "Reports feature"
+  },
+  "reportShowingLatest": "Showing latest {included} of {total} readings",
+  "@reportShowingLatest": {
+    "description": "Reports feature",
+    "placeholders": {
+      "included": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportAttachmentsCount": "Attachments ({count})",
+  "@reportAttachmentsCount": {
+    "description": "Reports feature",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportGenderOther": "Other",
+  "@reportGenderOther": {
+    "description": "Reports feature"
+  },
+  "reportEmptyPeriodNote": "Nothing recorded for this period.",
+  "@reportEmptyPeriodNote": {
+    "description": "Reports feature"
+  },
+  "reportActivitySummary": "{count} sessions: {completed} completed, {cancelled} cancelled",
+  "@reportActivitySummary": {
+    "description": "Reports feature",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      },
+      "cancelled": {
+        "type": "int"
+      }
+    }
+  },
+  "reportTotalActiveTime": "Total active time",
+  "@reportTotalActiveTime": {
+    "description": "Reports feature"
+  },
+  "reportSessionHistoryHeading": "Session History",
+  "@reportSessionHistoryHeading": {
+    "description": "Reports feature"
+  },
+  "reportDietFoodsHeading": "Foods",
+  "@reportDietFoodsHeading": {
+    "description": "Reports feature"
+  },
+  "reportDefaultTitle": "Health Summary",
+  "@reportDefaultTitle": {
+    "description": "Reports feature"
+  },
+  "reportDietGuidanceHeading": "General Guidance",
+  "@reportDietGuidanceHeading": {
+    "description": "Reports feature"
+  },
+  "reportDateLabel": "Date",
+  "@reportDateLabel": {
+    "description": "Reports feature"
+  },
+  "reportStatusLabel": "Status",
+  "@reportStatusLabel": {
+    "description": "Reports feature"
+  },
+  "generatePdf": "Generate PDF",
+  "@generatePdf": {
+    "description": "Reports feature: action that renders and saves the report PDF"
+  },
+  "reportGeneratedSuccessfully": "Report generated successfully",
+  "@reportGeneratedSuccessfully": {
+    "description": "Reports feature: success confirmation after saving the PDF"
+  },
+  "savedTo": "Saved to",
+  "@savedTo": {
+    "description": "Reports feature: prefix before the save location, e.g. Saved to: Downloads/RehabTrack"
+  },
+  "downloadsFolder": "Downloads",
+  "@downloadsFolder": {
+    "description": "Reports feature: user-visible name of the system Downloads folder"
+  },
+  "openReport": "Open",
+  "@openReport": {
+    "description": "Reports feature: opens the saved PDF in a viewer"
+  },
+  "shareReport": "Share",
+  "@shareReport": {
+    "description": "Reports feature: shares the saved PDF"
+  },
+  "doneAction": "Done",
+  "@doneAction": {
+    "description": "Reports feature: closes the success dialog"
+  },
+  "reportFileSaved": "Report saved",
+  "@reportFileSaved": {
+    "description": "Reports feature: short confirmation that the file was saved"
+  },
+  "couldNotSaveReport": "Couldn't save the report",
+  "@couldNotSaveReport": {
+    "description": "Reports feature: error when the PDF cannot be persisted"
+  },
+  "couldNotOpenReport": "No app found to open the report",
+  "@couldNotOpenReport": {
+    "description": "Reports feature: no installed PDF viewer for the saved report"
+  },
+  "couldNotShareReport": "Couldn't share the report",
+  "@couldNotShareReport": {
+    "description": "Reports feature: error when sharing the saved report fails"
+  },
+  "reportStorageUnavailable": "Storage is unavailable. Free up space and try again.",
+  "@reportStorageUnavailable": {
+    "description": "Reports feature: storage full/unavailable while saving"
   }
 }

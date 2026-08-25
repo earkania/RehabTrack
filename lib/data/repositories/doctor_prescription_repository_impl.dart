@@ -323,6 +323,13 @@ class DoctorPrescriptionRepositoryImpl implements DoctorPrescriptionRepository {
   }
 
   @override
+  Future<List<DoctorPrescriptionAttachment>> getAttachments(
+      int prescriptionId) async {
+    final rows = await _dao.getAttachments(prescriptionId);
+    return rows.map(DoctorPrescriptionAttachment.fromDb).toList();
+  }
+
+  @override
   Stream<List<DoctorPrescriptionMedication>> watchMedications(
       int prescriptionId) {
     return _dao.watchMedications(prescriptionId).map(
