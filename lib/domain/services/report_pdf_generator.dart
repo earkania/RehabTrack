@@ -474,18 +474,31 @@ class ReportPdfGenerator {
     ReportLocalization loc,
     ReportPdfTheme t,
   ) {
-    final metrics = <(String, List<String>)>[
+    final ranges = type.effectiveRanges;
+
+    // Each metric row: (label, [(displayValue, rawValue)]).
+    // rawValue is used for status classification; displayValue for rendering.
+    final metrics = <(String, List<(String, double?)>)>[
       (
         loc.latestLabel,
         [for (final c in type.components)
-          c.latest != null ? _num(c.latest!) : '—']
+          (c.latest != null ? _num(c.latest!) : '—', c.latest)]
       ),
-      (loc.statAvg,
-          [for (final c in type.components) _num(c.average.roundToDouble())]),
-      (loc.statMin,
-          [for (final c in type.components) _num(c.minimum)]),
-      (loc.statMax,
-          [for (final c in type.components) _num(c.maximum)]),
+      (
+        loc.statAvg,
+        [for (final c in type.components)
+          (_num(c.average.roundToDouble()), c.average)]
+      ),
+      (
+        loc.statMin,
+        [for (final c in type.components)
+          (_num(c.minimum), c.minimum)]
+      ),
+      (
+        loc.statMax,
+        [for (final c in type.components)
+          (_num(c.maximum), c.maximum)]
+      ),
     ];
 
     // Visible header row with dark background — matches recordings table.
@@ -519,13 +532,21 @@ class ReportPdfGenerator {
                 horizontal: ReportPdfTheme.cellPaddingH),
             child: pw.Text(label, style: t.captionBoldStyle),
           ),
-          for (final v in values)
+          for (var ci = 0; ci < values.length; ci++)
             pw.Padding(
               padding: const pw.EdgeInsets.symmetric(
                   vertical: ReportPdfTheme.cellPaddingV,
                   horizontal: ReportPdfTheme.cellPaddingH),
               child: pw.Center(
-                child: pw.Text(v, style: t.tableCellStyle),
+                child: pw.Text(
+                  values[ci].$1,
+                  style: _statusTextStyle(
+                    type.components[ci].fieldKey,
+                    values[ci].$2,
+                    ranges,
+                    t.tableCellStyle,
+                  ),
+                ),
               ),
             ),
         ],
@@ -576,7 +597,7 @@ class ReportPdfGenerator {
     final dateLabels = <String>[
       for (var i = 0; i < xCount; i++)
         if (i % labelInterval == 0 || i == xCount - 1)
-          _shortDateFormat(readingsAsc[i].measuredAt)
+          loc.formatCompactDate(readingsAsc[i].measuredAt)
         else
           '',
     ];
@@ -727,6 +748,25 @@ class ReportPdfGenerator {
     };
   }
 
+  /// Returns [base] styled with the status colour for the given
+  /// [fieldKey]/[value]/[ranges].  If no ranges are available or the value is
+  /// null, the base style is returned unchanged.
+  pw.TextStyle _statusTextStyle(
+    String? fieldKey,
+    double? value,
+    MeasurementRanges? ranges,
+    pw.TextStyle base,
+  ) {
+    if (ranges == null || value == null) return base;
+    final status = ReadingStatusCalculator.calculateFieldValue(
+      fieldKey: fieldKey ?? '',
+      value: value,
+      ranges: ranges,
+    );
+    if (status == ReadingStatus.unknown) return base;
+    return base.copyWith(color: _statusPdfColor(status));
+  }
+
   // ---- Readings table (single or two-column) ------------------------------
 
   List<pw.Widget> _readingsSection(
@@ -769,7 +809,7 @@ class ReportPdfGenerator {
   }
 
   /// Builds a compact readings table with two-line headers. Values are
-  /// unit-free numbers, centered.
+  /// unit-free numbers, centered, with per-cell status coloring.
   pw.Widget _readingsTable(
     List<ReportReadingRow> readings,
     ReportMeasurementTypeData type,
@@ -777,6 +817,8 @@ class ReportPdfGenerator {
     ReportPdfTheme t,
   ) {
     if (readings.isEmpty) return pw.SizedBox();
+
+    final ranges = type.effectiveRanges;
 
     // Two-line header row with background decoration.
     final headerRow = pw.TableRow(
@@ -821,7 +863,14 @@ class ReportPdfGenerator {
               child: pw.Center(
                 child: pw.Text(
                   i < row.values.length ? _num(row.values[i].value) : '—',
-                  style: t.tableCellStyle,
+                  style: i < row.values.length
+                      ? _statusTextStyle(
+                          type.components[i].fieldKey,
+                          row.values[i].value,
+                          ranges,
+                          t.tableCellStyle,
+                        )
+                      : t.tableCellStyle,
                 ),
               ),
             ),
@@ -1144,14 +1193,6 @@ class ReportPdfGenerator {
     final s = value.toStringAsFixed(1);
     return s.endsWith('.0') ? s.substring(0, s.length - 2) : s;
   }
-
-  /// Short date format for chart X-axis labels (e.g. "Jul 28", "Sep 3").
-  static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-
-  String _shortDateFormat(DateTime d) => '${_months[d.month - 1]} ${d.day}';
 
   /// Short display label for a measurement component.
   /// Maps well-known lowercase keys to compact headings; falls back to the

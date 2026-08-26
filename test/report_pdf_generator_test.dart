@@ -778,6 +778,7 @@ ReportLocalization _testLocalization() {
     formatDate: f,
     formatDateTime: (d) => '${f(d)} 10:00',
     formatDuration: (d) => '${d.inMinutes}m',
+    formatCompactDate: (d) => '${d.day}/${d.month}',
     latestLabel: 'Latest',
     totalReadingsLabel: (count) => 'Total readings: $count',
     phoneLabel: 'Phone',

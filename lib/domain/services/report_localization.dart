@@ -65,6 +65,7 @@ class ReportLocalization {
     required this.formatDate,
     required this.formatDateTime,
     required this.formatDuration,
+    required this.formatCompactDate,
     required this.latestLabel,
     required this.totalReadingsLabel,
     required this.phoneLabel,
@@ -146,6 +147,9 @@ class ReportLocalization {
   final String Function(DateTime) formatDate;
   final String Function(DateTime) formatDateTime;
   final String Function(Duration) formatDuration;
+
+  /// Compact date for chart X-axis labels (e.g. "4 Aug" / "4 აგვ").
+  final String Function(DateTime) formatCompactDate;
   final String latestLabel;
 
   /// `String Function(int count)` for "Total readings: N".
@@ -252,6 +256,7 @@ class ReportLocalization {
       formatDate: formatter.formatMediumDate,
       formatDateTime: formatter.formatMediumDateTime,
       formatDuration: formatHm,
+      formatCompactDate: formatter.formatMonthDay,
       latestLabel: l10n.reportLatest,
       totalReadingsLabel: l10n.reportTotalReadingsCount,
       phoneLabel: l10n.reportPatientPhone,
