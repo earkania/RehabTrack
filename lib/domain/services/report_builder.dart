@@ -10,6 +10,7 @@ import 'package:rehab_track/domain/repositories/lab_analysis_repository.dart';
 import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/domain/repositories/profile_repository.dart';
+import 'package:rehab_track/domain/repositories/reference_range_repository.dart';
 
 import 'package:rehab_track/domain/entities/report_configuration.dart';
 import 'package:rehab_track/domain/entities/report_data.dart';
@@ -51,6 +52,7 @@ class ReportBuilder {
     required this._dietRepository,
     required this._activityRepository,
     required this._careContactRepository,
+    required this._referenceRangeRepository,
   });
 
   /// Maximum reading rows carried per measurement type; older readings are
@@ -66,6 +68,7 @@ class ReportBuilder {
   final DietRepository _dietRepository;
   final ActivityRepository _activityRepository;
   final CareContactRepository _careContactRepository;
+  final ReferenceRangeRepository _referenceRangeRepository;
 
   Future<ReportData> build(
     ReportConfiguration configuration, {
@@ -133,6 +136,8 @@ class ReportBuilder {
       bloodType: profile.bloodType,
       heightCm: profile.heightCm,
       weightKg: profile.weightKg,
+      phone: profile.phone,
+      email: profile.email,
       allergies: profile.allergies,
       emergencyContactName: profile.emergencyContactName,
       emergencyContactPhone: profile.emergencyContactPhone,
@@ -232,6 +237,14 @@ class ReportBuilder {
       );
       if (records.isEmpty) continue;
 
+      // Resolve effective measurement boundaries (profile overrides merged
+      // with defaults) — same logic used by Measurement Trends.
+      final typeKey = type.key;
+      final effectiveRanges = typeKey != null
+          ? await _referenceRangeRepository.getEffectiveRanges(
+              profileId, typeKey)
+          : null;
+
       final fields = await _measurementRepository.getFieldsForType(typeId);
       final fieldKeys = _canonicalFieldKeys(type.key, fields);
       final fieldByKey = {for (final f in fields) f.fieldKey: f};
@@ -265,6 +278,7 @@ class ReportBuilder {
       final presentKeys = <String>[];
       final componentValues = <String, List<double>>{};
       final componentUnits = <String, String>{};
+      final componentLatest = <String, double>{};
       for (var i = 0; i < fieldKeys.length; i++) {
         final key = fieldKeys[i];
         final values = <double>[];
@@ -276,6 +290,15 @@ class ReportBuilder {
         presentKeys.add(key);
         componentValues[key] = values;
         componentUnits[key] = unitFor(i, key);
+        // Derive latest from the most recent record with a value (records
+        // are ascending, so scan in reverse).
+        for (var ri = records.length - 1; ri >= 0; ri--) {
+          final v = valueFor(records[ri], i, key);
+          if (v != null) {
+            componentLatest[key] = v;
+            break;
+          }
+        }
       }
 
       final components = <ReportComponentStats>[];
@@ -288,6 +311,8 @@ class ReportBuilder {
           minimum: stats.minimum!,
           maximum: stats.maximum!,
           average: stats.average!,
+          latest: componentLatest[key],
+          fieldKey: key,
         ));
       }
 
@@ -316,6 +341,8 @@ class ReportBuilder {
 
       result.add(ReportMeasurementTypeData(
         typeName: type.name,
+        typeKey: type.key,
+        effectiveRanges: effectiveRanges,
         readingCountInRange: records.length,
         totalReadingCount: records.length,
         includedReadingCount: included.length,

@@ -1,3 +1,4 @@
+import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/domain/entities/report_configuration.dart';
 import 'package:rehab_track/domain/entities/report_section.dart';
 
@@ -82,6 +83,8 @@ class ReportProfileSummary {
     this.bloodType,
     this.heightCm,
     this.weightKg,
+    this.phone,
+    this.email,
     this.allergies,
     this.emergencyContactName,
     this.emergencyContactPhone,
@@ -95,6 +98,8 @@ class ReportProfileSummary {
   final String? bloodType;
   final double? heightCm;
   final double? weightKg;
+  final String? phone;
+  final String? email;
   final String? allergies;
   final String? emergencyContactName;
   final String? emergencyContactPhone;
@@ -135,6 +140,8 @@ class ReportComponentStats {
     required this.minimum,
     required this.maximum,
     required this.average,
+    this.latest,
+    this.fieldKey,
   });
 
   final String label;
@@ -143,6 +150,14 @@ class ReportComponentStats {
   final double minimum;
   final double maximum;
   final double average;
+
+  /// Chronologically latest value within the filtered report data.
+  /// Derived from the most recent reading, not from max timestamp sorting.
+  final double? latest;
+
+  /// Stable storage key for this field (e.g. 'systolic', 'diastolic', 'pulse').
+  /// Used to look up measurement boundaries for chart point coloring.
+  final String? fieldKey;
 }
 
 /// One individual reading row for the compact readings table.
@@ -167,6 +182,8 @@ class ReportValueCell {
 class ReportMeasurementTypeData {
   const ReportMeasurementTypeData({
     required this.typeName,
+    this.typeKey,
+    this.effectiveRanges,
     required this.readingCountInRange,
     required this.totalReadingCount,
     required this.includedReadingCount,
@@ -177,6 +194,14 @@ class ReportMeasurementTypeData {
   });
 
   final String typeName;
+
+  /// Stable storage key for this measurement type (e.g. 'blood_pressure').
+  final String? typeKey;
+
+  /// Resolved measurement boundaries for this type — profile overrides merged
+  /// with defaults.  Used by the PDF chart to colour individual data-point
+  /// markers identically to Measurement Trends.
+  final MeasurementRanges? effectiveRanges;
 
   /// Readings inside the resolved report period.
   final int readingCountInRange;

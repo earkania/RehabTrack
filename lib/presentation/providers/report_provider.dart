@@ -13,7 +13,8 @@ import 'package:rehab_track/presentation/providers/database_provider.dart'
         doctorVisitRepositoryProvider,
         medicationRepositoryProvider,
         measurementRepositoryProvider,
-        profileRepositoryProvider;
+        profileRepositoryProvider,
+        referenceRangeRepositoryProvider;
 import 'package:rehab_track/presentation/providers/diet_provider.dart'
     show dietRepositoryProvider;
 import 'package:rehab_track/presentation/providers/doctor_prescription_provider.dart'
@@ -50,6 +51,7 @@ final reportBuilderProvider = Provider<ReportBuilder>((ref) {
     dietRepository: ref.watch(dietRepositoryProvider),
     activityRepository: ref.watch(activityRepositoryProvider),
     careContactRepository: ref.watch(careContactRepositoryProvider),
+    referenceRangeRepository: ref.watch(referenceRangeRepositoryProvider),
   );
 });
 

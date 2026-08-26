@@ -3663,4 +3663,39 @@ class AppLocalizationsKa extends AppLocalizations {
   @override
   String get reportStorageUnavailable =>
       'მეხსიერება მიუწვდომელია. გაათავისუფლეთ ადგილი და სცადეთ ხელახლა.';
+
+  @override
+  String get reportLatest => 'უახლესი';
+
+  @override
+  String reportTotalReadingsCount(int count) {
+    return 'სულ ჩანაწერი: $count';
+  }
+
+  @override
+  String get reportPatientPhone => 'ტელეფონი';
+
+  @override
+  String get reportPatientEmail => 'ელ-ფოსტა';
+
+  @override
+  String get reportGeneratedBy => 'მომზადებულია RehabTrack-ის მიერ';
+
+  @override
+  String get reportReadingDate => 'ჩანაწერის თარიღი';
+
+  @override
+  String get reportSystolicShort => 'სისტ.';
+
+  @override
+  String get reportDiastolicShort => 'დიასტ.';
+
+  @override
+  String get reportPulseShort => 'პულსი';
+
+  @override
+  String get reportUnitMmHg => 'mmHg';
+
+  @override
+  String get reportUnitBpm => 'bpm';
 }

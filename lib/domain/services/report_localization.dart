@@ -65,6 +65,17 @@ class ReportLocalization {
     required this.formatDate,
     required this.formatDateTime,
     required this.formatDuration,
+    required this.latestLabel,
+    required this.totalReadingsLabel,
+    required this.phoneLabel,
+    required this.emailLabel,
+    required this.generatedByLabel,
+    required this.readingDateLabel,
+    required this.systolicShortLabel,
+    required this.diastolicShortLabel,
+    required this.pulseShortLabel,
+    required this.unitMmHgLabel,
+    required this.unitBpmLabel,
   });
 
   final String defaultTitle;
@@ -135,6 +146,19 @@ class ReportLocalization {
   final String Function(DateTime) formatDate;
   final String Function(DateTime) formatDateTime;
   final String Function(Duration) formatDuration;
+  final String latestLabel;
+
+  /// `String Function(int count)` for "Total readings: N".
+  final String Function(int count) totalReadingsLabel;
+  final String phoneLabel;
+  final String emailLabel;
+  final String generatedByLabel;
+  final String readingDateLabel;
+  final String systolicShortLabel;
+  final String diastolicShortLabel;
+  final String pulseShortLabel;
+  final String unitMmHgLabel;
+  final String unitBpmLabel;
 
   /// Full "Generated: …" line for the document header.
   late final String Function(DateTime) formatGeneratedAt;
@@ -228,6 +252,17 @@ class ReportLocalization {
       formatDate: formatter.formatMediumDate,
       formatDateTime: formatter.formatMediumDateTime,
       formatDuration: formatHm,
+      latestLabel: l10n.reportLatest,
+      totalReadingsLabel: l10n.reportTotalReadingsCount,
+      phoneLabel: l10n.reportPatientPhone,
+      emailLabel: l10n.reportPatientEmail,
+      generatedByLabel: l10n.reportGeneratedBy,
+      readingDateLabel: l10n.reportReadingDate,
+      systolicShortLabel: l10n.reportSystolicShort,
+      diastolicShortLabel: l10n.reportDiastolicShort,
+      pulseShortLabel: l10n.reportPulseShort,
+      unitMmHgLabel: l10n.reportUnitMmHg,
+      unitBpmLabel: l10n.reportUnitBpm,
     )..formatGeneratedAt =
         (dt) => l10n.reportGeneratedAt(formatter.formatMediumDateTime(dt));
   }

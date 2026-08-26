@@ -10,6 +10,7 @@ import 'package:rehab_track/data/repositories/lab_analysis_repository_impl.dart'
 import 'package:rehab_track/data/repositories/medication_repository_impl.dart';
 import 'package:rehab_track/data/repositories/measurement_repository_impl.dart';
 import 'package:rehab_track/data/repositories/profile_repository_impl.dart';
+import 'package:rehab_track/data/repositories/reference_range_repository_impl.dart';
 import 'package:rehab_track/domain/entities/report_configuration.dart';
 import 'package:rehab_track/domain/entities/report_date_range.dart';
 import 'package:rehab_track/domain/entities/report_section.dart';
@@ -35,6 +36,7 @@ void main() {
       dietRepository: DietRepositoryImpl(database),
       activityRepository: ActivityRepositoryImpl(database),
       careContactRepository: CareContactRepositoryImpl(database),
+      referenceRangeRepository: ReferenceRangeRepositoryImpl(database),
     );
   });
 
