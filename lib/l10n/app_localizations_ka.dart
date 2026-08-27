@@ -3698,4 +3698,39 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get reportUnitBpm => 'bpm';
+
+  @override
+  String get sendToDoctorOrClinic => 'ექიმთან/კლინიკაში გაგზავნა';
+
+  @override
+  String get selectCareContact => 'აირჩიეთ კონტაქტი';
+
+  @override
+  String get noCareContactsWithEmail =>
+      'ელ-ფოსტის მქონე კონტაქტები არ მოიძებნა.';
+
+  @override
+  String get manageCareContacts => 'კონტაქტების მართვა';
+
+  @override
+  String reportEmailSubject(String reportTitle, String patientName) {
+    return '$reportTitle - $patientName';
+  }
+
+  @override
+  String reportEmailBody(
+    String reportTitle,
+    String period,
+    String patientName,
+  ) {
+    return 'გამარჯობა,\n\nგთხოვთ იხილოთ ჩემი ჯანმრთელობის ანგარიში დანართში: $reportTitle\n\nანგარიშის პერიოდი: $period\n\nპატივისცემით,\n$patientName';
+  }
+
+  @override
+  String get noEmailAppAvailable =>
+      'მოწყობილობაზე ელ-ფოსტის აპლიკაცია არ არის დაინსტალირებული.';
+
+  @override
+  String get couldNotOpenEmailComposer =>
+      'ელ-ფოსტის გაგზავნის ფანჯრის გახსნა ვერ მოხერხდა.';
 }

@@ -6955,6 +6955,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'bpm'**
   String get reportUnitBpm;
+
+  /// Reports feature: action to email the report to a care contact
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Doctor/Clinic'**
+  String get sendToDoctorOrClinic;
+
+  /// Reports feature: title of the care contact picker dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Select Care Contact'**
+  String get selectCareContact;
+
+  /// Reports feature: shown when no eligible contacts exist for emailing
+  ///
+  /// In en, this message translates to:
+  /// **'No care contacts with email addresses are available.'**
+  String get noCareContactsWithEmail;
+
+  /// Reports feature: navigates to Care Contacts management
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Care Contacts'**
+  String get manageCareContacts;
+
+  /// Reports feature: default email subject when sending a report
+  ///
+  /// In en, this message translates to:
+  /// **'{reportTitle} - {patientName}'**
+  String reportEmailSubject(String reportTitle, String patientName);
+
+  /// Reports feature: default email body when sending a report
+  ///
+  /// In en, this message translates to:
+  /// **'Hello,\n\nPlease find attached my {reportTitle} health report.\n\nReport period: {period}\n\nRegards,\n{patientName}'**
+  String reportEmailBody(String reportTitle, String period, String patientName);
+
+  /// Reports feature: no email-capable app installed
+  ///
+  /// In en, this message translates to:
+  /// **'No email application is available on this device.'**
+  String get noEmailAppAvailable;
+
+  /// Reports feature: email compose intent failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open email composer.'**
+  String get couldNotOpenEmailComposer;
 }
 
 class _AppLocalizationsDelegate

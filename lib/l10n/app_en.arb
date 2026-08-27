@@ -1888,5 +1888,46 @@
   "reportUnitBpm": "bpm",
   "@reportUnitBpm": {
     "description": "Reports feature: bpm unit label for measurement headers"
+  },
+  "sendToDoctorOrClinic": "Send to Doctor/Clinic",
+  "@sendToDoctorOrClinic": {
+    "description": "Reports feature: action to email the report to a care contact"
+  },
+  "selectCareContact": "Select Care Contact",
+  "@selectCareContact": {
+    "description": "Reports feature: title of the care contact picker dialog"
+  },
+  "noCareContactsWithEmail": "No care contacts with email addresses are available.",
+  "@noCareContactsWithEmail": {
+    "description": "Reports feature: shown when no eligible contacts exist for emailing"
+  },
+  "manageCareContacts": "Manage Care Contacts",
+  "@manageCareContacts": {
+    "description": "Reports feature: navigates to Care Contacts management"
+  },
+  "reportEmailSubject": "{reportTitle} - {patientName}",
+  "@reportEmailSubject": {
+    "description": "Reports feature: default email subject when sending a report",
+    "placeholders": {
+      "reportTitle": {"type": "String"},
+      "patientName": {"type": "String"}
+    }
+  },
+  "reportEmailBody": "Hello,\n\nPlease find attached my {reportTitle} health report.\n\nReport period: {period}\n\nRegards,\n{patientName}",
+  "@reportEmailBody": {
+    "description": "Reports feature: default email body when sending a report",
+    "placeholders": {
+      "reportTitle": {"type": "String"},
+      "period": {"type": "String"},
+      "patientName": {"type": "String"}
+    }
+  },
+  "noEmailAppAvailable": "No email application is available on this device.",
+  "@noEmailAppAvailable": {
+    "description": "Reports feature: no email-capable app installed"
+  },
+  "couldNotOpenEmailComposer": "Could not open email composer.",
+  "@couldNotOpenEmailComposer": {
+    "description": "Reports feature: email compose intent failed"
   }
 }

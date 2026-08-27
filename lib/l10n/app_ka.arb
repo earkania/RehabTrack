@@ -1888,5 +1888,46 @@
   "reportUnitBpm": "bpm",
   "@reportUnitBpm": {
     "description": "Reports feature: bpm unit label for measurement headers"
+  },
+  "sendToDoctorOrClinic": "ექიმთან/კლინიკაში გაგზავნა",
+  "@sendToDoctorOrClinic": {
+    "description": "Reports feature: action to email the report to a care contact"
+  },
+  "selectCareContact": "აირჩიეთ კონტაქტი",
+  "@selectCareContact": {
+    "description": "Reports feature: title of the care contact picker dialog"
+  },
+  "noCareContactsWithEmail": "ელ-ფოსტის მქონე კონტაქტები არ მოიძებნა.",
+  "@noCareContactsWithEmail": {
+    "description": "Reports feature: shown when no eligible contacts exist for emailing"
+  },
+  "manageCareContacts": "კონტაქტების მართვა",
+  "@manageCareContacts": {
+    "description": "Reports feature: navigates to Care Contacts management"
+  },
+  "reportEmailSubject": "{reportTitle} - {patientName}",
+  "@reportEmailSubject": {
+    "description": "Reports feature: default email subject when sending a report",
+    "placeholders": {
+      "reportTitle": {"type": "String"},
+      "patientName": {"type": "String"}
+    }
+  },
+  "reportEmailBody": "გამარჯობა,\n\nგთხოვთ იხილოთ ჩემი ჯანმრთელობის ანგარიში დანართში: {reportTitle}\n\nანგარიშის პერიოდი: {period}\n\nპატივისცემით,\n{patientName}",
+  "@reportEmailBody": {
+    "description": "Reports feature: default email body when sending a report",
+    "placeholders": {
+      "reportTitle": {"type": "String"},
+      "period": {"type": "String"},
+      "patientName": {"type": "String"}
+    }
+  },
+  "noEmailAppAvailable": "მოწყობილობაზე ელ-ფოსტის აპლიკაცია არ არის დაინსტალირებული.",
+  "@noEmailAppAvailable": {
+    "description": "Reports feature: no email-capable app installed"
+  },
+  "couldNotOpenEmailComposer": "ელ-ფოსტის გაგზავნის ფანჯრის გახსნა ვერ მოხერხდა.",
+  "@couldNotOpenEmailComposer": {
+    "description": "Reports feature: email compose intent failed"
   }
 }

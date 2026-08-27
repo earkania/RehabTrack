@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/data/services/report/report_storage_service.dart';
 import 'package:rehab_track/data/services/report/saved_report_file.dart';
+import 'package:rehab_track/domain/entities/care_contact.dart';
 import 'package:rehab_track/domain/entities/report_data.dart';
+import 'package:rehab_track/domain/entities/report_date_range.dart';
 import 'package:rehab_track/domain/entities/report_section.dart';
+import 'package:rehab_track/domain/enums/enums.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/providers/care_contact_provider.dart';
 import 'package:rehab_track/presentation/providers/report_provider.dart';
+import 'package:rehab_track/domain/services/app_date_formatter.dart';
 import 'package:rehab_track/domain/services/report_localization.dart';
 
 /// Read-only preview of the prepared [ReportData], mirroring the section
@@ -43,7 +50,7 @@ class _ReportPreviewScreenState extends ConsumerState<ReportPreviewScreen> {
         displayName: generator.buildFileName(widget.data),
       );
       if (!mounted) return;
-      await _showSuccessSheet(saved, l10n, storage);
+      await _showSuccessSheet(saved, l10n, loc, storage);
     } on ReportStorageException catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(SnackBar(
@@ -65,12 +72,14 @@ class _ReportPreviewScreenState extends ConsumerState<ReportPreviewScreen> {
   Future<void> _showSuccessSheet(
     SavedReportFile saved,
     AppLocalizations l10n,
+    ReportLocalization loc,
     ReportStorageService storage,
   ) async {
     await showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       builder: (sheetContext) => SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -111,6 +120,17 @@ class _ReportPreviewScreenState extends ConsumerState<ReportPreviewScreen> {
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
+                onPressed: () => _showContactPicker(
+                  saved: saved,
+                  loc: loc,
+                  l10n: l10n,
+                  storage: storage,
+                ),
+                icon: const Icon(Icons.email_outlined),
+                label: Text(l10n.sendToDoctorOrClinic),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
                 onPressed: () async {
                   final sheetMessenger = ScaffoldMessenger.of(sheetContext);
                   try {
@@ -133,6 +153,165 @@ class _ReportPreviewScreenState extends ConsumerState<ReportPreviewScreen> {
         ),
       ),
     );
+  }
+
+  /// Shows a bottom sheet listing Care Contacts with email addresses.
+  /// When a contact is selected, opens the email composer.
+  Future<void> _showContactPicker({
+    required SavedReportFile saved,
+    required ReportLocalization loc,
+    required AppLocalizations l10n,
+    required ReportStorageService storage,
+  }) async {
+    List<CareContact> contactsWithEmail = const [];
+    try {
+      final contacts = await ref.read(careContactsProvider.future);
+      contactsWithEmail = contacts
+          .where((c) => c.email != null && c.email!.trim().isNotEmpty)
+          .toList();
+    } on Exception {
+      contactsWithEmail = const [];
+    }
+
+    if (!mounted) return;
+
+    if (contactsWithEmail.isEmpty) {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          content: Text(l10n.noCareContactsWithEmail),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.push(AppRoutes.profileCareContacts);
+              },
+              child: Text(l10n.manageCareContacts),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l10n.selectCareContact,
+                  style: Theme.of(sheetContext).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: contactsWithEmail.length,
+                  itemBuilder: (context, index) {
+                    final c = contactsWithEmail[index];
+                    return ListTile(
+                      title: Text(c.effectiveDisplayName),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _contactTypeLabel(c.contactType, l10n),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          Text(
+                            c.email!,
+                            style: Theme.of(context).textTheme.bodySmall,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        _sendReportByEmail(
+                          saved: saved,
+                          contact: c,
+                          loc: loc,
+                          l10n: l10n,
+                          storage: storage,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Builds the email subject, body, and opens the email composer.
+  Future<void> _sendReportByEmail({
+    required SavedReportFile saved,
+    required CareContact contact,
+    required ReportLocalization loc,
+    required AppLocalizations l10n,
+    required ReportStorageService storage,
+  }) async {
+    final data = widget.data;
+    final config = data.configuration;
+    final patientName = data.profileSummary?.fullName ?? '';
+    final reportTitle = loc.titleFor(config);
+
+    // Period text: use actual dates for custom range, label for presets.
+    final String period;
+    if (config.dateRangeType == ReportDateRangeType.custom &&
+        config.customStartDate != null &&
+        config.customEndDate != null) {
+      final formatter = AppDateFormatter.of(context);
+      period =
+          '${formatter.formatShortDate(config.customStartDate!)} – ${formatter.formatShortDate(config.customEndDate!)}';
+    } else {
+      period = loc.rangeLabels[config.dateRangeType] ?? '';
+    }
+
+    final subject = l10n.reportEmailSubject(reportTitle, patientName);
+    final body = l10n.reportEmailBody(reportTitle, period, patientName);
+
+    try {
+      await storage.composeEmail(
+        file: saved,
+        recipient: contact.email!,
+        subject: subject,
+        body: body,
+      );
+    } on ReportStorageException catch (e) {
+      if (!mounted) return;
+      final msg = e.code == 'NO_EMAIL_APP'
+          ? l10n.noEmailAppAvailable
+          : l10n.couldNotOpenEmailComposer;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.couldNotOpenEmailComposer)),
+      );
+    }
+  }
+
+  String _contactTypeLabel(CareContactType type, AppLocalizations l10n) {
+    return switch (type) {
+      CareContactType.doctor => l10n.doctor,
+      CareContactType.clinic => l10n.clinicOrHospital,
+      CareContactType.laboratory => l10n.laboratory,
+      CareContactType.pharmacy => l10n.pharmacy,
+      CareContactType.insurance => l10n.insurance,
+      CareContactType.other => l10n.otherGuidanceCategory,
+    };
   }
 
   @override

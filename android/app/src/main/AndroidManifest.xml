@@ -70,5 +70,11 @@
             <action android:name="android.intent.action.VIEW"/>
             <data android:mimeType="application/pdf"/>
         </intent>
+        <!-- Package visibility for email apps so ACTION_SEND with
+             message/rfc822 resolves on Android 11+. -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:mimeType="message/rfc822"/>
+        </intent>
     </queries>
 </manifest>

@@ -5,13 +5,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/data/services/report/report_storage_service.dart';
 import 'package:rehab_track/data/services/report/saved_report_file.dart';
+import 'package:rehab_track/domain/entities/care_contact.dart';
 import 'package:rehab_track/domain/entities/report_configuration.dart';
 import 'package:rehab_track/domain/entities/report_data.dart';
 import 'package:rehab_track/domain/entities/report_date_range.dart';
 import 'package:rehab_track/domain/entities/report_section.dart';
+import 'package:rehab_track/domain/enums/enums.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/providers/care_contact_provider.dart';
 import 'package:rehab_track/presentation/providers/report_provider.dart';
 import 'package:rehab_track/presentation/screens/reports/report_preview_screen.dart';
 
@@ -19,6 +23,7 @@ class _RecordingFakeStorage implements ReportStorageService {
   int saveCalls = 0;
   int openCalls = 0;
   int shareCalls = 0;
+  int composeEmailCalls = 0;
   bool failSave = false;
   Uint8List? savedBytes;
 
@@ -49,24 +54,24 @@ class _RecordingFakeStorage implements ReportStorageService {
   Future<void> share(SavedReportFile file) async => shareCalls++;
 
   @override
+  Future<void> composeEmail({
+    required SavedReportFile file,
+    required String recipient,
+    required String subject,
+    required String body,
+  }) async {
+    composeEmailCalls++;
+  }
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
-  late ProviderContainer container;
   late _RecordingFakeStorage storage;
 
   setUp(() {
     storage = _RecordingFakeStorage();
-    container = ProviderContainer(
-      overrides: [
-        reportStorageServiceProvider.overrideWithValue(storage),
-      ],
-    );
-  });
-
-  tearDown(() {
-    container.dispose();
   });
 
   ReportData minimalData() => ReportData(
@@ -80,7 +85,17 @@ void main() {
         profileSummary: const ReportProfileSummary(fullName: 'Test User'),
       );
 
-  Future<void> pumpPreview(WidgetTester tester) async {
+  Future<void> pumpPreview(
+    WidgetTester tester, {
+    List<CareContact> contacts = const [],
+  }) async {
+    final container = ProviderContainer(
+      overrides: [
+        reportStorageServiceProvider.overrideWithValue(storage),
+        careContactsProvider.overrideWith((ref) => Stream.value(contacts)),
+      ],
+    );
+    addTearDown(container.dispose);
     final router = GoRouter(
       initialLocation: '/preview',
       routes: [
@@ -88,6 +103,12 @@ void main() {
           path: '/preview',
           builder: (context, state) =>
               ReportPreviewScreen(data: minimalData()),
+        ),
+        GoRoute(
+          path: AppRoutes.profileCareContacts,
+          builder: (context, state) => const Scaffold(
+            body: Text('Care Contacts screen'),
+          ),
         ),
       ],
     );
@@ -105,6 +126,16 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
   }
+
+  CareContact contactWithEmail() => CareContact(
+        id: 1,
+        profileId: 1,
+        contactType: CareContactType.doctor,
+        displayName: 'Dr. Smith',
+        email: 'smith@example.com',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      );
 
   void expectNoPendingSheet() {
     expect(find.text('Report generated successfully'), findsNothing);
@@ -163,5 +194,49 @@ void main() {
     expect(storage.saveCalls, 0);
     expect(find.text("Couldn't save the report"), findsOneWidget);
     expectNoPendingSheet();
+  });
+
+  testWidgets('email flow: picker lists contacts with email and composes',
+      (tester) async {
+    await pumpPreview(tester, contacts: [contactWithEmail()]);
+    await tester.tap(find.byIcon(Icons.picture_as_pdf_outlined));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Send to Doctor/Clinic'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('Select Care Contact'), findsOneWidget);
+    expect(find.text('Dr. Smith'), findsOneWidget);
+
+    await tester.tap(find.text('Dr. Smith'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(storage.composeEmailCalls, 1);
+  });
+
+  testWidgets(
+      'email flow: no contacts with email shows manage contacts dialog',
+      (tester) async {
+    await pumpPreview(tester, contacts: const []);
+    await tester.tap(find.byIcon(Icons.picture_as_pdf_outlined));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Send to Doctor/Clinic'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(
+      find.text('No care contacts with email addresses are available.'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Manage Care Contacts'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Care Contacts screen'), findsOneWidget);
   });
 }

@@ -3690,4 +3690,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportUnitBpm => 'bpm';
+
+  @override
+  String get sendToDoctorOrClinic => 'Send to Doctor/Clinic';
+
+  @override
+  String get selectCareContact => 'Select Care Contact';
+
+  @override
+  String get noCareContactsWithEmail =>
+      'No care contacts with email addresses are available.';
+
+  @override
+  String get manageCareContacts => 'Manage Care Contacts';
+
+  @override
+  String reportEmailSubject(String reportTitle, String patientName) {
+    return '$reportTitle - $patientName';
+  }
+
+  @override
+  String reportEmailBody(
+    String reportTitle,
+    String period,
+    String patientName,
+  ) {
+    return 'Hello,\n\nPlease find attached my $reportTitle health report.\n\nReport period: $period\n\nRegards,\n$patientName';
+  }
+
+  @override
+  String get noEmailAppAvailable =>
+      'No email application is available on this device.';
+
+  @override
+  String get couldNotOpenEmailComposer => 'Could not open email composer.';
 }

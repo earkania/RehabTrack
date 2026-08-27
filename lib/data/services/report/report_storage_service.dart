@@ -97,6 +97,34 @@ class ReportStorageService {
     }
   }
 
+  /// Opens an email composer with pre-filled recipient, subject, body,
+  /// and the report PDF as an attachment.
+  ///
+  /// Uses Android ACTION_SEND with message/rfc822 to target email-capable
+  /// applications. The user must explicitly press Send in their mail app.
+  Future<void> composeEmail({
+    required SavedReportFile file,
+    required String recipient,
+    required String subject,
+    required String body,
+  }) async {
+    _requireUri(file);
+    try {
+      await channel.invokeMethod<void>('composeEmailWithAttachment', {
+        'contentUri': file.contentUri,
+        'mimeType': file.mimeType,
+        'displayName': file.displayName,
+        'recipient': recipient,
+        'subject': subject,
+        'body': body,
+      });
+    } on PlatformException catch (e) {
+      throw ReportStorageException(e.code, message: e.message);
+    } on MissingPluginException {
+      throw const ReportStorageException('MISSING_PLUGIN');
+    }
+  }
+
   void _requireUri(SavedReportFile file) {
     if (file.contentUri == null || file.contentUri!.isEmpty) {
       throw const ReportStorageException(

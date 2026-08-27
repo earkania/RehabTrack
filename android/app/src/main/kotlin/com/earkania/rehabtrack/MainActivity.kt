@@ -185,6 +185,19 @@ class MainActivity : FlutterActivity() {
                         shareSavedDocument(contentUri, mimeType, displayName, result)
                     }
                 }
+                "composeEmailWithAttachment" -> {
+                    val contentUri = call.argument<String>("contentUri")
+                    val mimeType = call.argument<String>("mimeType") ?: "application/pdf"
+                    val displayName = call.argument<String>("displayName")
+                    val recipient = call.argument<String>("recipient") ?: ""
+                    val subject = call.argument<String>("subject") ?: ""
+                    val body = call.argument<String>("body") ?: ""
+                    if (contentUri == null) {
+                        result.error("INVALID_ARGUMENTS", "contentUri is required", null)
+                    } else {
+                        composeEmailWithAttachment(contentUri, mimeType, displayName, recipient, subject, body, result)
+                    }
+                }
                 else -> result.notImplemented()
             }
         }
@@ -340,6 +353,42 @@ class MainActivity : FlutterActivity() {
             result.success(true)
         } catch (e: Exception) {
             result.error("SHARE_ERROR", e.message, null)
+        }
+    }
+
+    /**
+     * Opens an email composer with pre-filled recipient, subject, body, and
+     * a PDF attachment. Uses ACTION_SEND with message/rfc822 to target
+     * email-capable applications specifically.
+     */
+    private fun composeEmailWithAttachment(
+        contentUri: String,
+        mimeType: String,
+        displayName: String?,
+        recipient: String,
+        subject: String,
+        body: String,
+        result: MethodChannel.Result,
+    ) {
+        try {
+            val uri = Uri.parse(contentUri)
+            val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "message/rfc822"
+                if (recipient.isNotEmpty()) putExtra(Intent.EXTRA_EMAIL, arrayOf(recipient))
+                if (subject.isNotEmpty()) putExtra(Intent.EXTRA_SUBJECT, subject)
+                if (body.isNotEmpty()) putExtra(Intent.EXTRA_TEXT, body)
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                // ClipData ensures the attachment URI is accessible across
+                // all email clients on modern Android versions.
+                clipData = android.content.ClipData.newRawUri(displayName ?: "report", uri)
+            }
+            startActivity(Intent.createChooser(emailIntent, null))
+            result.success(true)
+        } catch (e: android.content.ActivityNotFoundException) {
+            result.error("NO_EMAIL_APP", "no email-capable application installed", null)
+        } catch (e: Exception) {
+            result.error("EMAIL_COMPOSE_ERROR", e.message, null)
         }
     }
 
