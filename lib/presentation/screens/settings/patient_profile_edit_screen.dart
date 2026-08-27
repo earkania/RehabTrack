@@ -9,6 +9,22 @@ import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/widgets/profile/profile_avatar.dart';
 
+const List<String> _bloodTypeChoices = <String>[
+  'O(I) Rh+',
+  'O(I) Rh-',
+  'A(II) Rh+',
+  'A(II) Rh-',
+  'B(III) Rh+',
+  'B(III) Rh-',
+  'AB(IV) Rh+',
+  'AB(IV) Rh-',
+];
+
+String? _canonicalBloodTypeOrNull(String? value) {
+  if (value == null) return null;
+  return _bloodTypeChoices.contains(value) ? value : null;
+}
+
 class PatientProfileEditScreen extends ConsumerStatefulWidget {
   const PatientProfileEditScreen({super.key});
 
@@ -27,7 +43,6 @@ class _PatientProfileEditScreenState
   late TextEditingController _addressController;
   late TextEditingController _heightController;
   late TextEditingController _weightController;
-  late TextEditingController _bloodTypeController;
   late TextEditingController _allergiesController;
   late TextEditingController _emergencyNameController;
   late TextEditingController _emergencyPhoneController;
@@ -36,6 +51,9 @@ class _PatientProfileEditScreenState
   DateTime? _birthDate;
   String? _selectedGender;
   String? _selectedRelationship;
+  String? _bloodTypeStored;
+  String? _bloodTypeSelection;
+  bool _bloodTypeChanged = false;
   bool _isSaving = false;
   bool _initialized = false;
   String? _pendingPhotoPath;
@@ -50,7 +68,6 @@ class _PatientProfileEditScreenState
     _addressController = TextEditingController();
     _heightController = TextEditingController();
     _weightController = TextEditingController();
-    _bloodTypeController = TextEditingController();
     _allergiesController = TextEditingController();
     _emergencyNameController = TextEditingController();
     _emergencyPhoneController = TextEditingController();
@@ -66,7 +83,6 @@ class _PatientProfileEditScreenState
     _addressController.dispose();
     _heightController.dispose();
     _weightController.dispose();
-    _bloodTypeController.dispose();
     _allergiesController.dispose();
     _emergencyNameController.dispose();
     _emergencyPhoneController.dispose();
@@ -84,7 +100,8 @@ class _PatientProfileEditScreenState
     _addressController.text = profile.address ?? '';
     _heightController.text = profile.heightCm?.toString() ?? '';
     _weightController.text = profile.weightKg?.toString() ?? '';
-    _bloodTypeController.text = profile.bloodType ?? '';
+    _bloodTypeStored = profile.bloodType;
+    _bloodTypeSelection = _canonicalBloodTypeOrNull(profile.bloodType);
     _allergiesController.text = profile.allergies ?? '';
     _emergencyNameController.text = profile.emergencyContactName ?? '';
     _emergencyPhoneController.text = profile.emergencyContactPhone ?? '';
@@ -330,12 +347,27 @@ class _PatientProfileEditScreenState
             ],
           ),
           const SizedBox(height: 12),
-          TextFormField(
-            controller: _bloodTypeController,
+          DropdownButtonFormField<String>(
+            key: const ValueKey('bloodTypeField'),
+            initialValue: _bloodTypeSelection,
+            isExpanded: true,
             decoration: InputDecoration(
               labelText: l10n.bloodType,
+              hintText: l10n.selectBloodType,
               border: const OutlineInputBorder(),
             ),
+            items: [
+              ..._bloodTypeChoices.map(
+                (type) => DropdownMenuItem(
+                  value: type,
+                  child: Text(type),
+                ),
+              ),
+            ],
+            onChanged: (v) => setState(() {
+              _bloodTypeChanged = true;
+              _bloodTypeSelection = v;
+            }),
           ),
           const SizedBox(height: 24),
           Text(
@@ -585,9 +617,9 @@ class _PatientProfileEditScreenState
         gender: _selectedGender,
         heightCm: double.tryParse(_heightController.text),
         weightKg: double.tryParse(_weightController.text),
-        bloodType: _bloodTypeController.text.isEmpty
-            ? null
-            : _bloodTypeController.text,
+        bloodType: _bloodTypeChanged
+            ? _bloodTypeSelection
+            : _bloodTypeStored,
         phone: _phoneController.text.isEmpty ? null : _phoneController.text,
         email: _emailController.text.isEmpty ? null : _emailController.text,
         address:

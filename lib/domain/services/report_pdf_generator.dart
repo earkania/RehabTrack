@@ -8,6 +8,7 @@ import 'package:rehab_track/domain/entities/report_data.dart';
 import 'package:rehab_track/domain/entities/report_date_range.dart';
 import 'package:rehab_track/domain/entities/report_section.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
+import 'package:rehab_track/domain/services/bmi.dart';
 import 'package:rehab_track/domain/services/reading_status_calculator.dart';
 import 'package:rehab_track/domain/services/report_localization.dart';
 import 'package:rehab_track/domain/services/report_pdf_theme.dart';
@@ -273,6 +274,7 @@ class ReportPdfGenerator {
       if (p.bloodType != null) (loc.bloodTypeLabel, p.bloodType!),
       if (p.heightCm != null) (loc.heightLabel, _num(p.heightCm!)),
       if (p.weightKg != null) (loc.weightLabel, _num(p.weightKg!)),
+      if (p.bmi != null) (loc.bmiLabel, formatBmi(p.bmi!)),
       if (p.allergies != null && p.allergies!.isNotEmpty)
         (loc.allergiesLabel, p.allergies!),
       if (p.emergencyContactName != null || p.emergencyContactPhone != null)

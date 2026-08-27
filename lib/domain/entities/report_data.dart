@@ -83,6 +83,7 @@ class ReportProfileSummary {
     this.bloodType,
     this.heightCm,
     this.weightKg,
+    this.bmi,
     this.phone,
     this.email,
     this.allergies,
@@ -98,6 +99,10 @@ class ReportProfileSummary {
   final String? bloodType;
   final double? heightCm;
   final double? weightKg;
+
+  /// Derived Body Mass Index (null when it cannot be computed from
+  /// [heightCm] and [weightKg]).
+  final double? bmi;
   final String? phone;
   final String? email;
   final String? allergies;

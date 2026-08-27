@@ -1269,6 +1269,13 @@ class AppLocalizationsKa extends AppLocalizations {
   String get adjustTrendFilters => 'სცადეთ სხვა პერიოდი ან დღის დრო';
 
   @override
+  String get noReadingsForTimeOfDay =>
+      'არჩეული დღის დროისთვის გაზომვები არ მოიძებნა';
+
+  @override
+  String get tryDifferentTimeOfDay => 'სცადეთ დღის სხვა დრო';
+
+  @override
   String get statusSummary => 'სტატუსის შეჯამება';
 
   @override
@@ -1561,6 +1568,9 @@ class AppLocalizationsKa extends AppLocalizations {
   String get bloodType => 'სისხლის ჯგუფი';
 
   @override
+  String get selectBloodType => 'აირჩიეთ სისხლის ჯგუფი';
+
+  @override
   String get allergies => 'ალერგიები';
 
   @override
@@ -1639,6 +1649,9 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get weightLabel => 'წონა';
+
+  @override
+  String get bmi => 'BMI';
 
   @override
   String get nameLabel => 'სახელი';

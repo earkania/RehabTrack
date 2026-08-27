@@ -1,3 +1,5 @@
+import 'package:rehab_track/domain/entities/measurement_time_of_day_filter.dart';
+
 class AppRoutes {
   AppRoutes._();
 
@@ -121,6 +123,18 @@ class RecordNowExtra {
   const RecordNowExtra({
     required this.scheduledOccurrenceTime,
     required this.reminderScheduleId,
+  });
+}
+
+/// Optional arguments for navigating to Measurement Trends. Passed via
+/// `state.extra` so the value is typed and never encoded as a localized string.
+class MeasurementTrendsExtra {
+  /// The initial time-of-day filter when Trends opens. This is only the
+  /// starting value — the user can still change it inside Trends.
+  final MeasurementTimeOfDayFilter initialTimeOfDayFilter;
+
+  const MeasurementTrendsExtra({
+    this.initialTimeOfDayFilter = MeasurementTimeOfDayFilter.all,
   });
 }
 

@@ -11,6 +11,7 @@ import 'package:rehab_track/domain/repositories/medication_repository.dart';
 import 'package:rehab_track/domain/repositories/measurement_repository.dart';
 import 'package:rehab_track/domain/repositories/profile_repository.dart';
 import 'package:rehab_track/domain/repositories/reference_range_repository.dart';
+import 'package:rehab_track/domain/services/bmi.dart';
 
 import 'package:rehab_track/domain/entities/report_configuration.dart';
 import 'package:rehab_track/domain/entities/report_data.dart';
@@ -136,6 +137,10 @@ class ReportBuilder {
       bloodType: profile.bloodType,
       heightCm: profile.heightCm,
       weightKg: profile.weightKg,
+      bmi: calculateBmi(
+        heightCm: profile.heightCm,
+        weightKg: profile.weightKg,
+      ),
       phone: profile.phone,
       email: profile.email,
       allergies: profile.allergies,

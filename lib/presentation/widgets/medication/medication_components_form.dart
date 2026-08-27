@@ -219,12 +219,13 @@ class MedicationComponentsFormState extends State<MedicationComponentsForm> {
       children: [
         Row(
           children: [
-            Flexible(
+            Expanded(
               child: Text(
                 l10n.dosageComponents,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const Spacer(),
@@ -233,6 +234,7 @@ class MedicationComponentsFormState extends State<MedicationComponentsForm> {
                 onPressed: _addComponent,
                 icon: const Icon(Icons.add_circle_outline),
                 tooltip: l10n.addComponent,
+                padding: const EdgeInsets.only(left: 24),
               ),
           ],
         ),
@@ -255,7 +257,7 @@ class MedicationComponentsFormState extends State<MedicationComponentsForm> {
 
     return Padding(
       key: ValueKey(component.localId),
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: EdgeInsets.only(bottom: AppSpacing.md),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -272,7 +274,7 @@ class MedicationComponentsFormState extends State<MedicationComponentsForm> {
               _notifyChanged();
             },
           ),
-          AppSpacing.xsH,
+          AppSpacing.mdH,
           Row(
             children: [
               Expanded(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rehab_track/domain/entities/measurement_time_of_day_filter.dart';
 import 'package:rehab_track/domain/entities/report_data.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 
@@ -513,7 +514,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           if (typeId == null) {
             return const _InvalidRouteScreen();
           }
-          return MeasurementTrendsScreen(measurementTypeId: typeId);
+          final extra = state.extra as MeasurementTrendsExtra?;
+          return MeasurementTrendsScreen(
+            measurementTypeId: typeId,
+            initialTimeOfDayFilter:
+                extra?.initialTimeOfDayFilter ??
+                    MeasurementTimeOfDayFilter.all,
+          );
         },
       ),
       GoRoute(

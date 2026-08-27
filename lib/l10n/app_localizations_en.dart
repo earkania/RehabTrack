@@ -1273,6 +1273,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adjustTrendFilters => 'Try a different date range or time of day';
 
   @override
+  String get noReadingsForTimeOfDay =>
+      'No measurements for the selected time of day';
+
+  @override
+  String get tryDifferentTimeOfDay => 'Try a different time of day';
+
+  @override
   String get statusSummary => 'Status Summary';
 
   @override
@@ -1565,6 +1572,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bloodType => 'Blood Type';
 
   @override
+  String get selectBloodType => 'Select blood type';
+
+  @override
   String get allergies => 'Allergies';
 
   @override
@@ -1643,6 +1653,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weightLabel => 'Weight';
+
+  @override
+  String get bmi => 'BMI';
 
   @override
   String get nameLabel => 'Name';

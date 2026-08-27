@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rehab_track/domain/entities/medication_component.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/widgets/medication/medication_components_form.dart';
 
 Widget _wrapWithL10n(Widget child) {
@@ -47,6 +48,61 @@ void main() {
       expect(doseY, lessThanOrEqualTo(unitY));
     });
 
+    testWidgets(
+        'internal gap between name and dose row uses standard field spacing',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(_wrapWithL10n(
+        MedicationComponentsForm.forMedication(
+          components: const [],
+          onChanged: (_) {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      final nameLabel =
+          find.text('Component Name (optional)').evaluate().first.renderObject!
+              as RenderBox;
+      final doseLabel =
+          find.text('Dose Amount').evaluate().first.renderObject! as RenderBox;
+
+      final nameFieldBottom = nameLabel.localToGlobal(Offset.zero).dy +
+          nameLabel.size.height;
+      final doseRowTop = doseLabel.localToGlobal(Offset.zero).dy;
+
+      // The vertical gap between the end of the Component Name field and the
+      // start of the Dose Amount/Dose Unit row should be at least the standard
+      // form-field spacing, not the previous compressed gap.
+      expect(doseRowTop - nameFieldBottom,
+          greaterThanOrEqualTo(AppSpacing.md));
+    });
+
+    testWidgets('add button aligns flush with the content right edge',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(_wrapWithL10n(
+        MedicationComponentsForm.forMedication(
+          components: const [],
+          onChanged: (_) {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      final formBox = tester.renderObject<RenderBox>(
+        find.byType(MedicationComponentsForm),
+      );
+      final addIconBox = tester.renderObject<RenderBox>(
+        find.byIcon(Icons.add_circle_outline),
+      );
+
+      final contentRight =
+          formBox.localToGlobal(Offset.zero).dx + formBox.size.width;
+      final iconRight =
+          addIconBox.localToGlobal(Offset.zero).dx + addIconBox.size.width;
+
+      // The [+] button should sit at the section content edge (the same edge
+      // used by the remove buttons below), with no extra floating inset.
+      expect((contentRight - iconRight).abs(), lessThan(1));
+    });
+
     testWidgets('does not overflow on a narrow screen (320px)',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(320 * 3, 640 * 3);
@@ -78,6 +134,50 @@ void main() {
 
       // If there were overflow errors, the framework would have thrown.
       // Since pumpAndSettle completed without exception, no overflow occurred.
+    });
+
+    testWidgets('component rows use standard form-field vertical spacing',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(_wrapWithL10n(
+        MedicationComponentsForm.forMedication(
+          components: [
+            MedicationComponent(
+              medicationId: 1,
+              componentName: 'Aspirin',
+              doseAmount: '10',
+              doseUnit: 'mg',
+              createdAt: DateTime(2026),
+            ),
+            MedicationComponent(
+              medicationId: 1,
+              componentName: 'Clopidogrel',
+              doseAmount: '2.5',
+              doseUnit: 'mg',
+              createdAt: DateTime(2026),
+            ),
+          ],
+          onChanged: (_) {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      // Dose row resides below each component name field; the gap between the
+      // end of the first component's fields and the start of the second's name
+      // field should match the standard form-field spacing (AppSpacing.md).
+      final firstUnitLabel =
+          find.text('mg').evaluate().first.renderObject! as RenderBox;
+      final secondName = find
+          .text('Component Name (optional)')
+          .evaluate()
+          .map((e) => e.renderObject! as RenderBox)
+          .toList()[1];
+
+      final firstRowBottom = firstUnitLabel.localToGlobal(Offset.zero).dy +
+          firstUnitLabel.size.height;
+      final secondRowTop = secondName.localToGlobal(Offset.zero).dy;
+
+      expect(secondRowTop - firstRowBottom,
+          greaterThanOrEqualTo(AppSpacing.md));
     });
 
     testWidgets('alternative form uses same layout',

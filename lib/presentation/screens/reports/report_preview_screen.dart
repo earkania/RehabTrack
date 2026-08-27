@@ -12,6 +12,7 @@ import 'package:rehab_track/domain/entities/report_date_range.dart';
 import 'package:rehab_track/domain/entities/report_section.dart';
 import 'package:rehab_track/domain/enums/enums.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
+import 'package:rehab_track/domain/services/bmi.dart';
 import 'package:rehab_track/presentation/providers/care_contact_provider.dart';
 import 'package:rehab_track/presentation/providers/report_provider.dart';
 import 'package:rehab_track/domain/services/app_date_formatter.dart';
@@ -382,6 +383,7 @@ class _ReportPreviewScreenState extends ConsumerState<ReportPreviewScreen> {
             _kv(loc.heightLabel, p.heightCm!.toStringAsFixed(0)),
           if (p.weightKg != null)
             _kv(loc.weightLabel, p.weightKg!.toStringAsFixed(0)),
+          if (p.bmi != null) _kv(loc.bmiLabel, formatBmi(p.bmi!)),
           if (p.allergies != null) _kv(loc.allergiesLabel, p.allergies!),
           if (p.emergencyContactName != null ||
               p.emergencyContactPhone != null)

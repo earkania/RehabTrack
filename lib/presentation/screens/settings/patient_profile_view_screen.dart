@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
 import 'package:rehab_track/domain/services/app_date_formatter.dart';
+import 'package:rehab_track/domain/services/bmi.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
+import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 import 'package:rehab_track/presentation/widgets/profile/profile_avatar.dart';
 
 class PatientProfileViewScreen extends ConsumerWidget {
@@ -169,8 +172,13 @@ class PatientProfileViewScreen extends ConsumerWidget {
                 profile.bloodType ?? l10n.unavailable),
             _buildInfoTile(Icons.height_outlined, l10n.heightLabel,
                 profile.heightCm != null ? '${profile.heightCm} cm' : l10n.unavailable),
-            _buildInfoTile(Icons.monitor_weight_outlined, l10n.weightLabel,
+            _buildInfoTile(measurementIconForType('weight'), l10n.weightLabel,
                 profile.weightKg != null ? '${profile.weightKg} kg' : l10n.unavailable),
+            _buildInfoTile(
+              Symbols.body_fat,
+              l10n.bmi,
+              _formatBmi(profile, l10n),
+            ),
           ]),
           _buildSection(l10n.contactInformation, [
             _buildInfoTile(Icons.phone_outlined, l10n.phone,
@@ -237,6 +245,14 @@ class PatientProfileViewScreen extends ConsumerWidget {
   ) {
     if (date == null) return l10n.unavailable;
     return AppDateFormatter.of(context).formatShortDate(date);
+  }
+
+  String _formatBmi(Profile profile, AppLocalizations l10n) {
+    final bmi = calculateBmi(
+      heightCm: profile.heightCm,
+      weightKg: profile.weightKg,
+    );
+    return bmi == null ? l10n.unavailable : formatBmi(bmi);
   }
 
   String _relationshipLabel(Relationship relationship) {

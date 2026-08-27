@@ -88,6 +88,17 @@ final measurementTrendTimeOfDayFilterProvider =
   (ref) => MeasurementTimeOfDayFilter.all,
 );
 
+/// The selected time-of-day dimension for the Measurement History screen.
+///
+/// Auto-disposed so a brand-new History screen (after the previous one was
+/// fully removed) starts at [MeasurementTimeOfDayFilter.all], while the
+/// selection survives normal rebuilds and remains on the navigation stack for
+/// the current screen session.
+final measurementHistoryTimeOfDayFilterProvider =
+    StateProvider.autoDispose<MeasurementTimeOfDayFilter>(
+  (ref) => MeasurementTimeOfDayFilter.all,
+);
+
 typedef TrendParams = ({
   int measurementTypeId,
   MeasurementPeriod period,

@@ -19,9 +19,17 @@ import 'package:rehab_track/presentation/widgets/measurements/measurement_time_o
 class MeasurementTrendsScreen extends ConsumerStatefulWidget {
   final int measurementTypeId;
 
+  /// The initial time-of-day filter applied when this Trends screen opens.
+  ///
+  /// This is only the starting value: the user can still change the filter
+  /// normally inside Trends. Defaults to [MeasurementTimeOfDayFilter.all] so
+  /// existing navigation continues to work unchanged.
+  final MeasurementTimeOfDayFilter initialTimeOfDayFilter;
+
   const MeasurementTrendsScreen({
     super.key,
     required this.measurementTypeId,
+    this.initialTimeOfDayFilter = MeasurementTimeOfDayFilter.all,
   });
 
   @override
@@ -32,10 +40,38 @@ class MeasurementTrendsScreen extends ConsumerStatefulWidget {
 class _MeasurementTrendsScreenState
     extends ConsumerState<MeasurementTrendsScreen> {
   MeasurementPeriod _selectedPeriod = MeasurementPeriod.last30Days;
+  bool _appliedInitialFilter = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Seed the shared Trends time-of-day provider so a screen opened from
+    // History can start pre-filtered. This is a one-time seed, not a permanent
+    // override: the user can still change the filter normally inside Trends.
+    _applyInitialFilterIfProvided();
+  }
+
+  void _applyInitialFilterIfProvided() {
+    // Writing to a provider during build is deferred via a post-frame callback
+    // so the (auto-disposed, provider-driven) Trends filter reliably reflects
+    // the initial value without resetting on a fresh screen. Runs at most once.
+    if (_appliedInitialFilter) return;
+    if (widget.initialTimeOfDayFilter == MeasurementTimeOfDayFilter.all) return;
+    _appliedInitialFilter = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(measurementTrendTimeOfDayFilterProvider.notifier).state =
+          widget.initialTimeOfDayFilter;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Watch the time-of-day provider unconditionally so the auto-disposed
+    // provider stays alive from the first frame — the async data above must
+    // not let it reset before the initial filter has been applied.
+    ref.watch(measurementTrendTimeOfDayFilterProvider);
     final typeAsync = ref.watch(trendTypeProvider(widget.measurementTypeId));
 
     return Scaffold(

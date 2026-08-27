@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:rehab_track/domain/entities/profile.dart';
 import 'package:rehab_track/domain/repositories/profile_repository.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
 import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/screens/settings/patient_profile_view_screen.dart';
+import 'package:rehab_track/presentation/utils/measurement_icon.dart';
 
 class FakeProfileRepository implements ProfileRepository {
   final Map<int, Profile> _profiles = {};
@@ -89,11 +91,15 @@ void main() {
     int id, {
     String firstName = 'John',
     String lastName = 'Doe',
+    double? heightCm,
+    double? weightKg,
   }) {
     return Profile(
       id: id,
       firstName: firstName,
       lastName: lastName,
+      heightCm: heightCm,
+      weightKg: weightKg,
       createdAt: DateTime(2026),
       updatedAt: DateTime(2026),
       isPrimary: true,
@@ -274,6 +280,98 @@ void main() {
       await tester.pump();
 
       expect(find.text('Personal Information'), findsOneWidget);
+    });
+
+    testWidgets('displays BMI when height and weight are present',
+        (tester) async {
+      final repo = FakeProfileRepository();
+      repo.addProfile(makeProfile(1,
+          firstName: 'Test', lastName: 'User', heightCm: 170, weightKg: 70));
+
+      await tester.pumpWidget(wrapScreen(
+        activeProfileId: 1,
+        fakeRepo: repo,
+      ));
+
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('BMI'), findsOneWidget);
+      expect(find.text('24.2'), findsOneWidget);
+    });
+
+    testWidgets('does not display a BMI value when height is missing',
+        (tester) async {
+      final repo = FakeProfileRepository();
+      repo.addProfile(
+          makeProfile(1, firstName: 'Test', lastName: 'User', weightKg: 70));
+
+      await tester.pumpWidget(wrapScreen(
+        activeProfileId: 1,
+        fakeRepo: repo,
+      ));
+
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('BMI'), findsOneWidget);
+      expect(find.text('0.0'), findsNothing);
+      expect(find.text('NaN'), findsNothing);
+      expect(find.text('Infinity'), findsNothing);
+    });
+
+    testWidgets('does not display a BMI value when weight is missing',
+        (tester) async {
+      final repo = FakeProfileRepository();
+      repo.addProfile(
+          makeProfile(1, firstName: 'Test', lastName: 'User', heightCm: 170));
+
+      await tester.pumpWidget(wrapScreen(
+        activeProfileId: 1,
+        fakeRepo: repo,
+      ));
+
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('BMI'), findsOneWidget);
+      expect(find.text('0.0'), findsNothing);
+      expect(find.text('NaN'), findsNothing);
+      expect(find.text('Infinity'), findsNothing);
+    });
+
+    testWidgets('uses the canonical measurement weight icon and a body/scale '
+        'BMI icon (no pulse icon)', (tester) async {
+      final repo = FakeProfileRepository();
+      repo.addProfile(makeProfile(1,
+          firstName: 'Test',
+          lastName: 'User',
+          heightCm: 170,
+          weightKg: 70));
+
+      await tester.pumpWidget(wrapScreen(
+        activeProfileId: 1,
+        fakeRepo: repo,
+      ));
+
+      await tester.pump();
+      await tester.pump();
+
+      // Weight uses the same canonical icon as the Measurements UI.
+      expect(
+        find.byIcon(measurementIconForType('weight')),
+        findsWidgets,
+      );
+      // BMI uses a body-composition / body-fat icon, distinct from the pulse
+      // icon and from the Weight (scale) icon.
+      expect(find.byIcon(Icons.monitor_heart_outlined), findsNothing);
+      expect(find.byIcon(Symbols.body_fat), findsWidgets);
+      expect(find.byIcon(Symbols.monitor_weight), findsNothing);
+
+      // Height / Weight / BMI values remain correct.
+      expect(find.text('170.0 cm'), findsOneWidget);
+      expect(find.text('70.0 kg'), findsOneWidget);
+      expect(find.text('24.2'), findsOneWidget);
     });
   });
 }

@@ -88,6 +88,7 @@ void main() {
   Future<void> pumpPreview(
     WidgetTester tester, {
     List<CareContact> contacts = const [],
+    ReportData? data,
   }) async {
     final container = ProviderContainer(
       overrides: [
@@ -96,13 +97,14 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
+    final routeData = data ?? minimalData();
     final router = GoRouter(
       initialLocation: '/preview',
       routes: [
         GoRoute(
           path: '/preview',
           builder: (context, state) =>
-              ReportPreviewScreen(data: minimalData()),
+              ReportPreviewScreen(data: routeData),
         ),
         GoRoute(
           path: AppRoutes.profileCareContacts,
@@ -238,5 +240,52 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('Care Contacts screen'), findsOneWidget);
+  });
+
+  testWidgets('patient summary shows BMI when height and weight are present',
+      (tester) async {
+    final data = ReportData(
+      configuration: ReportConfiguration(
+        title: 'Health Summary',
+        dateRangeType: ReportDateRangeType.last30Days,
+        selectedSections: {ReportSection.profile},
+        profileId: 1,
+      ),
+      generatedAt: DateTime(2026, 8, 24),
+      profileSummary: const ReportProfileSummary(
+        fullName: 'Test User',
+        heightCm: 170,
+        weightKg: 70,
+        bmi: 24.2,
+      ),
+    );
+    await pumpPreview(tester, data: data);
+    expect(find.text('BMI', skipOffstage: false), findsOneWidget);
+    expect(find.text('24.2', skipOffstage: false), findsOneWidget);
+  });
+
+  testWidgets(
+      'patient summary does not show BMI when weight is missing (no 0.0/NaN/Infinity)',
+      (tester) async {
+    final data = ReportData(
+      configuration: ReportConfiguration(
+        title: 'Health Summary',
+        dateRangeType: ReportDateRangeType.last30Days,
+        selectedSections: {ReportSection.profile},
+        profileId: 1,
+      ),
+      generatedAt: DateTime(2026, 8, 24),
+      profileSummary: const ReportProfileSummary(
+        fullName: 'Test User',
+        heightCm: 170,
+        weightKg: null,
+        bmi: null,
+      ),
+    );
+    await pumpPreview(tester, data: data);
+    expect(find.text('BMI', skipOffstage: false), findsNothing);
+    expect(find.text('0.0', skipOffstage: false), findsNothing);
+    expect(find.text('NaN', skipOffstage: false), findsNothing);
+    expect(find.text('Infinity', skipOffstage: false), findsNothing);
   });
 }

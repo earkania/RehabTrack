@@ -2438,6 +2438,18 @@ abstract class AppLocalizations {
   /// **'Try a different date range or time of day'**
   String get adjustTrendFilters;
 
+  /// Measurement History: shown when records exist but none match the selected time-of-day filter
+  ///
+  /// In en, this message translates to:
+  /// **'No measurements for the selected time of day'**
+  String get noReadingsForTimeOfDay;
+
+  /// Measurement History: hint shown with the filtered empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different time of day'**
+  String get tryDifferentTimeOfDay;
+
   /// No description provided for @statusSummary.
   ///
   /// In en, this message translates to:
@@ -2978,6 +2990,12 @@ abstract class AppLocalizations {
   /// **'Blood Type'**
   String get bloodType;
 
+  /// No description provided for @selectBloodType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select blood type'**
+  String get selectBloodType;
+
   /// No description provided for @allergies.
   ///
   /// In en, this message translates to:
@@ -3133,6 +3151,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weight'**
   String get weightLabel;
+
+  /// No description provided for @bmi.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI'**
+  String get bmi;
 
   /// No description provided for @nameLabel.
   ///

@@ -316,6 +316,9 @@ void main() {
     expect(data.generatedAt, now);
     expect(data.profileSummary!.fullName, 'Nino Beridze');
     expect(data.profileSummary!.gender, 'female');
+    expect(data.profileSummary!.heightCm, 170.0);
+    expect(data.profileSummary!.weightKg, 65.0);
+    expect(data.profileSummary!.bmi, closeTo(65 / (1.7 * 1.7), 0.01));
 
     // Medications: active only, schedule times normalized+sorted.
     expect(data.medications, hasLength(1));

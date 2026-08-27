@@ -5,13 +5,17 @@ import 'package:rehab_track/core/router/app_routes.dart';
 import 'package:rehab_track/domain/entities/blood_pressure_component_status.dart';
 import 'package:rehab_track/domain/entities/default_reference_ranges.dart';
 import 'package:rehab_track/domain/entities/measurement.dart';
+import 'package:rehab_track/domain/entities/measurement_time_of_day_filter.dart';
 import 'package:rehab_track/domain/entities/reading_status.dart';
 import 'package:rehab_track/domain/services/blood_pressure_status_evaluator.dart';
 import 'package:rehab_track/domain/services/app_date_formatter.dart';
+import 'package:rehab_track/domain/services/bmi.dart';
+import 'package:rehab_track/domain/services/measurement_time_of_day_classifier.dart';
 import 'package:rehab_track/domain/services/reading_status_calculator.dart';
 import 'package:rehab_track/l10n/app_localizations.dart';
 import 'package:rehab_track/presentation/providers/measurement_provider.dart';
 import 'package:rehab_track/presentation/providers/database_provider.dart';
+import 'package:rehab_track/presentation/providers/profile_provider.dart';
 import 'package:rehab_track/presentation/providers/reference_range_provider.dart';
 import 'package:rehab_track/presentation/theme/app_spacing.dart';
 import 'package:rehab_track/presentation/utils/measurement_formatter.dart';
@@ -19,6 +23,7 @@ import 'package:rehab_track/presentation/utils/measurement_localizer.dart';
 import 'package:rehab_track/presentation/widgets/common/reading_status_indicator.dart';
 import 'package:rehab_track/presentation/widgets/empty_state.dart';
 import 'package:rehab_track/presentation/widgets/measurements/blood_pressure_summary_text.dart';
+import 'package:rehab_track/presentation/widgets/measurements/measurement_time_of_day_selector.dart';
 import 'package:rehab_track/presentation/widgets/measurements/status_aware_measurement_value.dart';
 
 class MeasurementHistoryScreen extends ConsumerWidget {
@@ -32,6 +37,9 @@ class MeasurementHistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final selectedTimeOfDay = ref.watch(
+      measurementHistoryTimeOfDayFilterProvider,
+    );
     final typeAsync = ref.watch(
       measurementTypeProvider(measurementTypeId),
     );
@@ -48,6 +56,9 @@ class MeasurementHistoryScreen extends ConsumerWidget {
           IconButton(
             onPressed: () => context.push(
               AppRoutes.measurementTrends(measurementTypeId),
+              extra: MeasurementTrendsExtra(
+                initialTimeOfDayFilter: selectedTimeOfDay,
+              ),
             ),
             icon: const Icon(Icons.show_chart),
             tooltip: l10n.viewTrends,
@@ -117,6 +128,14 @@ class MeasurementHistoryScreen extends ConsumerWidget {
                     fields: fields,
                     records: records,
                     effectiveRangesAsync: effectiveRangesAsync,
+                    selectedTimeOfDay: selectedTimeOfDay,
+                    onTimeOfDayChanged: (filter) {
+                      ref
+                          .read(
+                            measurementHistoryTimeOfDayFilterProvider.notifier,
+                          )
+                          .state = filter;
+                    },
                   );
                 },
               );
@@ -248,6 +267,7 @@ class _RecordTile extends StatelessWidget {
   final List<MeasurementTypeField> fields;
   final MeasurementType type;
   final MeasurementRanges? effectiveRanges;
+  final double? profileHeightCm;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -256,6 +276,7 @@ class _RecordTile extends StatelessWidget {
     required this.fields,
     required this.type,
     this.effectiveRanges,
+    this.profileHeightCm,
     required this.onEdit,
     required this.onDelete,
   });
@@ -270,6 +291,21 @@ class _RecordTile extends StatelessWidget {
       builder: (context, snapshot) {
         final values = snapshot.data ?? [];
         final status = _calculateStatus(values);
+
+        final isWeight = type.key == 'weight';
+        // BMI is derived per row from this record's recorded Weight combined
+        // with the current active profile's Height (never stored).
+        double? bmi;
+        if (isWeight && profileHeightCm != null) {
+          double? weightValue;
+          for (final v in values) {
+            if (v.fieldKey == 'weight') weightValue = v.numericValue;
+          }
+          bmi = calculateBmi(
+            heightCm: profileHeightCm,
+            weightKg: weightValue,
+          );
+        }
 
         final isBloodPressure = type.key == 'blood_pressure';
         Widget titleWidget;
@@ -291,6 +327,9 @@ class _RecordTile extends StatelessWidget {
         }
 
         return ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: AppSpacing.sm,
+          ),
           leading: ReadingStatusIndicator(status: status),
           title: titleWidget,
           subtitle: Column(
@@ -300,6 +339,16 @@ class _RecordTile extends StatelessWidget {
                 _formatDate(context, record.timestamp),
                 style: theme.textTheme.bodySmall,
               ),
+              if (bmi != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    '${l10n.bmi} ${formatBmi(bmi)}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
               if (record.irregularHeartbeatDetected == true)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
@@ -546,6 +595,8 @@ class _HistoryBody extends ConsumerWidget {
   final List<MeasurementTypeField> fields;
   final List<MeasurementRecord> records;
   final AsyncValue<MeasurementRanges?> effectiveRangesAsync;
+  final MeasurementTimeOfDayFilter selectedTimeOfDay;
+  final ValueChanged<MeasurementTimeOfDayFilter> onTimeOfDayChanged;
 
   const _HistoryBody({
     required this.measurementTypeId,
@@ -553,11 +604,30 @@ class _HistoryBody extends ConsumerWidget {
     required this.fields,
     required this.records,
     required this.effectiveRangesAsync,
+    required this.selectedTimeOfDay,
+    required this.onTimeOfDayChanged,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+
+    final profileId = ref.watch(currentActiveProfileIdProvider);
+    final profile = profileId == null
+        ? null
+        : ref.watch(watchProfileByIdProvider(profileId)).valueOrNull;
+    final heightCm = profile?.heightCm;
+
+    final recordsHaveAny = records.isNotEmpty;
+    final filteredRecords = records
+        .where(
+          (r) =>
+              MeasurementTimeOfDayClassifier.matches(
+                r.timestamp,
+                selectedTimeOfDay,
+              ),
+        )
+        .toList();
 
     return Column(
       children: [
@@ -577,12 +647,27 @@ class _HistoryBody extends ConsumerWidget {
             ],
           ),
         ),
-        if (records.isEmpty)
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: MeasurementTimeOfDaySelector(
+            selected: selectedTimeOfDay,
+            onChanged: onTimeOfDayChanged,
+          ),
+        ),
+        if (!recordsHaveAny)
           Expanded(
             child: EmptyState(
               icon: Icons.history,
               title: l10n.noReadingsYet,
               subtitle: l10n.addFirstReading,
+            ),
+          )
+        else if (filteredRecords.isEmpty)
+          Expanded(
+            child: EmptyState(
+              icon: Icons.filter_alt_off,
+              title: l10n.noReadingsForTimeOfDay,
+              subtitle: l10n.tryDifferentTimeOfDay,
             ),
           )
         else
@@ -591,10 +676,10 @@ class _HistoryBody extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
               ),
-              itemCount: records.length,
+              itemCount: filteredRecords.length,
               separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (context, index) {
-                final record = records[index];
+                final record = filteredRecords[index];
                 final effectiveRanges =
                     effectiveRangesAsync.valueOrNull;
                 return _RecordTile(
@@ -602,6 +687,7 @@ class _HistoryBody extends ConsumerWidget {
                   fields: fields,
                   type: type,
                   effectiveRanges: effectiveRanges,
+                  profileHeightCm: heightCm,
                   onEdit: () => context.push(
                     AppRoutes.measurementEdit(record.id!),
                   ),

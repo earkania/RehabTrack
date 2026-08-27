@@ -29,6 +29,7 @@ class ReportLocalization {
     required this.bloodTypeLabel,
     required this.heightLabel,
     required this.weightLabel,
+    required this.bmiLabel,
     required this.allergiesLabel,
     required this.emergencyContactLabel,
     required this.statMin,
@@ -93,6 +94,7 @@ class ReportLocalization {
   final String bloodTypeLabel;
   final String heightLabel;
   final String weightLabel;
+  final String bmiLabel;
   final String allergiesLabel;
   final String emergencyContactLabel;
   final String statMin;
@@ -200,6 +202,7 @@ class ReportLocalization {
       bloodTypeLabel: l10n.bloodType,
       heightLabel: l10n.heightCm,
       weightLabel: l10n.weightKg,
+      bmiLabel: l10n.bmi,
       allergiesLabel: l10n.allergies,
       emergencyContactLabel: l10n.emergencyContact,
       statMin: l10n.reportStatMin,

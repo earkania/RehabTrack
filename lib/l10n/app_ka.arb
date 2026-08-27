@@ -506,6 +506,14 @@
   "noEveningReadings": "არჩეულ პერიოდში საღამოს გაზომვები არ არის",
   "noNightReadings": "არჩეულ პერიოდში ღამის გაზომვები არ არის",
   "adjustTrendFilters": "სცადეთ სხვა პერიოდი ან დღის დრო",
+  "noReadingsForTimeOfDay": "არჩეული დღის დროისთვის გაზომვები არ მოიძებნა",
+  "@noReadingsForTimeOfDay": {
+    "description": "Measurement History: shown when records exist but none match the selected time-of-day filter"
+  },
+  "tryDifferentTimeOfDay": "სცადეთ დღის სხვა დრო",
+  "@tryDifferentTimeOfDay": {
+    "description": "Measurement History: hint shown with the filtered empty state"
+  },
   "statusSummary": "სტატუსის შეჯამება",
   "statistics": "სტატისტიკა",
   "chart": "გრაფიკი",
@@ -638,6 +646,7 @@
   "heightCm": "სიმაღლე",
   "weightKg": "წონა",
   "bloodType": "სისხლის ჯგუფი",
+  "selectBloodType": "აირჩიეთ სისხლის ჯგუფი",
   "allergies": "ალერგიები",
   "gender": "სქესი",
   "relationship": "ურთიერთობა",
@@ -671,6 +680,7 @@
   "birthDateLabel": "დაბადების თარიღი",
   "heightLabel": "სიმაღლე",
   "weightLabel": "წონა",
+  "bmi": "BMI",
   "nameLabel": "სახელი",
   "emergencyContactNameLabel": "კონტაქტის სახელი",
   "emergencyContactPhoneLabel": "კონტაქტის ტელეფონი",

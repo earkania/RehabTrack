@@ -506,6 +506,14 @@
   "noEveningReadings": "No evening readings in the selected period",
   "noNightReadings": "No night readings in the selected period",
   "adjustTrendFilters": "Try a different date range or time of day",
+  "noReadingsForTimeOfDay": "No measurements for the selected time of day",
+  "@noReadingsForTimeOfDay": {
+    "description": "Measurement History: shown when records exist but none match the selected time-of-day filter"
+  },
+  "tryDifferentTimeOfDay": "Try a different time of day",
+  "@tryDifferentTimeOfDay": {
+    "description": "Measurement History: hint shown with the filtered empty state"
+  },
   "statusSummary": "Status Summary",
   "statistics": "Statistics",
   "chart": "Chart",
@@ -638,6 +646,7 @@
   "heightCm": "Height",
   "weightKg": "Weight",
   "bloodType": "Blood Type",
+  "selectBloodType": "Select blood type",
   "allergies": "Allergies",
   "gender": "Gender",
   "relationship": "Relationship",
@@ -671,6 +680,7 @@
   "birthDateLabel": "Birth Date",
   "heightLabel": "Height",
   "weightLabel": "Weight",
+  "bmi": "BMI",
   "nameLabel": "Name",
   "emergencyContactNameLabel": "Contact Name",
   "emergencyContactPhoneLabel": "Contact Phone",

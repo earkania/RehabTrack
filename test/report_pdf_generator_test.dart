@@ -721,6 +721,7 @@ ReportLocalization _testLocalization() {
     bloodTypeLabel: 'Blood Type',
     heightLabel: 'Height',
     weightLabel: 'Weight',
+    bmiLabel: 'BMI',
     allergiesLabel: 'Allergies',
     emergencyContactLabel: 'Emergency Contact',
     statMin: 'Min',
