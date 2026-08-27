@@ -19,6 +19,15 @@ abstract class DoctorVisitRepository {
   /// One-shot fetch of open visits for reminder recovery.
   Future<List<DoctorVisitRecord>> getUpcomingVisits(int profileId);
 
+  /// One-shot fetch of non-archived visits whose [DoctorVisitRecord.scheduledDateTime]
+  /// falls within the half-open range `[startInclusive, endExclusive)` for a
+  /// profile, newest first. Any visit status is included.
+  Future<List<DoctorVisitRecord>> getVisitsBetween(
+    int profileId,
+    DateTime startInclusive,
+    DateTime endExclusive,
+  );
+
   Future<int> createVisit(DoctorVisitRecord visit);
 
   Future<void> updateVisit(DoctorVisitRecord visit);

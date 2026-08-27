@@ -6583,6 +6583,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{minutes} min'**
   String xMinutes(int minutes);
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Create Report'**
+  String get reportCreateTitle;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Report Name'**
+  String get reportNameLabel;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Date Range'**
+  String get reportDateRangeLabel;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get reportRangeLastWeek;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get reportRangeLastMonth;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Last 3 months'**
+  String get reportRangeLast3Months;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Last 6 months'**
+  String get reportRangeLast6Months;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Last year'**
+  String get reportRangeLastYear;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'All time'**
+  String get reportRangeAllTime;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Custom range'**
+  String get reportRangeCustom;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Sections to include'**
+  String get reportSectionsLabel;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get reportCustomStartDate;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get reportCustomEndDate;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get reportPreview;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one section'**
+  String get reportErrorNoSections;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a report name'**
+  String get reportErrorInvalidTitle;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Check the custom date range'**
+  String get reportErrorInvalidRange;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t generate the report'**
+  String get reportErrorGeneric;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Report Preview'**
+  String get reportPreviewTitle;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Share PDF'**
+  String get reportSharePdf;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Generated: {dateTime}'**
+  String reportGeneratedAt(String dateTime);
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get reportPeriodLabel;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Summary'**
+  String get reportPatientSummary;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Date'**
+  String get reportBirthDateLabel;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Min'**
+  String get reportStatMin;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Max'**
+  String get reportStatMax;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Avg'**
+  String get reportStatAvg;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Showing latest {included} of {total} readings'**
+  String reportShowingLatest(int included, int total);
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments ({count})'**
+  String reportAttachmentsCount(int count);
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get reportGenderOther;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing recorded for this period.'**
+  String get reportEmptyPeriodNote;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sessions: {completed} completed, {cancelled} cancelled'**
+  String reportActivitySummary(int count, int completed, int cancelled);
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Total active time'**
+  String get reportTotalActiveTime;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Session History'**
+  String get reportSessionHistoryHeading;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Foods'**
+  String get reportDietFoodsHeading;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Health Summary'**
+  String get reportDefaultTitle;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'General Guidance'**
+  String get reportDietGuidanceHeading;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get reportDateLabel;
+
+  /// Reports feature
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get reportStatusLabel;
+
+  /// Reports feature: action that renders and saves the report PDF
+  ///
+  /// In en, this message translates to:
+  /// **'Generate PDF'**
+  String get generatePdf;
+
+  /// Reports feature: success confirmation after saving the PDF
+  ///
+  /// In en, this message translates to:
+  /// **'Report generated successfully'**
+  String get reportGeneratedSuccessfully;
+
+  /// Reports feature: prefix before the save location, e.g. Saved to: Downloads/RehabTrack
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to'**
+  String get savedTo;
+
+  /// Reports feature: user-visible name of the system Downloads folder
+  ///
+  /// In en, this message translates to:
+  /// **'Downloads'**
+  String get downloadsFolder;
+
+  /// Reports feature: opens the saved PDF in a viewer
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get openReport;
+
+  /// Reports feature: shares the saved PDF
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareReport;
+
+  /// Reports feature: closes the success dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get doneAction;
+
+  /// Reports feature: short confirmation that the file was saved
+  ///
+  /// In en, this message translates to:
+  /// **'Report saved'**
+  String get reportFileSaved;
+
+  /// Reports feature: error when the PDF cannot be persisted
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the report'**
+  String get couldNotSaveReport;
+
+  /// Reports feature: no installed PDF viewer for the saved report
+  ///
+  /// In en, this message translates to:
+  /// **'No app found to open the report'**
+  String get couldNotOpenReport;
+
+  /// Reports feature: error when sharing the saved report fails
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t share the report'**
+  String get couldNotShareReport;
+
+  /// Reports feature: storage full/unavailable while saving
+  ///
+  /// In en, this message translates to:
+  /// **'Storage is unavailable. Free up space and try again.'**
+  String get reportStorageUnavailable;
+
+  /// Reports feature: label for the most recent reading in measurement summary
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get reportLatest;
+
+  /// Reports feature: total number of readings outside measurement summary table
+  ///
+  /// In en, this message translates to:
+  /// **'Total readings: {count}'**
+  String reportTotalReadingsCount(int count);
+
+  /// Reports feature: patient phone label
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get reportPatientPhone;
+
+  /// Reports feature: patient email label
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get reportPatientEmail;
+
+  /// Reports feature: footer text
+  ///
+  /// In en, this message translates to:
+  /// **'Generated by RehabTrack'**
+  String get reportGeneratedBy;
+
+  /// Reports feature: column header for individual readings table
+  ///
+  /// In en, this message translates to:
+  /// **'Reading Date'**
+  String get reportReadingDate;
+
+  /// Reports feature: compact systolic column header
+  ///
+  /// In en, this message translates to:
+  /// **'Syst.'**
+  String get reportSystolicShort;
+
+  /// Reports feature: compact diastolic column header
+  ///
+  /// In en, this message translates to:
+  /// **'Diast.'**
+  String get reportDiastolicShort;
+
+  /// Reports feature: compact pulse column header
+  ///
+  /// In en, this message translates to:
+  /// **'Pulse'**
+  String get reportPulseShort;
+
+  /// Reports feature: mmHg unit label for measurement headers
+  ///
+  /// In en, this message translates to:
+  /// **'mmHg'**
+  String get reportUnitMmHg;
+
+  /// Reports feature: bpm unit label for measurement headers
+  ///
+  /// In en, this message translates to:
+  /// **'bpm'**
+  String get reportUnitBpm;
+
+  /// Reports feature: action to email the report to a care contact
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Doctor/Clinic'**
+  String get sendToDoctorOrClinic;
+
+  /// Reports feature: title of the care contact picker dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Select Care Contact'**
+  String get selectCareContact;
+
+  /// Reports feature: shown when no eligible contacts exist for emailing
+  ///
+  /// In en, this message translates to:
+  /// **'No care contacts with email addresses are available.'**
+  String get noCareContactsWithEmail;
+
+  /// Reports feature: navigates to Care Contacts management
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Care Contacts'**
+  String get manageCareContacts;
+
+  /// Reports feature: default email subject when sending a report
+  ///
+  /// In en, this message translates to:
+  /// **'{reportTitle} - {patientName}'**
+  String reportEmailSubject(String reportTitle, String patientName);
+
+  /// Reports feature: default email body when sending a report
+  ///
+  /// In en, this message translates to:
+  /// **'Hello,\n\nPlease find attached my {reportTitle} health report.\n\nReport period: {period}\n\nRegards,\n{patientName}'**
+  String reportEmailBody(String reportTitle, String period, String patientName);
+
+  /// Reports feature: no email-capable app installed
+  ///
+  /// In en, this message translates to:
+  /// **'No email application is available on this device.'**
+  String get noEmailAppAvailable;
+
+  /// Reports feature: email compose intent failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open email composer.'**
+  String get couldNotOpenEmailComposer;
 }
 
 class _AppLocalizationsDelegate

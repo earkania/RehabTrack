@@ -3500,4 +3500,237 @@ class AppLocalizationsKa extends AppLocalizations {
   String xMinutes(int minutes) {
     return '$minutes წთ';
   }
+
+  @override
+  String get reportCreateTitle => 'ანგარიშის შექმნა';
+
+  @override
+  String get reportNameLabel => 'ანგარიშის დასახელება';
+
+  @override
+  String get reportDateRangeLabel => 'პერიოდი';
+
+  @override
+  String get reportRangeLastWeek => 'ბოლო 7 დღე';
+
+  @override
+  String get reportRangeLastMonth => 'ბოლო 30 დღე';
+
+  @override
+  String get reportRangeLast3Months => 'ბოლო 3 თვე';
+
+  @override
+  String get reportRangeLast6Months => 'ბოლო 6 თვე';
+
+  @override
+  String get reportRangeLastYear => 'ბოლო წელი';
+
+  @override
+  String get reportRangeAllTime => 'ყველა ჩანაწერი';
+
+  @override
+  String get reportRangeCustom => 'მორგებული პერიოდი';
+
+  @override
+  String get reportSectionsLabel => 'ჩასართავი განყოფილებები';
+
+  @override
+  String get reportCustomStartDate => '-დან';
+
+  @override
+  String get reportCustomEndDate => '-მდე';
+
+  @override
+  String get reportPreview => 'გადახედვა';
+
+  @override
+  String get reportErrorNoSections => 'აირჩიეთ მინიმუმ ერთი განყოფილება';
+
+  @override
+  String get reportErrorInvalidTitle => 'შეიყვანეთ ანგარიშის დასახელება';
+
+  @override
+  String get reportErrorInvalidRange => 'შეამოწმეთ მორგებული პერიოდი';
+
+  @override
+  String get reportErrorGeneric => 'ანგარიშის გენერირება ვერ მოხერხდა';
+
+  @override
+  String get reportPreviewTitle => 'ანგარიშის გადახედვა';
+
+  @override
+  String get reportSharePdf => 'PDF-ის გაზიარება';
+
+  @override
+  String reportGeneratedAt(String dateTime) {
+    return 'შექმნის დრო: $dateTime';
+  }
+
+  @override
+  String get reportPeriodLabel => 'პერიოდი';
+
+  @override
+  String get reportPatientSummary => 'პაციენტის მონაცემები';
+
+  @override
+  String get reportBirthDateLabel => 'დაბადების თარიღი';
+
+  @override
+  String get reportStatMin => 'მინ';
+
+  @override
+  String get reportStatMax => 'მაქს';
+
+  @override
+  String get reportStatAvg => 'საშ.';
+
+  @override
+  String reportShowingLatest(int included, int total) {
+    return 'ნაჩვენებია ბოლო $included / $total გაზომვა';
+  }
+
+  @override
+  String reportAttachmentsCount(int count) {
+    return 'დანართები ($count)';
+  }
+
+  @override
+  String get reportGenderOther => 'სხვა';
+
+  @override
+  String get reportEmptyPeriodNote => 'ამ პერიოდში ჩანაწერი არ არის.';
+
+  @override
+  String reportActivitySummary(int count, int completed, int cancelled) {
+    return '$count სეანსი: $completed დასრულებული, $cancelled გაუქმებული';
+  }
+
+  @override
+  String get reportTotalActiveTime => 'საერთო აქტიური დრო';
+
+  @override
+  String get reportSessionHistoryHeading => 'სეანსების ისტორია';
+
+  @override
+  String get reportDietFoodsHeading => 'საკვები';
+
+  @override
+  String get reportDefaultTitle => 'ჯანმრთელობის მიმოხილვა';
+
+  @override
+  String get reportDietGuidanceHeading => 'ზოგადი რეკომენდაციები';
+
+  @override
+  String get reportDateLabel => 'თარიღი';
+
+  @override
+  String get reportStatusLabel => 'სტატუსი';
+
+  @override
+  String get generatePdf => 'PDF-ის გენერაცია';
+
+  @override
+  String get reportGeneratedSuccessfully => 'ანგარიში წარმატებით შეიქმნა';
+
+  @override
+  String get savedTo => 'შენახულია';
+
+  @override
+  String get downloadsFolder => 'ჩამოტვირთვები';
+
+  @override
+  String get openReport => 'გახსნა';
+
+  @override
+  String get shareReport => 'გაზიარება';
+
+  @override
+  String get doneAction => 'მზადაა';
+
+  @override
+  String get reportFileSaved => 'ანგარიში შენახულია';
+
+  @override
+  String get couldNotSaveReport => 'ანგარიშის შენახვა ვერ მოხერხდა';
+
+  @override
+  String get couldNotOpenReport =>
+      'ანგარიშის გასახსნელი აპლიკაცია ვერ მოიძებნა';
+
+  @override
+  String get couldNotShareReport => 'ანგარიშის გაზიარება ვერ მოხერხდა';
+
+  @override
+  String get reportStorageUnavailable =>
+      'მეხსიერება მიუწვდომელია. გაათავისუფლეთ ადგილი და სცადეთ ხელახლა.';
+
+  @override
+  String get reportLatest => 'უახლესი';
+
+  @override
+  String reportTotalReadingsCount(int count) {
+    return 'სულ ჩანაწერი: $count';
+  }
+
+  @override
+  String get reportPatientPhone => 'ტელეფონი';
+
+  @override
+  String get reportPatientEmail => 'ელ-ფოსტა';
+
+  @override
+  String get reportGeneratedBy => 'მომზადებულია RehabTrack-ის მიერ';
+
+  @override
+  String get reportReadingDate => 'ჩანაწერის თარიღი';
+
+  @override
+  String get reportSystolicShort => 'სისტ.';
+
+  @override
+  String get reportDiastolicShort => 'დიასტ.';
+
+  @override
+  String get reportPulseShort => 'პულსი';
+
+  @override
+  String get reportUnitMmHg => 'mmHg';
+
+  @override
+  String get reportUnitBpm => 'bpm';
+
+  @override
+  String get sendToDoctorOrClinic => 'ექიმთან/კლინიკაში გაგზავნა';
+
+  @override
+  String get selectCareContact => 'აირჩიეთ კონტაქტი';
+
+  @override
+  String get noCareContactsWithEmail =>
+      'ელ-ფოსტის მქონე კონტაქტები არ მოიძებნა.';
+
+  @override
+  String get manageCareContacts => 'კონტაქტების მართვა';
+
+  @override
+  String reportEmailSubject(String reportTitle, String patientName) {
+    return '$reportTitle - $patientName';
+  }
+
+  @override
+  String reportEmailBody(
+    String reportTitle,
+    String period,
+    String patientName,
+  ) {
+    return 'გამარჯობა,\n\nგთხოვთ იხილოთ ჩემი ჯანმრთელობის ანგარიში დანართში: $reportTitle\n\nანგარიშის პერიოდი: $period\n\nპატივისცემით,\n$patientName';
+  }
+
+  @override
+  String get noEmailAppAvailable =>
+      'მოწყობილობაზე ელ-ფოსტის აპლიკაცია არ არის დაინსტალირებული.';
+
+  @override
+  String get couldNotOpenEmailComposer =>
+      'ელ-ფოსტის გაგზავნის ფანჯრის გახსნა ვერ მოხერხდა.';
 }

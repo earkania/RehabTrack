@@ -63,6 +63,15 @@ abstract class ActivityRepository {
   /// first.
   Stream<List<ActivitySession>> watchSessionHistory(int profileId);
 
+  /// One-shot fetch of finished (completed/cancelled) sessions started within
+  /// the half-open range [startInclusive, endExclusive), newest first.
+  /// Running or paused sessions are never included.
+  Future<List<ActivitySession>> getSessionsBetween(
+    int profileId,
+    DateTime startInclusive,
+    DateTime endExclusive,
+  );
+
   /// Start a new session for an activity.
   ///
   /// [plannedDurationSeconds] and [restDurationSeconds] carry the timer

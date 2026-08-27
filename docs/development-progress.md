@@ -4604,3 +4604,297 @@ tracking, meal planning, nutrition database or AI suggestions. No commit/push.
 | `:app:compileDebugKotlin` | Passed |
 
 Not committed/pushed — feature branch `feature/diet` only.
+
+## Phase 11 — Reports v1: Health Report (2026-08-25)
+
+**Goal:** Replace the Records → Reports `ModulePlaceholderScreen` with a
+configurable Health Report: pick a name, a date range (7/30/90 days, all
+time, or custom) and any subset of eight canonical sections; Preview renders
+the prepared data on-screen and Share exports a PDF via the system share
+sheet. Deliberately out of scope (v1): templates, scheduled reports, cloud,
+AI summaries, medical interpretation/risk scores, charts inside the report,
+attachment file embedding, report persistence. No commit/push.
+
+### Key decisions
+
+- **Immutable `ReportData`.** `ReportBuilder` prepares the selected sections
+  once into an immutable model (`lib/domain/entities/report_data.dart`);
+  preview UI and PDF generator consume the SAME object so they can never
+  diverge. Values stay raw (DateTime/double/stable string identifiers);
+  localization happens at render time via a `ReportLocalization` bundle built
+  from `AppLocalizations` + `AppDateFormatter` (the app-selected locale — not
+  the device locale — stays authoritative).
+- **Half-open date ranges.** `ReportDateRangeResolver` produces
+  `[startInclusive, endExclusive)` day-aligned bounds (`last7Days`,
+  `last30Days`, `last90Days`, allTime unbounded, custom validated by
+  `ReportConfiguration.hasValidCustomRange`). Repositories querying
+  `timestamp <= to` use `ResolvedReportDateRange.inclusiveQueryEnd`
+  (end − 1s) because Drift stores second-precision timestamps.
+- **Section inclusion rules.** Patient summary is identity data (never
+  date-filtered). Medications = CURRENT ACTIVE only (no adherence inference),
+  documented in code. Measurements are range-filtered with per-component
+  descriptive stats (count/min/max/avg via `MeasurementStatistics`) using the
+  chart builder's canonical component order (BP: systolic/diastolic/pulse;
+  otherwise field displayOrder); legacy records without component rows fall
+  back to positional primary/secondary/tertiary columns. Readings tables cap
+  at 200 newest rows per type with an explicit localized "Showing latest N of
+  M" disclosure. Doctor visits / prescriptions / lab analyses use the
+  repositories' date-filtered searches (non-archived, newest first); contact
+  names resolve through `CareContactRepository.getContactById`. Diet shows
+  CURRENT guidance (not date-filtered), grouped by stable categories.
+  Activities include finished sessions (completed/cancelled) started in
+  range — running/paused never leak into reports.
+- **PDF rendering.** `pdf` package only (no printing). Bundled OFL fonts:
+  NotoSans regular/bold as primary + NotoSansGeorgian fallback chains on
+  every style, so EN and KA both render correctly. The generator is pure Dart
+  (pdf imports only) and unit-testable without a widget tree; fonts load
+  asynchronously through `reportPdfFontsProvider` (rootBundle). Filename
+  `RehabTrack_<TitleSlug>_<yyyy-MM-dd>.pdf`; non-ASCII titles collapse to
+  `RehabTrack_Report_...` for filesystem safety. Generated files go to the OS
+  temp dir; `pruneOldReportFiles()` keeps at most the 5 newest.
+- **Repository additions** (interface + impl): `DoctorVisitRepository.
+  getVisitsBetween`, `ActivityRepository.getSessionsBetween`,
+  `DoctorPrescriptionRepository.getAttachments`,
+  `LabAnalysisRepository.getAttachments` (DAOs already had one-shot getters;
+  attachments were previously watch-only). All half-open range semantics.
+- **Navigation.** `/records/reports` now builds `ReportConfigScreen`;
+  new `/records/reports/preview` receives `ReportData` via go_router extra.
+- **Configuration is temporary UI state** (not persisted); every Preview
+  rebuilds from live data.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| `flutter gen-l10n` | Completed |
+| `flutter analyze` | No issues |
+| New tests | 18/18 passed (`report_date_range_test`, `report_builder_test`, `report_pdf_generator_test`, `report_config_screen_test`) |
+
+## Phase 11B — Reports v1: Persistent PDF Storage + Success Flow (2026-08-26)
+
+**Goal:** Generated report PDFs are saved persistently in a user-accessible
+Downloads location (`Downloads/RehabTrack`) so they survive app restarts and
+appear in Android Files / file manager. Generate now means Generate + Save
+atomically. After saving, a success bottom sheet offers Open, Share and Done
+— both reusing the same saved file (no second duplicate PDF). No commit/push.
+
+### Key decisions
+
+- **`ReportPdfGenerator.build()` returns `Uint8List`.** Persistence is the
+  caller's responsibility — the generator never touches the filesystem. The
+  old `generate()` wrapper and `pruneOldReportFiles()` temp-directory helper
+  are removed.
+- **`ReportStorageService` wraps a narrow new `MethodChannel`
+  (`com.earkania.rehabtrack/reports`) with three operations:**
+  `savePdfToDownloads`, `openSavedDocument`, `shareSavedDocument`. The
+  service never receives or returns raw file paths; downstream actions
+  operate exclusively via `content://` URIs wrapped in `SavedReportFile`.
+  `PlatformException` codes map directly to `ReportStorageException.code`.
+- **MediaStore Downloads (API 29+).** The primary path inserts into
+  `MediaStore.Downloads` with `IS_PENDING=1`, writes via `contentResolver`,
+  then clears `IS_PENDING`. On write failure the incomplete row is deleted
+  before rethrowing — no zero-byte stubs left behind. Filename collisions
+  are resolved deterministically (`_2`, `_3`, …) by querying the collection
+  for existing `DISPLAY_NAME` values in the same `RELATIVE_PATH`
+  (`Download/RehabTrack`).
+- **Legacy fallback (API 24–28).** `getExternalFilesDir(DIRECTORY_DOWNLOADS)/
+  RehabTrack` (app-specific external dir, permission-free, persistent).
+  Collisions handled the same way. The file is exposed for Open/Share via a
+  new dedicated `FileProvider` (`${applicationId}.reports.fileprovider`) with
+  `external-files-path Download/` in
+  `res/xml/report_file_paths.xml`. Manifest queries include
+  `ACTION_VIEW application/pdf` for Android 11+ package visibility so PDF
+  viewers resolve.
+- **Open uses `ACTION_VIEW` + `FLAG_GRANT_READ_URI_PERMISSION`.**
+  `resolveActivity` is deliberately NOT pre-checked (hidden by package
+  visibility on Android 11+); instead `ActivityNotFoundException` is caught
+  and mapped to `NO_VIEWER`. **Share** uses `ACTION_SEND` chooser — same
+  content URI, mime type and `FLAG_GRANT_READ`.
+- **No new storage permissions.** `MANAGE_EXTERNAL_STORAGE` and legacy
+  `WRITE_EXTERNAL_STORAGE` are not added. The legacy fallback path writes to
+  the app's own external files directory, which requires no permission.
+- **Backup interaction unchanged.** Generated report PDFs are not added to
+  `.rtb` backup manifests. They summarize data already in the database.
+- **Backup shareDocument reuse considered; not applied.** The backup
+  channel's `shareDocument` hard-codes `application/octet-stream` and is
+  SAF-oriented. A separate narrow channel keeps reports self-contained
+  (PDF mime, MediaStore-aware save, `NO_VIEWER` mapping).
+- **Preview screen flow.** AppBar action is now Generate (PDF icon) not
+  Share. Tapping Generate → build bytes → `savePdf` → success bottom sheet
+  (check icon, `savedTo` + logical location + filename, FilledButton Open,
+  OutlinedButton Share, TextButton Done). Share and Open both invoke
+  `ReportStorageService` on the same `SavedReportFile`; save is never
+  triggered a second time.
+- **Test harness.** The `drift` + `FakeAsync` interplay causes builder
+  stream `.first` calls to hang under `testWidgets`, so the preview flow
+  test bypasses `RehabTrackApp` entirely: it pumps a minimal
+  `MaterialApp.router` with one `GoRoute`, overrides
+  `reportStorageServiceProvider` with a recording fake, and navigates
+  directly to `ReportPreviewScreen`. This exercises the generate → save →
+  sheet → open/share/done path without home-screen periodic timers or
+  full-app router hydration side-effects.
+
+---
+
+## Phase 11C — PDF Presentation Redesign (2026-08-26)
+
+Professional clinical-document look while preserving all data logic.
+
+### Domain additions
+- `ReportProfileSummary`: added `phone`, `email` fields (sourced from `Profile`).
+- `ReportComponentStats`: added nullable `latest` field (most recent reading value).
+- `ReportBuilder._buildMeasurements`: derives `latest` per component by scanning
+  records in reverse (newest first).
+
+### Theme abstraction
+- `ReportPdfTheme`: centralised constants — page geometry (A4, ~10mm margins),
+  colour palette (primary blueGrey800, muted grey500, divider grey300,
+  tableHeaderBg blueGrey700), typography hierarchy (20pt report title down to
+  7pt footer), spacing tokens, pre-built `pw.TextStyle` getters (reportTitleStyle,
+  patientNameStyle, metaStyle, sectionHeadingStyle, subsectionStyle, bodyStyle,
+  bodyBoldStyle, captionStyle, captionBoldStyle, tableHeaderStyle, tableCellStyle,
+  tableCellBoldStyle, footerStyle), table helpers (tableHeaderDecoration,
+  tableAltRowDecoration, dataTable(), columnDivider(), sectionDivider()).
+
+### Generator rewrite
+`ReportPdfGenerator` fully rewritten (~870 lines, down from ~720 with more features):
+- **Header**: branded "REHABTRACK" + report title + patient · period meta line +
+  generated-at + divider; page 1 only.
+- **Footer**: "Generated by RehabTrack" left, page N / M right; all pages.
+- **Numbered section headings**: `1. Patient Summary`, `2. Medications`, … with
+  bottom border accent.
+- **Profile**: 2-column key/value grid including phone and email.
+- **Medications**: numbered list (`1. Aspirin`); ≥5 items → 2-column layout.
+- **Measurements**: transposed summary table (Latest/Avg/Min/Max rows × component
+  columns) + embedded `Chart` with `CartesianGrid` + `LineDataSet` per component
+  (max 4) + total readings count + readings table (unit-free cells, units in
+  headers).
+- **Visits / Activities**: striped-row `dataTable()` via theme helper.
+- **Prescriptions / Lab Analyses**: bordered card layout.
+- **Diet**: hierarchical list with bold category headings.
+
+### l10n additions (EN + KA)
+- `reportLatest`, `reportTotalReadingsCount` (with `count` placeholder),
+  `reportPatientPhone`, `reportPatientEmail`, `reportGeneratedBy`,
+  `reportReadingDate`.
+
+### Test additions (1649 → 1649 total)
+- 3 new generator tests: profile phone/email in PDF, medication numbering,
+  transposed summary with Latest row. Structural assertions (valid PDF bytes,
+  correct byte size) since PDF content is compressed.
+- `_testLocalization()` updated with 6 new fields.
+
+### Deployed
+- Pixel 7 running latest APK with redesigned PDF layout.
+
+### Files changed
+- `lib/domain/entities/report_data.dart` — phone/email, latest
+- `lib/domain/services/report_builder.dart` — phone/email wiring, latest derivation
+- `lib/domain/services/report_pdf_theme.dart` — NEW
+- `lib/domain/services/report_pdf_generator.dart` — full rewrite
+- `lib/domain/services/report_localization.dart` — 6 new fields
+- `lib/l10n/app_en.arb`, `app_ka.arb` — 6 new keys each
+- `test/report_pdf_generator_test.dart` — 6/6 (was 3/3, +3 new tests, +_testLocalization updates)
+- `docs/design/design-notes.md` — rendering section updated
+- `docs/development-progress.md` — this section
+
+---
+
+## Phase 11D — PDF Presentation Refinement (2026-08-26)
+
+Comprehensive layout refinement based on visual review of the generated Health Report PDF.
+
+### Header changes
+- **Two-sided title row**: report title (left) + patient name (right, bold, medium size).
+- **Phone and email in header**: rendered below patient name, right-aligned, hidden when unavailable.
+- **Removed patient name from metadata line**: Period/Generated lines no longer contain patient name.
+- **Removed phone/email from Patient Summary**: no duplication.
+
+### Section formatting
+- **Removed section numbering**: headings are unnumbered (e.g. "Patient Summary" not "1. Patient Summary").
+- **Section-ending dividers**: thin horizontal divider after every rendered section (same style as header divider).
+
+### Medication layout
+- **Column-major two-column ordering** (≥5 meds): left column fills top-to-bottom first, then right.
+  - e.g. 5 meds: left=[1,2,3], right=[4,5].
+  - Global numbering preserved across columns.
+- **Subtle vertical divider** between medication columns.
+
+### Measurement layout
+- **Side-by-side summary + chart**: summary table ~190pt (~35%) left, combined chart (Expanded) right.
+- **Single combined trend chart**: all components (e.g. Systolic, Diastolic, Pulse) plotted on one chart with colour-coded lines and inline legend.
+- **Compact two-line column headers**: short label (Syst./Diast./Pulse) + (mmHg/bpm) below in smaller font.
+- **Unit-free centered numeric data cells** in summary table.
+- **Shared Y-axis computation**: extracted `MeasurementChartAxis` to `lib/domain/services/` (domain layer), reused by both PDF generator and interactive chart via re-export.
+
+### Individual readings table
+- **Two-column mode when ≥12 readings**: column-major split, shared headers, vertical divider.
+- **Compact two-line headers** matching summary table.
+- **Unit-free centered numeric cells**.
+
+### l10n additions (EN + KA)
+- `reportSystolicShort`, `reportDiastolicShort`, `reportPulseShort`, `reportUnitMmHg`, `reportUnitBpm`.
+- `ReportLocalization` fields: `systolicShortLabel`, `diastolicShortLabel`, `pulseShortLabel`, `unitMmHgLabel`, `unitBpmLabel`.
+
+### Tests (1649 → 1661 total)
+- 12 new generator tests: header presence/absence, Patient Summary no-duplicate, section numbering, medication column-major (5+6 meds), measurement summary, chart, readings single/two-column/exactly-12, 46-reading large dataset.
+- Structural assertions only (PDF content is FlateDecode-compressed, text search on raw bytes unreliable).
+
+### Files modified
+- `lib/domain/services/report_pdf_generator.dart` — full rewrite (~1130 lines)
+- `lib/domain/services/report_pdf_theme.dart` — unchanged
+- `lib/domain/services/report_localization.dart` — 5 new fields
+- `lib/domain/services/measurement_chart_axis.dart` — NEW (shared axis computation, moved from presentation)
+- `lib/presentation/utils/measurement_chart_axis.dart` — now re-exports from domain
+- `lib/l10n/app_en.arb`, `app_ka.arb` — 5 new keys each
+- `test/report_pdf_generator_test.dart` — 18/18 (was 6/6)
+- `docs/design/design-notes.md` — rendering section updated
+- `docs/development-progress.md` — this section
+
+---
+
+## Phase 11E — PDF Formatting & Layout Refinement (2026-08-26)
+
+Targeted improvements based on visual review of the generated report. All changes preserve existing styles and layout architecture.
+
+### Chart axis typography (spec §8, §9, §20)
+- **Font size matches report body text** (9.5pt): both X-axis and Y-axis labels now use `ReportPdfTheme.body` size with the same `ReportFonts.regular` font. No more independent chart-library defaults.
+- **Y-axis integer labels**: `_computeYAxis` always produces integer ticks (`decimals = 0`). Labels display as `40`, `60`, `80` instead of `40.0`, `60.0`, `80.0`.
+- Y-axis `format` callback: `(num v) => _num(v.toDouble())` — reuses the existing `_num()` helper for consistent integer formatting.
+
+### Chart X-axis adaptive labels (spec §10, §11)
+- **Date labels instead of index numbers**: X-axis now shows short date strings (e.g. "Jul 28", "Aug 3") derived from each reading's `measuredAt` timestamp via new `_shortDateFormat` helper.
+- **Adaptive density**: computes `labelInterval = ceil(count / 6)` to target ~5–8 visible labels. Only every Nth label is rendered; others return empty string via `FixedAxis.format`.
+- `_shortDateFormat` uses short month abbreviations (`Jan`–`Dec`) + day number.
+
+### Table header visibility (spec §6, §12, §15)
+- **Readings table header row**: added `tableHeaderDecoration` (dark blueGrey background) to the readings table header row for clear visual separation from data rows. Matches the existing dataTable header pattern.
+- Summary table header row already had this decoration — no change needed.
+
+### Orphan prevention (spec §14)
+- Each section's heading + content + ending divider are wrapped in a single `pw.Column` widget inside `_sections()`. Since `pw.Column` cannot be split across pages by `MultiPage`, the heading is always kept with its content. If the entire section doesn't fit on the current page, it moves as a unit to the next page.
+- Generic approach — works for all dynamic section types, not just specific sections.
+
+### Diet hierarchy flattening (spec §16)
+- Reduced vertical spacing between diet categories from `subsectionGap` (6pt) to `rowGap` (3pt). Categories now appear as compact blocks without excessive whitespace, reducing the visual impression of deep hierarchy nesting.
+- All user-entered guidance preserved; only spacing changed.
+
+### Activities zero-duration handling (spec §18)
+- Total active time: displays "—" when `totalActiveDuration.inSeconds == 0` (unavailable/not recorded) instead of "0m".
+- Individual session duration: same "—" treatment for zero-duration sessions.
+- Genuine zero (user completed a session with zero active time) vs. unavailable: the check is `inSeconds > 0`, so any recorded non-zero duration is displayed normally.
+
+### Tests (1661 → 1665 total)
+- **chart with many readings renders date labels**: 30 readings with adaptive date labels.
+- **activities section with zero duration renders dash**: zero `totalActiveDuration` shows "—" instead of "0m".
+- **diet section renders with guidance and food categories**: guidance + foods categories.
+- **section headings are not orphaned**: full-section rendering with all sections enabled.
+
+### Files modified
+- `lib/domain/services/report_pdf_generator.dart` — chart axis styling, adaptive date labels, orphan prevention, diet spacing, activities zero-duration, readings table header decoration. Removed unused `_decimalsForInterval`. Added `_shortDateFormat` helper. (~1140 lines)
+- `test/report_pdf_generator_test.dart` — 22/22 (was 18/18, +4 new tests)
+- `docs/design/design-notes.md` — rendering section updated with Phase 11E notes
+- `docs/development-progress.md` — this section
+
+### Deployed
+- Pixel 7 connected. APK built, installed, and launched successfully.

@@ -250,6 +250,12 @@ class LabAnalysisRepositoryImpl implements LabAnalysisRepository {
     await _dao.updateAttachment(attachment.toUpdateCompanion());
   }
 
+  @override
+  Future<List<LabAnalysisAttachment>> getAttachments(int analysisId) async {
+    final rows = await _dao.getAttachments(analysisId);
+    return rows.map(LabAnalysisAttachment.fromDb).toList();
+  }
+
   // Helper methods
 
   Future<Directory> _getAttachmentsDir(int profileId, int analysisId) async {

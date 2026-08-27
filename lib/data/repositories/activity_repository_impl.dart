@@ -127,6 +127,17 @@ class ActivityRepositoryImpl implements ActivityRepository {
   }
 
   @override
+  Future<List<ActivitySession>> getSessionsBetween(
+    int profileId,
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) async {
+    final rows =
+        await _dao.getSessionsBetween(profileId, startInclusive, endExclusive);
+    return rows.map(ActivitySession.fromDb).toList();
+  }
+
+  @override
   Future<ActivitySession> startSession(
     int activityId,
     int profileId, {

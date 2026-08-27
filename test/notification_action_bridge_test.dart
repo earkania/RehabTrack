@@ -103,6 +103,19 @@ class FakeDoctorVisitRepository implements DoctorVisitRepository {
           .toList();
 
   @override
+  Future<List<DoctorVisitRecord>> getVisitsBetween(
+    int profileId,
+    DateTime startInclusive,
+    DateTime endExclusive,
+  ) async =>
+      visits.values
+          .where((v) =>
+              !v.scheduledDateTime.isBefore(startInclusive) &&
+              v.scheduledDateTime.isBefore(endExclusive))
+          .toList()
+        ..sort((a, b) => b.scheduledDateTime.compareTo(a.scheduledDateTime));
+
+  @override
   Future<void> setVisitStatus(
     int profileId,
     int visitId,

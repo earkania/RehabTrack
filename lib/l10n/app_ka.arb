@@ -1606,5 +1606,328 @@
         "type": "int"
       }
     }
+  },
+  "reportCreateTitle": "ანგარიშის შექმნა",
+  "@reportCreateTitle": {
+    "description": "Reports feature"
+  },
+  "reportNameLabel": "ანგარიშის დასახელება",
+  "@reportNameLabel": {
+    "description": "Reports feature"
+  },
+  "reportDateRangeLabel": "პერიოდი",
+  "@reportDateRangeLabel": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastWeek": "ბოლო 7 დღე",
+  "@reportRangeLastWeek": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastMonth": "ბოლო 30 დღე",
+  "@reportRangeLastMonth": {
+    "description": "Reports feature"
+  },
+  "reportRangeLast3Months": "ბოლო 3 თვე",
+  "@reportRangeLast3Months": {
+    "description": "Reports feature"
+  },
+  "reportRangeLast6Months": "ბოლო 6 თვე",
+  "@reportRangeLast6Months": {
+    "description": "Reports feature"
+  },
+  "reportRangeLastYear": "ბოლო წელი",
+  "@reportRangeLastYear": {
+    "description": "Reports feature"
+  },
+  "reportRangeAllTime": "ყველა ჩანაწერი",
+  "@reportRangeAllTime": {
+    "description": "Reports feature"
+  },
+  "reportRangeCustom": "მორგებული პერიოდი",
+  "@reportRangeCustom": {
+    "description": "Reports feature"
+  },
+  "reportSectionsLabel": "ჩასართავი განყოფილებები",
+  "@reportSectionsLabel": {
+    "description": "Reports feature"
+  },
+  "reportCustomStartDate": "-დან",
+  "@reportCustomStartDate": {
+    "description": "Reports feature"
+  },
+  "reportCustomEndDate": "-მდე",
+  "@reportCustomEndDate": {
+    "description": "Reports feature"
+  },
+  "reportPreview": "გადახედვა",
+  "@reportPreview": {
+    "description": "Reports feature"
+  },
+  "reportErrorNoSections": "აირჩიეთ მინიმუმ ერთი განყოფილება",
+  "@reportErrorNoSections": {
+    "description": "Reports feature"
+  },
+  "reportErrorInvalidTitle": "შეიყვანეთ ანგარიშის დასახელება",
+  "@reportErrorInvalidTitle": {
+    "description": "Reports feature"
+  },
+  "reportErrorInvalidRange": "შეამოწმეთ მორგებული პერიოდი",
+  "@reportErrorInvalidRange": {
+    "description": "Reports feature"
+  },
+  "reportErrorGeneric": "ანგარიშის გენერირება ვერ მოხერხდა",
+  "@reportErrorGeneric": {
+    "description": "Reports feature"
+  },
+  "reportPreviewTitle": "ანგარიშის გადახედვა",
+  "@reportPreviewTitle": {
+    "description": "Reports feature"
+  },
+  "reportSharePdf": "PDF-ის გაზიარება",
+  "@reportSharePdf": {
+    "description": "Reports feature"
+  },
+  "reportGeneratedAt": "შექმნის დრო: {dateTime}",
+  "@reportGeneratedAt": {
+    "description": "Reports feature",
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "reportPeriodLabel": "პერიოდი",
+  "@reportPeriodLabel": {
+    "description": "Reports feature"
+  },
+  "reportPatientSummary": "პაციენტის მონაცემები",
+  "@reportPatientSummary": {
+    "description": "Reports feature"
+  },
+  "reportBirthDateLabel": "დაბადების თარიღი",
+  "@reportBirthDateLabel": {
+    "description": "Reports feature"
+  },
+  "reportStatMin": "მინ",
+  "@reportStatMin": {
+    "description": "Reports feature"
+  },
+  "reportStatMax": "მაქს",
+  "@reportStatMax": {
+    "description": "Reports feature"
+  },
+  "reportStatAvg": "საშ.",
+  "@reportStatAvg": {
+    "description": "Reports feature"
+  },
+  "reportShowingLatest": "ნაჩვენებია ბოლო {included} / {total} გაზომვა",
+  "@reportShowingLatest": {
+    "description": "Reports feature",
+    "placeholders": {
+      "included": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportAttachmentsCount": "დანართები ({count})",
+  "@reportAttachmentsCount": {
+    "description": "Reports feature",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportGenderOther": "სხვა",
+  "@reportGenderOther": {
+    "description": "Reports feature"
+  },
+  "reportEmptyPeriodNote": "ამ პერიოდში ჩანაწერი არ არის.",
+  "@reportEmptyPeriodNote": {
+    "description": "Reports feature"
+  },
+  "reportActivitySummary": "{count} სეანსი: {completed} დასრულებული, {cancelled} გაუქმებული",
+  "@reportActivitySummary": {
+    "description": "Reports feature",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      },
+      "cancelled": {
+        "type": "int"
+      }
+    }
+  },
+  "reportTotalActiveTime": "საერთო აქტიური დრო",
+  "@reportTotalActiveTime": {
+    "description": "Reports feature"
+  },
+  "reportSessionHistoryHeading": "სეანსების ისტორია",
+  "@reportSessionHistoryHeading": {
+    "description": "Reports feature"
+  },
+  "reportDietFoodsHeading": "საკვები",
+  "@reportDietFoodsHeading": {
+    "description": "Reports feature"
+  },
+  "reportDefaultTitle": "ჯანმრთელობის მიმოხილვა",
+  "@reportDefaultTitle": {
+    "description": "Reports feature"
+  },
+  "reportDietGuidanceHeading": "ზოგადი რეკომენდაციები",
+  "@reportDietGuidanceHeading": {
+    "description": "Reports feature"
+  },
+  "reportDateLabel": "თარიღი",
+  "@reportDateLabel": {
+    "description": "Reports feature"
+  },
+  "reportStatusLabel": "სტატუსი",
+  "@reportStatusLabel": {
+    "description": "Reports feature"
+  },
+  "generatePdf": "PDF-ის გენერაცია",
+  "@generatePdf": {
+    "description": "Reports feature: action that renders and saves the report PDF"
+  },
+  "reportGeneratedSuccessfully": "ანგარიში წარმატებით შეიქმნა",
+  "@reportGeneratedSuccessfully": {
+    "description": "Reports feature: success confirmation after saving the PDF"
+  },
+  "savedTo": "შენახულია",
+  "@savedTo": {
+    "description": "Reports feature: prefix before the save location, e.g. Saved to: Downloads/RehabTrack"
+  },
+  "downloadsFolder": "ჩამოტვირთვები",
+  "@downloadsFolder": {
+    "description": "Reports feature: user-visible name of the system Downloads folder"
+  },
+  "openReport": "გახსნა",
+  "@openReport": {
+    "description": "Reports feature: opens the saved PDF in a viewer"
+  },
+  "shareReport": "გაზიარება",
+  "@shareReport": {
+    "description": "Reports feature: shares the saved PDF"
+  },
+  "doneAction": "მზადაა",
+  "@doneAction": {
+    "description": "Reports feature: closes the success dialog"
+  },
+  "reportFileSaved": "ანგარიში შენახულია",
+  "@reportFileSaved": {
+    "description": "Reports feature: short confirmation that the file was saved"
+  },
+  "couldNotSaveReport": "ანგარიშის შენახვა ვერ მოხერხდა",
+  "@couldNotSaveReport": {
+    "description": "Reports feature: error when the PDF cannot be persisted"
+  },
+  "couldNotOpenReport": "ანგარიშის გასახსნელი აპლიკაცია ვერ მოიძებნა",
+  "@couldNotOpenReport": {
+    "description": "Reports feature: no installed PDF viewer for the saved report"
+  },
+  "couldNotShareReport": "ანგარიშის გაზიარება ვერ მოხერხდა",
+  "@couldNotShareReport": {
+    "description": "Reports feature: error when sharing the saved report fails"
+  },
+  "reportStorageUnavailable": "მეხსიერება მიუწვდომელია. გაათავისუფლეთ ადგილი და სცადეთ ხელახლა.",
+  "@reportStorageUnavailable": {
+    "description": "Reports feature: storage full/unavailable while saving"
+  },
+  "reportLatest": "უახლესი",
+  "@reportLatest": {
+    "description": "Reports feature: label for the most recent reading in measurement summary"
+  },
+  "reportTotalReadingsCount": "სულ ჩანაწერი: {count}",
+  "@reportTotalReadingsCount": {
+    "description": "Reports feature: total number of readings outside measurement summary table",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPatientPhone": "ტელეფონი",
+  "@reportPatientPhone": {
+    "description": "Reports feature: patient phone label"
+  },
+  "reportPatientEmail": "ელ-ფოსტა",
+  "@reportPatientEmail": {
+    "description": "Reports feature: patient email label"
+  },
+  "reportGeneratedBy": "მომზადებულია RehabTrack-ის მიერ",
+  "@reportGeneratedBy": {
+    "description": "Reports feature: footer text"
+  },
+  "reportReadingDate": "ჩანაწერის თარიღი",
+  "@reportReadingDate": {
+    "description": "Reports feature: column header for individual readings table"
+  },
+  "reportSystolicShort": "სისტ.",
+  "@reportSystolicShort": {
+    "description": "Reports feature: compact systolic column header"
+  },
+  "reportDiastolicShort": "დიასტ.",
+  "@reportDiastolicShort": {
+    "description": "Reports feature: compact diastolic column header"
+  },
+  "reportPulseShort": "პულსი",
+  "@reportPulseShort": {
+    "description": "Reports feature: compact pulse column header"
+  },
+  "reportUnitMmHg": "mmHg",
+  "@reportUnitMmHg": {
+    "description": "Reports feature: mmHg unit label for measurement headers"
+  },
+  "reportUnitBpm": "bpm",
+  "@reportUnitBpm": {
+    "description": "Reports feature: bpm unit label for measurement headers"
+  },
+  "sendToDoctorOrClinic": "ექიმთან/კლინიკაში გაგზავნა",
+  "@sendToDoctorOrClinic": {
+    "description": "Reports feature: action to email the report to a care contact"
+  },
+  "selectCareContact": "აირჩიეთ კონტაქტი",
+  "@selectCareContact": {
+    "description": "Reports feature: title of the care contact picker dialog"
+  },
+  "noCareContactsWithEmail": "ელ-ფოსტის მქონე კონტაქტები არ მოიძებნა.",
+  "@noCareContactsWithEmail": {
+    "description": "Reports feature: shown when no eligible contacts exist for emailing"
+  },
+  "manageCareContacts": "კონტაქტების მართვა",
+  "@manageCareContacts": {
+    "description": "Reports feature: navigates to Care Contacts management"
+  },
+  "reportEmailSubject": "{reportTitle} - {patientName}",
+  "@reportEmailSubject": {
+    "description": "Reports feature: default email subject when sending a report",
+    "placeholders": {
+      "reportTitle": {"type": "String"},
+      "patientName": {"type": "String"}
+    }
+  },
+  "reportEmailBody": "გამარჯობა,\n\nგთხოვთ იხილოთ ჩემი ჯანმრთელობის ანგარიში დანართში: {reportTitle}\n\nანგარიშის პერიოდი: {period}\n\nპატივისცემით,\n{patientName}",
+  "@reportEmailBody": {
+    "description": "Reports feature: default email body when sending a report",
+    "placeholders": {
+      "reportTitle": {"type": "String"},
+      "period": {"type": "String"},
+      "patientName": {"type": "String"}
+    }
+  },
+  "noEmailAppAvailable": "მოწყობილობაზე ელ-ფოსტის აპლიკაცია არ არის დაინსტალირებული.",
+  "@noEmailAppAvailable": {
+    "description": "Reports feature: no email-capable app installed"
+  },
+  "couldNotOpenEmailComposer": "ელ-ფოსტის გაგზავნის ფანჯრის გახსნა ვერ მოხერხდა.",
+  "@couldNotOpenEmailComposer": {
+    "description": "Reports feature: email compose intent failed"
   }
 }
